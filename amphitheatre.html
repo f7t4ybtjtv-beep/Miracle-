@@ -4,30 +4,62 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Synthora — Amphithéâtre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0A0504; --bg2:#120806; --card:rgba(217,72,42,.08);
     --ink:#F2E3D5; --muted:#C9B5A3; --accent:#D9482A; --accent2:#F2A65A;
-    --ring:#3A1E16;
+    --ring:#3A1E16; --ring-strong:#5A2E20;
+    --font-ui: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+    --font-mono: "JetBrains Mono", Consolas, monospace;
   }
-  body.light{ --bg:#f7f2ee; --bg2:#efe5dc; --card:#fff; --ink:#20120c; --muted:#5a4438; --ring:#e0cfc2; }
+  body.light{ --bg:#f7f2ee; --bg2:#efe5dc; --card:#fff; --ink:#20120c; --muted:#5a4438; --ring:#e0cfc2; --ring-strong:#cbb8a8; }
+  *{ box-sizing:border-box; }
   html,body{height:100%;}
-  body{ margin:0; font:16px/1.5 Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial; color:var(--ink); background:linear-gradient(180deg,var(--bg),var(--bg2)); }
+  body{
+    margin:0; font-family: var(--font-ui); font-size:16px; line-height:1.5;
+    color:var(--ink); background:linear-gradient(180deg,var(--bg),var(--bg2));
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible{ outline: 1px solid var(--accent); outline-offset: 2px; }
   .wrap{ display:grid; grid-template-columns:1fr 300px; gap:16px; min-height:100%; }
-  header.top{ grid-column:1/-1; padding:14px 20px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; border-bottom:1px solid var(--ring); backdrop-filter:blur(6px); }
-  header.top h1{ font-size:16px; margin:0; letter-spacing:.4px; font-family: "JetBrains Mono", Consolas, monospace; text-transform:uppercase; flex:none; }
-  header.top a.back{ color:var(--muted); text-decoration:none; font-size:13px; flex:none; }
-  header.top a.back:hover{ color:var(--ink); }
+  header.top{ grid-column:1/-1; padding:16px 22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; border-bottom:1px solid var(--ring); backdrop-filter:blur(6px); }
+  header.top h1{ font-size:14px; margin:0; letter-spacing:.14em; font-family: var(--font-mono); text-transform:uppercase; flex:none; }
+  header.top a.back{ color:var(--muted); text-decoration:none; font-size:13px; flex:none; transition: color .2s ease; }
+  header.top a.back:hover{ color:var(--accent); }
   .controls{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-  button, select, input[type=range]{ accent-color:var(--accent); background:transparent; color:var(--ink); border:1px solid var(--ring); border-radius:10px; padding:8px 12px; font-family:inherit; }
-  button:hover, select:hover{ background:var(--card); cursor:pointer; }
+  button, select, input[type=range]{
+    accent-color:var(--accent); background:transparent; color:var(--ink);
+    border:1px solid var(--ring); border-radius:10px; padding:9px 14px; font-family:inherit; font-size:.85rem;
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+  }
+  button:hover, select:hover{ background:var(--card); border-color:var(--ring-strong); cursor:pointer; }
+  button#start{ font-weight:600; letter-spacing:.02em; }
+  button#start:hover, button#stop:hover{ transform: translateY(-1px); }
   .main{ position:relative; min-height: 70vh; }
   canvas#stage{ position:absolute; inset:0; width:100%; height:100%; }
-  aside#feed{ padding:14px; border-left:1px solid var(--ring); overflow:auto; }
-  aside#feed h2{ font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-family:"JetBrains Mono",Consolas,monospace; }
-  .orb{ position:absolute; transform:translate(-50%,-50%); border:none; padding:10px 12px; background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink); font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap; }
-  .orb small{ font-weight:500; color:var(--muted); }
-  #core{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); padding:12px 18px; border-radius:16px; background:var(--card); border:1px solid var(--ring); text-align:center; width: min(420px, 82vw); box-sizing:border-box; }
+  aside#feed{ padding:18px; border-left:1px solid var(--ring); overflow:auto; }
+  aside#feed h2{ font-size:12px; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-family: var(--font-mono); margin:0 0 14px; }
+  #feedList li{ padding: 10px 0; border-bottom: 1px solid var(--ring); font-size:.88rem; }
+  #feedList li:first-child{ padding-top:0; }
+  .orb{
+    position:absolute; transform:translate(-50%,-50%); border:none; padding:10px 14px;
+    background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink);
+    font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap;
+    box-shadow: 0 12px 28px -14px rgba(0,0,0,.6);
+    transition: opacity .3s ease, transform .2s ease, border-color .2s ease;
+  }
+  .orb:hover{ border-color: var(--accent); }
+  .orb small{ font-weight:500; color:var(--muted); font-family: var(--font-mono); }
+  #core{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    padding:16px 22px; border-radius:16px; background:var(--card); border:1px solid var(--ring);
+    text-align:center; width: min(420px, 82vw); box-sizing:border-box;
+    box-shadow: 0 24px 48px -20px rgba(0,0,0,.65);
+  }
+  #core #current{ font-family: var(--font-mono); font-size:.85rem; letter-spacing:.04em; color: var(--accent2); margin-bottom:4px; }
   #core .quote{ max-width:100%; color:var(--muted); }
   .controls.bottom{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width: min(320px, 90vw); }
   #progress{ width:100%; max-width:220px; }
@@ -37,8 +69,8 @@
   @media (max-width:640px){
     .main{ min-height: 62vh; }
     .orb{ padding:8px 10px; font-size:.85rem; gap:6px; }
-    #core{ padding:10px 14px; }
-    #core #current{ font-size:.9rem; }
+    #core{ padding:12px 16px; }
+    #core #current{ font-size:.78rem; }
     #core .quote{ font-size:.85rem; }
   }
   @media (prefers-reduced-motion: reduce){ .orb{ transition:none; } }
