@@ -14,26 +14,33 @@
   html,body{height:100%;}
   body{ margin:0; font:16px/1.5 Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Arial; color:var(--ink); background:linear-gradient(180deg,var(--bg),var(--bg2)); }
   .wrap{ display:grid; grid-template-columns:1fr 300px; gap:16px; min-height:100%; }
-  header.top{ grid-column:1/-1; padding:14px 20px; display:flex; gap:12px; align-items:center; border-bottom:1px solid var(--ring); backdrop-filter:blur(6px); }
-  header.top h1{ font-size:16px; margin:0; letter-spacing:.4px; font-family: "JetBrains Mono", Consolas, monospace; text-transform:uppercase; }
-  header.top a.back{ color:var(--muted); text-decoration:none; font-size:13px; }
+  header.top{ grid-column:1/-1; padding:14px 20px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; border-bottom:1px solid var(--ring); backdrop-filter:blur(6px); }
+  header.top h1{ font-size:16px; margin:0; letter-spacing:.4px; font-family: "JetBrains Mono", Consolas, monospace; text-transform:uppercase; flex:none; }
+  header.top a.back{ color:var(--muted); text-decoration:none; font-size:13px; flex:none; }
   header.top a.back:hover{ color:var(--ink); }
-  .controls{ margin-left:auto; display:flex; gap:8px; align-items:center; }
+  .controls{ margin-left:auto; display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   button, select, input[type=range]{ accent-color:var(--accent); background:transparent; color:var(--ink); border:1px solid var(--ring); border-radius:10px; padding:8px 12px; font-family:inherit; }
   button:hover, select:hover{ background:var(--card); cursor:pointer; }
-  .main{ position:relative; }
+  .main{ position:relative; min-height: 70vh; }
   canvas#stage{ position:absolute; inset:0; width:100%; height:100%; }
   aside#feed{ padding:14px; border-left:1px solid var(--ring); overflow:auto; }
   aside#feed h2{ font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-family:"JetBrains Mono",Consolas,monospace; }
-  .orb{ position:absolute; transform:translate(-50%,-50%); border:none; padding:10px 12px; background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink); font-weight:600; display:flex; gap:10px; align-items:center; }
+  .orb{ position:absolute; transform:translate(-50%,-50%); border:none; padding:10px 12px; background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink); font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap; }
   .orb small{ font-weight:500; color:var(--muted); }
-  #core{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); padding:12px 18px; border-radius:16px; background:var(--card); border:1px solid var(--ring); text-align:center; }
-  #core .quote{ max-width:420px; color:var(--muted); }
-  .controls.bottom{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:flex; gap:10px; }
-  #progress{ width:220px; }
+  #core{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); padding:12px 18px; border-radius:16px; background:var(--card); border:1px solid var(--ring); text-align:center; width: min(420px, 82vw); box-sizing:border-box; }
+  #core .quote{ max-width:100%; color:var(--muted); }
+  .controls.bottom{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width: min(320px, 90vw); }
+  #progress{ width:100%; max-width:220px; }
   .sr{ position:absolute!important; clip:rect(1px,1px,1px,1px); padding:0;border:0;height:1px;width:1px;overflow:hidden; }
   li strong{ color: var(--accent); }
   @media (max-width:980px){ .wrap{grid-template-columns:1fr} aside#feed{display:none} }
+  @media (max-width:640px){
+    .main{ min-height: 62vh; }
+    .orb{ padding:8px 10px; font-size:.85rem; gap:6px; }
+    #core{ padding:10px 14px; }
+    #core #current{ font-size:.9rem; }
+    #core .quote{ font-size:.85rem; }
+  }
   @media (prefers-reduced-motion: reduce){ .orb{ transition:none; } }
 </style>
 </head>
