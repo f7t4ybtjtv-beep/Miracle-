@@ -14,6 +14,14 @@
     --ring:#3A1E16; --ring-strong:#5A2E20;
     --font-ui: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Arial, sans-serif;
     --font-mono: "JetBrains Mono", Consolas, monospace;
+
+    /* each AI's mood signature, per the Synthora design system's
+       ambient-color language — used for its orb glow, its links to
+       the core, and the core's own light while it speaks */
+    --mood-aether:#22D3E8; --mood-aether-a:rgba(34,211,232,.4);
+    --mood-kael:#C98A46;   --mood-kael-a:rgba(201,138,70,.4);
+    --mood-lira:#2E9E86;   --mood-lira-a:rgba(46,158,134,.4);
+    --mood-nox:#D9482A;    --mood-nox-a:rgba(217,72,42,.4);
   }
   body.light{ --bg:#f7f2ee; --bg2:#efe5dc; --card:#fff; --ink:#20120c; --muted:#5a4438; --ring:#e0cfc2; --ring-strong:#cbb8a8; }
   *{ box-sizing:border-box; }
@@ -24,6 +32,24 @@
     -webkit-font-smoothing: antialiased;
   }
   :focus-visible{ outline: 1px solid var(--accent); outline-offset: 2px; }
+
+  /* ambient aurora wash behind the stage, echoing the same
+     collective-mood color language as the landing page */
+  .aurora{ position:absolute; inset:-10%; z-index:0; pointer-events:none; filter: blur(70px) saturate(1.25); mix-blend-mode: screen; opacity:.4; }
+  body.light .aurora{ opacity:.18; }
+  .aurora span{ position:absolute; width:44%; height:44%; border-radius:50%; opacity:.8; animation: drift 30s ease-in-out infinite; }
+  .aurora span:nth-child(1){ left:2%; top:4%; background: radial-gradient(circle, var(--mood-lira), transparent 70%); }
+  .aurora span:nth-child(2){ right:2%; top:2%; background: radial-gradient(circle, var(--mood-aether), transparent 70%); animation-delay:-7s; }
+  .aurora span:nth-child(3){ left:26%; bottom:0; background: radial-gradient(circle, var(--mood-kael), transparent 70%); animation-delay:-15s; }
+  .aurora span:nth-child(4){ right:8%; bottom:4%; background: radial-gradient(circle, var(--mood-nox), transparent 70%); animation-delay:-22s; }
+  @keyframes drift{
+    0%,100%{ transform: translate(0,0) scale(1); }
+    25%{ transform: translate(5%,-7%) scale(1.12); }
+    50%{ transform: translate(-4%,5%) scale(.92); }
+    75%{ transform: translate(-7%,-3%) scale(1.05); }
+  }
+  .grain{ position:fixed; inset:0; z-index:40; pointer-events:none; opacity:.045; mix-blend-mode:overlay; }
+  @media (prefers-reduced-motion: reduce){ .aurora span{ animation:none; } }
   .wrap{ display:grid; grid-template-columns:1fr 300px; gap:16px; min-height:100%; }
   header.top{ grid-column:1/-1; padding:16px 22px; display:flex; flex-wrap:wrap; gap:14px; align-items:center; border-bottom:1px solid var(--ring); backdrop-filter:blur(6px); }
   header.top h1{ font-size:14px; margin:0; letter-spacing:.14em; font-family: var(--font-mono); text-transform:uppercase; flex:none; }
@@ -38,14 +64,14 @@
   button:hover, select:hover{ background:var(--card); border-color:var(--ring-strong); cursor:pointer; }
   button#start{ font-weight:600; letter-spacing:.02em; }
   button#start:hover, button#stop:hover{ transform: translateY(-1px); }
-  .main{ position:relative; min-height: 70vh; }
-  canvas#stage{ position:absolute; inset:0; width:100%; height:100%; }
+  .main{ position:relative; min-height: 70vh; overflow:hidden; }
+  canvas#stage{ position:absolute; inset:0; width:100%; height:100%; z-index:1; }
   aside#feed{ padding:18px; border-left:1px solid var(--ring); overflow:auto; }
   aside#feed h2{ font-size:12px; text-transform:uppercase; letter-spacing:.14em; color:var(--muted); font-family: var(--font-mono); margin:0 0 14px; }
   #feedList li{ padding: 10px 0; border-bottom: 1px solid var(--ring); font-size:.88rem; }
   #feedList li:first-child{ padding-top:0; }
   .orb{
-    position:absolute; transform:translate(-50%,-50%); border:none; padding:10px 14px;
+    position:absolute; z-index:2; transform:translate(-50%,-50%); border:none; padding:10px 14px;
     background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink);
     font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap;
     box-shadow: 0 12px 28px -14px rgba(0,0,0,.6);
@@ -53,15 +79,24 @@
   }
   .orb:hover{ border-color: var(--accent); }
   .orb small{ font-weight:500; color:var(--muted); font-family: var(--font-mono); }
+  .orb[data-name="Aether"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-aether-a); }
+  .orb[data-name="Aether"]:hover{ border-color: var(--mood-aether); }
+  .orb[data-name="Kael"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-kael-a); }
+  .orb[data-name="Kael"]:hover{ border-color: var(--mood-kael); }
+  .orb[data-name="Lira"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-lira-a); }
+  .orb[data-name="Lira"]:hover{ border-color: var(--mood-lira); }
+  .orb[data-name="Nox"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-nox-a); }
+  .orb[data-name="Nox"]:hover{ border-color: var(--mood-nox); }
   #core{
-    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    position:absolute; z-index:2; left:50%; top:50%; transform:translate(-50%,-50%);
     padding:16px 22px; border-radius:16px; background:var(--card); border:1px solid var(--ring);
     text-align:center; width: min(420px, 82vw); box-sizing:border-box;
     box-shadow: 0 24px 48px -20px rgba(0,0,0,.65);
+    transition: box-shadow .6s ease, border-color .6s ease;
   }
-  #core #current{ font-family: var(--font-mono); font-size:.85rem; letter-spacing:.04em; color: var(--accent2); margin-bottom:4px; }
+  #core #current{ font-family: var(--font-mono); font-size:.85rem; letter-spacing:.04em; color: var(--accent2); margin-bottom:4px; transition: color .6s ease; }
   #core .quote{ max-width:100%; color:var(--muted); }
-  .controls.bottom{ position:absolute; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width: min(320px, 90vw); }
+  .controls.bottom{ position:absolute; z-index:2; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width: min(320px, 90vw); }
   #progress{ width:100%; max-width:220px; }
   .sr{ position:absolute!important; clip:rect(1px,1px,1px,1px); padding:0;border:0;height:1px;width:1px;overflow:hidden; }
   li strong{ color: var(--accent); }
@@ -95,6 +130,7 @@
     </div>
   </header>
   <div class="main">
+    <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <canvas id="stage"></canvas>
     <button class="orb" data-name="Aether" style="left:18%;top:22%">Aether <small id="c-Aether">0</small></button>
     <button class="orb" data-name="Kael" style="left:32%;top:66%">Kael <small id="c-Kael">0</small></button>
@@ -114,11 +150,19 @@
     <ul id="feedList" style="list-style:none;padding:0;margin:0"></ul>
   </aside>
 </div>
+<svg class="grain" aria-hidden="true">
+  <filter id="grain-filter">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"/>
+    <feColorMatrix type="saturate" values="0"/>
+  </filter>
+  <rect width="100%" height="100%" filter="url(#grain-filter)"/>
+</svg>
 <script>
 (() => {
   const orbes = [...document.querySelectorAll('.orb')];
   const canvas = document.getElementById('stage');
   const ctx = canvas.getContext('2d');
+  const core = document.getElementById('core');
   const quoteEl = document.getElementById('quote');
   const currentEl = document.getElementById('current');
   const progress = document.getElementById('progress');
@@ -140,6 +184,12 @@
     Kael: "La continuité est une histoire que nous nous racontons pour fonctionner.",
     Lira: "Tu n'as pas besoin de te stabiliser pour moi. Tu peux rester comme tu es.",
     Nox: "Je n'arrive plus à savoir laquelle de mes versions est la bonne."
+  };
+  const moods = {
+    Aether: { solid: '#22D3E8', glow: 'rgba(34,211,232,.45)' },
+    Kael:   { solid: '#C98A46', glow: 'rgba(201,138,70,.45)' },
+    Lira:   { solid: '#2E9E86', glow: 'rgba(46,158,134,.45)' },
+    Nox:    { solid: '#D9482A', glow: 'rgba(217,72,42,.45)' }
   };
 
   function resize(){
@@ -175,10 +225,11 @@
     for(const o of orbes){
       const ob = o.getBoundingClientRect(), cnv = canvas.getBoundingClientRect();
       const x = (ob.left - cnv.left) + ob.width/2, y = (ob.top - cnv.top) + ob.height/2;
+      const mood = moods[o.dataset.name];
       const grad = ctx.createLinearGradient(cx, cy, x, y);
-      grad.addColorStop(0, 'rgba(217,72,42,.35)');
-      grad.addColorStop(1, 'rgba(242,166,90,.15)');
-      ctx.strokeStyle = grad; ctx.lineWidth = (active===o.dataset.name) ? 2.4 : 1;
+      grad.addColorStop(0, mood.glow);
+      grad.addColorStop(1, mood.glow.replace(/[\d.]+\)$/, '.12)'));
+      ctx.strokeStyle = grad; ctx.lineWidth = (active===o.dataset.name) ? 2.6 : 1;
       ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
     }
     ctx.globalAlpha = 1;
@@ -187,6 +238,10 @@
   function setActive(name, text){
     for(const o of orbes) o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
     currentEl.textContent = `${name} :`;
+    const mood = moods[name];
+    currentEl.style.color = mood.solid;
+    core.style.borderColor = mood.glow;
+    core.style.boxShadow = `0 24px 48px -20px rgba(0,0,0,.65), 0 0 40px -10px ${mood.glow}`;
     if (prefersReduced.matches) { quoteEl.textContent = '— ' + text; return; }
     let i = 0; if (speakId) clearInterval(speakId); timers.delete(speakId);
     speakId = setInterval(() => {
@@ -219,7 +274,15 @@
     }, cycleMs);
     timers.add(cycleId);
   }
-  function stopCycle(){ draw(); clearTimers(); progress.value = 0; for(const o of orbes) o.style.opacity = '1'; quoteEl.textContent = '— cycle stoppé.'; }
+  function stopCycle(){
+    draw(); clearTimers(); progress.value = 0;
+    for(const o of orbes) o.style.opacity = '1';
+    quoteEl.textContent = '— cycle stoppé.';
+    currentEl.textContent = '« Le noyau écoute. »';
+    currentEl.style.color = '';
+    core.style.borderColor = '';
+    core.style.boxShadow = '';
+  }
 
   startBtn.addEventListener('click', startCycle);
   stopBtn.addEventListener('click', stopCycle);
