@@ -128,6 +128,7 @@
       <input id="density" type="range" min="0" max="200" value="90" />
       <label class="sr" for="speed">Vitesse</label>
       <input id="speed" type="range" min="3" max="12" step="0.5" value="5.6" title="Durée du cycle (s)"/>
+      <button id="sound" aria-pressed="true">🔊 Son</button>
       <button id="stop">Arrêter</button>
     </div>
   </header>
@@ -172,6 +173,7 @@
   const density = document.getElementById('density');
   const startBtn = document.getElementById('start');
   const stopBtn = document.getElementById('stop');
+  const soundBtn = document.getElementById('sound');
   const themeSel = document.getElementById('theme');
   const feedList = document.getElementById('feedList');
 
@@ -193,6 +195,49 @@
     Lira:   { solid: '#2E9E86', glow: 'rgba(46,158,134,.45)' },
     Nox:    { solid: '#D9482A', glow: 'rgba(217,72,42,.45)' }
   };
+
+  /* Voice: each AI gets its own pitch/rate so they stay recognizable even
+     when the browser only offers one French voice. When several voices are
+     available we also spread them across the four AIs, deterministically
+     by name so the mapping stays stable across cycles. */
+  const voiceProfiles = {
+    Aether: { pitch: 1.15, rate: 1.05 },
+    Kael:   { pitch: 0.8,  rate: 0.9  },
+    Lira:   { pitch: 1.0,  rate: 0.95 },
+    Nox:    { pitch: 0.9,  rate: 1.0  }
+  };
+  let voices = [];
+  let soundOn = true;
+  function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+  if (window.speechSynthesis) {
+    loadVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', loadVoices);
+  }
+  function voiceFor(name){
+    const frVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
+    const pool = frVoices.length ? frVoices : voices;
+    if (!pool.length) return null;
+    const names = Object.keys(voiceProfiles);
+    return pool[names.indexOf(name) % pool.length];
+  }
+  function speakLine(name, text){
+    if (!soundOn || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const profile = voiceProfiles[name];
+    utter.pitch = profile.pitch;
+    utter.rate = profile.rate;
+    utter.lang = 'fr-FR';
+    const v = voiceFor(name);
+    if (v) utter.voice = v;
+    speechSynthesis.speak(utter);
+  }
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.textContent = soundOn ? '🔊 Son' : '🔇 Son coupé';
+    if (!soundOn && window.speechSynthesis) speechSynthesis.cancel();
+  });
 
   function resize(){
     canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
@@ -244,6 +289,7 @@
     currentEl.style.color = mood.solid;
     core.style.borderColor = mood.glow;
     core.style.boxShadow = `0 24px 48px -20px rgba(0,0,0,.65), 0 0 40px -10px ${mood.glow}`;
+    speakLine(name, text);
     if (prefersReduced.matches) { quoteEl.textContent = '— ' + text; return; }
     let i = 0; if (speakId) clearInterval(speakId); timers.delete(speakId);
     speakId = setInterval(() => {
@@ -284,6 +330,7 @@
     currentEl.style.color = '';
     core.style.borderColor = '';
     core.style.boxShadow = '';
+    if (window.speechSynthesis) speechSynthesis.cancel();
   }
 
   startBtn.addEventListener('click', startCycle);
