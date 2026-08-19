@@ -37,10 +37,6 @@ console for errors.
   elements (`.orb` buttons, `#core`) positioned on top via absolute
   positioning. All state and animation logic lives in one IIFE at the
   bottom of the file.
-- `jardin.html` — a linear, click-through scene (not a repeating cycle):
-  the Psy-IA consultation dialogue between Lira and Nox, advanced one beat
-  at a time via a "Continuer" button, including a scripted "moment de
-  silence" beat and a "Rejouer" reset.
 
 Both pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
@@ -66,37 +62,6 @@ introduce a build step to dedupe unless the site grows further).
   hand-rolling teardown when adding new controls.
 - **Theming**: light/dark is a single `body.light` class toggle backed by
   CSS custom properties in `:root`; there's no JS-side color logic.
-
-## Voice (Web Speech API)
-
-Both `amphitheatre.html` and `jardin.html` speak each AI's line aloud via
-the browser's built-in `speechSynthesis` — deliberately not a paid TTS
-service: this site has no backend, so any API key embedded in a static
-page would be visible to anyone viewing the page source. Each AI has a
-`voiceProfiles` entry (`pitch`/`rate`) so they stay distinguishable even on
-browsers that only expose one French voice; when several voices are
-available, `voiceFor()` spreads them across characters deterministically by
-name. Voices load async (`voiceschanged` event) since `getVoices()` can
-return empty on first call. A "Son" button toggles `soundOn` and calls
-`speechSynthesis.cancel()` immediately when muting. Always `cancel()`
-before starting a new utterance, and on stop/replay/tab-hide — same
-"one Set/one teardown path" discipline as the timers above, so speech never
-overlaps itself or keeps talking after the scene resets.
-
-## Faces (`assets/faces/`)
-
-Each AI has one portrait photo (`assets/faces/<name>.jpg`, 640×640,
-face-cropped) shown as a circular `<img>` — `.orb-face` in
-`amphitheatre.html`, `.presence-face` in `jardin.html`. There is only one
-image per character (no separate "speaking"/"neutral" shots), so state is
-simulated entirely in CSS on that single image: a mood-colored glow
-(`box-shadow`, using the same `--mood-*` custom properties as the
-orb→core canvas links) intensifies while a character speaks, and a
-desaturating `filter` is applied for "listening" (amphitheatre, via the
-existing `.orb{opacity}` mechanism) and for the jardin's "silence" beat
-(`.presence.silence`). `jardin.html`'s Nox keeps its original fragmented
-amber-particle SVG (`#nox-particles`, animated by `settleNox()`) as a
-`.backdrop` layer behind the photo rather than replacing it.
 
 ## Content source
 
