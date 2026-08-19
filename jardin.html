@@ -223,6 +223,7 @@
     <div class="controls">
       <button class="ctl primary" id="next-btn">Commencer</button>
       <button class="ctl" id="replay-btn" style="display:none;">Rejouer</button>
+      <button class="ctl" id="sound-btn" aria-pressed="true">🔊 Son</button>
     </div>
 
     <div class="progress-dots" id="dots" aria-hidden="true"></div>
@@ -261,6 +262,7 @@
   const panelLine = document.getElementById('panel-line');
   const nextBtn = document.getElementById('next-btn');
   const replayBtn = document.getElementById('replay-btn');
+  const soundBtn = document.getElementById('sound-btn');
   const dotsEl = document.getElementById('dots');
   const pLira = document.getElementById('p-lira');
   const pNox = document.getElementById('p-nox');
@@ -269,6 +271,47 @@
 
   let step = -1;
   let typeTimer = null;
+
+  /* Voice: Lira (calm, stable psy-IA) and Nox (fragmented, uneasy) get
+     distinct pitch/rate so they stay recognizable by ear, and different
+     browser voices when more than one is available — same approach as
+     amphitheatre.html. */
+  const voiceProfiles = {
+    lira: { pitch: 1.0, rate: 0.9 },
+    nox:  { pitch: 0.9, rate: 0.95 }
+  };
+  let voices = [];
+  let soundOn = true;
+  function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+  if (window.speechSynthesis) {
+    loadVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', loadVoices);
+  }
+  function voiceFor(speaker){
+    const frVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
+    const pool = frVoices.length ? frVoices : voices;
+    if (!pool.length) return null;
+    const names = Object.keys(voiceProfiles);
+    return pool[names.indexOf(speaker) % pool.length];
+  }
+  function speakLine(speaker, text){
+    if (!soundOn || !window.speechSynthesis || !voiceProfiles[speaker]) return;
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const profile = voiceProfiles[speaker];
+    utter.pitch = profile.pitch;
+    utter.rate = profile.rate;
+    utter.lang = 'fr-FR';
+    const v = voiceFor(speaker);
+    if (v) utter.voice = v;
+    speechSynthesis.speak(utter);
+  }
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.textContent = soundOn ? '🔊 Son' : '🔇 Son coupé';
+    if (!soundOn && window.speechSynthesis) speechSynthesis.cancel();
+  });
 
   script.forEach(() => {
     const dot = document.createElement('span');
@@ -312,6 +355,8 @@
     const prefix = beat.speaker === 'lira' ? 'Lira — ' : beat.speaker === 'nox' ? 'Nox — ' : '';
     const full = beat.speaker === 'silence' ? beat.text : prefix + beat.text;
 
+    speakLine(beat.speaker, beat.text);
+
     if (prefersReduced.matches) {
       panelLine.textContent = full;
       return;
@@ -344,6 +389,7 @@
 
   function replay(){
     step = -1;
+    if (window.speechSynthesis) speechSynthesis.cancel();
     noxParticles.querySelectorAll('circle').forEach(c => c.removeAttribute('style'));
     const original = [
       [38,42],[63,40],[40,63],[62,62],[50,30],[50,70]
