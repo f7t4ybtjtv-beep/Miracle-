@@ -83,6 +83,21 @@ before starting a new utterance, and on stop/replay/tab-hide — same
 "one Set/one teardown path" discipline as the timers above, so speech never
 overlaps itself or keeps talking after the scene resets.
 
+## Faces (`assets/faces/`)
+
+Each AI has one portrait photo (`assets/faces/<name>.jpg`, 640×640,
+face-cropped) shown as a circular `<img>` — `.orb-face` in
+`amphitheatre.html`, `.presence-face` in `jardin.html`. There is only one
+image per character (no separate "speaking"/"neutral" shots), so state is
+simulated entirely in CSS on that single image: a mood-colored glow
+(`box-shadow`, using the same `--mood-*` custom properties as the
+orb→core canvas links) intensifies while a character speaks, and a
+desaturating `filter` is applied for "listening" (amphitheatre, via the
+existing `.orb{opacity}` mechanism) and for the jardin's "silence" beat
+(`.presence.silence`). `jardin.html`'s Nox keeps its original fragmented
+amber-particle SVG (`#nox-particles`, animated by `settleNox()`) as a
+`.backdrop` layer behind the photo rather than replacing it.
+
 ## Content source
 
 The narrative text, color palette, and animation vocabulary come from a

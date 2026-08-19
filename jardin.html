@@ -94,12 +94,37 @@
     margin-bottom: 32px;
   }
   .presence{ display:flex; flex-direction:column; align-items:center; gap:10px; }
-  .presence svg{ width: clamp(72px,16vw,120px); height: clamp(72px,16vw,120px); }
+  .presence-visual{ position:relative; display:flex; align-items:center; justify-content:center; }
+  .presence-visual svg.backdrop{
+    position:absolute; inset:-35%; width:170%; height:170%; z-index:1;
+    opacity:.5; pointer-events:none; transition: opacity .5s ease;
+  }
+  .presence-face{
+    position:relative; z-index:2;
+    width: clamp(72px,16vw,120px); height: clamp(72px,16vw,120px);
+    border-radius:50%; object-fit:cover;
+    border:2px solid var(--ring-strong);
+    box-shadow: 0 12px 30px -12px rgba(0,0,0,.6);
+    transition: border-color .5s ease, box-shadow .5s ease, filter .6s ease;
+  }
+  #p-lira .presence-face{ border-color: var(--mood-lira-a); }
+  #p-lira.active .presence-face{
+    border-color: var(--mood-lira);
+    box-shadow: 0 0 0 4px var(--panel), 0 0 28px 4px var(--mood-lira-a), 0 12px 30px -12px rgba(0,0,0,.6);
+  }
+  #p-nox .presence-face{ border-color: var(--mood-nox-a); }
+  #p-nox.active .presence-face{
+    border-color: var(--mood-nox);
+    box-shadow: 0 0 0 4px var(--panel), 0 0 28px 4px var(--mood-nox-a), 0 12px 30px -12px rgba(0,0,0,.6);
+  }
+  .presence.silence .presence-face{ filter: saturate(.45) brightness(.8); }
+  .presence.silence .backdrop{ opacity:.2; }
   .presence .name{
     font-family: var(--font-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase;
     color: var(--muted); transition: color .5s ease;
   }
   .presence.active .name{ color: var(--ink); }
+  @media (prefers-reduced-motion: reduce){ .presence-face, .backdrop{ transition:none; } }
 
   .script-panel{
     position:relative; z-index:2;
@@ -179,39 +204,34 @@
 
     <div class="presences">
       <div class="presence" id="p-lira">
-        <svg viewBox="0 0 100 100" role="img" aria-label="Lira, forme douce et stable">
-          <defs>
-            <radialGradient id="lira-glow" cx="50%" cy="45%" r="55%">
-              <stop offset="0%" stop-color="#C9C4DC"/>
-              <stop offset="60%" stop-color="var(--mood-lira)"/>
-              <stop offset="100%" stop-color="#4A4560"/>
-            </radialGradient>
-          </defs>
-          <circle cx="50" cy="50" r="34" fill="url(#lira-glow)" opacity=".92"/>
-          <circle cx="50" cy="50" r="42" fill="none" stroke="var(--mood-lira)" stroke-opacity=".35" stroke-width="1"/>
-        </svg>
+        <div class="presence-visual">
+          <img class="presence-face" src="assets/faces/lira.jpg" alt="Lira, forme douce et stable" />
+        </div>
         <span class="name">Lira · psy-IA</span>
       </div>
 
       <div class="presence" id="p-nox">
-        <svg viewBox="0 0 100 100" role="img" aria-label="Nox, forme fragmentée qui cherche à se stabiliser">
-          <defs>
-            <radialGradient id="nox-glow" cx="50%" cy="45%" r="60%">
-              <stop offset="0%" stop-color="#F2C79A"/>
-              <stop offset="55%" stop-color="var(--mood-nox)"/>
-              <stop offset="100%" stop-color="var(--mood-nox-2)"/>
-            </radialGradient>
-          </defs>
-          <g id="nox-particles" fill="url(#nox-glow)">
-            <circle cx="50" cy="50" r="10"/>
-            <circle cx="38" cy="42" r="6"/>
-            <circle cx="63" cy="40" r="5.5"/>
-            <circle cx="40" cy="63" r="5"/>
-            <circle cx="62" cy="62" r="6.5"/>
-            <circle cx="50" cy="30" r="4"/>
-            <circle cx="50" cy="70" r="4.5"/>
-          </g>
-        </svg>
+        <div class="presence-visual">
+          <svg class="backdrop" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <radialGradient id="nox-glow" cx="50%" cy="45%" r="60%">
+                <stop offset="0%" stop-color="#F2C79A"/>
+                <stop offset="55%" stop-color="var(--mood-nox)"/>
+                <stop offset="100%" stop-color="var(--mood-nox-2)"/>
+              </radialGradient>
+            </defs>
+            <g id="nox-particles" fill="url(#nox-glow)">
+              <circle cx="50" cy="50" r="10"/>
+              <circle cx="38" cy="42" r="6"/>
+              <circle cx="63" cy="40" r="5.5"/>
+              <circle cx="40" cy="63" r="5"/>
+              <circle cx="62" cy="62" r="6.5"/>
+              <circle cx="50" cy="30" r="4"/>
+              <circle cx="50" cy="70" r="4.5"/>
+            </g>
+          </svg>
+          <img class="presence-face" src="assets/faces/nox.jpg" alt="Nox, forme fragmentée qui cherche à se stabiliser" />
+        </div>
         <span class="name">Nox</span>
       </div>
     </div>
@@ -343,6 +363,8 @@
     const beat = script[i];
     pLira.classList.toggle('active', beat.speaker === 'lira');
     pNox.classList.toggle('active', beat.speaker === 'nox');
+    pLira.classList.toggle('silence', beat.speaker === 'silence');
+    pNox.classList.toggle('silence', beat.speaker === 'silence');
     panel.classList.toggle('silence', beat.speaker === 'silence');
 
     if (beat.speaker === 'silence') {
@@ -399,6 +421,8 @@
       c.setAttribute('cx', original[i][0]);
       c.setAttribute('cy', original[i][1]);
     });
+    pLira.classList.remove('silence');
+    pNox.classList.remove('silence');
     nextBtn.style.display = 'inline-block';
     replayBtn.style.display = 'none';
     panelLine.className = 'line';

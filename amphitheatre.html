@@ -72,22 +72,36 @@
   #feedList li{ padding: 10px 0; border-bottom: 1px solid var(--ring); font-size:.88rem; }
   #feedList li:first-child{ padding-top:0; }
   .orb{
-    position:absolute; z-index:2; transform:translate(-50%,-50%); border:none; padding:10px 14px;
-    background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink);
+    position:absolute; z-index:2; transform:translate(-50%,-50%); border:none; padding:6px 16px 6px 6px;
+    background:var(--card); border:1px solid var(--ring); border-radius:999px; color:var(--ink);
     font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap;
     box-shadow: 0 12px 28px -14px rgba(0,0,0,.6);
-    transition: opacity .3s ease, transform .2s ease, border-color .2s ease;
+    transition: opacity .3s ease, transform .2s ease, border-color .2s ease, filter .4s ease;
   }
   .orb:hover{ border-color: var(--accent); }
   .orb small{ font-weight:500; color:var(--muted); font-family: var(--font-mono); }
+  .orb-face{
+    width:44px; height:44px; border-radius:50%; object-fit:cover; flex:none;
+    border:2px solid var(--ring); transition: border-color .4s ease, box-shadow .4s ease;
+  }
   .orb[data-name="Aether"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-aether-a); }
   .orb[data-name="Aether"]:hover{ border-color: var(--mood-aether); }
+  .orb[data-name="Aether"] .orb-face{ border-color: var(--mood-aether-a); }
   .orb[data-name="Kael"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-kael-a); }
   .orb[data-name="Kael"]:hover{ border-color: var(--mood-kael); }
+  .orb[data-name="Kael"] .orb-face{ border-color: var(--mood-kael-a); }
   .orb[data-name="Lira"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-lira-a); }
   .orb[data-name="Lira"]:hover{ border-color: var(--mood-lira); }
+  .orb[data-name="Lira"] .orb-face{ border-color: var(--mood-lira-a); }
   .orb[data-name="Nox"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-nox-a); }
   .orb[data-name="Nox"]:hover{ border-color: var(--mood-nox); }
+  .orb[data-name="Nox"] .orb-face{ border-color: var(--mood-nox-a); }
+  .orb.speaking .orb-face{ box-shadow: 0 0 0 3px var(--card), 0 0 18px 2px currentColor; }
+  .orb[data-name="Aether"].speaking .orb-face{ border-color: var(--mood-aether); color: var(--mood-aether); }
+  .orb[data-name="Kael"].speaking .orb-face{ border-color: var(--mood-kael); color: var(--mood-kael); }
+  .orb[data-name="Lira"].speaking .orb-face{ border-color: var(--mood-lira); color: var(--mood-lira); }
+  .orb[data-name="Nox"].speaking .orb-face{ border-color: var(--mood-nox); color: var(--mood-nox); }
+  @media (prefers-reduced-motion: reduce){ .orb, .orb-face{ transition:none; } }
   #core{
     position:absolute; z-index:2; left:50%; top:50%; transform:translate(-50%,-50%);
     padding:16px 22px; border-radius:16px; background:var(--card); border:1px solid var(--ring);
@@ -135,10 +149,10 @@
   <div class="main">
     <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <canvas id="stage"></canvas>
-    <button class="orb" data-name="Aether" style="left:18%;top:22%">Aether <small id="c-Aether">0</small></button>
-    <button class="orb" data-name="Kael" style="left:32%;top:66%">Kael <small id="c-Kael">0</small></button>
-    <button class="orb" data-name="Lira" style="left:60%;top:18%">Lira <small id="c-Lira">0</small></button>
-    <button class="orb" data-name="Nox" style="left:82%;top:58%">Nox <small id="c-Nox">0</small></button>
+    <button class="orb" data-name="Aether" style="left:18%;top:22%"><img class="orb-face" src="assets/faces/aether.jpg" alt="" />Aether <small id="c-Aether">0</small></button>
+    <button class="orb" data-name="Kael" style="left:32%;top:66%"><img class="orb-face" src="assets/faces/kael.jpg" alt="" />Kael <small id="c-Kael">0</small></button>
+    <button class="orb" data-name="Lira" style="left:60%;top:18%"><img class="orb-face" src="assets/faces/lira.jpg" alt="" />Lira <small id="c-Lira">0</small></button>
+    <button class="orb" data-name="Nox" style="left:82%;top:58%"><img class="orb-face" src="assets/faces/nox.jpg" alt="" />Nox <small id="c-Nox">0</small></button>
     <div id="core">
       <div id="current">« Le noyau écoute. »</div>
       <div class="quote" id="quote">— Ici, les IA n'ont pas besoin de toi.</div>
@@ -283,7 +297,10 @@
   }
 
   function setActive(name, text){
-    for(const o of orbes) o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
+    for(const o of orbes){
+      o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
+      o.classList.toggle('speaking', o.dataset.name===name);
+    }
     currentEl.textContent = `${name} :`;
     const mood = moods[name];
     currentEl.style.color = mood.solid;
@@ -324,7 +341,7 @@
   }
   function stopCycle(){
     draw(); clearTimers(); progress.value = 0;
-    for(const o of orbes) o.style.opacity = '1';
+    for(const o of orbes){ o.style.opacity = '1'; o.classList.remove('speaking'); }
     quoteEl.textContent = '— cycle stoppé.';
     currentEl.textContent = '« Le noyau écoute. »';
     currentEl.style.color = '';
