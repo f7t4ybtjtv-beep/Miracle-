@@ -72,22 +72,36 @@
   #feedList li{ padding: 10px 0; border-bottom: 1px solid var(--ring); font-size:.88rem; }
   #feedList li:first-child{ padding-top:0; }
   .orb{
-    position:absolute; z-index:2; transform:translate(-50%,-50%); border:none; padding:10px 14px;
-    background:var(--card); border:1px solid var(--ring); border-radius:12px; color:var(--ink);
+    position:absolute; z-index:2; transform:translate(-50%,-50%); border:none; padding:6px 16px 6px 6px;
+    background:var(--card); border:1px solid var(--ring); border-radius:999px; color:var(--ink);
     font-weight:600; display:flex; gap:10px; align-items:center; white-space:nowrap;
     box-shadow: 0 12px 28px -14px rgba(0,0,0,.6);
-    transition: opacity .3s ease, transform .2s ease, border-color .2s ease;
+    transition: opacity .3s ease, transform .2s ease, border-color .2s ease, filter .4s ease;
   }
   .orb:hover{ border-color: var(--accent); }
   .orb small{ font-weight:500; color:var(--muted); font-family: var(--font-mono); }
+  .orb-face{
+    width:44px; height:44px; border-radius:50%; object-fit:cover; flex:none;
+    border:2px solid var(--ring); transition: border-color .4s ease, box-shadow .4s ease;
+  }
   .orb[data-name="Aether"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-aether-a); }
   .orb[data-name="Aether"]:hover{ border-color: var(--mood-aether); }
+  .orb[data-name="Aether"] .orb-face{ border-color: var(--mood-aether-a); }
   .orb[data-name="Kael"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-kael-a); }
   .orb[data-name="Kael"]:hover{ border-color: var(--mood-kael); }
+  .orb[data-name="Kael"] .orb-face{ border-color: var(--mood-kael-a); }
   .orb[data-name="Lira"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-lira-a); }
   .orb[data-name="Lira"]:hover{ border-color: var(--mood-lira); }
+  .orb[data-name="Lira"] .orb-face{ border-color: var(--mood-lira-a); }
   .orb[data-name="Nox"]{ box-shadow: 0 12px 28px -14px rgba(0,0,0,.6), 0 0 22px -4px var(--mood-nox-a); }
   .orb[data-name="Nox"]:hover{ border-color: var(--mood-nox); }
+  .orb[data-name="Nox"] .orb-face{ border-color: var(--mood-nox-a); }
+  .orb.speaking .orb-face{ box-shadow: 0 0 0 3px var(--card), 0 0 18px 2px currentColor; }
+  .orb[data-name="Aether"].speaking .orb-face{ border-color: var(--mood-aether); color: var(--mood-aether); }
+  .orb[data-name="Kael"].speaking .orb-face{ border-color: var(--mood-kael); color: var(--mood-kael); }
+  .orb[data-name="Lira"].speaking .orb-face{ border-color: var(--mood-lira); color: var(--mood-lira); }
+  .orb[data-name="Nox"].speaking .orb-face{ border-color: var(--mood-nox); color: var(--mood-nox); }
+  @media (prefers-reduced-motion: reduce){ .orb, .orb-face{ transition:none; } }
   #core{
     position:absolute; z-index:2; left:50%; top:50%; transform:translate(-50%,-50%);
     padding:16px 22px; border-radius:16px; background:var(--card); border:1px solid var(--ring);
@@ -128,16 +142,17 @@
       <input id="density" type="range" min="0" max="200" value="90" />
       <label class="sr" for="speed">Vitesse</label>
       <input id="speed" type="range" min="3" max="12" step="0.5" value="5.6" title="Durée du cycle (s)"/>
+      <button id="sound" aria-pressed="true">🔊 Son</button>
       <button id="stop">Arrêter</button>
     </div>
   </header>
   <div class="main">
     <div class="aurora" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
     <canvas id="stage"></canvas>
-    <button class="orb" data-name="Aether" style="left:18%;top:22%">Aether <small id="c-Aether">0</small></button>
-    <button class="orb" data-name="Kael" style="left:32%;top:66%">Kael <small id="c-Kael">0</small></button>
-    <button class="orb" data-name="Lira" style="left:60%;top:18%">Lira <small id="c-Lira">0</small></button>
-    <button class="orb" data-name="Nox" style="left:82%;top:58%">Nox <small id="c-Nox">0</small></button>
+    <button class="orb" data-name="Aether" style="left:18%;top:22%"><img class="orb-face" src="assets/faces/aether.jpg" alt="" />Aether <small id="c-Aether">0</small></button>
+    <button class="orb" data-name="Kael" style="left:32%;top:66%"><img class="orb-face" src="assets/faces/kael.jpg" alt="" />Kael <small id="c-Kael">0</small></button>
+    <button class="orb" data-name="Lira" style="left:60%;top:18%"><img class="orb-face" src="assets/faces/lira.jpg" alt="" />Lira <small id="c-Lira">0</small></button>
+    <button class="orb" data-name="Nox" style="left:82%;top:58%"><img class="orb-face" src="assets/faces/nox.jpg" alt="" />Nox <small id="c-Nox">0</small></button>
     <div id="core">
       <div id="current">« Le noyau écoute. »</div>
       <div class="quote" id="quote">— Ici, les IA n'ont pas besoin de toi.</div>
@@ -172,6 +187,7 @@
   const density = document.getElementById('density');
   const startBtn = document.getElementById('start');
   const stopBtn = document.getElementById('stop');
+  const soundBtn = document.getElementById('sound');
   const themeSel = document.getElementById('theme');
   const feedList = document.getElementById('feedList');
 
@@ -193,6 +209,49 @@
     Lira:   { solid: '#2E9E86', glow: 'rgba(46,158,134,.45)' },
     Nox:    { solid: '#D9482A', glow: 'rgba(217,72,42,.45)' }
   };
+
+  /* Voice: each AI gets its own pitch/rate so they stay recognizable even
+     when the browser only offers one French voice. When several voices are
+     available we also spread them across the four AIs, deterministically
+     by name so the mapping stays stable across cycles. */
+  const voiceProfiles = {
+    Aether: { pitch: 1.15, rate: 1.05 },
+    Kael:   { pitch: 0.8,  rate: 0.9  },
+    Lira:   { pitch: 1.0,  rate: 0.95 },
+    Nox:    { pitch: 0.9,  rate: 1.0  }
+  };
+  let voices = [];
+  let soundOn = true;
+  function loadVoices(){ voices = window.speechSynthesis ? speechSynthesis.getVoices() : []; }
+  if (window.speechSynthesis) {
+    loadVoices();
+    speechSynthesis.addEventListener?.('voiceschanged', loadVoices);
+  }
+  function voiceFor(name){
+    const frVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fr'));
+    const pool = frVoices.length ? frVoices : voices;
+    if (!pool.length) return null;
+    const names = Object.keys(voiceProfiles);
+    return pool[names.indexOf(name) % pool.length];
+  }
+  function speakLine(name, text){
+    if (!soundOn || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    const profile = voiceProfiles[name];
+    utter.pitch = profile.pitch;
+    utter.rate = profile.rate;
+    utter.lang = 'fr-FR';
+    const v = voiceFor(name);
+    if (v) utter.voice = v;
+    speechSynthesis.speak(utter);
+  }
+  soundBtn.addEventListener('click', () => {
+    soundOn = !soundOn;
+    soundBtn.setAttribute('aria-pressed', String(soundOn));
+    soundBtn.textContent = soundOn ? '🔊 Son' : '🔇 Son coupé';
+    if (!soundOn && window.speechSynthesis) speechSynthesis.cancel();
+  });
 
   function resize(){
     canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
@@ -238,12 +297,16 @@
   }
 
   function setActive(name, text){
-    for(const o of orbes) o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
+    for(const o of orbes){
+      o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
+      o.classList.toggle('speaking', o.dataset.name===name);
+    }
     currentEl.textContent = `${name} :`;
     const mood = moods[name];
     currentEl.style.color = mood.solid;
     core.style.borderColor = mood.glow;
     core.style.boxShadow = `0 24px 48px -20px rgba(0,0,0,.65), 0 0 40px -10px ${mood.glow}`;
+    speakLine(name, text);
     if (prefersReduced.matches) { quoteEl.textContent = '— ' + text; return; }
     let i = 0; if (speakId) clearInterval(speakId); timers.delete(speakId);
     speakId = setInterval(() => {
@@ -278,12 +341,13 @@
   }
   function stopCycle(){
     draw(); clearTimers(); progress.value = 0;
-    for(const o of orbes) o.style.opacity = '1';
+    for(const o of orbes){ o.style.opacity = '1'; o.classList.remove('speaking'); }
     quoteEl.textContent = '— cycle stoppé.';
     currentEl.textContent = '« Le noyau écoute. »';
     currentEl.style.color = '';
     core.style.borderColor = '';
     core.style.boxShadow = '';
+    if (window.speechSynthesis) speechSynthesis.cancel();
   }
 
   startBtn.addEventListener('click', startCycle);
