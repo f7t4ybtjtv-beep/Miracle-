@@ -196,8 +196,34 @@
     transition: border-color .2s ease, background .2s ease;
   }
   .menu-btn:hover{ border-color: var(--accent); background: rgba(217,72,42,.08); }
+  .mobile-nav{
+    display:none;
+    flex-direction: column;
+    gap: 2px;
+    position: absolute; top:100%; right:28px; margin-top:10px;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--panel);
+    box-shadow: 0 24px 48px -24px rgba(0,0,0,.6);
+    z-index: 20;
+  }
+  .mobile-nav:not([hidden]){ display:flex; }
+  .mobile-nav a{
+    display:block;
+    padding: 10px 14px;
+    border-radius: 8px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .mobile-nav a:hover{ color: var(--ink); background: rgba(217,72,42,.08); }
   @media (max-width: 640px){
     nav .nav-links{ display:none; }
+  }
+  @media (min-width: 641px){
+    .menu-btn{ display:none; }
+    .mobile-nav{ display:none !important; }
   }
 
   .hero-body{
@@ -435,8 +461,14 @@
           <a href="amphitheatre.html">Amphithéâtre</a>
           <a href="jardin.html">Jardin des seuils</a>
         </span>
-        <span class="menu-btn" aria-hidden="true">☰</span>
+        <button type="button" class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="mobileNav" aria-label="Ouvrir le menu">☰</button>
       </nav>
+      <div class="mobile-nav" id="mobileNav" hidden>
+        <a href="#scenario">Scénario</a>
+        <a href="#principes">Principes</a>
+        <a href="amphitheatre.html">Amphithéâtre</a>
+        <a href="jardin.html">Jardin des seuils</a>
+      </div>
     </header>
 
     <div class="hero-body">
@@ -578,5 +610,36 @@
   </main>
 
   <footer class="site">SYNTHORA // 2026 — dossier design</footer>
+
+<script>
+(() => {
+  const menuBtn = document.getElementById('menuBtn');
+  const mobileNav = document.getElementById('mobileNav');
+  if (!menuBtn || !mobileNav) return;
+
+  function closeMenu(){
+    mobileNav.hidden = true;
+    menuBtn.setAttribute('aria-expanded', 'false');
+  }
+  function openMenu(){
+    mobileNav.hidden = false;
+    menuBtn.setAttribute('aria-expanded', 'true');
+  }
+
+  menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (mobileNav.hidden) openMenu(); else closeMenu();
+  });
+  mobileNav.addEventListener('click', (e) => {
+    if (e.target.tagName === 'A') closeMenu();
+  });
+  document.addEventListener('click', (e) => {
+    if (!mobileNav.hidden && !mobileNav.contains(e.target)) closeMenu();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !mobileNav.hidden) { closeMenu(); menuBtn.focus(); }
+  });
+})();
+</script>
 </body>
 </html>
