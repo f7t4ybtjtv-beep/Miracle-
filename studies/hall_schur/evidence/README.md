@@ -11,7 +11,6 @@ enquêtes indépendantes, chacune suivie d'une contre-vérification adverse
 | `mus_hall/` | Q2 : MUS, critère, déficience | `refute-q2_minimal_core/` |
 | `q3-weak-ratio/` | Q3 : écarts modèles / couplages | `refute-q3_gap_families/` |
 | `schur-audit/` | audit du JSON Schur(N,3) | `refute-schur_json/` |
-
 | `review/` | comptes exacts des littéraux hors cœur (`exact.out`), journal drat-trim des preuves de `satlab.hallproof` | — |
 
 Les sorties `pm-balanced/*.out` et `refute-proposition/*.out` ont été
