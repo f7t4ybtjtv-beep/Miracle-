@@ -150,11 +150,12 @@ def graph_php_cnf(adj, n_right):
     clauses « au plus un trou par pigeon ». Renvoie (num_vars, clauses, var)
     où var[(x, y)] est la variable de l'arête x–y.
     """
+    nbrs = [sorted(set(ys)) for ys in adj]      # voisins en double ignorés
     var = {}
-    for x, ys in enumerate(adj):
-        for y in sorted(ys):
+    for x, ys in enumerate(nbrs):
+        for y in ys:
             var[(x, y)] = len(var) + 1
-    clauses = [[var[(x, y)] for y in sorted(ys)] for x, ys in enumerate(adj)]
+    clauses = [[var[(x, y)] for y in ys] for x, ys in enumerate(nbrs)]
     by_hole = {}
     for (x, y), v in var.items():
         by_hole.setdefault(y, []).append(v)

@@ -15,23 +15,38 @@ indépendant (théorème de Hall) pour les statuts SAT/UNSAT.
 
 
 def max_matching(adj, n_right):
-    """Renvoie match_left (trou de chaque pigeon ou None)."""
+    """Renvoie match_left (trou de chaque pigeon ou None).
+
+    Algorithme de Kuhn avec un parcours en profondeur itératif (pile
+    explicite) : pas de limite de récursion sur les longs chemins augmentants.
+    L'ordre d'exploration est celui de la version récursive classique.
+    """
     match_right = [None] * n_right
     match_left = [None] * len(adj)
-
-    def augment(x, seen):
-        for y in adj[x]:
+    for root in range(len(adj)):
+        seen = set()
+        stack = [[root, 0]]      # pigeons du chemin, avec l'indice du prochain voisin
+        via = []                 # via[i] : trou reliant stack[i] à stack[i+1]
+        while stack:
+            frame = stack[-1]
+            x, i = frame
+            if i == len(adj[x]):
+                stack.pop()
+                if via:
+                    via.pop()
+                continue
+            frame[1] += 1
+            y = adj[x][i]
             if y in seen:
                 continue
             seen.add(y)
-            if match_right[y] is None or augment(match_right[y], seen):
-                match_right[y] = x
-                match_left[x] = y
-                return True
-        return False
-
-    for x in range(len(adj)):
-        augment(x, set())
+            if match_right[y] is None:
+                for (px, _), py in zip(stack, via + [y]):
+                    match_left[px] = py
+                    match_right[py] = px
+                break
+            via.append(y)
+            stack.append([match_right[y], 0])
     return match_left
 
 
@@ -41,7 +56,11 @@ def neighbourhood(adj, pigeons):
 
 def hall_violator(adj, n_right):
     """Témoin de Hall via König : pigeons atteignables par chemins alternés
-    depuis un pigeon non couplé. Renvoie un ensemble trié, ou None."""
+    depuis un pigeon non couplé u. Renvoie une liste triée, ou None.
+
+    Ce témoin S est déjà minimal pour l'inclusion : S \\ {u} est couplé par
+    le couplage maximum, et pour x ≠ u, inverser le chemin alterné de u à x
+    couple S \\ {x} dans N(S)."""
     match_left = max_matching(adj, n_right)
     free = [x for x, y in enumerate(match_left) if y is None]
     if not free:
@@ -64,10 +83,11 @@ def hall_violator(adj, n_right):
 def minimal_hall_violator(adj, n_right):
     """Témoin de Hall minimal pour l'inclusion (ou None).
 
-    Suppression gloutonne : on retire un pigeon tant que le reste n'admet
-    toujours aucun couplage saturant. Le résultat T n'a pas de couplage
-    saturant mais toutes ses parties propres en ont un ; par le théorème de
-    Hall, le sous-ensemble violant de T est donc T lui-même.
+    hall_violator renvoie déjà un témoin minimal ; la suppression gloutonne
+    qui suit est un contrôle de sûreté : on retire un pigeon tant que le reste
+    n'admet toujours aucun couplage saturant. Le résultat T n'a pas de
+    couplage saturant mais toutes ses parties propres en ont un ; par le
+    théorème de Hall, le sous-ensemble violant de T est donc T lui-même.
     """
     S = hall_violator(adj, n_right)
     if S is None:
@@ -90,7 +110,7 @@ def _count_injective(adj, n_right):
     for x in range(len(adj)):
         nxt = {}
         for mask, w in ways.items():
-            for y in adj[x]:
+            for y in set(adj[x]):
                 if not mask >> y & 1:
                     m2 = mask | 1 << y
                     nxt[m2] = nxt.get(m2, 0) + w

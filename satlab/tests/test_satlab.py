@@ -1,3 +1,4 @@
+import itertools
 import os
 import random
 import subprocess
@@ -194,6 +195,46 @@ class TestBipartiteAndCores(unittest.TestCase):
             self.assertLessEqual(len(lines), hallproof.lemma_bound(m))
             self.assertTrue(checker.check_proof(cnf.num_vars, cnf.clauses,
                                                 checker._parse_proof("\n".join(lines)))[0])
+
+    def test_hall_proof_on_arbitrary_violators(self):
+        # témoins non minimaux, non complets, mélangés, pigeons sans voisin :
+        # la preuve reste valide sur la CNF complète et sous la borne
+        rng = random.Random(11)
+        tried = 0
+        for _ in range(150):
+            nx, ny = rng.randint(1, 6), rng.randint(0, 5)
+            adj = [[y for y in range(ny) if rng.random() < 0.5] for _ in range(nx)]
+            nv, clauses, _ = generators.graph_php_cnf(adj, ny)
+            for r in range(1, nx + 1):
+                for S in itertools.combinations(range(nx), r):
+                    m = len(matching.neighbourhood(adj, S))
+                    if m >= len(S):
+                        continue
+                    w = list(S)
+                    rng.shuffle(w)
+                    _, lines = hallproof.hall_witness_proof(adj, ny, witness=w)
+                    self.assertLessEqual(len(lines), hallproof.lemma_bound(m))
+                    self.assertTrue(checker.check_proof(
+                        nv, clauses, checker._parse_proof("\n".join(lines)))[0], (adj, w))
+                    tried += 1
+        self.assertGreater(tried, 100)
+        with self.assertRaises(ValueError):
+            hallproof.hall_witness_proof([[0], [0]], 1, witness=[0, 0])
+
+    def test_duplicate_neighbours_and_long_paths(self):
+        nv, clauses, var = generators.graph_php_cnf([[0, 1, 0], [1]], 2)
+        self.assertEqual(nv, 3)
+        self.assertEqual(sorted(var.values()), [1, 2, 3])
+        self.assertEqual(cdcl.CDCLSolver(nv, clauses).solve().status, "SAT")
+        self.assertEqual(matching.count_saturating_matchings([[0, 0]], 1), 1)
+        n = 3000      # chemin augmentant de longueur n : pas de récursion
+        chain = [[0]] + [[x - 1, x] for x in range(1, n)]
+        self.assertNotIn(None, matching.max_matching(chain, n))
+        self.assertEqual(len(matching.hall_violator(chain + [[n - 1]], n)), n + 1)
+
+    def test_core_input_validation(self):
+        with self.assertRaises(ValueError):
+            core.shrink_to_mus(1, [[1], [-1]], order=[0])
 
     def test_mus_pigeon_set_need_not_be_minimal_witness(self):
         # N(a)=N(b)={y1}, N(c)=N(d)={y1,y2} : MUS de déficience 2 qui utilise

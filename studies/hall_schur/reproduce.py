@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Reproduit et vérifie (assertions) les résultats de NOTE.md avec satlab seul.
 
-    python3 studies/hall_schur/reproduce.py        # ~1-2 min, écrit results.json
+    python3 studies/hall_schur/reproduce.py        # ~10 s, écrit results.json
 
 Chaque section recalcule ses nombres par au moins deux méthodes
 indépendantes (force brute / formule / couplage / CDCL certifié) et
@@ -90,6 +90,11 @@ def section(name):
     return time.perf_counter()
 
 
+def done(t):
+    # les durées varient selon la machine : affichées, jamais écrites dans results.json
+    print("   (%.1f s)" % (time.perf_counter() - t))
+
+
 # --------------------------------------------------------------------------
 t = section("Proposition : cas équilibré, modèles = couplages parfaits")
 res = {}
@@ -116,8 +121,8 @@ for nx, ny in [(2, 1), (3, 2), (4, 3), (3, 1)]:
         assert weak_models_ie(adj, ny) == 0
         unb += 1
 print("|X| > |Y| : %d graphes, tous UNSAT (0 modèle)" % unb)
-OUT["proposition"] = dict(balanced=res, unbalanced_graphs_all_unsat=unb,
-                          seconds=round(time.perf_counter() - t, 1))
+OUT["proposition"] = dict(balanced=res, unbalanced_graphs_all_unsat=unb)
+done(t)
 
 # --------------------------------------------------------------------------
 t = section("Q1 : preuve DRUP explicite depuis un témoin de Hall")
@@ -147,8 +152,8 @@ nv, cl, _ = generators.graph_php_cnf(adj, 9)
 ok_trivial, _ = checker.check_proof(nv, cl, checker._parse_proof("0"))
 assert ok_trivial
 OUT["q1"] = dict(complete_php_lines=sizes, planted=planted,
-                 counterexample_transfer="K_{9,8} ⊔ K_{2,1} : la clause vide est RUP",
-                 seconds=round(time.perf_counter() - t, 1))
+                 counterexample_transfer="K_{9,8} ⊔ K_{2,1} : la clause vide est RUP")
+done(t)
 
 # --------------------------------------------------------------------------
 t = section("Q2 : la CNF d'un témoin minimal est-elle un MUS ?")
@@ -161,21 +166,22 @@ for adj, ny in ((ex4, 3), (ex3, 2)):
     assert not core.is_mus(nv, cl) and not induced_is_mus_criterion(adj, list(range(len(adj))))
 print("contre-exemples à 4 et 3 pigeons : témoin minimal, CNF induite non minimale")
 fractions = {}
-for nx, ny in [(3, 2), (3, 3), (4, 2), (4, 3)]:
+for nx, ny in [(3, 2), (3, 3), (4, 2), (4, 3), (4, 4), (5, 3)]:
     tot = mus = checked = 0
     for adj in all_graphs(nx, ny):
         for S in minimal_witnesses(adj, ny):
             tot += 1
             crit = induced_is_mus_criterion(adj, S)
             mus += crit
-            if (nx, ny) != (4, 3) or tot % 7 == 0:   # critère comparé au test MUS direct
+            if nx * ny <= 9 or tot % 97 == 0:   # critère comparé au test MUS direct (certifié)
                 nv, cl, _ = induced_cnf(adj, S)
                 assert crit == core.is_mus(nv, cl), (adj, S)
                 checked += 1
     fractions["%dx%d" % (nx, ny)] = dict(mus=mus, witnesses=tot, criterion_checked_by_cdcl=checked)
     print("%dx%d : %d/%d témoins minimaux à CNF induite MUS (%d vérifiés par CDCL)"
           % (nx, ny, mus, tot, checked))
-expected = {"3x2": (79, 85), "3x3": (285, 303), "4x2": (560, 656), "4x3": (4113, 5457)}
+expected = {"3x2": (79, 85), "3x3": (285, 303), "4x2": (560, 656), "4x3": (4113, 5457),
+            "4x4": (26180, 31556), "5x3": (58920, 101160)}
 for key, (a, b) in expected.items():
     assert (fractions[key]["mus"], fractions[key]["witnesses"]) == (a, b), key
 # MUS de déficience 2 : pigeons {a,b,c,d}, témoin minimal {a,b} seulement
@@ -239,7 +245,8 @@ assert any(k >= 2 for k in deficiency_hist)   # le test n'est pas vide
 print("caractérisation par la déficience : %d MUS extraits, 0 violation, déficiences %s"
       % (n_mus, dict(sorted(deficiency_hist.items()))))
 OUT["q2"] = dict(fractions_exhaustive=fractions, deficiency2_mus_example=True,
-                 random_mus_checked=n_mus, random_mus_deficiency=deficiency_hist, seconds=round(time.perf_counter() - t, 1))
+                 random_mus_checked=n_mus, random_mus_deficiency=deficiency_hist)
+done(t)
 
 # --------------------------------------------------------------------------
 t = section("Q3 : écart modèles / couplages saturants quand |X| < |Y|")
@@ -264,6 +271,20 @@ for n in range(1, 5):
             assert reference.brute_force(nv, cl, count=True)[2] == models
         if m == n + 1:
             assert models == math.factorial(n + 1) * (n + 2) // 2
+# réciproque fausse : K_{a,2a} ⊔ (n-a)·K_{1,1}, a ≈ n/ln n, excès k = a = o(n)
+# mais écart e^{Ω(n)} (les composantes K_{1,1} contribuent un facteur 1)
+sublinear = {}
+for n in (50, 100, 200, 400, 800):
+    a = round(n / math.log(n))
+    models = math.factorial(a) * stirling2(2 * a + 1, a + 1)
+    sat_matchings = math.factorial(2 * a) // math.factorial(a)
+    ln_r = math.log(models) - math.log(sat_matchings)
+    assert ln_r >= a * math.log((a + 1) / 4) - 1e-9          # borne inférieure prouvée
+    sublinear[n] = dict(k=a, k_over_n=round(a / n, 3), ln_ratio_over_n=round(ln_r / n, 3))
+assert all(v["ln_ratio_over_n"] > 0.5 for v in sublinear.values())
+print("K_{a,2a} ⊔ (n-a)K_{1,1}, a≈n/ln n :",
+      ", ".join("n=%d k/n=%.2f ln(r)/n=%.3f" % (n, v["k_over_n"], v["ln_ratio_over_n"])
+                for n, v in sublinear.items()))
 bounds_checked = 0
 for nx, ny in [(1, 3), (2, 3), (2, 4), (3, 4), (2, 5)]:
     for adj in all_graphs(nx, ny):
@@ -278,7 +299,8 @@ for nx, ny in [(1, 3), (2, 3), (2, 4), (3, 4), (2, 5)]:
         bounds_checked += 1
 print("étoiles (3/2)^n, K_{n,m} = n!·S(m+1,n+1), bornes (3/2)^k ≤ ratio ≤ (|X|+1)^k "
       "sur %d graphes" % bounds_checked)
-OUT["q3"] = dict(bounds_checked_graphs=bounds_checked, seconds=round(time.perf_counter() - t, 1))
+OUT["q3"] = dict(bounds_checked_graphs=bounds_checked, sublinear_excess_exponential_gap=sublinear)
+done(t)
 
 # --------------------------------------------------------------------------
 t = section("Schur(N,3) : audit du JSON fourni")
@@ -302,18 +324,26 @@ for N in (14, 15, 20, 30, 40, 50):
     cN, _ = generators.schur(N)
     reuse[N] = checker.check_proof(cN.num_vars, cN.clauses, steps)[0]
     assert reuse[N]
-assert cdcl.solve(generators.schur(14, amo=False)[0]).status == "UNSAT"
+c14_noamo = generators.schur(14, amo=False)[0]
+core.certify_unsat(c14_noamo.num_vars, c14_noamo.clauses)        # UNSAT certifié
+# contrôle négatif logique : sans la clause « au moins une couleur » de 1,
+# la formule devient SAT et la même preuve doit être rejetée
+weak = [c for c in c14.clauses if sorted(c) != [1, 2, 3]]
+assert len(weak) == len(c14.clauses) - 1
+assert cdcl.solve(type("C", (), {"num_vars": c14.num_vars, "clauses": weak})()).status == "SAT"
+assert not checker.check_proof(c14.num_vars, weak, steps)[0]
 mus = core.shrink_to_mus(c14.num_vars, c14.clauses)
 amo_in_mus = sum(1 for i in mus if len(c14.clauses[i]) == 2 and
                  (abs(c14.clauses[i][0]) - 1) // 3 == (abs(c14.clauses[i][1]) - 1) // 3)
 assert amo_in_mus == 0
 print("comptes = 4N + 3⌊N²/4⌋ ; S(13) SAT (coloration vérifiée), S(14) UNSAT ;"
-      " preuve de N=14 (%d lignes) valide pour N=14..50 ; MUS de %d clauses, 0 AMO"
+      " preuve de N=14 (%d lignes) valide pour N=14..50, rejetée sans ALO(1) ;"
+      " MUS certifié de %d clauses, 0 AMO"
       % (len(r14.proof), len(mus)))
 OUT["schur"] = dict(clause_counts=counts, schur13_coloring=coloring,
                     proof_lines_n14=len(r14.proof), proof_reuse_verified=reuse,
-                    amo_free_unsat=True, one_mus_size=len(mus), amo_in_mus=amo_in_mus,
-                    seconds=round(time.perf_counter() - t, 1))
+                    amo_free_unsat=True, one_mus_size=len(mus), amo_in_mus=amo_in_mus)
+done(t)
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "results.json"), "w") as f:
     json.dump(OUT, f, indent=1, ensure_ascii=False, default=str)

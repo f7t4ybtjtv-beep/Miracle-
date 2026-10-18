@@ -22,8 +22,7 @@
     "total_models": 98304
    }
   },
-  "unbalanced_graphs_all_unsat": 4172,
-  "seconds": 1.7
+  "unbalanced_graphs_all_unsat": 4172
  },
  "q1": {
   "complete_php_lines": {
@@ -248,8 +247,7 @@
     "vars": 364
    }
   ],
-  "counterexample_transfer": "K_{9,8} ⊔ K_{2,1} : la clause vide est RUP",
-  "seconds": 0.3
+  "counterexample_transfer": "K_{9,8} ⊔ K_{2,1} : la clause vide est RUP"
  },
  "q2": {
   "fractions_exhaustive": {
@@ -271,7 +269,17 @@
    "4x3": {
     "mus": 4113,
     "witnesses": 5457,
-    "criterion_checked_by_cdcl": 779
+    "criterion_checked_by_cdcl": 56
+   },
+   "4x4": {
+    "mus": 26180,
+    "witnesses": 31556,
+    "criterion_checked_by_cdcl": 325
+   },
+   "5x3": {
+    "mus": 58920,
+    "witnesses": 101160,
+    "criterion_checked_by_cdcl": 1042
    }
   },
   "deficiency2_mus_example": true,
@@ -280,12 +288,37 @@
    "1": 966,
    "2": 29,
    "3": 2
-  },
-  "seconds": 1.8
+  }
  },
  "q3": {
   "bounds_checked_graphs": 4355,
-  "seconds": 0.4
+  "sublinear_excess_exponential_gap": {
+   "50": {
+    "k": 13,
+    "k_over_n": 0.26,
+    "ln_ratio_over_n": 0.549
+   },
+   "100": {
+    "k": 22,
+    "k_over_n": 0.22,
+    "ln_ratio_over_n": 0.57
+   },
+   "200": {
+    "k": 38,
+    "k_over_n": 0.19,
+    "ln_ratio_over_n": 0.591
+   },
+   "400": {
+    "k": 67,
+    "k_over_n": 0.168,
+    "ln_ratio_over_n": 0.613
+   },
+   "800": {
+    "k": 120,
+    "k_over_n": 0.15,
+    "ln_ratio_over_n": 0.635
+   }
+  }
  },
  "schur": {
   "clause_counts": {
@@ -322,7 +355,6 @@
   },
   "amo_free_unsat": true,
   "one_mus_size": 137,
-  "amo_in_mus": 0,
-  "seconds": 1.6
+  "amo_in_mus": 0
  }
 }

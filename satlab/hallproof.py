@@ -32,6 +32,8 @@ def hall_witness_proof(adj, n_right, witness=None):
         witness = minimal_hall_violator(adj, n_right)
         if witness is None:
             raise ValueError("pas de témoin de Hall : la formule est satisfiable")
+    if len(set(witness)) != len(witness):
+        raise ValueError("témoin avec pigeons répétés : %s" % (witness,))
     T = sorted(neighbourhood(adj, witness))
     m = len(T)
     if m >= len(witness):

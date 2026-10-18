@@ -1,0 +1,5 @@
+n=1: graphs=2 mismatches=0 total_models=1 perm_hist={0: 1, 1: 1} time=0.0s
+n=2: graphs=16 mismatches=0 total_models=8 perm_hist={0: 9, 1: 6, 2: 1} time=0.0s
+n=3: graphs=512 mismatches=0 total_models=384 perm_hist={0: 265, 1: 150, 2: 69, 3: 18, 4: 9, 6: 1} time=0.1s
+n=4: graphs=65536 mismatches=0 total_models=98304 perm_hist={0: 27713, 1: 13032, 2: 10800, 3: 4992, 4: 4254, 5: 1440, 6: 1536, 7: 576, 8: 648, 9: 24, 10: 288, 11: 96, 12: 48, 14: 72, 18: 16, 24: 1} time=15.5s
+balanced_exhaustive rc=0
