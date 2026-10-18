@@ -39,6 +39,17 @@ class TestGenerators(unittest.TestCase):
             b, _ = generators.generate(fam, seed=7, **kw)
             self.assertEqual(a.sha256(), b.sha256(), fam)
 
+    def test_meta_params_match_call_params(self):
+        # l'axe d'une campagne est lu dans méta["params"] : les noms doivent
+        # être ceux des arguments, jamais écrasés par une grandeur dérivée
+        cases = [("tseitin", dict(n=10, d=3)), ("pigeonhole", dict(holes=4)),
+                 ("coloring", dict(n=12, k=3, avg_degree=4)),
+                 ("random_ksat", dict(n=20, m=80, k=3))]
+        for fam, kw in cases:
+            _, meta = generators.generate(fam, seed=1, **kw)
+            for k, v in kw.items():
+                self.assertEqual(meta["params"][k], v, (fam, k))
+
     def test_planted_hidden_model_satisfies(self):
         cnf, meta = generators.planted_ksat(40, 200, seed=1)
         self.assertTrue(checker.check_model(cnf.num_vars, cnf.clauses, meta["hidden"])[0])
@@ -134,6 +145,9 @@ class TestBench(unittest.TestCase):
         xs = list(range(5, 30, 3))
         self.assertEqual(bench.growth_fit(xs, [2 ** x for x in xs])["better"], "exponential")
         self.assertEqual(bench.growth_fit(xs, [x ** 3 for x in xs])["better"], "polynomial")
+        # deux points quasi alignés pour les deux modèles : pas de verdict
+        near = bench.growth_fit([10, 11, 12], [100, 110, 121])
+        self.assertEqual(near["better"], "inconclusive")
 
     def test_run_instance_row(self):
         row = bench.run_instance("pigeonhole", dict(holes=4), 0)

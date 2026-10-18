@@ -51,7 +51,7 @@ CAMPAIGNS = {
         dict(name="tseitin_3regular", family="tseitin", axis="n",
              params=[dict(n=v, d=3) for v in (10, 14, 18, 22, 26, 30, 34, 40, 46, 50, 56)],
              seeds=range(5)),
-        dict(name="coloring3_threshold", family="coloring", axis="vertices",
+        dict(name="coloring3_threshold", family="coloring", axis="n",
              params=[dict(n=v, k=3, avg_degree=4.69) for v in (20, 40, 60, 80, 100)],
              seeds=range(6)),
     ],
@@ -155,6 +155,12 @@ def _linfit(xs, ys):
     return a, b, r2
 
 
+# Écart minimal de R² pour départager les deux modèles. En deçà, sur des
+# tailles finies et étroites, les deux formes sont indiscernables : le
+# verdict est "inconclusive" plutôt qu'un choix arbitraire.
+FIT_R2_MARGIN = 0.02
+
+
 def growth_fit(sizes, values):
     """Compare log y ~ b·x (exponentielle) et log y ~ c·log x (polynôme)."""
     pts = [(x, y) for x, y in zip(sizes, values) if x > 0 and y > 0]
@@ -169,7 +175,8 @@ def growth_fit(sizes, values):
     return dict(points=len(pts),
                 exp_rate=round(e[1], 5), exp_base=round(math.exp(e[1]), 5), exp_r2=round(e[2], 4),
                 poly_degree=round(p[1], 4), poly_r2=round(p[2], 4),
-                better="exponential" if e[2] > p[2] else "polynomial")
+                better=("inconclusive" if abs(e[2] - p[2]) < FIT_R2_MARGIN
+                        else "exponential" if e[2] > p[2] else "polynomial"))
 
 
 def summarize(rows, exp):
@@ -293,14 +300,20 @@ def render_report(env, summaries):
         if g:
             L += ["", "Ajustement des conflits médians sur %d points : exponentiel "
                   "base %.4f par unité de `%s` (R² = %.4f) ; polynomial degré %.3f (R² = %.4f). "
-                  "Meilleur ajustement : **%s**." % (
+                  "Verdict (écart de R² minimal %.2f) : **%s**." % (
                       g["points"], g["exp_base"], s["axis"], g["exp_r2"],
-                      g["poly_degree"], g["poly_r2"], g["better"])]
+                      g["poly_degree"], g["poly_r2"], FIT_R2_MARGIN, g["better"])]
     L += ["", "## Portée", "",
           "Ces mesures décrivent un solveur CDCL précis sur des tailles finies. Une croissance "
           "exponentielle observée n'est pas une borne inférieure, et une croissance polynomiale "
           "observée n'est pas un algorithme polynomial : aucun de ces résultats ne tranche "
           "P vs NP. Leur valeur est de vérifier, avec certificats contrôlés, des comportements "
-          "attendus par la théorie de la complexité des preuves (pigeonnier, Tseitin) et de "
-          "fournir des points de comparaison reproductibles.", ""]
+          "attendus par la théorie de la complexité des preuves et de fournir des points de "
+          "comparaison reproductibles.", "",
+          "Repères théoriques (taille des réfutations en résolution, que le CDCL sans "
+          "prétraitement ne peut battre) : pigeonnier 2^Ω(h) (Haken 1985) ; Tseitin sur "
+          "expanseurs 2^Ω(n) (Urquhart 1987, Ben-Sasson & Wigderson 2001) ; k-CNF aléatoire "
+          "UNSAT à densité constante 2^Ω(n) avec forte probabilité (Chvátal & Szemerédi "
+          "1988). Un verdict « polynomial » ou « inconclusive » sur ces familles traduit "
+          "donc des tailles trop petites pour l'asymptotique, pas une contradiction.", ""]
     return "\n".join(L)

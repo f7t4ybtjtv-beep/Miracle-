@@ -1,7 +1,8 @@
 """Familles d'instances à graine déterministe.
 
 Chaque générateur renvoie (CNF, méta) où méta contient la famille, les
-paramètres, la graine et, quand il est connu par construction, le statut
+paramètres d'appel (mêmes noms que les arguments, plus d'éventuelles
+grandeurs dérivées sous un autre nom, ex. `edges`), la graine et, quand il est connu par construction, le statut
 attendu ("SAT"/"UNSAT"/None). Le statut attendu sert de contre-test : il est
 justifié mathématiquement, pas par le solveur.
 """
@@ -69,7 +70,7 @@ def pigeonhole(holes, seed=0):
         for c in clauses:
             rng.shuffle(c)
     cnf = CNF(p * holes, clauses, ["PHP %d->%d seed=%d" % (p, holes, seed)])
-    return cnf, _meta("pigeonhole", "UNSAT", seed, holes=holes, n=p * holes)
+    return cnf, _meta("pigeonhole", "UNSAT", seed, holes=holes, pigeons=p)
 
 
 def random_regular_graph(n, d, rng):
@@ -117,7 +118,7 @@ def tseitin(n, d=3, seed=0):
             if sum(signs) % 2 != charge[u]:
                 clauses.append([-v if s else v for v, s in zip(vs, signs)])
     cnf = CNF(len(edges), clauses, ["Tseitin n=%d d=%d seed=%d" % (n, d, seed)])
-    return cnf, _meta("tseitin", "UNSAT", seed, vertices=n, degree=d, n=len(edges))
+    return cnf, _meta("tseitin", "UNSAT", seed, n=n, d=d, edges=len(edges))
 
 
 def coloring(n, k, avg_degree, seed=0):
@@ -137,8 +138,8 @@ def coloring(n, k, avg_degree, seed=0):
         for c in range(k):
             clauses.append([-x(a, c), -x(b, c)])
     cnf = CNF(n * k, clauses, ["%d-coloring G(%d, d=%g) seed=%d" % (k, n, avg_degree, seed)])
-    return cnf, _meta("coloring", None, seed, vertices=n, colors=k,
-                      avg_degree=avg_degree, edges=len(edges), n=n * k)
+    return cnf, _meta("coloring", None, seed, n=n, k=k,
+                      avg_degree=avg_degree, edges=len(edges))
 
 
 FAMILIES = {
