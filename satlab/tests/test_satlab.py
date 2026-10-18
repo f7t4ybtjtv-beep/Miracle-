@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 
-from satlab import bench, cdcl, checker, generators, reference
+from satlab import bench, cdcl, checker, core, generators, matching, reference
 from satlab.dimacs import format_model, parse_dimacs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -138,6 +138,62 @@ class TestCheckerSoundness(unittest.TestCase):
         self.assertTrue(checker.check_proof(cnf.num_vars, cnf.clauses, steps)[0])
         weakened = cnf.clauses[1:]          # retire la clause du pigeon 0 : PHP(4,4) SAT
         self.assertFalse(checker.check_proof(cnf.num_vars, weakened, steps)[0])
+
+
+class TestBipartiteAndCores(unittest.TestCase):
+    def test_hall_oracle_matches_solvers(self):
+        rng = random.Random(5)
+        for s in range(300):
+            n, m = rng.randint(1, 5), rng.randint(1, 5)
+            w = rng.choice([0, 0, 1, 2, 3])
+            if w > n or w - 1 > m:
+                w = 0
+            cnf, meta = generators.bipartite_php(n, m, rng.random(), witness=w, seed=s)
+            if cnf.num_vars > 16:
+                continue
+            sat, _, count = reference.brute_force(cnf.num_vars, cnf.clauses, count=True)
+            self.assertEqual("SAT" if sat else "UNSAT", meta["expected"], s)
+            self.assertEqual(cdcl.solve(cnf).status, meta["expected"], s)
+            if n == m:
+                # modèles de l'encodage faible = couplages parfaits (cas équilibré)
+                self.assertEqual(count, matching.count_perfect_matchings(meta["adj"], m), s)
+
+    def test_minimal_hall_violator_is_minimal(self):
+        for s in range(100):
+            _, meta = generators.bipartite_php(6, 5, 0.4, witness=3, seed=s)
+            adj = meta["adj"]
+            T = matching.minimal_hall_violator(adj, 5)
+            self.assertLess(len(matching.neighbourhood(adj, T)), len(T))
+            for i in range(len(T)):
+                sub = [adj[x] for x in T[:i] + T[i + 1:]]
+                self.assertNotIn(None, matching.max_matching(sub, 5))
+
+    def test_minimal_witness_core_need_not_be_mus(self):
+        # a, b -> {y1, y3} ; c, d -> {y1, y2} : témoin de Hall minimal, mais
+        # les clauses de trou sur y1 entre a, b (et entre c, d) sont redondantes
+        adj = [[0, 2], [0, 2], [0, 1], [0, 1]]
+        self.assertEqual(matching.minimal_hall_violator(adj, 3), [0, 1, 2, 3])
+        nv, clauses, var = generators.graph_php_cnf(adj, 3)
+        red = [sorted(clauses[i]) for i in core.redundant_clauses(nv, clauses)]
+        self.assertIn(sorted([-var[(0, 0)], -var[(1, 0)]]), red)
+        self.assertFalse(core.is_mus(nv, clauses))
+
+    def test_schur_counts_threshold_and_embedding(self):
+        for n, m in [(14, 203), (15, 228), (20, 380), (30, 795), (40, 1360), (50, 2075)]:
+            self.assertEqual(generators.schur(n)[0].num_clauses, m)
+        self.assertEqual(cdcl.solve(generators.schur(13)[0]).status, "SAT")
+        c14 = generators.schur(14)[0]
+        res = cdcl.solve(c14)
+        self.assertEqual(res.status, "UNSAT")
+        steps = checker._parse_proof("\n".join(res.proof))
+        for n in (15, 20):
+            big = generators.schur(n)[0]
+            # sous-CNF, donc la même preuve réfute la formule plus grande
+            self.assertTrue({tuple(sorted(c)) for c in c14.clauses}
+                            <= {tuple(sorted(c)) for c in big.clauses})
+            self.assertTrue(checker.check_proof(big.num_vars, big.clauses, steps)[0])
+        # les clauses « au plus une couleur » ne servent pas à la réfutation
+        self.assertEqual(cdcl.solve(generators.schur(14, amo=False)[0]).status, "UNSAT")
 
 
 class TestBench(unittest.TestCase):
