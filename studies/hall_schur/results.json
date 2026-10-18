@@ -1,0 +1,328 @@
+{
+ "proposition": {
+  "balanced": {
+   "1": {
+    "graphs": 2,
+    "mismatches": 0,
+    "total_models": 1
+   },
+   "2": {
+    "graphs": 16,
+    "mismatches": 0,
+    "total_models": 8
+   },
+   "3": {
+    "graphs": 512,
+    "mismatches": 0,
+    "total_models": 384
+   },
+   "4": {
+    "graphs": 65536,
+    "mismatches": 0,
+    "total_models": 98304
+   }
+  },
+  "unbalanced_graphs_all_unsat": 4172,
+  "seconds": 1.7
+ },
+ "q1": {
+  "complete_php_lines": {
+   "1": 2,
+   "2": 7,
+   "3": 19,
+   "4": 47,
+   "5": 111,
+   "6": 255,
+   "7": 575,
+   "8": 1279
+  },
+  "planted": [
+   {
+    "n": 22,
+    "k": 6,
+    "witness": 6,
+    "lines": 111,
+    "vars": 220
+   },
+   {
+    "n": 14,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 95
+   },
+   {
+    "n": 11,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 50
+   },
+   {
+    "n": 17,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 133
+   },
+   {
+    "n": 17,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 136
+   },
+   {
+    "n": 29,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 403
+   },
+   {
+    "n": 28,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 388
+   },
+   {
+    "n": 20,
+    "k": 4,
+    "witness": 4,
+    "lines": 19,
+    "vars": 193
+   },
+   {
+    "n": 17,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 136
+   },
+   {
+    "n": 24,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 273
+   },
+   {
+    "n": 28,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 372
+   },
+   {
+    "n": 24,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 256
+   },
+   {
+    "n": 25,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 291
+   },
+   {
+    "n": 18,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 162
+   },
+   {
+    "n": 13,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 91
+   },
+   {
+    "n": 16,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 121
+   },
+   {
+    "n": 21,
+    "k": 6,
+    "witness": 6,
+    "lines": 111,
+    "vars": 219
+   },
+   {
+    "n": 26,
+    "k": 6,
+    "witness": 6,
+    "lines": 111,
+    "vars": 322
+   },
+   {
+    "n": 15,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 104
+   },
+   {
+    "n": 11,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 70
+   },
+   {
+    "n": 14,
+    "k": 5,
+    "witness": 5,
+    "lines": 47,
+    "vars": 96
+   },
+   {
+    "n": 15,
+    "k": 6,
+    "witness": 6,
+    "lines": 111,
+    "vars": 107
+   },
+   {
+    "n": 14,
+    "k": 4,
+    "witness": 4,
+    "lines": 19,
+    "vars": 90
+   },
+   {
+    "n": 19,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 169
+   },
+   {
+    "n": 22,
+    "k": 7,
+    "witness": 7,
+    "lines": 255,
+    "vars": 211
+   },
+   {
+    "n": 22,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 240
+   },
+   {
+    "n": 16,
+    "k": 4,
+    "witness": 4,
+    "lines": 19,
+    "vars": 122
+   },
+   {
+    "n": 30,
+    "k": 6,
+    "witness": 6,
+    "lines": 111,
+    "vars": 385
+   },
+   {
+    "n": 13,
+    "k": 4,
+    "witness": 4,
+    "lines": 19,
+    "vars": 86
+   },
+   {
+    "n": 27,
+    "k": 3,
+    "witness": 3,
+    "lines": 7,
+    "vars": 364
+   }
+  ],
+  "counterexample_transfer": "K_{9,8} ⊔ K_{2,1} : la clause vide est RUP",
+  "seconds": 0.3
+ },
+ "q2": {
+  "fractions_exhaustive": {
+   "3x2": {
+    "mus": 79,
+    "witnesses": 85,
+    "criterion_checked_by_cdcl": 85
+   },
+   "3x3": {
+    "mus": 285,
+    "witnesses": 303,
+    "criterion_checked_by_cdcl": 303
+   },
+   "4x2": {
+    "mus": 560,
+    "witnesses": 656,
+    "criterion_checked_by_cdcl": 656
+   },
+   "4x3": {
+    "mus": 4113,
+    "witnesses": 5457,
+    "criterion_checked_by_cdcl": 779
+   }
+  },
+  "deficiency2_mus_example": true,
+  "random_mus_checked": 997,
+  "random_mus_deficiency": {
+   "1": 966,
+   "2": 29,
+   "3": 2
+  },
+  "seconds": 1.8
+ },
+ "q3": {
+  "bounds_checked_graphs": 4355,
+  "seconds": 0.4
+ },
+ "schur": {
+  "clause_counts": {
+   "14": 203,
+   "15": 228,
+   "20": 380,
+   "30": 795,
+   "40": 1360,
+   "50": 2075
+  },
+  "schur13_coloring": {
+   "1": 2,
+   "2": 0,
+   "3": 0,
+   "4": 2,
+   "5": 1,
+   "6": 1,
+   "7": 2,
+   "8": 1,
+   "9": 1,
+   "10": 2,
+   "11": 0,
+   "12": 0,
+   "13": 2
+  },
+  "proof_lines_n14": 232,
+  "proof_reuse_verified": {
+   "14": true,
+   "15": true,
+   "20": true,
+   "30": true,
+   "40": true,
+   "50": true
+  },
+  "amo_free_unsat": true,
+  "one_mus_size": 137,
+  "amo_in_mus": 0,
+  "seconds": 1.6
+ }
+}

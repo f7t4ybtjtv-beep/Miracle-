@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 
-from satlab import bench, cdcl, checker, core, generators, matching, reference
+from satlab import bench, cdcl, checker, core, generators, hallproof, matching, reference
 from satlab.dimacs import format_model, parse_dimacs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -177,6 +177,34 @@ class TestBipartiteAndCores(unittest.TestCase):
         red = [sorted(clauses[i]) for i in core.redundant_clauses(nv, clauses)]
         self.assertIn(sorted([-var[(0, 0)], -var[(1, 0)]]), red)
         self.assertFalse(core.is_mus(nv, clauses))
+
+    def test_hall_witness_proof_size_and_validity(self):
+        for m in range(1, 7):
+            adj = [list(range(m)) for _ in range(m + 1)]
+            nv, clauses, _ = generators.graph_php_cnf(adj, m)
+            _, lines = hallproof.hall_witness_proof(adj, m)
+            self.assertEqual(len(lines), hallproof.lemma_bound(m))
+            self.assertTrue(checker.check_proof(nv, clauses, checker._parse_proof("\n".join(lines)))[0])
+        # témoin implanté dans un graphe plus grand : la preuve du témoin
+        # réfute la formule complète (sous-CNF)
+        for s in range(20):
+            cnf, meta = generators.bipartite_php(15, 17, 0.5, witness=5, seed=s)
+            w, lines = hallproof.hall_witness_proof(meta["adj"], 17)
+            m = len(matching.neighbourhood(meta["adj"], w))
+            self.assertLessEqual(len(lines), hallproof.lemma_bound(m))
+            self.assertTrue(checker.check_proof(cnf.num_vars, cnf.clauses,
+                                                checker._parse_proof("\n".join(lines)))[0])
+
+    def test_mus_pigeon_set_need_not_be_minimal_witness(self):
+        # N(a)=N(b)={y1}, N(c)=N(d)={y1,y2} : MUS de déficience 2 qui utilise
+        # les 4 pigeons alors que {a,b} est un témoin minimal
+        adj = [[0], [0], [0, 1], [0, 1]]
+        nv, clauses, var = generators.graph_php_cnf(adj, 2)
+        e = lambda x, y: var[(x, y)]
+        sub = [[e(0, 0)], [e(1, 0)], [e(2, 0), e(2, 1)], [e(3, 0), e(3, 1)],
+               [-e(0, 0), -e(2, 0)], [-e(1, 0), -e(3, 0)], [-e(2, 1), -e(3, 1)]]
+        self.assertTrue(all(sorted(c) in [sorted(d) for d in clauses] for c in sub))
+        self.assertTrue(core.is_mus(nv, sub))
 
     def test_schur_counts_threshold_and_embedding(self):
         for n, m in [(14, 203), (15, 228), (20, 380), (30, 795), (40, 1360), (50, 2075)]:

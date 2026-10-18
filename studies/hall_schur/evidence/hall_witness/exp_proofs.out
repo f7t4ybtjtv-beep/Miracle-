@@ -1,0 +1,40 @@
+== A. complete PHP^{m+1}_m ==
+m  lemmas  closed_form  lemma_lits  deletions  satlab  drat  t_s
+2       7            7          12          2  True  True  0.28
+3      19           19          63         12  True  True  0.06
+4      47           47         252         38  True  True  0.14
+5     111          111         875        100  True  True  0.11
+6     255          255        2778        242  True  True  0.09
+7     575          575        8281        560  True  True  0.10
+8    1279         1279       23544       1262  True  True  0.14
+9    2815         2815       64503       2796  True  True  0.51
+
+== B. planted witnesses in larger random graphs ==
+id n k p_in nv ncl | subcnf_subset sub_bf | |N(S)| lemmas bound(2^{m-1}(m+2)-1) lits satlab drat | minwit_size
+ 0 24 4 1.0  282  1538 | True UNSAT | 3    19    19      63 True True | 4
+ 1 12 4 1.0   67   175 | True UNSAT | 3    19    19      63 True True | 4
+ 2 20 4 1.0  182   760 | True UNSAT | 3    19    19      63 True True | 4
+ 3 20 4 0.6  179   715 | True UNSAT | 3    13    19      27 True True | 3
+ 4 16 4 0.6  117   383 | True UNSAT | 3    16    19      41 True True | 4
+ 5 20 5 1.0  193   886 | True UNSAT | 4    47    47     252 True True | 5
+ 6 30 5 1.0  404  2563 | True UNSAT | 4    47    47     252 True True | 5
+ 7 24 5 1.0  275  1452 | True UNSAT | 4    47    47     252 True True | 5
+ 8 16 5 0.6  103   304 | True UNSAT | 4    31    47      85 True True | 5
+ 9 20 5 0.6  167   637 | True UNSAT | 4    26    47      71 True True | 3
+10 12 6 1.0   75   226 | True - | 5   111   111     875 True True | 6
+11 24 6 1.0  265  1429 | True - | 5   111   111     875 True True | 6
+12 20 6 1.0  186   854 | True - | 5   111   111     875 True True | 6
+13 30 6 0.6  392  2416 | True UNSAT | 5    86   111     472 True True | 5
+14 16 6 0.6  114   392 | True UNSAT | 5    86   111     516 True True | 6
+15 30 7 1.0  404  2624 | True - | 6   255   255    2778 True True | 7
+16 30 7 1.0  410  2667 | True - | 6   255   255    2778 True True | 7
+17 16 7 1.0  131   573 | True - | 6   255   255    2778 True True | 7
+18 20 7 0.6  167   691 | True - | 6   200   255    1458 True True | 7
+19 12 7 0.6   63   180 | True - | 6   182   255    1317 True True | 7
+20 30 8 1.0  415  2822 | True - | 7   575   575    8281 True True | 8
+21 24 8 1.0  255  1405 | True - | 7   575   575    8281 True True | 8
+22 30 8 1.0  423  2932 | True - | 7   575   575    8281 True True | 8
+23 30 8 0.6  400  2554 | True - | 7   357   575    3187 True True | 8
+24 16 8 0.6  105   359 | True - | 7   405   575    3963 True True | 8
+
+ALL CHECKS PASSED; instances: 25

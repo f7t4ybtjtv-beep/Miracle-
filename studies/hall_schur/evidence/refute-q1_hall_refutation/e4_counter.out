@@ -1,0 +1,4 @@
+nv 74 ncl 300
+empty clause alone RUP: satlab (True, 'preuve valide (1 lemmes, 0 suppressions)') drat True
+CDCL UNSAT 0
+PHP9_8 alone: empty RUP? (False, 'étape 1 : lemme [] non RUP')

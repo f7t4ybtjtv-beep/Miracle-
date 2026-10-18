@@ -1,0 +1,10 @@
+k n nv ncl conflicts median core%% t_s proofOK(first seed)
+5 20 182 788 [29, 25, 29] 29 noncore_lits=0 of 356 0.0 True
+5 40 756 6882 [33, 30, 27] 30 noncore_lits=0 of 370 0.0 True
+5 60 1683 22832 [29, 27, 30] 29 noncore_lits=0 of 354 0.1 True
+6 20 187 838 [152, 159, 141] 152 noncore_lits=0 of 3695 0.0 True
+6 40 709 6179 [143, 137, 163] 143 noncore_lits=0 of 3418 0.1 True
+6 60 1702 23428 [141, 150, 147] 147 noncore_lits=0 of 3503 0.2 True
+7 20 188 914 [1078, 957, 828] 957 noncore_lits=96 of 39295 0.6 True
+7 40 757 6890 [864, 973, 924] 924 noncore_lits=0 of 37457 0.7 True
+7 60 1579 20034 [696, 933, 1076] 933 noncore_lits=0 of 36506 0.9 True

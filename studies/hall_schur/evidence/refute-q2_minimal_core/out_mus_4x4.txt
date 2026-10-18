@@ -1,0 +1,24 @@
+(1, 0) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 1 0.0s
+(1, 1) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 3 0.0s
+(1, 2) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 6 0.0s
+(1, 3) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 10 0.0s
+(1, 4) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 15 0.0s
+(2, 0) labelled MUS {'mus': 2, 'nonminwit': 0} iso classes so far 16 0.0s
+(2, 1) labelled MUS {'mus': 5, 'nonminwit': 0} iso classes so far 19 0.0s
+(2, 2) labelled MUS {'mus': 10, 'nonminwit': 0} iso classes so far 26 0.0s
+(2, 3) labelled MUS {'mus': 19, 'nonminwit': 0} iso classes so far 39 0.0s
+(2, 4) labelled MUS {'mus': 36, 'nonminwit': 0} iso classes so far 61 0.0s
+(3, 0) labelled MUS {'mus': 3, 'nonminwit': 0} iso classes so far 62 0.0s
+(3, 1) labelled MUS {'mus': 18, 'nonminwit': 0} iso classes so far 66 0.0s
+(3, 2) labelled MUS {'mus': 85, 'nonminwit': 0} iso classes so far 79 0.0s
+(3, 3) labelled MUS {'mus': 303, 'nonminwit': 0} iso classes so far 115 0.1s
+(3, 4) labelled MUS {'mus': 1038, 'nonminwit': 0} iso classes so far 202 0.9s
+(4, 0) labelled MUS {'mus': 4, 'nonminwit': 0} iso classes so far 203 0.9s
+(4, 1) labelled MUS {'mus': 56, 'nonminwit': 0} iso classes so far 208 0.9s
+(4, 2) labelled MUS {'mus': 722, 'nonminwit': 66} iso classes so far 230 1.9s
+(4, 3) labelled MUS {'mus': 5655, 'nonminwit': 198} iso classes so far 317 5.5s
+(4, 4) labelled MUS {'mus': 31952, 'nonminwit': 396} iso classes so far 634 25.2s
+(1, 5) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 640 25.2s
+iso classes 640
+aggregate over iso-class representatives: {'mus': 674, 'nonminwit': 69, 'bad_hole': 0, 'not_strict': 0, 'verify_fail': 0, 'd1_not_minwit': 0, 'minwit_not_d1': 0, 'minwit_without_mus': 0, 'd1_hole_outside_induced': 0, 'brute_checked': 611, 'brute_mismatch': 0, 'sd_sets': 877, 'sd_with_mus': 614, 'sd_conn': 660, 'sd_conn_with_mus': 614, 'hist': {1: 605, 2: 69}, 'uniq_H_fail': 0}
+smallest graph with MUS whose pigeon set is not a minimal witness (n+m,|E|,n,m,adj): (6, 6, 4, 2, (3, 3, 1, 1))
