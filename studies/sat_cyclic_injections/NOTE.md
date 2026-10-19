@@ -19,12 +19,17 @@ python3 studies/sat_cyclic_injections/verify.py --drat /chemin/vers/drat-trim
   et les autres certificats JSON n'existent ni dans le dépôt ni sur la machine.
   Les résultats qu'ils porteraient ne sont donc pas contrôlés. Je les ai
   recalculés autrement (§3 et §4).
-- **Compteurs de D_6 à largeur 3.** Le document annonce 11 523 clauses
-  produites, 12 831 210 couples candidats et un certificat de 153 résolvantes.
-  Une saturation à largeur 3 que j'ai écrite donne 11 480 clauses, 9 451 646
-  paires testées et un certificat de 172 étapes (ancêtres de la clause vide).
-  L'existence de la réfutation est confirmée ; les compteurs dépendent de
-  l'implémentation. Je n'ai pas établi que 153 est atteignable.
+- **Compteurs de D_6 à largeur 3, en partie reproduits.** Le document annonce
+  11 523 clauses, 12 831 210 couples candidats et un certificat de 153 résolvantes.
+  - *11 523 clauses* : reproduit. C'est la taille de la fermeture complète par
+    résolution de largeur ≤ 3, axiomes compris (11 489 clauses dérivées + 34 axiomes).
+  - *Certificat* : un certificat de **124 résolvantes distinctes** est trouvé et
+    vérifié (satlab, drat-trim, et contrôle explicite de chaque étape comme
+    résolvante exacte). Il est plus court que les 153 annoncés. Le coût d'arbre
+    minimal dans cette fermeture est 139. Je ne prétends pas que 124 soit minimal.
+  - *12 831 210 couples candidats* : non reproduit. Ce nombre dépend de la
+    procédure de saturation (ordre des paires, arrêt ou non) ; ma procédure
+    complète compte 21 121 428 paires.
 
 ## 2. Affirmations vérifiées
 
@@ -38,7 +43,7 @@ python3 studies/sat_cyclic_injections/verify.py --drat /chemin/vers/drat-trim
 | Tableau du §5 pour C_6, C_12, C_50 (variables, axiomes, étapes) | vérifié (14/17/22, 26/29/40, 102/105/154) |
 | D_n : élimination d'après le §4 avec un bloc de 24 variables au plus | voisinage maximal mesuré : 13 pour n = 6..200, soit un bloc de 14 variables ; invariant du lemme 1 de `PREUVE_D_n.md` vérifié pour n = 6..200. La preuve écrite est dans `PREUVE_D_n.md` |
 | D_n : Davis–Putnam avec dédoublonnage donne une preuve valide, de taille linéaire | valide par satlab et drat-trim pour n = 6, 8, 10, 12, 16, 20 ; 1 120 → 12 399 résolvantes, environ 700 par pigeon ajouté |
-| D_6 : réfutation de largeur 3 | existence confirmée (voir §1 pour les compteurs) |
+| D_6 : réfutation de largeur 3 | fermeture de 11 523 clauses (reproduit) ; certificat de 124 résolvantes, plus court que 153, vérifié par satlab et drat-trim |
 | Frontières (§6) : C_n, {0, k} ratio 2/k ; D_n, {0, k+1, k+2} ratio 3/k | vérifié, n = 6..15 |
 
 Affirmation générale du §4 : une réfutation de D_n de largeur ≤ 24 et de taille
@@ -81,7 +86,8 @@ La borne est très lâche ; la taille mesurée est de l'ordre de 700 par pigeon.
 
 Les constructions de C_n (réfutation linéaire explicite) et la structure de
 D_n (bloc borné, preuve linéaire mesurée) sont correctes et vérifiées par deux
-vérificateurs indépendants. Les compteurs chiffrés du §5 pour D_6 à largeur 3
-ne sont pas reproduits et ne peuvent pas l'être sans les fichiers cités. Pour
-publier le document, il faut soit fournir ces fichiers, soit remplacer les
-compteurs par ceux de `results.json`.
+vérificateurs indépendants. Les compteurs du §5 pour D_6 à largeur 3 sont en partie reproduits : 11 523 clauses
+(fermeture complète) et un certificat plus court, de 124 résolvantes. Le nombre de
+12 831 210 couples dépend de la procédure et n'est pas reproduit. Pour publier le document,
+il faut soit fournir les fichiers cités, soit remplacer les compteurs par ceux de
+`results.json`.

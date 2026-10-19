@@ -438,9 +438,9 @@
   }
  },
  "d6_width3": {
-  "generated": 11480,
-  "pairs": 9451646,
-  "certificate_steps": 172,
+  "closure_with_axioms": 11523,
+  "tree_cost": 139,
+  "certificate_resolvents": 124,
   "checker": true,
   "drat_trim": true
  }

@@ -301,76 +301,79 @@ def boundary(adj, S, n):
     return sorted(h for h in range(n) if sum(1 for p in S if h in adj[p]) == 1)
 
 
-def width_bounded_refutation(adj, n, w):
-    """Saturation par résolution restreinte à la largeur <= w (algorithme du « given clause »).
-    Renvoie (nb clauses distinctes produites, nb de paires testées, certificat DRUP ordonné
-    ou None). Le certificat ne contient que les ancêtres de la clause vide."""
+def d6_closure(adj, n):
+    """Fermeture complète par résolution de largeur <= 3 (ensemble unique, indépendant de
+    l'ordre). Renvoie (store, n_axiomes, deriv, index de la clause vide), où deriv[r] liste les
+    couples (i, j) d'index < r qui produisent la résolvante r."""
     nv, clauses, _ = build(adj, n)
-    store, parents, by_lit, seen = [], [], {}, {}
-    def add(cl, par):
-        if cl in seen:
-            return None
-        seen[cl] = len(store)
-        store.append(cl)
-        parents.append(par)
-        for l in cl:
-            by_lit.setdefault(l, []).append(seen[cl])
+    store, seen, by_lit, deriv = [], {}, {}, {}
+
+    def add(cl):
+        if cl not in seen:
+            seen[cl] = len(store)
+            store.append(cl)
+            for l in cl:
+                by_lit.setdefault(l, []).append(seen[cl])
         return seen[cl]
+
     for c in clauses:
-        add(frozenset(c), None)
-    pairs = 0
-    queue = list(range(len(store)))
+        add(frozenset(c))
+    n_ax = len(clauses)
     qi = 0
-    empty = None
-    while qi < len(store) and empty is None:
+    while qi < len(store):
         i = qi
         qi += 1
         C = store[i]
         for l in C:
             for j in list(by_lit.get(-l, [])):
-                if j > i and False:
-                    continue
                 D = store[j]
-                pairs += 1
                 R = (C - {l}) | (D - {-l})
-                if any(-x in R for x in R) or len(R) > w:
+                if any(-x in R for x in R) or len(R) > 3:
                     continue
-                k = add(R, (i, j, l))
-                if k is not None and not R:
-                    empty = k
-                    break
-            if empty is not None:
-                break
-    if empty is None:
-        return len(store) - len(clauses), pairs, None, None
-    # ancêtres de la clause vide, en ordre topologique (indices croissants)
-    needed, stack = set(), [empty]
-    while stack:
-        k = stack.pop()
-        if k in needed or parents[k] is None:
-            continue
-        needed.add(k)
-        i, j, _ = parents[k]
-        stack.extend([i, j])
-    order = sorted(needed)
-    lines = [" ".join(map(str, sorted(store[k], key=abs))) + " 0" for k in order]
-    cert_steps = len(order)
-    cert_nv, cert_cl = nv, clauses
-    return len(store) - len(clauses), pairs, "\n".join(lines) + "\n", cert_steps
+                r = add(R)
+                if r >= n_ax and max(i, j) < r:
+                    deriv.setdefault(r, set()).add((min(i, j), max(i, j)))
+    return nv, clauses, store, n_ax, deriv, seen[frozenset()]
 
 
 def check_d6_width3(drat):
+    """Réfutation de largeur 3 de D_6 : coût d'arbre minimal et certificat DAG (sous-ensemble
+    des dérivations de la fermeture). Chaque étape est contrôlée comme résolvante exacte."""
     adj = family_d(6)
-    generated, pairs, proof, steps = width_bounded_refutation(adj, 6, 3)
-    assert proof is not None, "pas de réfutation de largeur 3 pour D_6"
-    nv, clauses, _ = build(adj, 6)
-    ok_py, msg = checker.check_proof(nv, clauses, checker._parse_proof(proof + "0\n"))
-    ok_drat = run_drat(drat, CNF(nv, clauses).to_dimacs(), proof + "0\n", "d6w3") if drat else None
+    nv, clauses, store, n_ax, deriv, empty = d6_closure(adj, 6)
+    assert len(store) == 11523, len(store)     # axiomes inclus, comme dans le document
+    INF = float("inf")
+    cost = [0 if k < n_ax else INF for k in range(len(store))]
+    best = {}
+    for r in range(n_ax, len(store)):
+        for (i, j) in deriv.get(r, ()):
+            if cost[i] < INF and cost[j] < INF and cost[i] + cost[j] + 1 < cost[r]:
+                cost[r] = cost[i] + cost[j] + 1
+                best[r] = (i, j)
+    need, stack = set(), [empty]
+    while stack:
+        k = stack.pop()
+        if k < n_ax or k in need:
+            continue
+        need.add(k)
+        stack.extend(best[k])
+    order = sorted(need)
+    # contrôle explicite : chaque résolvante est une résolvante exacte de deux clauses antérieures
+    for k in order:
+        i, j = best[k]
+        ok = any(l in store[i] and -l in store[j] and
+                 (store[i] - {l}) | (store[j] - {-l}) == store[k] for l in store[i])
+        assert ok, k
+    lines = [" ".join(map(str, sorted(store[k], key=abs))) + " 0" for k in order] + ["0"]
+    proof = "\n".join(lines) + "\n"
+    ok_py, msg = checker.check_proof(nv, clauses, checker._parse_proof(proof))
+    ok_drat = run_drat(drat, CNF(nv, clauses).to_dimacs(), proof, "d6w3") if drat else None
     assert ok_py and ok_drat in (True, None), msg
-    print("D_6, largeur 3 : réfutation trouvée ; %d clauses produites, %d paires testées, "
-          "certificat de %d étapes (checker=%s, drat=%s)" % (generated, pairs, steps, ok_py, ok_drat))
-    return dict(generated=generated, pairs=pairs, certificate_steps=steps,
-                checker=ok_py, drat_trim=ok_drat)
+    print("D_6, largeur 3 : fermeture de %d clauses (axiomes inclus) ; coût d'arbre %d ; "
+          "certificat DAG de %d résolvantes (checker=%s, drat=%s)"
+          % (len(store), cost[empty], len(order), ok_py, ok_drat))
+    return dict(closure_with_axioms=len(store), tree_cost=cost[empty],
+                certificate_resolvents=len(order), checker=ok_py, drat_trim=ok_drat)
 
 
 def check_expansion(ns):
