@@ -36,15 +36,15 @@ python3 studies/sat_cyclic_injections/verify.py --drat /chemin/vers/drat-trim
 | Couplages constructifs décrits au §2, pour tout pigeon omis | vérifié pour tout n = 6..200 |
 | C_n : réfutation explicite de 3n+4 étapes, largeur 2 (§3) | construite pas à pas, chaque résolvante contrôlée ; validée par satlab et drat-trim pour n = 2..12 et 50 |
 | Tableau du §5 pour C_6, C_12, C_50 (variables, axiomes, étapes) | vérifié (14/17/22, 26/29/40, 102/105/154) |
-| D_n : élimination d'après le §4 avec un bloc de 24 variables au plus | voisinage maximal mesuré : 13 pour n = 6..200, soit un bloc de 14 variables |
+| D_n : élimination d'après le §4 avec un bloc de 24 variables au plus | voisinage maximal mesuré : 13 pour n = 6..200, soit un bloc de 14 variables ; invariant du lemme 1 de `PREUVE_D_n.md` vérifié pour n = 6..200. La preuve écrite est dans `PREUVE_D_n.md` |
 | D_n : Davis–Putnam avec dédoublonnage donne une preuve valide, de taille linéaire | valide par satlab et drat-trim pour n = 6, 8, 10, 12, 16, 20 ; 1 120 → 12 399 résolvantes, environ 700 par pigeon ajouté |
 | D_6 : réfutation de largeur 3 | existence confirmée (voir §1 pour les compteurs) |
 | Frontières (§6) : C_n, {0, k} ratio 2/k ; D_n, {0, k+1, k+2} ratio 3/k | vérifié, n = 6..15 |
 
 Affirmation générale du §4 : une réfutation de D_n de largeur ≤ 24 et de taille
-≤ (3n+3)·3^24. La borne est correcte par le raisonnement du document (au plus
-3^24 clauses distinctes par bloc, donc par variable éliminée). Elle est très
-lâche ; la taille mesurée est de l'ordre de 700 par pigeon.
+≤ (3n+3)·3^24. Le document ne donnait qu'une esquisse de l'invariant de bloc.
+Elle est maintenant démontrée dans `PREUVE_D_n.md` (lemmes 1 et 2, théorème du §6).
+La borne est très lâche ; la taille mesurée est de l'ordre de 700 par pigeon.
 
 ## 3. Imprécisions à corriger dans le document
 

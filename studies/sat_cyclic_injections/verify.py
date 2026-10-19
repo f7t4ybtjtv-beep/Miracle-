@@ -246,6 +246,39 @@ def check_d_elimination_width(ns):
     return rows
 
 
+def check_d_invariant(ns):
+    """Lemme de la preuve (PREUVE_D_n.md) : à l'étape k (élimination du pigeon k),
+    le voisinage courant de chaque variable du pigeon k est inclus dans les pigeons
+    B_k = {0,1,2,∞} ∪ {k,k+1,k+2,k+3} mod n."""
+    worst = {}
+    for n in ns:
+        adj = family_d(n)
+        nv, clauses, var = build(adj, n)
+        owner = {v: x for (x, y), v in var.items()}
+        nbr = {v: set() for v in range(1, nv + 1)}
+        for c in clauses:
+            for u in c:
+                for w in c:
+                    if u != w:
+                        nbr[abs(u)].add(abs(w))
+        worst_bag = 0
+        for k in range(3, n):
+            B = {0, 1, 2, n} | {(k + j) % n for j in range(4)}
+            for j in adj[k]:
+                v = var[(k, j)]
+                N = nbr.pop(v)
+                assert {owner[u] for u in N} <= B, (n, k, {owner[u] for u in N} - B)
+                worst_bag = max(worst_bag, len(N) + 1)
+                for u in N:
+                    nbr[u].discard(v)
+                    nbr[u] |= (N - {u})
+        worst[n] = worst_bag
+        assert worst_bag <= 24
+    print("D_n, lemme d'invariant (PREUVE_D_n.md) : vérifié pour n = %s ; bloc max = %s"
+          % (list(ns), sorted(set(worst.values()))))
+    return worst
+
+
 def check_d_dp_proofs(drat, ns):
     rows = {}
     for n in ns:
@@ -371,6 +404,7 @@ def main():
     results["c_refutation"] = check_c_refutation(args.drat, list(range(2, 13)) + [50])
     results["d_structure"] = check_d_structure([6, 8, 10, 12, 50])
     results["d_width"] = check_d_elimination_width([6, 8, 10, 12, 20, 50, 100, 200])
+    results["d_invariant"] = check_d_invariant(list(range(6, 201)))
     results["d_dp"] = check_d_dp_proofs(args.drat, [6, 8, 10, 12, 16, 20])
     results["d6_width3"] = check_d6_width3(args.drat)
     check_expansion(list(range(6, 16)))
