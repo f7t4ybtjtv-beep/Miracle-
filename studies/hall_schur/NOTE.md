@@ -5,8 +5,10 @@ graphes bipartis équilibrés, (2) les trois questions de suite qui
 l'accompagnaient, et (3) le fichier `pnp_schur_extension_results_20261019.json`
 (sha256 `e74f4438…d0f4d7`). Chaque affirmation porte un statut :
 
-- **prouvé** : preuve écrite dans cette note (dans le texte ou en annexe) et
-  relue indépendamment ;
+- **prouvé** : preuve écrite dans cette note (dans le texte ou en annexe).
+  Les annexes A–C ont été rédigées après la revue adverse, et la seconde passe
+  de revue (qui devait les relire) a échoué faute de quota : elles n'ont donc
+  pas été relues par un vérificateur indépendant ;
 - **vérifié** : recalculé par du code exécuté, avec au moins deux méthodes
   indépendantes quand c'est possible ; le domaine testé est précisé ;
 - **réfuté** : contre-exemple certifié ;
@@ -273,10 +275,11 @@ variables, l'inclusion pourrait ne plus être littérale.
 
 ## 6. Erreurs détectées (boucle de rétroaction)
 
-Deux passes de vérification adverse ont réfuté plusieurs affirmations. Les
-premières venaient des enquêtes ; les suivantes venaient de **la première
-version de cette note**, y compris des corrections que j'y avais apportées
-aux premières :
+Une passe de vérification adverse sur les enquêtes a réfuté plusieurs
+affirmations, puis une passe de revue sur la **première version de cette note**
+(y compris des corrections que j'y avais apportées). Une troisième passe, qui
+devait relire les annexes A–C et les affirmations corrigées, n'a pas pu
+s'exécuter (limite de quota) : ces points restent non relus (voir la légende) :
 
 | Affirmation | Correction |
 |---|---|
