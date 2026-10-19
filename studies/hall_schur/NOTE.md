@@ -6,19 +6,21 @@ l'accompagnaient, et (3) le fichier `pnp_schur_extension_results_20261019.json`
 (sha256 `e74f4438…d0f4d7`). Chaque affirmation porte un statut :
 
 - **prouvé** : preuve écrite dans cette note (dans le texte ou en annexe).
-  Les annexes A–C ont été rédigées après la revue adverse, et la seconde passe
-  de revue (qui devait les relire) a échoué faute de quota : elles n'ont donc
-  pas été relues par un vérificateur indépendant ;
+  Les annexes A–C ont été relues par une passe adverse ; ses constats sont
+  traités (§6). Ce ne sont pas des preuves formelles ;
 - **vérifié** : recalculé par du code exécuté, avec au moins deux méthodes
   indépendantes quand c'est possible ; le domaine testé est précisé ;
 - **réfuté** : contre-exemple certifié ;
 - **non vérifiable** : données ou définitions manquantes.
 
-Toute insatisfiabilité citée est certifiée par une preuve DRUP. Dans
-`reproduce.py`, `satlab.core` fait vérifier chaque verdict UNSAT par
-`satlab/checker.py`. Dans `evidence/`, les preuves sont contrôlées par
-`checker.py` et souvent aussi par drat-trim. `reproduce.py` recalcule les
-résultats principaux et les vérifie par assertion en ~10 s. `evidence/`
+Les insatisfiabilités issues d'un solveur sont certifiées par une preuve DRUP.
+Dans `reproduce.py`, `satlab.core` fait vérifier chaque verdict UNSAT par
+`satlab/checker.py`. Le cas |X| > |Y| (principe des tiroirs) n'est pas un verdict
+de solveur : il est vérifié par inclusion-exclusion, et par DRUP seulement pour
+les formes 3×2 et 4×3 (`evidence/pm-balanced/certified.out`). Dans `evidence/`,
+les autres preuves sont contrôlées par `checker.py` et souvent aussi par
+drat-trim. `reproduce.py` recalcule les résultats principaux et les vérifie par
+assertion en ~15 s sur cette machine. `evidence/`
 contient les scripts et les sorties brutes des enquêtes plus lourdes (voir
 `evidence/README.md`).
 
@@ -92,27 +94,28 @@ est monotone. La construction explicite est implémentée dans
 > (« les pigeons 1..j ne logent pas tous dans H ») ; on dérive D(j+1,H)
 > à partir des D(j, H\{h}), et D(m+1, N(S)) est la clause vide.
 
-- Taille : **2^{m−1}(m+2) − 1 lemmes** exactement sur K_{m+1,m}, et au plus
-  autant sur tout témoin. Avec m ≤ k−1, cela fait au plus
-  (k+1)·2^{k−2} − 1 lignes, soit Θ(k·2^k) et non O(2^k). Savoir si O(2^k)
-  est atteignable reste **ouvert**.
+- Taille : au plus **2^{m−1}(m+2) − 1 lemmes** pour tout témoin, avec m = |N(S)|.
+  Ce nombre est atteint exactement sur K_{m+1,m}. Comme m ≤ k−1, la borne donne
+  au plus (k+1)·2^{k−2} − 1 lignes, et sur K_{k,k−1} cela vaut Θ(k·2^k). Savoir
+  si O(2^k) est atteignable pour tout témoin reste **ouvert**.
 - La forme close a été vérifiée par trois générateurs indépendants. Les
   deux agents l'ont vérifiée pour m = 2..12, avec des preuves acceptées par
   `checker.py` et drat-trim pour m = 2..9 et m = 2..10 respectivement.
   `satlab.hallproof` l'a vérifiée pour m = 1..8 avec `checker.py` et pour
   m = 2..9 avec drat-trim (`evidence/review/hallproof_drat_trim.txt`).
-- En résolution pure : m(m+3)·2^{m−2} étapes, vérifiées comme résolvantes
-  exactes pour m = 2..10.
+- En résolution pure, sur K_{m+1,m} : m(m+3)·2^{m−2} étapes, vérifiées comme
+  résolvantes exactes pour m = 2..10.
 - Sur des graphes à témoin implanté, la preuve du seul témoin est acceptée
   sur la **formule complète** :
   - côté agents : 25 et 30 instances, jusqu'à 30 pigeons et 423 variables,
     avec `checker.py` et drat-trim ;
   - côté `satlab.hallproof` : 30 instances dans `reproduce.py`, avec
-    `checker.py`, et 10 avec drat-trim ;
+    `checker.py`, et 8 modèles K_{m+1,m} (m = 2..9) plus 10 instances implantées
+    avec drat-trim (`evidence/review/hallproof_drat_trim.txt`, régénéré par
+    `evidence/review/hallproof_drat.py`) ;
   - témoins arbitraires (non minimaux, non complets, ordre mélangé, pigeons
-    sans voisin) : tous ceux de 150 petits graphes aléatoires, dans les
-    tests unitaires. Les relecteurs en ont testé 52 253 de plus, sans aucun
-    échec.
+    sans voisin) : tous ceux de 150 petits graphes aléatoires, dans le test
+    unitaire `test_hall_proof_on_arbitrary_violators`.
 
 **Polynomiale ? Non en général — prouvé, avec une borne inférieure citée.**
 Si S ∪ N(S) induit K_{k,k−1}, alors F_S = PHP(k, k−1), qui exige des
@@ -165,8 +168,10 @@ mesurés.
 Proportion exhaustive de témoins minimaux dont la CNF induite est un MUS,
 sur les graphes étiquetés comptés avec multiplicité. Elle est recalculée par
 `reproduce.py` à l'aide du critère. Le critère y est comparé au test MUS
-direct, certifié, sur 2 467 témoins, et il a été recalculé indépendamment
-par deux agents.
+direct, certifié, sur 2 467 témoins : tous les témoins des formats 3×2, 3×3 et
+4×2 (1 044 témoins), et un échantillon pour 4×3, 4×4 et 5×3 (1 423 témoins). Le
+critère sur tous les témoins, sans certification CDCL, est dans
+`evidence/refute-q2_minimal_core/out_witness_exh.txt`.
 
 | \|X\|×\|Y\| | 3×2 | 3×3 | 4×2 | 4×3 | 4×4 | 5×3 |
 |---|---|---|---|---|---|---|
@@ -200,7 +205,8 @@ MUS d'ensemble de pigeons P :
 Il existe des MUS de déficience 2 et 3. Pour |X| ≤ 5, |Y| ≤ 3, en
 énumérant les MUS d'un représentant par classe d'isomorphisme de graphes, on
 en compte 1 196 de déficience 1, 2 204 de déficience 2 et 744 de
-déficience 3. Le plus petit est N(a) = N(b) = {y1}, N(c) = N(d) = {y1,y2},
+déficience 3 (sources : `evidence/mus_hall/out_exhaustive_5x3.txt` et
+`evidence/refute-q2_minimal_core/`). Le plus petit est N(a) = N(b) = {y1}, N(c) = N(d) = {y1,y2},
 avec le MUS {P(a), P(b), P(c), P(d), H(y1: a,c), H(y1: b,d), H(y2: c,d)}.
 Son ensemble de pigeons {a,b,c,d} n'est pas un témoin minimal : il contient
 le témoin minimal {a,b}. La condition 2 est nécessaire mais **pas
@@ -222,7 +228,9 @@ saturants sont les modèles où tous les |S_x| valent 1.
 
 **Théorème (prouvé en annexe B ; vérifié exactement, en fractions, sur
 environ 2,9 millions de graphes avec n·m ≤ 16 et formats 3×6, 2×9, 2×10,
-4×5).** Soit k = |N(X)| − |X| le nombre de trous excédentaires non isolés.
+4×5 ; sources : `evidence/refute-q3_gap_families/out_*.txt` et
+`evidence/q3-weak-ratio/theorem_check.py`, la vérification exhaustive complète
+n'étant pas reproduite par `reproduce.py`).** Soit k = |N(X)| − |X| le nombre de trous excédentaires non isolés.
 S'il existe un couplage saturant X :
 
   (3/2)^k ≤ r = modèles / couplages saturants ≤ (|X|+1)^k.
@@ -277,14 +285,15 @@ variables, l'inclusion pourrait ne plus être littérale.
 
 Une passe de vérification adverse sur les enquêtes a réfuté plusieurs
 affirmations, puis une passe de revue sur la **première version de cette note**
-(y compris des corrections que j'y avais apportées). Une troisième passe, qui
-devait relire les annexes A–C et les affirmations corrigées, n'a pas pu
-s'exécuter (limite de quota) : ces points restent non relus (voir la légende) :
+(y compris des corrections que j'y avais apportées). Une seconde passe, qui
+devait relire les annexes A–C et les affirmations corrigées, avait échoué faute
+de quota ; elle a été relancée, et ses constats sont traités dans le tableau
+ci-dessous et dans les annexes :
 
 | Affirmation | Correction |
 |---|---|
 | (moi) « l'ensemble de pigeons de tout MUS est un témoin de Hall minimal » | faux ; vrai seulement à déficience 1 (§3) |
-| « 100 % des littéraux appris sont dans le cœur, dans tous les runs » | faux : la colonne était arrondie à `%5.1f` ; comptes exacts : 62 / 137 496 hors cœur à k = 8 (§2) |
+| « 100 % des littéraux appris par le CDCL sont dans le cœur » | faux : la colonne était arrondie à `%5.1f` ; comptes exacts : 62 / 137 496 hors cœur à k = 8 (§2) |
 | (moi, 1re version) « l'arrondi masquait 96 littéraux » | ces 96 viennent d'autres instances, où l'affichage indiquait 99,8 ; l'arrondi masquait 62 littéraux ailleurs |
 | « le témoin minimal vaut k sauf 2 instances » | 3 exceptions, d'après le propre fichier de sortie |
 | « la proportion de MUS baisse avec la taille » | seulement avec \|X\| à \|Y\| fixé |
@@ -311,7 +320,7 @@ vérification lui-même plutôt que de chaque cas :
 ## 7. Reproduire
 
 ```bash
-python3 studies/hall_schur/reproduce.py           # ~10 s, assertions, écrit results.json (déterministe)
+python3 studies/hall_schur/reproduce.py           # ~15 s, assertions, écrit results.json (déterministe)
 python3 -m unittest discover -s satlab/tests -t . # inclut les nouveaux modules
 ```
 
@@ -339,7 +348,9 @@ théorème de Hall, S \ {x} se couple dans N(S). Réaliser ce couplage
 satisfait F_S \ {P(x)}. Corollaire :
 |N(S)| ≥ |N(S \ {x})| ≥ |S| − 1, donc |N(S)| = |S| − 1.
 
-**A2. Critère des clauses de trou.** Soit C = H(y: x1,x2) ∈ F_S.
+**A2. Critère des clauses de trou.** Soit S un témoin de Hall (F_S est UNSAT)
+et C = H(y: x1,x2) ∈ F_S. (⇐) désigne « critère ⇒ C nécessaire », (⇒) désigne
+« C nécessaire ⇒ critère ».
 - (⇐) Si S \ {x1,x2} se couple dans N(S) \ {y} par M, on met
   e(x1,y) = e(x2,y) = 1 et on réalise M. Seule C est violée, donc
   F_S \ {C} est SAT.
@@ -384,7 +395,9 @@ satisfait F_S \ {P(x)}. Corollaire :
    - si aucun n'est dans T, μ est injectif.
 
    Aucune clause n'est violée, donc F' est SAT : contradiction. Avec T = ∅,
-   on obtient en particulier d(P) ≥ 1.
+   on obtient en particulier d(P) ≥ 1. Il faut aussi P non vide : F' est UNSAT,
+   donc contient une clause ; une clause de trou seule est satisfaite (toutes
+   les arêtes à faux), donc F' contient une clause de pigeon, et P ≠ ∅.
 
 3. *d(P) = 1 ⟺ P témoin minimal.*
    - (⇒) d(P) ≥ 1 et d(T) ≤ 0 pour toute partie stricte T : P viole la
@@ -437,8 +450,8 @@ rapport vaut 3/2 pour c = 0 et 14/9 pour c = 1. Pour c ≥ 2, il dépasse
 f(c) ≥ (3/2)^c, et chaque M contribue au moins (3/2)^k. En sommant sur M :
 modèles ≥ (3/2)^k · couplages.
 
-**B4. Cas d'égalité et rapport 1.** Il y a égalité si et seulement si, pour
-tout M, deux conditions sont remplies :
+**B4. Cas d'égalité et rapport 1.** Il y a égalité dans la borne inférieure
+r ≥ (3/2)^k si et seulement si, pour tout M, deux conditions sont remplies :
 - aucun h n'a été écarté, c'est-à-dire que tout trou libre est de degré 1 ;
 - f(c_x) = (3/2)^{c_x} pour tout x, c'est-à-dire c_x ≤ 1, car le rapport
   est > 3/2 dès c ≥ 1.
@@ -448,15 +461,21 @@ Si k = 0, B2 donne r ≤ 1 ; si k ≥ 1, B3 donne r ≥ 3/2. Donc r = 1 ⟺ k = 
 **B5. Familles.**
 - *K_{n,m}.* Un modèle est une application des m trous vers {⊥, 1..n} qui
   atteint chaque pigeon. L'inclusion-exclusion donne
-  Σ_j (−1)^j C(n,j)(n+1−j)^m. On obtient aussi n!·S(m+1, n+1) en ajoutant
-  un trou fictif dont le bloc représente ⊥.
+  Σ_j (−1)^j C(n,j)(n+1−j)^m. Pour la forme en Stirling : un modèle est une
+  partition des m trous et d'un trou fictif en n+1 blocs non vides, le bloc du
+  trou fictif représentant ⊥ (trous inutilisés), et un étiquetage des n autres
+  blocs par les pigeons, soit n! façons. Cela donne n!·S(m+1, n+1), S étant le
+  nombre de Stirling de seconde espèce.
 - *K_{n,n+1}.* S(n+2, n+1) = C(n+2, 2), d'où r = (n+2)/2.
 - *K_{n,2n}.* Pour la borne inférieure, on envoie les trous 1..n
   bijectivement sur les pigeons (n! façons), puis chacun des trous n+1..2n
   vers l'une quelconque des n+1 étiquettes. Les modèles obtenus sont
-  distincts, d'où modèles ≥ n!(n+1)^n et
-  r ≥ (n+1)^n / C(2n,n) ≥ ((n+1)/4)^n. Pour la borne supérieure,
-  modèles ≤ (n+1)^{2n} et couplages = (2n)!/n! ≥ (n+1)^n.
+  distincts (la restriction aux trous 1..n retrouve la bijection), d'où
+  modèles ≥ n!(n+1)^n. Les couplages saturants sont les injections des pigeons
+  dans les trous, soit (2n)!/n! = (n+1)(n+2)…(2n). Donc
+  r ≥ n!(n+1)^n · n!/(2n)! = (n+1)^n / C(2n,n) ≥ (n+1)^n / 4^n.
+  Pour la borne supérieure, modèles ≤ (n+1)^{2n} (chaque trou a au plus n+1
+  étiquettes) et couplages = (2n)!/n! ≥ (n+1)^n.
 - *Excès sous-linéaire.* Pour une union disjointe, modèles et couplages se
   multiplient, et K_{1,1} contribue un facteur 1. Donc
   r(K_{a,2a} ⊔ (n−a)K_{1,1}) = r(K_{a,2a}) ≥ ((a+1)/4)^a. Avec a ~ n/ln n,
@@ -464,16 +483,45 @@ Si k = 0, B2 donne r ≤ 1 ; si k ≥ 1, B3 donne r ≥ 3/2. Donc r = 1 ⟺ k = 
 
 ## Annexe C — Preuve de la construction de Q1
 
-Fixons des pigeons p_1..p_{m+1} de S, et posons T = N(S), |T| = m.
-- Le lemme E(j+1,H,h) = D(j+1,H) ∨ ¬e(p_{j+1},h) est RUP. On nie le lemme :
-  e(p_{j+1},h) est vrai et tous les littéraux de D(j+1,H) sont faux. Les
-  clauses de trou sur h imposent ¬e(p_i,h) pour i ≤ j. D(j, H\{h}) est déjà
-  dans la base, et tous ses littéraux sont alors faux : ils pointent hors de
-  H, ou vers h. C'est un conflit.
-- D(j+1,H) est RUP : les lemmes E donnent ¬e(p_{j+1},h) pour tout h ∈ H
-  voisin de p_{j+1}, et la clause P(p_{j+1}) est alors fausse.
-- Ordre de génération : niveau par niveau, j = 1..m, donc chaque
-  D(j, H\{h}) précède son usage. D(1,∅) = P(p_1) est une clause d'entrée.
-  D(m+1, T) est vide, car tous les voisins sont dans T.
-- Compte : Σ_{j=1}^{m} C(m,j)(j+1) = m·2^{m−1} + 2^m − 1 = 2^{m−1}(m+2) − 1,
-  avec égalité quand chaque p_{j+1} est voisin de tout H.
+Soit S un témoin de Hall, T = N(S), m = |T|. Comme |S| > m, on peut fixer
+m+1 pigeons p_1..p_{m+1} de S. Pour un ensemble H ⊆ T, D(j,H) désigne la clause
+∨_{i≤j} ∨_{h∈N(p_i)\H} e(p_i,h) (« les pigeons 1..j ne logent pas tous dans H »).
+
+**Ordre d'émission.** D(1,∅) = P(p_1) est une clause d'entrée. Pour j = 1..m,
+pour chaque H ⊆ T de taille j, dans cet ordre :
+1. pour chaque h ∈ H ∩ N(p_{j+1}), émettre E(j+1,H,h) = D(j+1,H) ∨ ¬e(p_{j+1},h) ;
+2. émettre D(j+1,H), si elle n'est pas vide.
+Enfin, émettre la clause vide. D(m+1,T) est vide, car N(p_i) ⊆ T pour tout i.
+
+**Lemme A (E est RUP).** Supposons que D(j,H\{h}) soit dans la base et non
+vide. Niant E(j+1,H,h), on a e(p_{j+1},h) vrai et les littéraux de D(j+1,H)
+faux. Les clauses de trou sur h forcent ¬e(p_i,h) pour i ≤ j avec h ∈ N(p_i).
+Les littéraux de D(j,H\{h}) sont alors des e(p_i,h') avec h' ∈ N(p_i)\(H\{h}).
+Si h' ∉ H, e(p_i,h') est faux par hypothèse (c'est un littéral de D(j+1,H)) ;
+si h' = h, il est faux par propagation. Donc D(j,H\{h}) est falsifiée : conflit.
+
+**Lemme B (D est RUP quand elle est non vide).** Supposons D(j+1,H) non vide
+et ses littéraux tous faux. Par le lemme A, les unités ¬e(p_{j+1},h) sont RUP
+pour h ∈ H ∩ N(p_{j+1}). Les littéraux de P(p_{j+1}) sont alors tous faux : ceux
+pour h ∈ H par ces unités, ceux pour h ∉ H parce qu'ils figurent dans D(j+1,H).
+Conflit avec P(p_{j+1}), axiome de la base.
+
+**Cas D(j+1,H) vide.** C'est le cas où N(p_i) ⊆ H pour tout i ≤ j+1 ; elle
+n'est pas émise. Prenons la première occurrence dans l'ordre d'émission. Toutes
+les D précédentes sont non vides et présentes dans la base. Pour h ∈ N(p_{j+1}),
+on a h ∈ H (car N(p_{j+1}) ⊆ H). Le lemme A s'applique : les unités
+¬e(p_{j+1},h) sont RUP, parce que D(j,H\{h}) ne contient que des littéraux sur
+le trou h (N(p_i) ⊆ H). Ces unités falsifient P(p_{j+1}) par propagation : la base
+a alors un conflit de propagation unitaire. Toute ligne émise ensuite, y compris
+la clause vide finale, est RUP.
+
+**Conclusion.** Avant la première D vide, chaque ligne est RUP (lemmes A et B).
+À partir de la première D vide, la base a un conflit de propagation unitaire.
+La preuve est donc valide dans les deux cas, témoins minimaux ou non.
+
+**Compte.** Pour un témoin où chaque p_{j+1} est voisin de tout H (le cas K_{m+1,m}),
+le niveau j émet C(m,j)·j lemmes E et C(m,j) lemmes D (la D du niveau m est
+vide et remplacée par la clause vide finale). Le total est
+Σ_{j=1}^{m} C(m,j)(j+1) = m·2^{m−1} + 2^m − 1 = 2^{m−1}(m+2) − 1. Pour un témoin
+quelconque, le nombre de lignes est au plus ce nombre, puisque les E non définis
+et les D vides ne sont pas émis.
