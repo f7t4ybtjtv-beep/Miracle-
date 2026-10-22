@@ -1,0 +1,31 @@
+(2, 2) {'w': 10, 'mus': 10, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 2} 0.0s
+(3, 2) {'w': 85, 'mus': 79, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 66} 0.0s
+(4, 2) {'w': 656, 'mus': 560, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 864} 0.0s
+(5, 2) {'w': 4640, 'mus': 3680, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 8000} 0.0s
+(6, 2) {'w': 30464, 'mus': 22784, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 61440} 0.1s
+(2, 3) {'w': 19, 'mus': 19, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 3} 0.1s
+(3, 3) {'w': 303, 'mus': 285, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 198} 0.1s
+(4, 3) {'w': 5457, 'mus': 4113, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 12384} 0.2s
+(5, 3) {'w': 101160, 'mus': 58920, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 384000} 0.8s
+(6, 3) {'w': 1748928, 'mus': 827328, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 8386560} 6.5s
+(2, 4) {'w': 36, 'mus': 36, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 4} 6.5s
+(3, 4) {'w': 1038, 'mus': 1002, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 444} 6.8s
+(4, 4) {'w': 31556, 'mus': 26180, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 51072} 10.8s
+(5, 4) {'w': 1368241, 'mus': 737441, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 7801120} 89.4s
+(3, 5) {'w': 3682, 'mus': 3622, 'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 900} 98.3s
+(2, 2) frac 10/10 = 1.0000
+(3, 2) frac 79/85 = 0.9294
+(4, 2) frac 560/656 = 0.8537
+(5, 2) frac 3680/4640 = 0.7931
+(6, 2) frac 22784/30464 = 0.7479
+(2, 3) frac 19/19 = 1.0000
+(3, 3) frac 285/303 = 0.9406
+(4, 3) frac 4113/5457 = 0.7537
+(5, 3) frac 58920/101160 = 0.5824
+(6, 3) frac 827328/1748928 = 0.4730
+(2, 4) frac 36/36 = 1.0000
+(3, 4) frac 1002/1038 = 0.9653
+(4, 4) frac 26180/31556 = 0.8296
+(5, 4) frac 737441/1368241 = 0.5390
+(3, 5) frac 3622/3682 = 0.9837
+failure counters: {'unsat_fail': 0, 'pig_unnec': 0, 'crit_mis': 0, 'hole_tested': 16707057}

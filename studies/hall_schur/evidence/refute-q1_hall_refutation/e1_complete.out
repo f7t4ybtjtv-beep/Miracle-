@@ -1,0 +1,12 @@
+m lemmas closed lits closed_lits satlab drat naive res_steps res_bound(sumC(m,j)j(j+1)) emptyRes
+2 7 7 12 12 True True True 10 10 True
+3 19 19 63 63 True True True 36 36 True
+4 47 47 252 252 True True True 112 112 True
+5 111 111 875 875 True True True 320 320 True
+6 255 255 2778 2778 True True True 864 864 True
+7 575 575 8281 8281 True True - 2240 2240 True
+8 1279 1279 23544 23544 True True - 5632 5632 True
+9 2815 2815 64503 64503 True True - 13824 13824 True
+10 6143 6143 171510 171510 True True - 33280 33280 True
+11 13311 13311 444917 444917 - - - - 78848 -
+12 28671 28671 1130484 1130484 - - - - 184320 -

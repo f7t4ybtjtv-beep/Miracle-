@@ -1,0 +1,4 @@
+seed 20261018, time 150.1s
+Part A: {'graphs': 4270, 'witnesses': 20902, 'max_witness_size': 8, 'induced_unsat': 20902, 'induced_mus': 9843, 'pigeon_nec_fail': 0, 'hole_criterion_mismatch': 0, 'hole_clauses_tested': 294214}
+Part B: {'muses': 8380, 'bad_hole': 0, 'not_strict_defmax': 0, 'pset_minimal_witness': 7743, 'pset_nonminimal': 637, 'max_def': 3, 'max_pset': 8}
+oracle: {'oracle_calls': 716099, 'sat': 539375, 'unsat': 176724}

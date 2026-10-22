@@ -1,0 +1,95 @@
+== (2) complete K_{n,m}: formula vs brute force / own / DP / n!S(m+1,n+1) ==
+K_1,1: vars=1 bf=1 own=1 formula=1 match=1=m!/(m-n)! ratio=1
+K_1,2: vars=2 bf=3 own=3 formula=3 match=2=m!/(m-n)! ratio=1.5
+K_1,3: vars=3 bf=7 own=7 formula=7 match=3=m!/(m-n)! ratio=2.33333
+K_1,4: vars=4 bf=15 own=15 formula=15 match=4=m!/(m-n)! ratio=3.75
+K_1,5: vars=5 bf=31 own=31 formula=31 match=5=m!/(m-n)! ratio=6.2
+K_1,6: vars=6 bf=63 own=63 formula=63 match=6=m!/(m-n)! ratio=10.5
+K_1,7: vars=7 bf=127 own=127 formula=127 match=7=m!/(m-n)! ratio=18.1429
+K_1,8: vars=8 bf=255 own=255 formula=255 match=8=m!/(m-n)! ratio=31.875
+K_1,9: vars=9 bf=511 own=511 formula=511 match=9=m!/(m-n)! ratio=56.7778
+K_1,10: vars=10 bf=1023 own=1023 formula=1023 match=10=m!/(m-n)! ratio=102.3
+K_1,11: vars=11 bf=2047 own=2047 formula=2047 match=11=m!/(m-n)! ratio=186.091
+K_1,12: vars=12 bf=4095 own=4095 formula=4095 match=12=m!/(m-n)! ratio=341.25
+K_2,2: vars=4 bf=2 own=2 formula=2 match=2=m!/(m-n)! ratio=1
+K_2,3: vars=6 bf=12 own=12 formula=12 match=6=m!/(m-n)! ratio=2
+K_2,4: vars=8 bf=50 own=50 formula=50 match=12=m!/(m-n)! ratio=4.16667
+K_2,5: vars=10 bf=180 own=180 formula=180 match=20=m!/(m-n)! ratio=9
+K_2,6: vars=12 bf=602 own=602 formula=602 match=30=m!/(m-n)! ratio=20.0667
+K_2,7: vars=14 bf=1932 own=1932 formula=1932 match=42=m!/(m-n)! ratio=46
+K_2,8: vars=16 bf=6050 own=6050 formula=6050 match=56=m!/(m-n)! ratio=108.036
+K_2,9: vars=18 bf=18660 own=18660 formula=18660 match=72=m!/(m-n)! ratio=259.167
+K_2,10: vars=20 bf=57002 own=57002 formula=57002 match=90=m!/(m-n)! ratio=633.356
+K_2,11: own=173052 formula=173052 match=110 ratio=1573.2 (no bf, vars=22)
+K_2,12: own=523250 formula=523250 match=132 ratio=3964.02 (no bf, vars=24)
+K_3,3: vars=9 bf=6 own=6 formula=6 match=6=m!/(m-n)! ratio=1
+K_3,4: vars=12 bf=60 own=60 formula=60 match=24=m!/(m-n)! ratio=2.5
+K_3,5: vars=15 bf=390 own=390 formula=390 match=60=m!/(m-n)! ratio=6.5
+K_3,6: vars=18 bf=2100 own=2100 formula=2100 match=120=m!/(m-n)! ratio=17.5
+K_3,7: own=10206 formula=10206 match=210 ratio=48.6 (no bf, vars=21)
+K_3,8: own=46620 formula=46620 match=336 ratio=138.75 (no bf, vars=24)
+K_3,9: own=204630 formula=204630 match=504 ratio=406.012 (no bf, vars=27)
+K_3,10: own=874500 formula=874500 match=720 ratio=1214.58 (no bf, vars=30)
+K_3,11: own=3669006 formula=3669006 match=990 ratio=3706.07 (no bf, vars=33)
+K_4,4: vars=16 bf=24 own=24 formula=24 match=24=m!/(m-n)! ratio=1
+K_4,5: vars=20 bf=360 own=360 formula=360 match=120=m!/(m-n)! ratio=3
+K_4,6: own=3360 formula=3360 match=360 ratio=9.33333 (no bf, vars=24)
+K_4,7: own=25200 formula=25200 match=840 ratio=30 (no bf, vars=28)
+K_4,8: own=166824 formula=166824 match=1680 ratio=99.3 (no bf, vars=32)
+K_4,9: own=1020600 formula=1020600 match=3024 ratio=337.5 (no bf, vars=36)
+K_5,5: own=120 formula=120 match=120 ratio=1 (no bf, vars=25)
+K_5,6: own=2520 formula=2520 match=720 ratio=3.5 (no bf, vars=30)
+K_5,7: own=31920 formula=31920 match=2520 ratio=12.6667 (no bf, vars=35)
+K_5,8: own=317520 formula=317520 match=6720 ratio=47.25 (no bf, vars=40)
+K_5,9: own=2739240 formula=2739240 match=15120 ratio=181.167 (no bf, vars=45)
+K_6,6: own=720 formula=720 match=720 ratio=1 (no bf, vars=36)
+K_6,7: own=20160 formula=20160 match=5040 ratio=4 (no bf, vars=42)
+K_6,8: own=332640 formula=332640 match=20160 ratio=16.5 (no bf, vars=48)
+K_6,9: own=4233600 formula=4233600 match=60480 ratio=70 (no bf, vars=54)
+formula == DP == n!S(m+1,n+1) for all 1<=n<=6, n<=m<=12: OK
+formula == DP == n!S(m+1,n+1) for all 1<=n<60, n<=m<80: OK
+== (b) K_{n,n+1}: conjecture ratio = (n+2)/2 ==
+n=1 models=3 match=2 ratio=3/2
+n=2 models=12 match=6 ratio=2
+n=3 models=60 match=24 ratio=5/2
+n=4 models=360 match=120 ratio=3
+n=5 models=2520 match=720 ratio=7/2
+n=6 models=20160 match=5040 ratio=4
+n=10 models=239500800 match=39916800 ratio=6
+n=20 models=562000363888803840000 match=51090942171709440000 ratio=11
+n=30 models=131565418466846765083609006080000000 match=8222838654177922817725562880000000 ratio=16
+n=40 models=702503058876439949271571303122255784968192000000000 match=33452526613163807108170062053440751665152000000000 ratio=21
+K_{n,n+1}: models = n!*C(n+2,2), ratio = (n+2)/2 exactly for n=1..40 (formula); bf-verified for n<=4 above
+== (c) K_{n,2n}: ratio, lower bound ((n+1)/4)^n, and log(ratio)/(n ln n) ==
+n=  1 log(ratio)=0.4055 ratio^(1/n)=1.5000 ((n+1)/4)=0.5000 log(ratio)/(n ln n)=nan
+n=  2 log(ratio)=1.4271 ratio^(1/n)=2.0412 ((n+1)/4)=0.7500 log(ratio)/(n ln n)=1.0294
+n=  3 log(ratio)=2.8622 ratio^(1/n)=2.5962 ((n+1)/4)=1.0000 log(ratio)/(n ln n)=0.8684
+n=  4 log(ratio)=4.5981 ratio^(1/n)=3.1567 ((n+1)/4)=1.2500 log(ratio)/(n ln n)=0.8292
+n=  5 log(ratio)=6.5684 ratio^(1/n)=3.7199 ((n+1)/4)=1.5000 log(ratio)/(n ln n)=0.8162
+n=  6 log(ratio)=8.7300 ratio^(1/n)=4.2845 ((n+1)/4)=1.7500 log(ratio)/(n ln n)=0.8120
+n=  7 log(ratio)=11.0528 ratio^(1/n)=4.8500 ((n+1)/4)=2.0000 log(ratio)/(n ln n)=0.8114
+n=  8 log(ratio)=13.5149 ratio^(1/n)=5.4160 ((n+1)/4)=2.2500 log(ratio)/(n ln n)=0.8124
+n=  9 log(ratio)=16.0996 ratio^(1/n)=5.9825 ((n+1)/4)=2.5000 log(ratio)/(n ln n)=0.8141
+n= 10 log(ratio)=18.7936 ratio^(1/n)=6.5493 ((n+1)/4)=2.7500 log(ratio)/(n ln n)=0.8162
+n= 11 log(ratio)=21.5863 ratio^(1/n)=7.1163 ((n+1)/4)=3.0000 log(ratio)/(n ln n)=0.8184
+n= 12 log(ratio)=24.4689 ratio^(1/n)=7.6835 ((n+1)/4)=3.2500 log(ratio)/(n ln n)=0.8206
+n= 20 log(ratio)=50.0680 ratio^(1/n)=12.2240 ((n+1)/4)=5.2500 log(ratio)/(n ln n)=0.8357
+n= 40 log(ratio)=126.4194 ratio^(1/n)=23.5820 ((n+1)/4)=10.2500 log(ratio)/(n ln n)=0.8568
+n= 80 log(ratio)=306.8160 ratio^(1/n)=46.3027 ((n+1)/4)=20.2500 log(ratio)/(n ln n)=0.8752
+n=160 log(ratio)=723.0446 ratio^(1/n)=91.7464 ((n+1)/4)=40.2500 log(ratio)/(n ln n)=0.8904
+n=320 log(ratio)=1666.3969 ratio^(1/n)=182.6351 ((n+1)/4)=80.2500 log(ratio)/(n ln n)=0.9028
+== (2) fixed n, m->inf: ratio^(1/m) -> n+1 ? ==
+n=1 m=10 ratio^(1/m)=1.58850
+n=1 m=50 ratio^(1/m)=1.84948
+n=1 m=200 ratio^(1/m)=1.94771
+n=1 m=800 ratio^(1/m)=1.98336
+n=2 m=10 ratio^(1/m)=1.90618
+n=2 m=50 ratio^(1/m)=2.56648
+n=2 m=200 ratio^(1/m)=2.84526
+n=2 m=800 ratio^(1/m)=2.95029
+n=3 m=10 ratio^(1/m)=2.03443
+n=3 m=50 ratio^(1/m)=3.16703
+n=3 m=200 ratio^(1/m)=3.69468
+n=3 m=800 ratio^(1/m)=3.90100
+time 13.2s
+rc=0

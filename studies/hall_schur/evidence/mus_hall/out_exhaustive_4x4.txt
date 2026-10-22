@@ -1,0 +1,124 @@
+done |X|=1 |Y|=0  iso classes=1  t=0.0s
+done |X|=1 |Y|=1  iso classes=2  t=0.0s
+done |X|=1 |Y|=2  iso classes=3  t=0.0s
+done |X|=1 |Y|=3  iso classes=4  t=0.0s
+done |X|=1 |Y|=4  iso classes=5  t=0.0s
+done |X|=2 |Y|=0  iso classes=1  t=0.0s
+done |X|=2 |Y|=1  iso classes=3  t=0.0s
+done |X|=2 |Y|=2  iso classes=7  t=0.0s
+done |X|=2 |Y|=3  iso classes=13  t=0.0s
+done |X|=2 |Y|=4  iso classes=22  t=0.0s
+done |X|=3 |Y|=0  iso classes=1  t=0.0s
+  strict-defmax connected S without MUS: 3 1 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=1  iso classes=4  t=0.0s
+  strict-defmax connected S without MUS: 3 2 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=2  iso classes=13  t=0.0s
+  strict-defmax connected S without MUS: 3 3 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=3  iso classes=36  t=0.0s
+  strict-defmax connected S without MUS: 3 4 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=4  iso classes=87  t=0.1s
+done |X|=4 |Y|=0  iso classes=1  t=0.1s
+  strict-defmax connected S without MUS: 4 1 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 2, 3]
+done |X|=4 |Y|=1  iso classes=5  t=0.1s
+  strict-defmax connected S without MUS: 4 2 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 2, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 2, 3, 3) [0, 1, 2, 3]
+done |X|=4 |Y|=2  iso classes=22  t=0.1s
+  strict-defmax connected S without MUS: 4 3 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 2, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 2, 3, 3) [0, 1, 2, 3]
+done |X|=4 |Y|=3  iso classes=87  t=0.3s
+  strict-defmax connected S without MUS: 4 4 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 14) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 1, 15) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 4 (1, 1, 2, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 4 (1, 2, 3, 3) [0, 1, 2, 3]
+done |X|=4 |Y|=4  iso classes=317  t=2.5s
+{
+ "graphs_iso": 634,
+ "graphs_lab": 74958,
+ "exhaustive_crosschecked_iso": 632,
+ "mw_iso": 604,
+ "mw_lab": 39253,
+ "mw_mus_iso": 541,
+ "mw_mus_lab": 32377,
+ "induced_unsat_fail": 0,
+ "pigeon_unnecessary": 0,
+ "criterion_mismatch": 0,
+ "hole_clause_criterion_mismatch": 0,
+ "mus_total_iso": 673,
+ "mus_total_lab": 39913,
+ "mus_bad_hole_clause": 0,
+ "mus_no_violator": 0,
+ "mus_pigeonset_not_violator": 0,
+ "mus_pigeonset_minimal_witness": 604,
+ "mus_pigeonset_not_minimal": 69,
+ "mus_minwit_not_subset_of_induced": 0,
+ "minwit_without_mus": 0,
+ "mus_verify_fail": 0,
+ "mus_not_strict_defmax": 0,
+ "strict_defmax_sets": 876,
+ "strict_defmax_sets_with_mus": 613,
+ "strict_defmax_connected": 659,
+ "strict_defmax_connected_with_mus": 613,
+ "mus_deficiency_hist": {
+  "1": 604,
+  "2": 69
+ }
+}
+fraction of minimal witnesses (labelled, with multiplicity) whose induced CNF is MUS: 32377/39253 = 0.8248
+same over iso classes: 541/604 = 0.8957
+smallest non-MUS induced CNF (|X|+|Y|, |E|, nX, nY, adj, S): (5, 5, 3, 2, (1, 3, 3), [0, 1, 2])
+smallest MUS with non-minimal pigeon set (|X|+|Y|, |E|, nX, nY, adj, P, |MUS|): (6, 6, 4, 2, (1, 1, 3, 3), [0, 1, 2, 3], 7)
+per (|X|,|Y|): iso, labelled graphs, minimal witnesses(lab), induced=MUS(lab), MUSes(lab), MUSes with non-minimal pigeon set(lab)
+(1, 0) 1 1 1 1 1 0
+(1, 1) 2 2 1 1 1 0
+(1, 2) 3 4 1 1 1 0
+(1, 3) 4 8 1 1 1 0
+(1, 4) 5 16 1 1 1 0
+(2, 0) 1 1 2 2 2 0
+(2, 1) 3 4 5 5 5 0
+(2, 2) 7 16 10 10 10 0
+(2, 3) 13 64 19 19 19 0
+(2, 4) 22 256 36 36 36 0
+(3, 0) 1 1 3 3 3 0
+(3, 1) 4 8 18 18 18 0
+(3, 2) 13 64 85 79 85 0
+(3, 3) 36 512 303 285 303 0
+(3, 4) 87 4096 1038 1002 1038 0
+(4, 0) 1 1 4 4 4 0
+(4, 1) 5 16 56 56 56 0
+(4, 2) 22 256 656 560 722 66
+(4, 3) 87 4096 5457 4113 5655 198
+(4, 4) 317 65536 31556 26180 31952 396
+time 2.5s

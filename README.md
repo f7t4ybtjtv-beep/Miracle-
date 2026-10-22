@@ -13,6 +13,15 @@ interactif du dossier projet.
 - `index.html` — page d'accueil : scénario narratif d'entrée et principes de design.
 - `amphitheatre.html` — prototype interactif : un débat cyclique entre quatre IA (Aether, Kael, Lira, Nox) visualisé comme des orbes reliées à un noyau central, avec fil chronologique, thème clair/sombre, réglages de vitesse et de densité d'étoiles.
 
+## Outil de recherche SAT (`satlab/`)
+
+Indépendamment du site, `satlab/` est un outil Python (bibliothèque standard
+uniquement) pour l'étude empirique de SAT : générateurs d'instances,
+solveur CDCL instrumenté émettant des preuves DRUP, vérificateur de
+certificats autonome, contre-tests et campagnes reproductibles. Voir
+[`satlab/README.md`](satlab/README.md) et les résultats dans
+[`results/standard/REPORT.md`](results/standard/REPORT.md).
+
 ## Lancer le projet
 
 Aucun serveur ni installation requis : ouvrez `index.html` directement dans

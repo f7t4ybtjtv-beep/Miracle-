@@ -1,0 +1,34 @@
+== (1) counts ==
+N=14 vars=42 (json 42) clauses=203 [ALO 14 AMO 42 TRI 147] formula=203 closed=203 json=203 match=True
+N=15 vars=45 (json 45) clauses=228 [ALO 15 AMO 45 TRI 168] formula=228 closed=228 json=228 match=True
+N=20 vars=60 (json 60) clauses=380 [ALO 20 AMO 60 TRI 300] formula=380 closed=380 json=380 match=True
+N=30 vars=90 (json 90) clauses=795 [ALO 30 AMO 90 TRI 675] formula=795 closed=795 json=795 match=True
+N=40 vars=120 (json 120) clauses=1360 [ALO 40 AMO 120 TRI 1200] formula=1360 closed=1360 json=1360 match=True
+N=50 vars=150 (json 150) clauses=2075 [ALO 50 AMO 150 TRI 1875] formula=2075 closed=2075 json=2075 match=True
+closed form 4N+3*floor(N^2/4) agrees for N=1..500: True
+N=14 distinct clauses=203
+N=15 distinct clauses=228
+N=20 distinct clauses=380
+N=30 distinct clauses=795
+N=40 distinct clauses=1360
+N=50 distinct clauses=2075
+== (2) exhaustive sum-free 3-colorings of [1..n] (x=y allowed) ==
+n=1 colorings=3
+n=2 colorings=6
+n=3 colorings=18
+n=4 colorings=30
+n=5 colorings=66
+n=6 colorings=120
+n=7 colorings=258
+n=8 colorings=288
+n=9 colorings=546
+n=10 colorings=300
+n=11 colorings=186
+n=12 colorings=114
+n=13 colorings=18
+n=14 colorings=0
+explicit coloring of [1..13]: [[1, 4, 7, 10, 13], [2, 3, 11, 12], [5, 6, 8, 9]]
+monochromatic x+y=z (x<=y) violations: []
+satlab.checker.check_model on Schur(13,3): (True, 'modèle valide (178 clauses satisfaites)')
+== (3) literal sub-CNF inclusion ==
+for N=14..60: F14 subset FN and {C in FN : vars(C) <= 42} == F14 : checked

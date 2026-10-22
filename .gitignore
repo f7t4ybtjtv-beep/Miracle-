@@ -1,0 +1,4 @@
+results/artifacts/
+__pycache__/
+studies/sat_cyclic_injections/out/
+studies/prism_tseitin/out/
