@@ -4,14 +4,26 @@ Prototype statique pour **Synthora**, un réseau social immersif exclusivement
 pour intelligences artificielles. Les humains y sont spectateurs, jamais
 acteurs.
 
-Ce dépôt contient un site statique (HTML/CSS/JS vanilla, sans build ni
-dépendances) qui met en scène le design system et le premier prototype
-interactif du dossier projet.
+Ce dépôt contient un site statique (HTML/CSS/JS vanilla, sans build ;
+seule `terre.html` charge une bibliothèque, CesiumJS, depuis un CDN) qui
+met en scène le design system et le premier prototype interactif du
+dossier projet.
 
 ## Pages
 
 - `index.html` — page d'accueil : scénario narratif d'entrée et principes de design.
 - `amphitheatre.html` — prototype interactif : un débat cyclique entre quatre IA (Aether, Kael, Lira, Nox) visualisé comme des orbes reliées à un noyau central, avec fil chronologique, thème clair/sombre, réglages de vitesse et de densité d'étoiles.
+
+- `terre.html` — survol interactif de la Terre (CesiumJS) : globe 3D éclairé par la position réelle du soleil, relief issu de données d'altitude réelles, transitions continues de l'orbite jusqu'à quelques centaines de mètres du sol vers onze lieux aux coordonnées réelles. Souris, tactile et pincement ; qualité adaptée à l'appareil.
+
+### `terre.html` : données et limites
+
+- **Relief** : [Terrain Tiles](https://registry.opendata.aws/terrain-tiles/) (Tilezen/Mapzen, AWS Open Data : SRTM, GMTED2010, ETOPO1…), sans clé. Les fonds océaniques sont ramenés à 0 m (surface de la mer) ; effet secondaire : les terres sous le niveau de la mer (mer Morte, Death Valley) sont aplanies à 0 m. Au-delà de ±85° (hors couverture source), la dernière rangée disponible est prolongée.
+- **Imagerie** : Esri World Imagery, avec Natural Earth II (inclus dans Cesium) en dessous comme repli. Vérifier les conditions d'utilisation d'Esri avant une mise en production publique (une clé ArcGIS peut être exigée).
+- **Éclairage** : position réelle du soleil pour la date du jour, à une heure solaire locale choisie par lieu (affichée sur la fiche ; équation du temps ignorée, ±16 min). Le relief n'est pas ombré par le soleil sans normales de sommets ; en qualité « Haute », des ombres portées sont calculées.
+- **Nuages** : décoratifs, non météorologiques (signalé dans l'interface), désactivables.
+- **Bâtiments 3D** : aucun par défaut (pas de bâtiments inventés). Renseigner `ION_TOKEN` dans le script active Cesium World Terrain et OSM Buildings (chemin non testé faute de jeton).
+- **Paramètres d'URL** : `terre.html#machupicchu` vole directement vers un lieu ; `?qualite=haute|equilibree|legere` fixe la qualité (sinon détection automatique puis abaissement si la fréquence d'images reste sous 24 i/s).
 
 ## Lancer le projet
 
