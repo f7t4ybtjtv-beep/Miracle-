@@ -25,13 +25,13 @@ résolvantes. Il a été trouvé par recherche sur k = 9..11, puis vérifié pou
 k = 3..60 et k = 100. Un ordre glouton aléatoire donne aussi 32k − 33 pour
 k ≥ 4 (mais pas 40k − 49).
 
-## 2. Ce qui n'est pas établi
+## 2. Ce qui est établi pour tout k, et ce qui ne l'est pas
 
-- **La borne pour tout k.** Les nombres sont vérifiés pour k = 3..60 et k = 100.
-  Une démonstration pour tout k demande un argument de régime stationnaire : les
-  résolvantes ajoutées par colonne dépendent seulement d'une structure de
-  frontière qui se répète. Cet argument n'est pas écrit ici. Le texte du
-  document ne le fournit pas non plus.
+- **La borne pour tout k** : démontrée dans `STATIONNAIRE.md`, pour l'ordre périodique.
+  Chaque bloc stationnaire ajoute 8 + 16 + 8 = 32 résolvantes, le début coûte 8 et la
+  queue 23 : total 32k − 33, pour tout k ≥ 3. La démonstration a été écrite par moi et
+  n'a pas été relue par un vérificateur indépendant ; ses comptes sont contrôlés par
+  `verify.py` pour k = 3..60 et 100.
 - **La longueur minimale L(T_k).** Nous ne contrôlons que des majorations. Une
   borne inférieure n'a pas été cherchée, et le document n'en fournit pas.
 - **La décomposition en trois opérations.** Les formules du document ont été

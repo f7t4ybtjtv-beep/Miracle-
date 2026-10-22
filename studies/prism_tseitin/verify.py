@@ -160,6 +160,33 @@ def main():
             assert drat_ok, k
         results["dp"][k] = dict(resolvents=count, max_width=maxw, bound=32 * k - 33,
                                 checker=ok, drat_trim=drat_ok)
+    # 4. la démonstration (STATIONNAIRE.md) prédit chaque compte par étape : vérification
+    def predicted(k):
+        pred = [8]                                   # R_0
+        for _ in range(1, k - 1):                    # blocs stationnaires j = 1..k-2
+            pred += [8, 16, 8]                       # R_j, T_{j-1}, B_{j-1}
+        return pred + [8, 8, 4, 2, 1]                # queue : R_{k-1}, T_{k-2}, B_{k-2}, T_{k-1}, B_{k-1}
+    for k in ks:
+        nv, cl = tseitin_cnf(k)
+        db = {frozenset(c) for c in cl}
+        seq = []
+        for v in periodic_order(k):
+            pos = [c for c in db if v in c]
+            neg = [c for c in db if -v in c]
+            rest = {c for c in db if v not in c and -v not in c}
+            new = set()
+            for p_ in pos:
+                for q_ in neg:
+                    R = (p_ - {v}) | (q_ - {-v})
+                    if any(-l in R for l in R) or R in rest or R in new:
+                        continue
+                    new.add(R)
+            seq.append(len(new))
+            db = rest | new
+            if frozenset() in db:
+                break
+        assert seq == predicted(k), (k, seq[:6], predicted(k)[:6])
+    print("Comptes par étape conformes à STATIONNAIRE.md (motif 8 ; 8,16,8 ; queue 8,8,4,2,1) pour k = 3..60 et 100")
     print("Ordre périodique : %d réfutations, accroissement 32 par colonne ; "
           "longueur = 32k − 33 exactement pour k = 3..60 et 100 (checker validé)" % len(ks))
     print("  largeur maximale observée : %d" % max(results["dp"][k]["max_width"] for k in ks))
