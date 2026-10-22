@@ -25,6 +25,17 @@ dossier projet.
 - **Bâtiments 3D** : aucun par défaut (pas de bâtiments inventés). Renseigner `ION_TOKEN` dans le script active Cesium World Terrain et OSM Buildings (chemin non testé faute de jeton).
 - **Paramètres d'URL** : `terre.html#machupicchu` vole directement vers un lieu ; `?qualite=haute|equilibree|legere` fixe la qualité (sinon détection automatique puis abaissement si la fréquence d'images reste sous 24 i/s).
 
+## Nour
+
+`nour/index.html` — **Nour, la lumière du dialogue** : un site autonome qui
+reprend le moteur de survol de `terre.html` avec sa propre identité (lumière
+dorée sur fond de nuit, titres en Cormorant Garamond). Un écran d'accueil
+précède un voyage vers dix lieux où des cultures se sont rencontrées : Tolède,
+Cordoue, l'Alhambra, Tombouctou, Alexandrie, Jérusalem, Petra, Sainte-Sophie,
+Samarcande et Angkor. Coordonnées réelles ; textes limités à des faits
+vérifiables. Lien direct vers un lieu : `nour/index.html#samarcande`. Les
+données et limites sont les mêmes que pour `terre.html`.
+
 ## Lancer le projet
 
 Aucun serveur ni installation requis : ouvrez `index.html` directement dans

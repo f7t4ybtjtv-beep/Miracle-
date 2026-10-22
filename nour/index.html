@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Nour — La lumière du dialogue</title>
+<meta name="description" content="Nour : un voyage au-dessus de la Terre vers dix lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<meta name="theme-color" content="#0B0E14" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwQjBFMTQiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMSIgZmlsbD0iI0UzQjA2MiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNFM0IwNjIiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+<link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
+<style>
+  :root {
+    /* Nour: warm light on a night sky. */
+    --bg-deep: #0B0E14;
+    --bg-warm: #151A24;
+    --panel: rgba(14, 18, 26, 0.72);
+    --panel-solid: #10141C;
+    --border: #262D3A;
+    --border-strong: #3A4354;
+    --accent: #E3B062;
+    --accent-2: #F1CF8E;
+    --text: #F4ECDF;
+    --text-2: #BDB5A8;
+    --muted: #7F786D;
+    --font-ui: 'Inter', Arial, sans-serif;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'JetBrains Mono', Consolas, monospace;
+    --gutter: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: var(--bg-deep); color: var(--text);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+  }
+  #globe { position: fixed; inset: 0; }
+  #globe .cesium-viewer-bottom, #globe .cesium-widget-credits { display: none !important; }
+  /* Cinematic vignette: purely optical, keeps the eye on the centre of frame. */
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(5, 2, 1, 0.55) 100%);
+  }
+
+  .ui { position: fixed; z-index: 5; pointer-events: none; }
+  .ui > * { pointer-events: auto; }
+  .glass {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px) saturate(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    border-radius: 14px;
+  }
+  .kicker {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* Top bar */
+  .top {
+    top: calc(var(--gutter) + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    pointer-events: none;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; padding: 10px 16px; pointer-events: auto; }
+  .brand a { color: var(--text-2); text-decoration: none; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+  .brand a:hover { color: var(--text); }
+  .brand .sep { width: 1px; height: 16px; background: var(--border-strong); }
+  .brand h1 { margin: 0; font: 600 22px/1 var(--font-serif); letter-spacing: .02em; color: var(--accent-2); }
+  .brand .tag { font: italic 500 15px var(--font-serif); color: var(--text-2); white-space: nowrap; }
+  .tools { display: flex; gap: 8px; pointer-events: auto; }
+  .btn {
+    font: 500 12px var(--font-ui); color: var(--text-2);
+    background: var(--panel); border: 1px solid var(--border);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-radius: 999px; padding: 9px 14px; cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--border-strong); }
+  .btn[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+  .btn:focus-visible, .place:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+  /* Places list */
+  .places {
+    top: 50%; right: var(--gutter); transform: translateY(-50%);
+    width: 260px; max-height: calc(100vh - 200px); overflow: auto;
+    padding: 14px; scrollbar-width: thin;
+  }
+  .places .kicker {
+    position: sticky; top: -14px; z-index: 1; margin: -14px -14px 0; padding: 16px 20px 10px;
+    background: linear-gradient(var(--panel-solid) 70%, transparent);
+  }
+  .places ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .place {
+    width: 100%; text-align: left; cursor: pointer;
+    background: transparent; border: 1px solid transparent; border-radius: 10px;
+    padding: 9px 10px; color: var(--text); font: 500 13.5px var(--font-ui);
+    display: grid; gap: 2px; transition: background .2s, border-color .2s;
+  }
+  .place small { font: 400 11px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
+  .place:hover { background: rgba(242, 227, 213, 0.05); }
+  .place[aria-current="true"] { border-color: var(--border-strong); background: rgba(217, 72, 42, 0.10); }
+
+  /* Info card */
+  .card {
+    left: var(--gutter); bottom: calc(var(--gutter) + 56px + env(safe-area-inset-bottom));
+    width: min(380px, calc(100vw - 2 * var(--gutter)));
+    padding: 18px 20px; opacity: 0; transform: translateY(8px);
+    transition: opacity .6s ease, transform .6s ease; pointer-events: none;
+  }
+  .card.show { opacity: 1; transform: none; pointer-events: auto; }
+  .card h2 { margin: 4px 0 4px; font: 600 28px/1.1 var(--font-serif); letter-spacing: 0; }
+  .card .coords { font: 400 11.5px var(--font-mono); color: var(--text-2); }
+  .card p { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
+  .card .meta { margin-top: 12px; font: 400 11px var(--font-mono); color: var(--muted); }
+
+  /* HUD */
+  .hud {
+    left: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+    display: flex; gap: 18px; align-items: center; padding: 10px 16px;
+    font: 400 11.5px var(--font-mono); color: var(--text-2);
+  }
+  .hud b { color: var(--text); font-weight: 500; }
+  .hud .phase { color: var(--accent-2); }
+
+  .credits {
+    right: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+    max-width: 52vw; padding: 7px 12px; font: 400 10px/1.5 var(--font-mono); color: var(--muted);
+    text-align: right;
+  }
+  .credits a { color: var(--text-2); }
+  .credits summary { cursor: pointer; list-style: none; color: var(--text-2); }
+  .credits summary::-webkit-details-marker { display: none; }
+  .credits[open] summary { margin-bottom: 4px; }
+
+  /* Loader / fallback */
+  .loader {
+    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+    background: radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
+    transition: opacity 1.2s ease;
+  }
+  .loader.done { opacity: 0; pointer-events: none; }
+  .loader {
+    background:
+      radial-gradient(ellipse 60% 45% at 50% 42%, rgba(227, 176, 98, 0.14), transparent 70%),
+      radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
+  }
+  .loader .inner { text-align: center; max-width: 560px; padding: 0 24px; }
+  .loader h2 { margin: 10px 0 6px; font: 500 clamp(64px, 14vw, 120px)/0.95 var(--font-serif); color: var(--text); letter-spacing: .02em; }
+  .loader .tagline { margin: 0 0 22px; font: italic 500 clamp(20px, 4vw, 26px) var(--font-serif); color: var(--accent-2); }
+  .loader p { color: var(--text-2); font-size: 15px; line-height: 1.65; }
+  .loader .start {
+    margin-top: 26px; font: 500 14px var(--font-ui); letter-spacing: .02em;
+    color: var(--bg-deep); background: var(--accent); border: 0; border-radius: 999px;
+    padding: 13px 26px; cursor: pointer; transition: background .2s, opacity .3s;
+  }
+  .loader .start:hover { background: var(--accent-2); }
+  .loader .start:disabled { opacity: .45; cursor: progress; }
+  .loader .start:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+  .loader .bar { width: 160px; height: 2px; margin: 18px auto 0; background: var(--border); overflow: hidden; border-radius: 2px; }
+  .loader .bar i { display: block; height: 100%; width: 40%; background: var(--accent); animation: slide 1.4s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+  .fallback-list { text-align: left; margin-top: 18px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
+
+  /* Narrow screens: places become a horizontal strip, card stacks above it. */
+  @media (max-width: 760px) {
+    :root { --gutter: 16px; }
+    .brand .tag, .brand .sep { display: none; }
+    .brand { padding: 9px 14px; }
+    .tools .btn { padding: 8px 11px; }
+    .places {
+      top: auto; transform: none; right: var(--gutter); left: var(--gutter);
+      bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
+      width: auto; max-height: none; padding: 8px; overflow-x: auto; overflow-y: hidden;
+    }
+    .places .kicker { display: none; }
+    .places ul { grid-auto-flow: column; grid-auto-columns: max-content; }
+    .place { padding: 8px 12px; font-size: 13px; }
+    .card { bottom: calc(var(--gutter) + 124px + env(safe-area-inset-bottom)); padding: 14px 16px; }
+    .card h2 { font-size: 18px; }
+    .card p { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .hud { gap: 12px; padding: 8px 12px; font-size: 10.5px; }
+    .hud .opt { display: none; }
+    .credits { left: auto; right: var(--gutter); max-width: calc(100vw - 2 * var(--gutter)); bottom: auto; top: calc(var(--gutter) + 50px + env(safe-area-inset-top)); font-size: 9.5px; padding: 5px 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card, .loader { transition: none; }
+    .loader .bar i { animation: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div id="globe" aria-label="Globe terrestre interactif"></div>
+  <div class="vignette"></div>
+
+  <div class="ui top">
+    <div class="brand glass">
+      <h1>Nour</h1>
+      <span class="sep"></span>
+      <span class="tag">La lumière du dialogue</span>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btn-orbit" type="button">Orbite</button>
+      <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
+      <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
+    </div>
+  </div>
+
+  <nav class="ui places glass" aria-label="Lieux">
+    <div class="kicker">Lieux de rencontre</div>
+    <ul id="place-list"></ul>
+  </nav>
+
+  <section class="ui card glass" id="card" aria-live="polite">
+    <div class="kicker" id="card-kicker"></div>
+    <h2 id="card-title"></h2>
+    <div class="coords" id="card-coords"></div>
+    <p id="card-text"></p>
+    <div class="meta" id="card-meta"></div>
+  </section>
+
+  <div class="ui hud glass" aria-live="off">
+    <span class="phase" id="hud-phase">Orbite</span>
+    <span>Alt. <b id="hud-alt">—</b></span>
+    <span class="opt"><b id="hud-pos">—</b></span>
+    <span class="opt" id="hud-quality"></span>
+  </div>
+
+  <details class="ui credits glass" id="credits-box">
+    <summary>Sources</summary>
+    <div id="credits"></div>
+  </details>
+
+  <div class="loader" id="loader">
+    <div class="inner">
+      <h2>Nour</h2>
+      <p class="tagline">La lumière du dialogue</p>
+      <p id="loader-text">Survolez la Terre depuis l'espace jusqu'à dix lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
+      <div class="bar" id="loader-bar"><i></i></div>
+      <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
+      <div id="fallback"></div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  // Optional: a Cesium ion token enables Cesium World Terrain (with vertex
+  // normals, so relief is lit by the sun) and OSM 3D buildings. Left empty,
+  // the page uses only keyless open data sources.
+  const ION_TOKEN = '';
+
+  // Real coordinates (WGS84, decimal degrees). `view` frames the final
+  // approach: heading/pitch in degrees, range in metres from the site.
+  // `solarHour` is the local solar time used for lighting on arrival.
+  const PLACES = [
+    { id: 'tolede', name: 'Tolède', country: 'Espagne', lat: 39.8570, lon: -4.0237,
+      text: "Aux XIIe et XIIIe siècles, des traducteurs y firent passer en latin puis en castillan des œuvres scientifiques et philosophiques écrites en arabe : c'est ce qu'on appelle l'« école des traducteurs de Tolède ». La ville est bâtie sur un méandre du Tage.",
+      meta: 'UNESCO 1986 · Ville historique de Tolède', view: { heading: 330, pitch: -20, range: 3200 }, solarHour: 17.5 },
+    { id: 'cordoue', name: 'Mosquée-cathédrale de Cordoue', country: 'Espagne', lat: 37.8789, lon: -4.7794,
+      text: "Commencée en 785 sous l'émir omeyyade Abd al-Rahman Ier, la grande mosquée fut transformée en cathédrale après la prise de la ville par Ferdinand III de Castille en 1236. Ses arcs bicolores et la cathédrale insérée en son centre portent ces deux histoires.",
+      meta: 'UNESCO 1984 · Centre historique de Cordoue', view: { heading: 200, pitch: -22, range: 1800 }, solarHour: 9.5 },
+    { id: 'alhambra', name: 'Alhambra', country: 'Espagne', lat: 37.1761, lon: -3.5881,
+      text: "Palais et forteresse des souverains nasrides (XIIIe–XIVe siècles), sur la colline de la Sabika, face à la Sierra Nevada, à Grenade. Après 1492, Charles Quint y fit élever un palais Renaissance au milieu des palais nasrides.",
+      meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17 },
+    { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', lat: 16.7711, lon: -3.0105,
+      text: "Aux portes du Sahara, près du fleuve Niger, la ville fut un foyer de savoir dont témoignent des milliers de manuscrits. La mosquée Djingareyber, en terre crue, fut élevée au XIVe siècle, au retour de pèlerinage du souverain du Mali Kankou Moussa.",
+      meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5 },
+    { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', lat: 31.2089, lon: 29.9092,
+      text: "Inaugurée en 2002 sur le front de mer d'Alexandrie, près de l'emplacement présumé de la bibliothèque antique fondée sous les Ptolémées. Son mur de granit porte des caractères de nombreux systèmes d'écriture.",
+      meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16 },
+    { id: 'jerusalem', name: 'Vieille ville de Jérusalem', country: 'Proche-Orient', lat: 31.7767, lon: 35.2345,
+      text: "Sur moins d'un kilomètre carré, la vieille ville réunit des lieux saints du judaïsme, du christianisme et de l'islam, dont le mur des Lamentations, l'église du Saint-Sépulcre et le Dôme du Rocher.",
+      meta: 'UNESCO 1981', view: { heading: 250, pitch: -24, range: 2400 }, solarHour: 9 },
+    { id: 'petra', name: 'Petra', country: 'Jordanie', lat: 30.3222, lon: 35.4515,
+      text: "Capitale des Nabatéens, taillée dans le grès des montagnes de la région de Wadi Musa. Carrefour des routes caravanières de l'encens entre l'Arabie et la Méditerranée, la cité mêle des influences nabatéennes, grecques et romaines.",
+      meta: 'UNESCO 1985', view: { heading: 200, pitch: -32, range: 1800 }, solarHour: 10 },
+    { id: 'istanbul', name: 'Sainte-Sophie', country: 'Turquie', lat: 41.0086, lon: 28.9802,
+      text: "Construite de 532 à 537 sous l'empereur Justinien, la basilique devint mosquée après 1453, musée en 1934, puis de nouveau mosquée en 2020. Elle domine la péninsule historique, entre la Corne d'Or et le Bosphore.",
+      meta: "UNESCO 1985 · Zones historiques d'Istanbul", view: { heading: 300, pitch: -20, range: 2600 }, solarHour: 16.5 },
+    { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', lat: 39.6547, lon: 66.9758,
+      text: "Place bordée de trois madrasas, dont celle d'Ouloug Beg (1417–1420), prince astronome. Samarcande fut une étape majeure des routes de la soie, entre la Chine, l'Inde, la Perse et la Méditerranée.",
+      meta: 'UNESCO 2001 · Samarcande – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5 },
+    { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', lat: 13.4125, lon: 103.8670,
+      text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
+      meta: 'UNESCO 1992 · Angkor', view: { heading: 270, pitch: -24, range: 3000 }, solarHour: 7.5 },
+  ];
+
+  const $ = (id) => document.getElementById(id);
+  const loader = $('loader');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function fail(message) {
+    $('loader-text').textContent = message;
+    loader.querySelector('.bar').style.display = 'none';
+    $('btn-start').style.display = 'none';
+    const list = PLACES.map(p => `<div><b>${p.name}</b> — ${p.country} · ${p.lat.toFixed(4)}°, ${p.lon.toFixed(4)}°</div>`).join('');
+    $('fallback').innerHTML = `<div class="fallback-list">${list}</div>`;
+  }
+
+  if (typeof Cesium === 'undefined') {
+    fail("La bibliothèque 3D n'a pas pu être chargée (connexion ou bloqueur). Voici les lieux et leurs coordonnées :");
+    return;
+  }
+  const probe = document.createElement('canvas');
+  if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) {
+    fail("Votre navigateur ne prend pas en charge WebGL : le globe 3D ne peut pas s'afficher. Voici les lieux et leurs coordonnées :");
+    return;
+  }
+
+  const C = Cesium;
+  const R2D = C.Math.toDegrees, D2R = C.Math.toRadians;
+
+  // ---------- Device tier (graceful degradation) ----------
+  const TIERS = {
+    high:     { label: 'Haute',     sse: 1.5, scale: 1,    nativeRes: true,  msaa: 4, clouds: 40, shadows: true,  fxaa: true },
+    balanced: { label: 'Équilibrée', sse: 2,   scale: 1,    nativeRes: false, msaa: 1, clouds: 24, shadows: false, fxaa: true },
+    light:    { label: 'Légère',    sse: 4,   scale: 0.75, nativeRes: false, msaa: 1, clouds: 0,  shadows: false, fxaa: false },
+  };
+  const TIER_ORDER = ['high', 'balanced', 'light'];
+  function detectTier() {
+    const coarse = matchMedia('(pointer: coarse)').matches;
+    const cores = navigator.hardwareConcurrency || 4;
+    const mem = navigator.deviceMemory || 4;
+    if (coarse || cores <= 4 || mem <= 4) return (cores <= 4 || mem <= 2) ? 'light' : 'balanced';
+    return 'high';
+  }
+  // ?qualite=haute|equilibree|legere pins a tier and turns off auto-downgrade.
+  const forcedTier = { haute: 'high', equilibree: 'balanced', legere: 'light' }[new URLSearchParams(location.search).get('qualite')];
+  let tierName = forcedTier || detectTier();
+  let tier = TIERS[tierName];
+
+  // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
+  // Real elevation from SRTM, GMTED2010, ETOPO1 and others, aggregated by
+  // Mapzen/Tilezen. Ocean depths are clamped to 0 m (sea surface) and flagged
+  // as water; land below sea level is flattened to 0 m as a side effect.
+  const TERRAIN_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+  const TERRAIN_MAX_LEVEL = 15;
+  const GRID = 65;
+
+  // Cesium sizes heightmap skirts at 4× the estimated tile error, which is
+  // too short on steep relief (Andes, Himalaya) where tiles of different
+  // levels meet: background shows through as thin streaks. Taller skirts
+  // hide those cracks. Relies on a private field of the pinned 1.145.0
+  // release; if it changes, this silently falls back to Cesium's default.
+  // Applied to the base prototype so tiles Cesium upsamples past the last
+  // source level get the same skirts.
+  Object.defineProperty(C.HeightmapTerrainData.prototype, '_skirtHeight', {
+    get() { return this.__skirt; },
+    set(v) { this.__skirt = v === undefined ? v : Math.min(v * 4, 2000); },
+    configurable: true,
+  });
+
+  // Served on a geographic grid so the globe has no Mercator hole at the
+  // poles: each geographic tile at level L resamples the Mercator source
+  // tiles of zoom L it overlaps. Beyond ±85.05° (no source data) the
+  // nearest source row is extended. Adjacent tiles sample the same
+  // continuous function, so their shared edges match exactly.
+  const MERC_MAX_LAT = 85.0511287798 * Math.PI / 180;
+  const mercY = (lat) => (1 - Math.log(Math.tan(Math.PI / 4 + lat / 2)) / Math.PI) / 2;
+  const WATER_RES = 128;
+
+  class TerrariumTerrainProvider {
+    constructor() {
+      this.tilingScheme = new C.GeographicTilingScheme();
+      this.errorEvent = new C.Event();
+      this.credit = new C.Credit('Relief : Tilezen/Mapzen Terrain Tiles (AWS Open Data) — SRTM, GMTED2010, ETOPO1');
+      this.hasWaterMask = true;
+      this.hasVertexNormals = false;
+      this.availability = undefined;
+      this._levelZeroError = C.TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
+        this.tilingScheme.ellipsoid, GRID, this.tilingScheme.getNumberOfXTilesAtLevel(0));
+      this._canvas = document.createElement('canvas');
+      this._canvas.width = this._canvas.height = 256;
+      this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });
+      this._cache = new Map(); // "z/x/y" → Promise<Float32Array>, small LRU
+    }
+    getLevelMaximumGeometricError(level) { return this._levelZeroError / (1 << level); }
+    getTileDataAvailable(x, y, level) { return level <= TERRAIN_MAX_LEVEL ? undefined : false; }
+    loadTileDataAvailability() { return undefined; }
+
+    _source(z, x, y, request) {
+      const key = `${z}/${x}/${y}`;
+      const hit = this._cache.get(key);
+      if (hit) { this._cache.delete(key); this._cache.set(key, hit); return hit; }
+      const url = TERRAIN_URL.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+      const img = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
+      if (!img) return undefined; // throttled by Cesium's request scheduler
+      const p = img.then((im) => {
+        this._ctx.drawImage(im, 0, 0, 256, 256);
+        if (im.close) im.close();
+        const px = this._ctx.getImageData(0, 0, 256, 256).data;
+        const h = new Float32Array(256 * 256);
+        for (let i = 0, j = 0; i < h.length; i++, j += 4) {
+          const v = px[j] * 256 + px[j + 1] + px[j + 2] / 256 - 32768;
+          h[i] = v > 0 ? v : 0; // ocean floor → sea surface
+        }
+        return h;
+      });
+      p.catch(() => this._cache.delete(key));
+      this._cache.set(key, p);
+      if (this._cache.size > 48) this._cache.delete(this._cache.keys().next().value);
+      return p;
+    }
+
+    requestTileGeometry(x, y, level, request) {
+      const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
+      const z = Math.min(level, TERRAIN_MAX_LEVEL), n = 1 << z, size = n * 256;
+      const toPx = (lon, lat) => [
+        (lon + Math.PI) / (2 * Math.PI) * size - 0.5,
+        mercY(C.Math.clamp(lat, -MERC_MAX_LAT, MERC_MAX_LAT)) * size - 0.5,
+      ];
+      const [x0] = toPx(rect.west, rect.north), [x1] = toPx(rect.east, rect.south);
+      const ya = toPx(0, rect.north)[1], yb = toPx(0, rect.south)[1];
+      const tx0 = Math.floor(Math.max(x0 - 1, 0) / 256), tx1 = Math.floor(Math.min(x1 + 1, size - 1) / 256);
+      const ty0 = Math.floor(Math.max(ya - 1, 0) / 256), ty1 = Math.floor(Math.min(yb + 1, size - 1) / 256);
+      const keys = [];
+      for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) keys.push([tx, ty]);
+      // Only the first fetch goes through Cesium's scheduler; if it is
+      // throttled, Cesium retries the whole tile later.
+      const first = this._source(z, keys[0][0], keys[0][1], request);
+      if (!first) return undefined;
+      const rest = keys.slice(1).map(([tx, ty]) => this._source(z, tx, ty));
+      if (rest.some((p) => !p)) return undefined;
+      return Promise.all([first, ...rest]).then((tiles) => {
+        const lookup = new Map(keys.map(([tx, ty], i) => [ty * n + tx, tiles[i]]));
+        const pixel = (X, Y) => {
+          X = C.Math.clamp(X, 0, size - 1); Y = C.Math.clamp(Y, 0, size - 1);
+          const t = lookup.get((Y >> 8) * n + (X >> 8));
+          return t ? t[(Y & 255) * 256 + (X & 255)] : 0;
+        };
+        const sample = (lon, lat) => {
+          const [fx, fy] = toPx(lon, lat);
+          const X = Math.floor(fx), Y = Math.floor(fy), u = fx - X, v = fy - Y;
+          return (pixel(X, Y) * (1 - u) + pixel(X + 1, Y) * u) * (1 - v)
+               + (pixel(X, Y + 1) * (1 - u) + pixel(X + 1, Y + 1) * u) * v;
+        };
+        const dLon = rect.east - rect.west, dLat = rect.north - rect.south;
+        const out = new Float32Array(GRID * GRID);
+        for (let r = 0; r < GRID; r++) {
+          const lat = rect.north - r / (GRID - 1) * dLat;
+          for (let c = 0; c < GRID; c++) out[r * GRID + c] = sample(rect.west + c / (GRID - 1) * dLon, lat);
+        }
+        // Water where the source height is at or below sea level.
+        const water = new Uint8Array(WATER_RES * WATER_RES);
+        let any = 0;
+        for (let r = 0; r < WATER_RES; r++) {
+          const lat = rect.north - (r + 0.5) / WATER_RES * dLat;
+          for (let c = 0; c < WATER_RES; c++) {
+            const [fx, fy] = toPx(rect.west + (c + 0.5) / WATER_RES * dLon, lat);
+            if (pixel(Math.round(fx), Math.round(fy)) === 0) { water[r * WATER_RES + c] = 255; any++; }
+          }
+        }
+        return new C.HeightmapTerrainData({
+          buffer: out, width: GRID, height: GRID,
+          childTileMask: level < TERRAIN_MAX_LEVEL ? 15 : 0,
+          waterMask: any === 0 ? new Uint8Array([0]) : any === water.length ? new Uint8Array([255]) : water,
+        });
+      });
+    }
+  }
+
+  // ---------- Viewer ----------
+  const naturalEarth = C.ImageryLayer.fromProviderAsync(
+    C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl('Assets/Textures/NaturalEarthII')));
+
+  const viewer = new C.Viewer('globe', {
+    baseLayer: naturalEarth,
+    terrainProvider: new TerrariumTerrainProvider(),
+    animation: false, timeline: false, baseLayerPicker: false, geocoder: false,
+    homeButton: false, sceneModePicker: false, navigationHelpButton: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false,
+    creditContainer: document.createElement('div'),
+    msaaSamples: tier.msaa,
+    shadows: tier.shadows,
+    terrainShadows: tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED,
+    useBrowserRecommendedResolution: !tier.nativeRes,
+  });
+  const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
+  const canvas = scene.canvas;
+
+  // Satellite imagery (Esri World Imagery). If a tile fails, Natural Earth
+  // underneath stays visible instead of a hole.
+  const satellite = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    maximumLevel: 19,
+    credit: new C.Credit('Imagerie : Esri, Maxar, Earthstar Geographics, GIS User Community'),
+  }));
+  satellite.brightness = 1.02; satellite.contrast = 1.06; satellite.saturation = 1.0;
+  satellite.gamma = 1.04;
+
+  const labels = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    maximumLevel: 19,
+    credit: new C.Credit('Toponymes : Esri'),
+  }));
+  labels.show = false;
+
+  // Sun lighting and atmosphere from the real sun position at the clock time.
+  globe.enableLighting = true;
+  globe.dynamicAtmosphereLighting = true;
+  globe.dynamicAtmosphereLightingFromSun = true;
+  globe.showGroundAtmosphere = true;
+  globe.showWaterEffect = true;
+  globe.depthTestAgainstTerrain = true;
+  globe.maximumScreenSpaceError = tier.sse;
+  globe.tileCacheSize = 400;
+  globe.preloadSiblings = true;
+  globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
+  globe.atmosphereLightIntensity = 10;
+  // Keep sun lighting at every distance so the terminator shows from orbit.
+  globe.lightingFadeOutDistance = 1.0e9;
+  globe.lightingFadeInDistance = 1.1e9;
+  scene.skyAtmosphere.show = true;
+  scene.fog.enabled = true;
+  scene.fog.density = 2.0e-4;
+  scene.fog.minimumBrightness = 0.03;
+  scene.highDynamicRange = tierName === 'high';
+  scene.postProcessStages.fxaa.enabled = tier.fxaa;
+  scene.sun.show = true; scene.moon.show = false;
+  viewer.resolutionScale = tier.scale;
+  if (scene.shadowMap) { scene.shadowMap.softShadows = true; scene.shadowMap.darkness = 0.45; scene.shadowMap.maximumDistance = 25000; }
+
+  // Inertia tuned for a heavier, steadier camera feel.
+  const ctl = scene.screenSpaceCameraController;
+  ctl.inertiaSpin = 0.93; ctl.inertiaTranslate = 0.93; ctl.inertiaZoom = 0.85;
+  ctl.minimumZoomDistance = 120;
+  ctl.maximumZoomDistance = 4.0e7;
+  ctl.enableCollisionDetection = true;
+
+  if (ION_TOKEN) {
+    C.Ion.defaultAccessToken = ION_TOKEN;
+    C.createWorldTerrainAsync({ requestVertexNormals: true, requestWaterMask: true })
+      .then((t) => { viewer.terrainProvider = t; })
+      .catch((e) => console.warn('Cesium World Terrain indisponible', e));
+    C.createOsmBuildingsAsync().then((b) => scene.primitives.add(b))
+      .catch((e) => console.warn('OSM Buildings indisponible', e));
+  }
+
+  // ---------- Clock: real sun, eased between local solar times ----------
+  viewer.clock.shouldAnimate = false;
+  const clock = viewer.clock;
+  function timeForSolarHour(lon, hour) {
+    // Local mean solar time ≈ UTC + lon/15 (equation of time ignored, ±16 min).
+    const now = C.JulianDate.now();
+    const g = C.JulianDate.toGregorianDate(now);
+    const midnight = C.JulianDate.fromGregorianDate(new C.GregorianDate(g.year, g.month, g.day, 0, 0, 0, 0, false));
+    let t = C.JulianDate.addHours(midnight, hour - lon / 15, new C.JulianDate());
+    // Keep within ±12 h of the current clock so the sun never spins round.
+    const diff = C.JulianDate.secondsDifference(t, clock.currentTime);
+    if (diff > 43200) t = C.JulianDate.addDays(t, -1, t);
+    if (diff < -43200) t = C.JulianDate.addDays(t, 1, t);
+    return t;
+  }
+
+  // ---------- Place markers ----------
+  const markerColor = C.Color.fromCssColorString('#F4ECDF');
+  PLACES.forEach((p) => {
+    viewer.entities.add({
+      id: p.id,
+      position: C.Cartesian3.fromDegrees(p.lon, p.lat),
+      point: {
+        pixelSize: 7, color: markerColor.withAlpha(0.95),
+        outlineColor: C.Color.fromCssColorString('#E3B062'), outlineWidth: 2,
+        heightReference: C.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        scaleByDistance: new C.NearFarScalar(2e5, 1.2, 2e7, 0.7),
+        distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 5e7),
+      },
+      label: {
+        text: p.name, font: '600 16px "Cormorant Garamond", Georgia, serif',
+        fillColor: markerColor, outlineColor: C.Color.fromCssColorString('#0B0E14'),
+        outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new C.Cartesian2(0, -16),
+        heightReference: C.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 4.5e6),
+      },
+    });
+  });
+
+  // ---------- Decorative clouds (not weather data) ----------
+  const clouds = scene.primitives.add(new C.CloudCollection({ noiseDetail: 16.0 }));
+  let cloudsOn = tier.clouds > 0;
+  $('btn-clouds').setAttribute('aria-pressed', String(cloudsOn));
+  function seededRandom(seed) {
+    let s = seed >>> 0;
+    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  }
+  // Scatter a cloud bank along the final approach so the camera passes
+  // through it on the way down.
+  function placeClouds(p, groundHeight) {
+    clouds.removeAll();
+    // Light tier has none by default; a few if the visitor turns them on.
+    const count = tier.clouds || 12;
+    if (!cloudsOn) return;
+    const rnd = seededRandom(p.id.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7));
+    const target = C.Cartographic.fromDegrees(p.lon, p.lat);
+    // The bank starts ~40 km back along the arrival heading.
+    const enu = C.Transforms.eastNorthUpToFixedFrame(C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight));
+    const hd = D2R(p.view.heading);
+    const approachStart = ellipsoid.cartesianToCartographic(C.Matrix4.multiplyByPoint(enu,
+      new C.Cartesian3(-Math.sin(hd) * 40000, -Math.cos(hd) * 40000, 0), new C.Cartesian3()));
+    const base = Math.max(groundHeight, 0) + 1800;
+    for (let i = 0; i < count; i++) {
+      const f = rnd();
+      const lon = C.Math.lerp(approachStart.longitude, target.longitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.06);
+      const lat = C.Math.lerp(approachStart.latitude, target.latitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.05);
+      const w = 1600 + rnd() * 2800, hgt = w * (0.3 + rnd() * 0.2);
+      clouds.add({
+        position: C.Cartesian3.fromRadians(lon, lat, base + rnd() * 1600),
+        scale: new C.Cartesian2(w, hgt),
+        // Same units as `scale` (metres): the volume the cloud may fill.
+        maximumSize: new C.Cartesian3(w * 0.95, hgt * 0.95, hgt * (0.6 + rnd() * 0.3)),
+        slice: 0.3 + rnd() * 0.3,
+        brightness: 0.95 + rnd() * 0.05,
+      });
+    }
+  }
+
+  // ---------- Cinematic flight engine ----------
+  // One continuous parametric path (no chained waypoints, so the camera never
+  // stops mid-way). Following van Wijk & Nuij's smooth zoom-and-pan model,
+  // ground speed is kept proportional to altitude: the globe turns quickly
+  // from orbit and the terrain scrolls at a steady apparent speed near the
+  // ground. Altitude is interpolated in log space (equal time per decade),
+  // pitch follows altitude, and roll stays at zero for a level horizon.
+  const tmp = { a: new C.Cartesian3(), b: new C.Cartesian3(), c: new C.Cartesian3() };
+  const smooth = (e0, e1, x) => { const t = C.Math.clamp((x - e0) / (e1 - e0), 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+  const easeInOutSine = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+  function slerpUnit(a, b, t, out) {
+    const d = C.Math.clamp(C.Cartesian3.dot(a, b), -1, 1);
+    const w = Math.acos(d);
+    if (w < 1e-9) return C.Cartesian3.clone(a, out);
+    const s = Math.sin(w), ka = Math.sin((1 - t) * w) / s, kb = Math.sin(t * w) / s;
+    out.x = a.x * ka + b.x * kb; out.y = a.y * ka + b.y * kb; out.z = a.z * ka + b.z * kb;
+    return C.Cartesian3.normalize(out, out);
+  }
+  // Quadratic Bézier on the sphere (de Casteljau with slerp): leaves `a`
+  // towards `ctrl` and reaches `b` along the ctrl→b direction.
+  function bezierUnit(a, ctrl, b, q, out) {
+    const p1 = slerpUnit(a, ctrl, q, new C.Cartesian3());
+    const p2 = slerpUnit(ctrl, b, q, new C.Cartesian3());
+    return slerpUnit(p1, p2, q, out);
+  }
+  const lerpAngle = (a, b, t) => a + C.Math.negativePiToPi(b - a) * t;
+  const ellipsoid = C.Ellipsoid.WGS84;
+  function unitOf(carto) { return C.Cartesian3.normalize(C.Cartesian3.fromRadians(carto.longitude, carto.latitude, 0), new C.Cartesian3()); }
+  function cartoOfUnit(u, height) {
+    const c = ellipsoid.cartesianToCartographic(C.Cartesian3.multiplyByScalar(u, ellipsoid.maximumRadius, tmp.a)) || new C.Cartographic();
+    c.height = height; return c;
+  }
+
+  let flight = null;
+  let orbit = null;           // idle orbit around the arrived place
+  let activePlace = null;
+
+  function releaseLookAt() { camera.lookAtTransform(C.Matrix4.IDENTITY); }
+
+  function cancelFlight() {
+    if (!flight) return;
+    flight = null;
+    ctl.enableInputs = true;
+    setPhase(activePlace ? 'Survol libre' : 'Exploration libre');
+  }
+  function stopOrbit() { orbit = null; }
+
+  /**
+   * target: Cartesian3 on the ground the camera must end up looking at.
+   * view: { heading, pitch, range } in degrees / metres, ENU frame at target.
+   */
+  function startFlight(target, view, opts) {
+    stopOrbit(); releaseLookAt(); flight = null;
+    const startCarto = camera.positionCartographic.clone();
+    const startHeading = camera.heading, startPitch = camera.pitch, startRoll = C.Math.negativePiToPi(camera.roll);
+
+    // Final camera pose from heading/pitch/range around the target.
+    const H = D2R(view.heading), P = Math.max(D2R(view.pitch), D2R(-89.5));
+    const enu = C.Transforms.eastNorthUpToFixedFrame(target);
+    const offset = new C.Cartesian3(
+      view.range * Math.cos(P) * -Math.sin(H),
+      view.range * Math.cos(P) * -Math.cos(H),
+      -view.range * Math.sin(P));
+    const endCarto = ellipsoid.cartesianToCartographic(C.Matrix4.multiplyByPoint(enu, offset, new C.Cartesian3()));
+
+    const uStart = unitOf(startCarto), uEnd = unitOf(endCarto);
+    const arc = Math.acos(C.Math.clamp(C.Cartesian3.dot(uStart, uEnd), -1, 1));
+    const arcMeters = arc * 6371000;
+    // Control point behind the site along the final heading, so the last
+    // stretch glides in over the territory rather than dropping vertically.
+    const entryDist = Math.min(Math.max(view.range * 10, 25000), 80000, arcMeters * 0.5 + 1);
+    const uCtrl = C.Cartesian3.normalize(C.Matrix4.multiplyByPoint(enu,
+      new C.Cartesian3(-Math.sin(H) * entryDist, -Math.cos(H) * entryDist, 0), new C.Cartesian3()), new C.Cartesian3());
+
+    const h0 = Math.max(startCarto.height, 50);
+    const hEnd = Math.max(endCarto.height, 50);
+    const hPeak = Math.max(h0, hEnd, C.Math.clamp(arcMeters * 0.6, 0, 9.0e6));
+    const L0 = Math.log(h0), Lf = Math.log(hEnd), Lp = Math.log(hPeak);
+    const altitudeAt = (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
+
+    // Pitch: tilt down towards nadir during the climb, then open up to the
+    // arrival pitch over the second half of the flight. Time-based windows
+    // bound the tilt rate whatever the altitude change.
+    const NADIR = D2R(-89.5);
+    const climbing = hPeak > h0 * 1.5;
+    const pitchAt = (s) => {
+      const up = climbing ? C.Math.lerp(startPitch, NADIR, smooth(0, 0.45, s)) : startPitch;
+      const down = C.Math.lerp(NADIR, P, smooth(0.5, 1.0, s));
+      return C.Math.lerp(up, down, smooth(0.3, 0.5, s));
+    };
+    const longHaul = hPeak > 1e6;
+
+    // Precompute arc-length of the ground track and the time→distance map
+    // (weight ∝ altitude, windowed so speed eases in and out).
+    const N = 400;
+    const trackLen = new Float64Array(N + 1);
+    let prev = uStart;
+    for (let i = 1; i <= N; i++) {
+      const u = bezierUnit(uStart, uCtrl, uEnd, i / N, new C.Cartesian3());
+      trackLen[i] = trackLen[i - 1] + Math.acos(C.Math.clamp(C.Cartesian3.dot(prev, u), -1, 1));
+      prev = u;
+    }
+    const progress = new Float64Array(N + 1);
+    for (let i = 1; i <= N; i++) {
+      const s = (i - 0.5) / N;
+      const w = altitudeAt(s) * smooth(0, 0.18, s) * (1 - smooth(0.82, 1, s)) + 1e-6;
+      progress[i] = progress[i - 1] + w;
+    }
+    for (let i = 0; i <= N; i++) progress[i] /= progress[N];
+    const lookup = (table, x) => { // x in [0,1] → interpolated table value
+      const f = C.Math.clamp(x, 0, 1) * N, i = Math.min(Math.floor(f), N - 1);
+      return table[i] + (table[i + 1] - table[i]) * (f - i);
+    };
+    const qForDistance = (d) => { // inverse of trackLen (monotonic)
+      let lo = 0, hi = N;
+      while (hi - lo > 1) { const m = (lo + hi) >> 1; if (trackLen[m] < d) lo = m; else hi = m; }
+      const span = trackLen[hi] - trackLen[lo];
+      return (lo + (span > 0 ? (d - trackLen[lo]) / span : 0)) / N;
+    };
+
+    const reduced = prefersReduced.matches;
+    const decades = (Math.abs(Lp - L0) + Math.abs(Lp - Lf)) / Math.LN10;
+    const duration = reduced ? 1200
+      : (opts && opts.duration) || C.Math.clamp(4000 + decades * 1500 + arc * 2000, 7000, 18000);
+
+    const t0 = performance.now();
+    const time0 = C.JulianDate.clone(clock.currentTime);
+    const time1 = opts && opts.time ? opts.time : time0;
+    const dt = C.JulianDate.secondsDifference(time1, time0);
+    const pos = new C.Cartesian3();
+    const hpr = new C.HeadingPitchRoll();
+
+    flight = {
+      t0, duration, onDone: opts && opts.onDone,
+      step(now) {
+        const t = C.Math.clamp((now - t0) / duration, 0, 1);
+        const s = reduced ? t : easeInOutSine(t);
+
+        const q = qForDistance(lookup(progress, s) * trackLen[N]);
+        const g = bezierUnit(uStart, uCtrl, uEnd, q, tmp.b);
+        const carto = cartoOfUnit(g, altitudeAt(s));
+        // Never go below the loaded terrain.
+        const ground = globe.getHeight(carto);
+        if (ground !== undefined && carto.height < ground + 80) carto.height = ground + 80;
+        C.Cartographic.toCartesian(carto, ellipsoid, pos);
+
+        // Heading: on long flights settle to north while in orbit, then turn
+        // to the arrival heading over the whole descent.
+        const toNorth = longHaul ? smooth(0, 0.4, s) : 0;
+        hpr.heading = lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
+        hpr.pitch = pitchAt(s);
+        hpr.roll = startRoll * (1 - smooth(0, 0.2, s));
+        camera.setView({ destination: pos, orientation: hpr });
+
+        if (dt !== 0) clock.currentTime = C.JulianDate.addSeconds(time0, dt * smooth(0, 1, t), new C.JulianDate());
+        if (opts && opts.onProgress) opts.onProgress(s, carto.height);
+        return t >= 1;
+      },
+    };
+    ctl.enableInputs = false;
+  }
+
+  function startOrbit(target) {
+    if (prefersReduced.matches) return;
+    // Express the current pose as heading/pitch/range so lookAt starts exactly here.
+    const enuInv = C.Matrix4.inverseTransformation(C.Transforms.eastNorthUpToFixedFrame(target), new C.Matrix4());
+    const local = C.Matrix4.multiplyByPoint(enuInv, camera.positionWC, new C.Cartesian3());
+    const range = C.Cartesian3.magnitude(local);
+    const heading = Math.atan2(-local.x, -local.y);
+    const pitch = -Math.asin(C.Math.clamp(local.z / range, -1, 1));
+    camera.lookAt(target, new C.HeadingPitchRange(heading, pitch, range));
+    orbit = { target, rate: 0, t: performance.now() };
+  }
+
+  // Cancel automated motion as soon as the visitor takes the controls.
+  ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
+    canvas.addEventListener(ev, () => {
+      if (flight) { cancelFlight(); }
+      if (orbit) { stopOrbit(); }
+    }, { passive: true });
+  });
+
+  let last = performance.now();
+  scene.preUpdate.addEventListener(() => {
+    const now = performance.now();
+    const dtMs = now - last; last = now;
+    if (flight) {
+      const f = flight;
+      if (f.step(now)) {
+        flight = null; ctl.enableInputs = true;
+        if (f.onDone) f.onDone();
+      }
+    } else if (orbit) {
+      // The orbit pivots on the lookAt frame; without it rotateLeft would
+      // circle the Earth's centre instead of the site.
+      if (C.Matrix4.equals(camera.transform, C.Matrix4.IDENTITY)) { orbit = null; return; }
+      // Ease into a slow 1.6°/s orbit.
+      orbit.rate = Math.min(orbit.rate + dtMs * 0.000004, D2R(1.6) / 1000);
+      camera.rotateLeft(orbit.rate * dtMs);
+    }
+  });
+
+  // ---------- UI ----------
+  const list = $('place-list');
+  PLACES.forEach((p) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'place'; btn.type = 'button'; btn.dataset.id = p.id;
+    btn.innerHTML = `<span>${p.name}</span><small>${p.country}</small>`;
+    btn.addEventListener('click', () => flyToPlace(p));
+    li.appendChild(btn); list.appendChild(li);
+  });
+
+  function fmtCoord(lat, lon) {
+    const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'O';
+    return `${Math.abs(lat).toFixed(4)}° ${ns} · ${Math.abs(lon).toFixed(4)}° ${ew}`;
+  }
+  function showCard(p, groundHeight) {
+    $('card-kicker').textContent = p.country;
+    $('card-title').textContent = p.name;
+    $('card-coords').textContent = fmtCoord(p.lat, p.lon)
+      + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
+    $('card-text').textContent = p.text;
+    const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
+    $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
+    $('card').classList.add('show');
+  }
+  function hideCard() { $('card').classList.remove('show'); }
+
+  function setActive(p) {
+    activePlace = p;
+    list.querySelectorAll('.place').forEach((b) => {
+      const on = !!p && b.dataset.id === p.id;
+      b.setAttribute('aria-current', String(on));
+      if (on) b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: prefersReduced.matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  function sampleGround(p) {
+    const carto = C.Cartographic.fromDegrees(p.lon, p.lat);
+    const timeout = new Promise((res) => setTimeout(() => res(null), 4000));
+    const sample = C.sampleTerrain(viewer.terrainProvider, 13, [carto]).then((r) => r[0].height).catch(() => null);
+    return Promise.race([sample, timeout]).then((h) => (Number.isFinite(h) ? h : 0));
+  }
+
+  let flightToken = 0;
+  async function flyToPlace(p) {
+    const token = ++flightToken;
+    setActive(p); hideCard(); stopOrbit(); cancelFlight();
+    setPhase('Préparation');
+    const groundHeight = await sampleGround(p);
+    if (token !== flightToken) return;
+    const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
+    placeClouds(p, groundHeight);
+
+    startFlight(target, p.view, {
+      time: timeForSolarHour(p.lon, p.solarHour),
+      onProgress: (s, h) => {
+        setPhase(h > 1.2e5 ? 'Orbite' : h > 1.2e4 ? 'Traversée de l\'atmosphère' : 'Approche');
+      },
+      onDone: () => {
+        setPhase('Arrivée');
+        showCard(p, groundHeight);
+        startOrbit(target);
+      },
+    });
+  }
+
+  function returnToOrbit() {
+    ++flightToken;
+    setActive(null); hideCard(); stopOrbit(); cancelFlight();
+    clouds.removeAll();
+    const c = camera.positionCartographic;
+    const target = C.Cartesian3.fromRadians(c.longitude, C.Math.clamp(c.latitude, D2R(-60), D2R(60)), 0);
+    startFlight(target, { heading: 0, pitch: -90, range: 1.9e7 }, {
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Ascension'),
+      onDone: () => setPhase('Orbite'),
+    });
+  }
+
+  function setPhase(t) { $('hud-phase').textContent = t; }
+
+  $('btn-orbit').addEventListener('click', returnToOrbit);
+  $('btn-labels').addEventListener('click', (e) => {
+    labels.show = !labels.show;
+    e.currentTarget.setAttribute('aria-pressed', String(labels.show));
+  });
+  $('btn-clouds').addEventListener('click', (e) => {
+    cloudsOn = !cloudsOn;
+    e.currentTarget.setAttribute('aria-pressed', String(cloudsOn));
+    if (!cloudsOn) clouds.removeAll();
+    else if (activePlace) {
+      const p = activePlace;
+      sampleGround(p).then((h) => { if (activePlace === p) placeClouds(p, h); });
+    }
+  });
+
+  // Click a marker on the globe to fly there.
+  const handler = new C.ScreenSpaceEventHandler(canvas);
+  handler.setInputAction((m) => {
+    const picked = scene.pick(m.position);
+    const id = picked && picked.id && picked.id.id;
+    const p = PLACES.find((x) => x.id === id);
+    if (p) flyToPlace(p);
+  }, C.ScreenSpaceEventType.LEFT_CLICK);
+
+  // HUD readout + adaptive quality (steps down if frame rate stays low).
+  const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
+    : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
+  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0;
+  function applyTier(name) {
+    tierName = name; tier = TIERS[name];
+    globe.maximumScreenSpaceError = tier.sse;
+    viewer.resolutionScale = tier.scale;
+    viewer.useBrowserRecommendedResolution = !tier.nativeRes;
+    viewer.shadows = tier.shadows;
+    viewer.terrainShadows = tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED;
+    scene.highDynamicRange = name === 'high';
+    scene.postProcessStages.fxaa.enabled = tier.fxaa;
+    if (!tier.clouds) clouds.removeAll();
+    $('hud-quality').textContent = `Qualité ${tier.label}`;
+  }
+  $('hud-quality').textContent = `Qualité ${tier.label}`;
+  scene.postRender.addEventListener(() => {
+    frames++;
+    const now = performance.now();
+    if (now - fpsT > 2500) {
+      const fps = frames * 1000 / (now - fpsT);
+      frames = 0; fpsT = now;
+      slowWindows = fps < 24 ? slowWindows + 1 : 0;
+      const i = TIER_ORDER.indexOf(tierName);
+      if (!forcedTier && slowWindows >= 2 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; }
+    }
+    if (now - hudT > 200) {
+      hudT = now;
+      const c = camera.positionCartographic;
+      const g = globe.getHeight(c);
+      const agl = g !== undefined ? c.height - g : c.height;
+      $('hud-alt').textContent = fmtAlt(Math.max(agl, 0));
+      $('hud-pos').textContent = fmtCoord(R2D(c.latitude), R2D(c.longitude));
+    }
+  });
+
+  // Credits come from the layers actually in use.
+  $('credits').innerHTML = [
+    'Imagerie : Esri, Maxar, Earthstar Geographics · Natural Earth II',
+    'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
+    'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques)',
+  ].join('<br>');
+
+  // Credits are open on wide screens, folded behind "Sources" on phones.
+  if (matchMedia('(min-width: 761px)').matches) $('credits-box').open = true;
+
+  // ---------- Opening shot ----------
+  // Start far out with the sunlit side facing the viewer, then settle in.
+  clock.currentTime = timeForSolarHour(25, 13);
+  camera.setView({
+    destination: C.Cartesian3.fromDegrees(10, 22, 3.2e7),
+    orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
+  });
+  const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
+  let opened = false;
+  // The intro stays up until the visitor starts the journey; a deep link
+  // (index.html#alhambra) skips it.
+  function ready() {
+    if (opened) return;
+    opened = true; removeTileListener();
+    $('loader-bar').style.visibility = 'hidden';
+    const btn = $('btn-start');
+    btn.disabled = false; btn.textContent = 'Commencer le voyage';
+    btn.addEventListener('click', open);
+    if (placeFromHash()) open(); else btn.focus();
+  }
+  function open() {
+    if (loader.classList.contains('done')) return;
+    loader.classList.add('done');
+    // Deep link (index.html#alhambra) or a place picked during loading
+    // takes over from the opening shot.
+    const p = placeFromHash();
+    if (p && !activePlace) flyToPlace(p);
+    else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
+      duration: 5500,
+      onDone: () => setPhase('Orbite'),
+    });
+  }
+  const removeTileListener = globe.tileLoadProgressEvent.addEventListener((queued) => {
+    if (queued === 0 && globe.tilesLoaded) ready();
+  });
+  // Never keep the loader up forever on a slow network.
+  setTimeout(ready, 12000);
+  window.addEventListener('hashchange', () => {
+    const p = placeFromHash();
+    if (p) { open(); flyToPlace(p); }
+  });
+
+  // Exposed for automated tests only.
+  window.__terre = { viewer, PLACES, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+})();
+</script>
+</body>
+</html>
