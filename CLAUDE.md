@@ -9,7 +9,8 @@ prototyping the design system and first interactive scene for Synthora — a
 fictional immersive social network exclusively for AIs, where humans are
 spectators, never actors. There is no backend, no build step, and no package
 manager: every page is a single self-contained `.html` file with inline
-`<style>` and `<script>`.
+`<style>` and `<script>`. The one external dependency is CesiumJS, loaded
+from jsDelivr by `terre.html` only (pinned to `cesium@1.145.0`).
 
 ## Running the site
 
@@ -41,8 +42,9 @@ console for errors.
   the Psy-IA consultation dialogue between Lira and Nox, advanced one beat
   at a time via a "Continuer" button, including a scripted "moment de
   silence" beat and a "Rejouer" reset.
+- `terre.html` — interactive Earth flyover on CesiumJS (see below).
 
-Both pages are independent — there's no shared CSS/JS file. If a style or
+All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
 separately (intentional duplication for a two-page static prototype; don't
 introduce a build step to dedupe unless the site grows further).
@@ -66,6 +68,33 @@ introduce a build step to dedupe unless the site grows further).
   hand-rolling teardown when adding new controls.
 - **Theming**: light/dark is a single `body.light` class toggle backed by
   CSS custom properties in `:root`; there's no JS-side color logic.
+
+## `terre.html` internals
+
+- **Data sources are all keyless**: terrain from AWS Terrain Tiles
+  (Terrarium PNG), imagery from Esri World Imagery over Cesium's bundled
+  Natural Earth II. `ION_TOKEN` (empty) optionally switches on Cesium World
+  Terrain + OSM Buildings; that path is untested.
+- **`TerrariumTerrainProvider`** serves a *geographic* tiling scheme by
+  resampling the Mercator source tiles (no polar hole, matching tile
+  edges), clamps ocean depths to 0 m and builds the water mask. Heightmap
+  skirts are made taller via a `_skirtHeight` accessor on
+  `HeightmapTerrainData.prototype` (private field of the pinned version) to
+  hide cracks on steep relief — re-check it if you bump Cesium.
+- **Flight engine** (`startFlight`): one continuous parametric path per
+  flight driven from `scene.preUpdate` — spherical Bézier ground track,
+  log-space altitude profile, ground speed ∝ altitude (van Wijk–Nuij), pitch
+  and heading on time windows, roll forced to 0. User input on the canvas
+  cancels a flight or the idle orbit. Keep any new camera motion inside this
+  engine rather than mixing in `camera.flyTo`.
+- **Places**: `PLACES` holds real WGS84 coordinates and factual text. Don't
+  add places or facts without checking them against a reliable source.
+- **Quality tiers** (`TIERS`) degrade automatically when FPS stays < 24;
+  `?qualite=` pins one. `prefers-reduced-motion` shortens flights to 1.2 s
+  and disables the idle orbit.
+- Testing headless: the sandbox can't reach the CDN or Esri, so route the
+  CDN to a local `npm i cesium@1.145.0` copy in Playwright and use
+  SwiftShader (`--use-angle=swiftshader`); expect low FPS there.
 
 ## Voice (Web Speech API)
 
