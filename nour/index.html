@@ -320,9 +320,9 @@
 
   // ---------- Device tier (graceful degradation) ----------
   const TIERS = {
-    high:     { label: 'Haute',     sse: 1.5, scale: 1,    nativeRes: true,  msaa: 4, clouds: 40, shadows: true,  fxaa: true },
-    balanced: { label: 'Équilibrée', sse: 2,   scale: 1,    nativeRes: false, msaa: 1, clouds: 24, shadows: false, fxaa: true },
-    light:    { label: 'Légère',    sse: 4,   scale: 0.75, nativeRes: false, msaa: 1, clouds: 0,  shadows: false, fxaa: false },
+    high:     { label: 'Haute',     sse: 1.0, scale: 1,    nativeRes: true,  msaa: 8, clouds: 48, shadows: true,  fxaa: true },
+    balanced: { label: 'Équilibrée', sse: 1.6, scale: 1,    nativeRes: true,  msaa: 2, clouds: 28, shadows: false, fxaa: true },
+    light:    { label: 'Légère',    sse: 3.2, scale: 0.85, nativeRes: false, msaa: 1, clouds: 10, shadows: false, fxaa: true },
   };
   const TIER_ORDER = ['high', 'balanced', 'light'];
   function detectTier() {
@@ -343,7 +343,7 @@
   // as water; land below sea level is flattened to 0 m as a side effect.
   const TERRAIN_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
   const TERRAIN_MAX_LEVEL = 15;
-  const GRID = 65;
+  const GRID = 97;
 
   // Cesium sizes heightmap skirts at 4× the estimated tile error, which is
   // too short on steep relief (Andes, Himalaya) where tiles of different
@@ -511,7 +511,7 @@
   globe.showWaterEffect = true;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
-  globe.tileCacheSize = 400;
+  globe.tileCacheSize = 1000;
   globe.preloadSiblings = true;
   globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
   globe.atmosphereLightIntensity = 10;
@@ -522,7 +522,7 @@
   scene.fog.enabled = true;
   scene.fog.density = 2.0e-4;
   scene.fog.minimumBrightness = 0.03;
-  scene.highDynamicRange = tierName === 'high';
+  scene.highDynamicRange = tierName !== 'light';
   scene.postProcessStages.fxaa.enabled = tier.fxaa;
   scene.sun.show = true; scene.moon.show = false;
   viewer.resolutionScale = tier.scale;
@@ -942,7 +942,7 @@
     viewer.useBrowserRecommendedResolution = !tier.nativeRes;
     viewer.shadows = tier.shadows;
     viewer.terrainShadows = tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED;
-    scene.highDynamicRange = name === 'high';
+    scene.highDynamicRange = name !== 'light';
     scene.postProcessStages.fxaa.enabled = tier.fxaa;
     if (!tier.clouds) clouds.removeAll();
     $('hud-quality').textContent = `Qualité ${tier.label}`;
