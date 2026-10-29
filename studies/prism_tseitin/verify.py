@@ -8,8 +8,8 @@ Charge : 1 au sommet 0, 0 ailleurs (somme impaire : insatisfiable).
 
 Ce script ne démontre pas la borne pour tout k : il vérifie des réfutations explicites
 pour k = 3..60 et k = 100, avec un ordre d'élimination périodique dont l'accroissement
-vaut exactement 32 par colonne. Une démonstration pour tout k demande l'argument de
-régime stationnaire, non écrit ici.
+vaut exactement 32 par colonne. La démonstration pour tout k est dans STATIONNAIRE.md ;
+ce script contrôle ses comptes par étape, sans en vérifier la preuve.
 """
 import argparse
 import itertools

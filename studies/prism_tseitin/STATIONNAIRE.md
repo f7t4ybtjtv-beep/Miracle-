@@ -34,9 +34,9 @@ de résolvantes distinctes produites, ce qui est aussi le nombre de lignes de la
 
 ## 2. Trois lemmes de résolution
 
-**Lemme 1 (variables disjointes).** Soient X et Y disjoints, x ∉ X ∪ Y, p, q ∈ {0,1}.
+**Lemme 1 (variables disjointes).** Soient X et Y disjoints, X ∪ Y ≠ ∅, x ∉ X ∪ Y, p, q ∈ {0,1}.
 La résolution de P(X∪{x},p) avec P(Y∪{x},q) sur x donne exactement les 2^{|X|+|Y|−1}
-clauses de P(X∪Y, p+q), toutes distinctes et non tautologiques.
+clauses de P(X∪Y, p+q mod 2), toutes distinctes et non tautologiques.
 
 *Démonstration.* Une résolvante de C_α et C_β sur x exige que l'un contienne x et l'autre
 ¬x, donc α(x) ≠ β(x). Posons a = α|X, b = β|Y et γ = a ∪ b, affectation sur X∪Y. Comme X et
@@ -48,13 +48,19 @@ Les deux cas donnent les γ de parité p+q+1, et chacun n'apparaît qu'une fois,
 parité de a décide du cas. Les résolvantes sont donc les clauses qui interdisent les γ de
 parité p+q+1, c'est-à-dire P(X∪Y, p+q). ∎
 
-**Lemme 2 (une variable commune).** Soient X et Y tels que X ∩ Y = {b}, et x ∉ X ∪ Y.
+**Lemme 2 (une variable commune).** Soient X et Y tels que X ∩ Y = {b}, |X ∪ Y| ≥ 2, et x ∉ X ∪ Y.
 La résolution de P(X∪{x},p) avec P(Y∪{x},q) sur x donne exactement les clauses C_γ pour
 les γ sur X∪Y tels que |γ| + γ(b) ≡ p+q+1 ; il y en a 2^{|X|+|Y|−2}, toutes distinctes.
+L'hypothèse |X ∪ Y| ≥ 2 est nécessaire pour le compte : si X = Y = {b}, il y a 0 résolvante si p = q,
+et 2 sinon (au lieu de 1), comme le vérifie un calcul direct. L'ensemble décrit reste correct dans ce cas.
 
 *Démonstration.* Une résolvante non tautologique exige que α et β aient le même signe sur b,
 donc γ est bien défini sur X∪Y. Avec a = α|X et b' = β|Y, on a |a| + |b'| = |γ| + γ(b),
-car b est compté deux fois. Le reste du calcul est celui du lemme 1. ∎
+car b est compté deux fois. Pour chaque γ de la condition, la parité de a = γ|X fixe α(x) : |a| ≡ p+1
+donne α(x) = 0, |a| ≡ p donne α(x) = 1, et β(x) est l'opposé ; la parité de b' suit de la condition.
+Chaque γ donne donc une seule résolvante, et γ ↦ C_γ est injective.
+Le compte : |γ| + γ(b) ≡ Σ_{v ∈ X∪Y, v ≠ b} γ(v) (mod 2), car 2γ(b) ≡ 0. Cette forme linéaire est non
+nulle exactement quand |X∪Y| ≥ 2, d'où 2^{|X∪Y|−1} = 2^{|X|+|Y|−2} valeurs de γ. ∎
 
 **Lemme 3 (variables complètes).** Si S est un ensemble de m variables et si toutes les
 clauses sur S sont présentes, la résolution sur une variable de S donne les 2^{m−1} clauses
