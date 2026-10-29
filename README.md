@@ -36,6 +36,23 @@ Samarcande et Angkor. Coordonnées réelles ; textes limités à des faits
 vérifiables. Lien direct vers un lieu : `nour/index.html#samarcande`. Les
 données et limites sont les mêmes que pour `terre.html`.
 
+### Nour : veille mondiale (bouton « Veille »)
+
+Couches de données **publiques et agrégées**, activables une à une ou toutes
+d'un coup via « Salle de situation » :
+
+- **Séismes 24 h** : flux GeoJSON public de l'USGS (M2,5+), rafraîchi toutes les 5 min ; clic sur un séisme de la liste pour y voler.
+- **Station spatiale** : position et trace de l'ISS via wheretheiss.at, toutes les 5 s.
+- **Précipitations** : imagerie NASA GIBS / IMERG (dernier relevé disponible).
+- **Jour/nuit réel** : horloge réelle, terminateur calculé par la position du soleil.
+- **Salle de situation** : affichage type centre de contrôle (heure UTC, journal d'événements).
+
+Aucune de ces couches ne suit ni n'identifie de personnes. Elles dépendent de
+services tiers : si une source est indisponible, un message l'indique.
+Les trois flux étaient injoignables depuis l'environnement de développement :
+l'interface a été testée avec des données simulées au format documenté, pas
+avec les flux réels.
+
 ## Lancer le projet
 
 Aucun serveur ni installation requis : ouvrez `index.html` directement dans

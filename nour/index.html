@@ -167,12 +167,43 @@
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
   .fallback-list { text-align: left; margin-top: 18px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
 
+  /* Veille mondiale panel */
+  .watch {
+    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
+    width: 300px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
+    display: none; pointer-events: auto; scrollbar-width: thin;
+  }
+  .watch.open { display: block; }
+  .watch .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 12px; }
+  .watch .toggles .btn { text-align: left; border-radius: 10px; padding: 9px 11px; }
+  .watch .toggles .wide { grid-column: 1 / -1; }
+  .watch .status { margin: 0 0 12px; font: 400 11px/1.65 var(--font-mono); color: var(--text-2); white-space: pre-line; }
+  .watch .sub { margin: 12px 0 6px; }
+  .watch ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .watch li button {
+    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px; padding: 6px 8px;
+    color: var(--text-2); font: 400 12px/1.4 var(--font-mono); cursor: pointer;
+    display: grid; grid-template-columns: 40px 1fr; gap: 8px;
+  }
+  .watch li button:hover { background: rgba(244, 236, 223, 0.06); color: var(--text); }
+  .watch li button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+  .watch .mag { color: var(--accent); font-weight: 500; }
+  .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
+  .watch .journal li b { color: var(--text-2); font-weight: 400; }
+  .sit-only { display: none; }
+  body.sitroom .sit-only { display: inline; }
+  body.sitroom .places, body.sitroom .card { display: none; }
+  body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
+
   /* Narrow screens: places become a horizontal strip, card stacks above it. */
   @media (max-width: 760px) {
     :root { --gutter: 16px; }
     .brand .tag, .brand .sep { display: none; }
     .brand { padding: 9px 14px; }
     .tools .btn { padding: 8px 11px; }
+    .tools { flex-wrap: wrap; justify-content: flex-end; }
+    .top { align-items: flex-start; }
+    .watch { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 38vh; }
     .places {
       top: auto; transform: none; right: var(--gutter); left: var(--gutter);
       bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
@@ -186,7 +217,7 @@
     .card p { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
     .hud { gap: 12px; padding: 8px 12px; font-size: 10.5px; }
     .hud .opt { display: none; }
-    .credits { left: auto; right: var(--gutter); max-width: calc(100vw - 2 * var(--gutter)); bottom: auto; top: calc(var(--gutter) + 50px + env(safe-area-inset-top)); font-size: 9.5px; padding: 5px 10px; }
+    .credits { left: auto; right: var(--gutter); max-width: calc(100vw - 2 * var(--gutter)); bottom: auto; top: calc(var(--gutter) + 98px + env(safe-area-inset-top)); font-size: 9.5px; padding: 5px 10px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .card, .loader { transition: none; }
@@ -207,6 +238,7 @@
     <div class="tools">
       <button class="btn" id="btn-orbit" type="button">Orbite</button>
       <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
+      <button class="btn" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch">Veille</button>
       <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
     </div>
   </div>
@@ -215,6 +247,22 @@
     <div class="kicker">Lieux de rencontre</div>
     <ul id="place-list"></ul>
   </nav>
+
+  <aside class="ui watch glass" id="watch" aria-label="Veille mondiale">
+    <div class="kicker">Veille mondiale · données publiques</div>
+    <div class="toggles">
+      <button class="btn" type="button" data-layer="quakes" aria-pressed="false">Séismes 24 h</button>
+      <button class="btn" type="button" data-layer="iss" aria-pressed="false">Station spatiale</button>
+      <button class="btn" type="button" data-layer="rain" aria-pressed="false">Précipitations</button>
+      <button class="btn" type="button" data-layer="live" aria-pressed="false">Jour/nuit réel</button>
+      <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
+    </div>
+    <p class="status" id="watch-status" aria-live="polite"></p>
+    <div class="kicker sub">Séismes les plus forts</div>
+    <ul id="watch-quakes"></ul>
+    <div class="kicker sub">Journal</div>
+    <ul id="watch-journal" class="journal"></ul>
+  </aside>
 
   <section class="ui card glass" id="card" aria-live="polite">
     <div class="kicker" id="card-kicker"></div>
@@ -229,6 +277,7 @@
     <span>Alt. <b id="hud-alt">—</b></span>
     <span class="opt"><b id="hud-pos">—</b></span>
     <span class="opt" id="hud-quality"></span>
+    <span class="sit-only"><b id="hud-utc">—</b></span>
   </div>
 
   <details class="ui credits glass" id="credits-box">
@@ -945,7 +994,7 @@
     placeClouds(p, groundHeight);
 
     startFlight(target, p.view, {
-      time: timeForSolarHour(p.lon, p.solarHour),
+      time: veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour),
       onProgress: (s, h) => {
         setPhase(h > 1.2e5 ? 'Orbite' : h > 1.2e4 ? 'Traversée de l\'atmosphère' : 'Approche');
       },
@@ -1030,6 +1079,7 @@
       const agl = g !== undefined ? c.height - g : c.height;
       $('hud-alt').textContent = fmtAlt(Math.max(agl, 0));
       $('hud-pos').textContent = fmtCoord(R2D(c.latitude), R2D(c.longitude));
+      if (veille.sit) $('hud-utc').textContent = fmtUTC(new Date());
     }
   });
 
@@ -1037,11 +1087,201 @@
   $('credits').innerHTML = [
     'Imagerie : Esri, Maxar, Earthstar Geographics · Natural Earth II',
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
+    'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS / IMERG (précipitations)',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques)',
   ].join('<br>');
 
   // Credits are open on wide screens, folded behind "Sources" on phones.
   if (matchMedia('(min-width: 761px)').matches) $('credits-box').open = true;
+
+  // ---------- Veille mondiale: open public data layers ----------
+  // Everything here is public, read-only and aggregate (earthquakes, one
+  // satellite, weather imagery). Nothing tracks or identifies people.
+  const veille = { quakes: false, iss: false, rain: false, live: false, sit: false };
+  const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
+  const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
+  const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
+
+  const quakeSource = new C.CustomDataSource('quakes');
+  const issSource = new C.CustomDataSource('iss');
+  quakeSource.show = false; issSource.show = false;
+  viewer.dataSources.add(quakeSource);
+  viewer.dataSources.add(issSource);
+  const rain = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: RAIN_URL, maximumLevel: 6, credit: new C.Credit('Précipitations : NASA GIBS / IMERG'),
+  }), 3);                       // under the place-name layer
+  rain.show = false; rain.alpha = 0.75;
+
+  const fmtUTC = (d) => `${d.toISOString().slice(11, 16)} UTC`;
+  const statusLines = { quakes: '', iss: '', rain: '', live: '' };
+  function renderStatus() {
+    $('watch-status').textContent = Object.values(statusLines).filter(Boolean).join('\n');
+  }
+  function journal(msg) {
+    const li = document.createElement('li');
+    const t = document.createElement('b');
+    t.textContent = fmtUTC(new Date()) + ' ';
+    li.append(t, document.createTextNode(msg));
+    const ul = $('watch-journal');
+    ul.prepend(li);
+    while (ul.children.length > 8) ul.lastChild.remove();
+  }
+
+  // Fly the camera to a point on the ground using the same engine as the places.
+  function flyToPoint(lat, lon, range) {
+    ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight();
+    clouds.removeAll(); setPhase('Veille');
+    startFlight(C.Cartesian3.fromDegrees(lon, lat, 0), { heading: 0, pitch: -55, range }, {
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Veille'),
+      onDone: () => setPhase('Veille'),
+    });
+  }
+
+  // Earthquakes (USGS GeoJSON summary feed, magnitude 2.5+, past 24 h).
+  const quakeSeen = new Set();
+  let quakeTimer = null, quakeFirstLoad = true;
+  async function loadQuakes() {
+    try {
+      const res = await fetch(QUAKE_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const feats = (Array.isArray(data.features) ? data.features : []).filter((f) => f && f.geometry
+        && Array.isArray(f.geometry.coordinates) && f.properties && Number.isFinite(f.properties.mag));
+      quakeSource.entities.removeAll();
+      feats.forEach((f) => {
+        const [lon, lat] = f.geometry.coordinates, m = f.properties.mag;
+        const col = C.Color.lerp(C.Color.fromCssColorString('#F1CF8E'), C.Color.fromCssColorString('#D9482A'),
+          C.Math.clamp((m - 2.5) / 4.5, 0, 1), new C.Color());
+        quakeSource.entities.add({
+          position: C.Cartesian3.fromDegrees(lon, lat),
+          point: {
+            pixelSize: C.Math.clamp(4 + m * 2.2, 6, 28), color: col.withAlpha(0.75),
+            outlineColor: C.Color.fromCssColorString('#F4ECDF').withAlpha(0.7), outlineWidth: 1,
+            heightReference: C.HeightReference.CLAMP_TO_GROUND,
+            disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          },
+          label: m >= 5.5 ? {
+            text: `M${m.toFixed(1)}`, font: '600 14px Inter, Arial, sans-serif', fillColor: C.Color.WHITE,
+            outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new C.Cartesian2(0, -18), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            heightReference: C.HeightReference.CLAMP_TO_GROUND,
+          } : undefined,
+        });
+        const id = f.id || `${lat},${lon},${f.properties.time}`;
+        if (!quakeSeen.has(id)) {
+          quakeSeen.add(id);
+          if (!quakeFirstLoad && m >= 4.5) journal(`Séisme M${m.toFixed(1)} · ${f.properties.place || 'lieu inconnu'}`);
+        }
+      });
+      quakeFirstLoad = false;
+      const top = feats.slice().sort((a, b) => b.properties.mag - a.properties.mag).slice(0, 8);
+      const ul = $('watch-quakes'); ul.replaceChildren();
+      top.forEach((f) => {
+        const [lon, lat] = f.geometry.coordinates;
+        const li = document.createElement('li'), b = document.createElement('button');
+        b.type = 'button';
+        const mag = document.createElement('span'); mag.className = 'mag'; mag.textContent = `M${f.properties.mag.toFixed(1)}`;
+        const where = document.createElement('span'); where.textContent = f.properties.place || '—';
+        b.append(mag, where);
+        b.addEventListener('click', () => flyToPoint(lat, lon, 450000));
+        li.append(b); ul.append(li);
+      });
+      statusLines.quakes = `Séismes : ${feats.length} sur 24 h (M2,5+) · mis à jour ${fmtUTC(new Date())}`;
+    } catch (e) {
+      statusLines.quakes = 'Séismes : données indisponibles (réseau ou source)';
+    }
+    renderStatus();
+  }
+
+  // International Space Station (wheretheiss.at: lat/lon in degrees, altitude km, velocity km/h).
+  const issTrail = [];
+  let issPos, issTimer = null;
+  issSource.entities.add({
+    id: 'iss',
+    position: new C.CallbackProperty(() => issPos, false),
+    point: { pixelSize: 10, color: C.Color.fromCssColorString('#F1CF8E'), outlineColor: C.Color.WHITE, outlineWidth: 2,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY },
+    label: { text: 'ISS', font: '600 14px Inter, Arial, sans-serif', fillColor: C.Color.WHITE, outlineColor: C.Color.BLACK,
+      outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -18),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY },
+    polyline: { positions: new C.CallbackProperty(() => issTrail.slice(), false), width: 2,
+      arcType: C.ArcType.NONE, material: C.Color.fromCssColorString('#F1CF8E').withAlpha(0.7) },
+  });
+  let issLast = null;
+  async function loadISS() {
+    try {
+      const res = await fetch(ISS_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      if (![d.latitude, d.longitude, d.altitude].every(Number.isFinite)) throw new Error('format');
+      issPos = C.Cartesian3.fromDegrees(d.longitude, d.latitude, d.altitude * 1000);
+      issTrail.push(issPos); if (issTrail.length > 90) issTrail.shift();
+      issLast = d;
+      statusLines.iss = `ISS : ${fmtCoord(d.latitude, d.longitude)} · ${Math.round(d.altitude)} km · ${Math.round(d.velocity || 0).toLocaleString('fr-FR')} km/h`;
+    } catch (e) {
+      statusLines.iss = 'ISS : données indisponibles (réseau ou source)';
+    }
+    renderStatus();
+  }
+
+  function setLive(on) {
+    if (on) {
+      clock.currentTime = C.JulianDate.now();
+      clock.clockStep = C.ClockStep.SYSTEM_CLOCK_MULTIPLIER; clock.multiplier = 1; clock.shouldAnimate = true;
+      statusLines.live = 'Jour/nuit : heure réelle (terminateur calculé par le soleil)';
+    } else {
+      clock.shouldAnimate = false;
+      statusLines.live = '';
+    }
+    renderStatus();
+  }
+
+  const layerOn = {
+    quakes(on) {
+      quakeSource.show = on;
+      clearInterval(quakeTimer);
+      if (on) { loadQuakes(); quakeTimer = setInterval(loadQuakes, 300000); }
+      else { statusLines.quakes = ''; renderStatus(); $('watch-quakes').replaceChildren(); }
+    },
+    iss(on) {
+      issSource.show = on;
+      clearInterval(issTimer);
+      if (on) { loadISS(); issTimer = setInterval(loadISS, 5000); }
+      else { statusLines.iss = ''; renderStatus(); }
+    },
+    rain(on) {
+      rain.show = on;
+      statusLines.rain = on ? 'Précipitations : NASA GIBS / IMERG (dernier relevé disponible)' : '';
+      renderStatus();
+    },
+    live: setLive,
+    sit(on) {
+      document.body.classList.toggle('sitroom', on);
+      if (on) { hideCard(); setPhase('Veille'); setLayer('quakes', true); setLayer('iss', true); setLayer('live', true); }
+    },
+  };
+  function setLayer(name, on) {
+    if (veille[name] === on) return;
+    veille[name] = on;
+    document.querySelector(`#watch [data-layer="${name}"]`).setAttribute('aria-pressed', String(on));
+    layerOn[name](on);
+    journal(`${on ? 'Activé' : 'Désactivé'} : ${document.querySelector(`#watch [data-layer="${name}"]`).textContent}`);
+  }
+  document.querySelectorAll('#watch [data-layer]').forEach((b) => {
+    b.addEventListener('click', () => setLayer(b.dataset.layer, !veille[b.dataset.layer]));
+  });
+  $('btn-watch').addEventListener('click', (e) => {
+    const open = !$('watch').classList.contains('open');
+    $('watch').classList.toggle('open', open);
+    e.currentTarget.setAttribute('aria-pressed', String(open));
+  });
+  // Stop polling when the tab is hidden; resume when it comes back.
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(quakeTimer); clearInterval(issTimer);
+    if (document.hidden) return;
+    if (veille.quakes) { loadQuakes(); quakeTimer = setInterval(loadQuakes, 300000); }
+    if (veille.iss) { loadISS(); issTimer = setInterval(loadISS, 5000); }
+  });
 
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.
