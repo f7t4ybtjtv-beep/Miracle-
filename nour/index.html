@@ -308,7 +308,8 @@
 
   // Real coordinates (WGS84, decimal degrees). `view` frames the final
   // approach: heading/pitch in degrees, range in metres from the site.
-  // `solarHour` is the local solar time used for lighting on arrival.
+  // `solarHour` only says whether to light the place in the morning (<12) or the afternoon;
+  // the actual hour is computed below from the real sun so no place arrives in the dark.
   const PLACES = [
     { id: 'tolede', name: 'Tolède', country: 'Espagne', lat: 39.8570, lon: -4.0237,
       text: "Aux XIIe et XIIIe siècles, des traducteurs y firent passer en latin puis en castillan des œuvres scientifiques et philosophiques écrites en arabe : c'est ce qu'on appelle l'« école des traducteurs de Tolède ». La ville est bâtie sur un méandre du Tage.",
@@ -341,6 +342,21 @@
       text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
       meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5 },
   ];
+
+  // Pick the local solar hour at which the sun stands ~32° high today at this
+  // latitude (bright, with readable shadows). If it never gets that high today
+  // (high latitude in winter), use solar noon. Declination: standard
+  // cosine approximation, accurate to about 1°.
+  function niceSolarHour(lat, preferred, now) {
+    const day = Math.floor((now - Date.UTC(now.getUTCFullYear(), 0, 0)) / 864e5);
+    const dec = -23.44 * Math.PI / 180 * Math.cos(2 * Math.PI / 365 * (day + 10));
+    const la = lat * Math.PI / 180, el = 32 * Math.PI / 180;
+    const cosH = (Math.sin(el) - Math.sin(la) * Math.sin(dec)) / (Math.cos(la) * Math.cos(dec));
+    const H = cosH >= 1 ? 0 : cosH <= -1 ? Math.PI : Math.acos(cosH);
+    const hour = 12 + (preferred < 12 ? -1 : 1) * (H * 180 / Math.PI) / 15;
+    return Math.round(hour * 4) / 4;
+  }
+  PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
