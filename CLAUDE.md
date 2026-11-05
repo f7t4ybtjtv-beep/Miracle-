@@ -47,6 +47,12 @@ console for errors.
   flyover engine plus ten places, a quality selector, public-data "Veille" layers and an
   optional Google 3D mode. Its own `<style>`/`<script>`; `nour/index.html` only redirects here.
   The `nour.*` localStorage keys keep their old prefix on purpose so saved settings survive.
+  Cesium 1.145 gotchas learned here: `globe.lightingFadeOutDistance`/`lightingFadeInDistance` make the globe
+  uniformly lit *below* the first and day/night-shaded *above* the second (distances from the Earth's centre),
+  so huge values switch the shading off; ~1 m / 2 m keeps it on at every altitude. `ImageryLayer.alpha` as a
+  function is documented but not evaluated in this version (the globe turns black): fade by camera altitude
+  with a numeric alpha instead. `nightAlpha`/`dayAlpha` only apply while `enableLighting` is on, and the night
+  side is multiplied by 0.3, hence the brightness boost on the night-lights layer.
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
