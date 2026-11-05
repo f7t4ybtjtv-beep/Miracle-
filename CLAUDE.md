@@ -77,7 +77,8 @@ introduce a build step to dedupe unless the site grows further).
   Terrain + OSM Buildings; that path is untested.
 - **`TerrariumTerrainProvider`** serves a *geographic* tiling scheme by
   resampling the Mercator source tiles (no polar hole, matching tile
-  edges), clamps ocean depths to 0 m and builds the water mask. Heightmap
+  edges) and clamps ocean depths to 0 m. There is deliberately no water mask (it made
+  stair-stepped coasts and sun-glint patches on land below sea level). Heightmap
   skirts are made taller via a `_skirtHeight` accessor on
   `HeightmapTerrainData.prototype` (private field of the pinned version) to
   hide cracks on steep relief — re-check it if you bump Cesium.
