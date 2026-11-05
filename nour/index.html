@@ -118,6 +118,9 @@
   .card .coords { font: 400 11.5px var(--font-mono); color: var(--text-2); }
   .card p { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
   .card .meta { margin-top: 12px; font: 400 11px var(--font-mono); color: var(--muted); }
+  .card a.earth { display: inline-block; margin-top: 12px; font: 500 12px var(--font-mono); color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+  .card a.earth:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .card a.earth:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
 
   /* HUD */
   .hud {
@@ -270,6 +273,7 @@
     <div class="coords" id="card-coords"></div>
     <p id="card-text"></p>
     <div class="meta" id="card-meta"></div>
+    <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
   </section>
 
   <div class="ui hud glass" aria-live="off">
@@ -1000,6 +1004,9 @@
     $('card-text').textContent = p.text;
     const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
     $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
+    // Google Earth Web deep link: @lat,lon,groundAltitude a, distance d, fov y, heading h, tilt t (0 = straight down), roll r.
+    const tilt = Math.round(90 + p.view.pitch);
+    $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
     $('card').classList.add('show');
   }
   function hideCard() { $('card').classList.remove('show'); }
