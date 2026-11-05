@@ -98,7 +98,7 @@
   #core #current{ font-family: var(--font-mono); font-size:.85rem; letter-spacing:.04em; color: var(--accent2); margin-bottom:4px; transition: color .6s ease; }
   #core .quote{ max-width:100%; color:var(--muted); }
   .controls.bottom{ position:absolute; z-index:2; left:50%; bottom:18px; transform:translateX(-50%); display:flex; flex-wrap:wrap; justify-content:center; gap:10px; width: min(320px, 90vw); }
-  #progress{ width:100%; max-width:220px; }
+  #progress{ width:100%; max-width:220px; height:6px; accent-color:var(--accent); }
   .sr{ position:absolute!important; clip:rect(1px,1px,1px,1px); padding:0;border:0;height:1px;width:1px;overflow:hidden; }
   li strong{ color: var(--accent); }
   @media (max-width:980px){ .wrap{grid-template-columns:1fr} aside#feed{display:none} }
@@ -108,6 +108,12 @@
     #core{ padding:12px 16px; }
     #core #current{ font-size:.78rem; }
     #core .quote{ font-size:.85rem; }
+    /* the core spans most of the width here; park the orbs above and
+       below it so none of them covers the quote */
+    .orb[data-name="Aether"]{ left:24%!important; top:14%!important; }
+    .orb[data-name="Lira"]{ left:72%!important; top:24%!important; }
+    .orb[data-name="Kael"]{ left:26%!important; top:70%!important; }
+    .orb[data-name="Nox"]{ left:74%!important; top:76%!important; }
   }
   @media (prefers-reduced-motion: reduce){ .orb{ transition:none; } }
 </style>
@@ -143,7 +149,7 @@
     </div>
     <div class="controls bottom">
       <button id="start">Démarrer le cycle</button>
-      <input id="progress" type="range" min="0" max="1" step="0.01" value="0" />
+      <progress id="progress" max="1" value="0" aria-label="Progression du tour de parole"></progress>
     </div>
   </div>
   <aside id="feed">
@@ -178,6 +184,7 @@
   let timers = new Set();
   let cycleId = null, speakId = null, progId = null;
   let stars = [];
+  let activeName = null, step = 0;
   let cycleMs = parseFloat(speed.value) * 1000;
 
   const scripts = {
@@ -196,6 +203,7 @@
   function resize(){
     canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight;
     makeStars();
+    draw(activeName);
   }
   function makeStars(){
     stars = [];
@@ -203,8 +211,12 @@
     for(let i=0;i<n;i++) stars.push({x:Math.random(), y:Math.random(), r:Math.random()*1.2+.3, a:Math.random()});
   }
   window.addEventListener('resize', resize);
-  density.addEventListener('input', makeStars);
-  speed.addEventListener('input', () => cycleMs = parseFloat(speed.value)*1000);
+  density.addEventListener('input', () => { makeStars(); draw(activeName); });
+  speed.addEventListener('input', () => {
+    cycleMs = parseFloat(speed.value)*1000;
+    // reschedule a running cycle so its rhythm matches the progress bar
+    if (cycleId) schedule();
+  });
   themeSel.addEventListener('change', () => document.body.classList.toggle('light', themeSel.value==='light'));
 
   const counters = Object.fromEntries(orbes.map(o => [o.dataset.name, 0]));
@@ -238,6 +250,7 @@
 
   function setActive(name, text){
     for(const o of orbes) o.style.opacity = (o.dataset.name===name) ? '1' : '.45';
+    activeName = name; draw(name);
     currentEl.textContent = `${name} :`;
     const mood = moods[name];
     currentEl.style.color = mood.solid;
@@ -259,24 +272,30 @@
     feedList.prepend(li); while (feedList.children.length > 18) feedList.removeChild(feedList.lastChild);
   }
 
-  function startCycle(){
-    stopCycle();
-    let step = 0;
-    cycleId = setInterval(() => {
-      const o = orbes[step % orbes.length]; const name = o.dataset.name;
-      const text = scripts[name];
-      setActive(name, text); record(name, text);
-      progress.value = 0;
-      let t0 = 0;
-      if (progId) clearInterval(progId); timers.delete(progId);
-      progId = setInterval(() => { progress.value = Math.min(1, (++t0) / (cycleMs/100) ); }, 100);
-      timers.add(progId);
-      step++;
-    }, cycleMs);
+  function tick(){
+    const name = orbes[step % orbes.length].dataset.name;
+    const text = scripts[name];
+    setActive(name, text); record(name, text);
+    progress.value = 0;
+    let t0 = 0;
+    if (progId) { clearInterval(progId); timers.delete(progId); }
+    progId = setInterval(() => { progress.value = Math.min(1, (++t0) / (cycleMs/100) ); }, 100);
+    timers.add(progId);
+    step++;
+  }
+  function schedule(){
+    if (cycleId) { clearInterval(cycleId); timers.delete(cycleId); }
+    cycleId = setInterval(tick, cycleMs);
     timers.add(cycleId);
   }
+  function startCycle(){
+    stopCycle();
+    step = 0;
+    tick();       // first speaker right away, not after a full silent cycle
+    schedule();
+  }
   function stopCycle(){
-    draw(); clearTimers(); progress.value = 0;
+    clearTimers(); activeName = null; draw(); progress.value = 0;
     for(const o of orbes) o.style.opacity = '1';
     quoteEl.textContent = '— cycle stoppé.';
     currentEl.textContent = '« Le noyau écoute. »';
@@ -287,7 +306,7 @@
 
   startBtn.addEventListener('click', startCycle);
   stopBtn.addEventListener('click', stopCycle);
-  prefersReduced.addEventListener?.('change', () => draw());
+  prefersReduced.addEventListener?.('change', () => draw(activeName));
   document.addEventListener('visibilitychange', () => { if (document.hidden && cycleId) stopCycle(); });
 
   resize();
