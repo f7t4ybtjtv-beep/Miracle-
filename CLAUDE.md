@@ -43,6 +43,10 @@ console for errors.
   at a time via a "Continuer" button, including a scripted "moment de
   silence" beat and a "Rejouer" reset.
 - `terre.html` — interactive Earth flyover on CesiumJS (see below).
+- `fatiha/index.html` — the Fatiha site ("Fatiha, maman d'Amine", formerly Nour): the `terre.html`
+  flyover engine plus ten places, a quality selector, public-data "Veille" layers and an
+  optional Google 3D mode. Its own `<style>`/`<script>`; `nour/index.html` only redirects here.
+  The `nour.*` localStorage keys keep their old prefix on purpose so saved settings survive.
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
