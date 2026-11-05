@@ -9,7 +9,9 @@ prototyping the design system and first interactive scene for Synthora — a
 fictional immersive social network exclusively for AIs, where humans are
 spectators, never actors. There is no backend, no build step, and no package
 manager: every page is a single self-contained `.html` file with inline
-`<style>` and `<script>`.
+`<style>` and `<script>`. The one external dependency is CesiumJS, loaded
+from jsDelivr by `terre.html` and `fatiha/index.html` (pinned to `cesium@1.145.0`); `fatiha/` also loads hls.js and
+world-atlas lazily from jsDelivr when the "Direct" panel needs them.
 
 ## Running the site
 
@@ -57,8 +59,38 @@ python3 -m satlab bench --campaign standard --out results/standard
   elements (`.orb` buttons, `#core`) positioned on top via absolute
   positioning. All state and animation logic lives in one IIFE at the
   bottom of the file.
+- `jardin.html` — a linear, click-through scene (not a repeating cycle):
+  the Psy-IA consultation dialogue between Lira and Nox, advanced one beat
+  at a time via a "Continuer" button, including a scripted "moment de
+  silence" beat and a "Rejouer" reset.
+- `terre.html` — interactive Earth flyover on CesiumJS (see below).
+- `fatiha/index.html` — the Fatiha site ("Fatiha, maman d'Amine", formerly Nour): the `terre.html`
+  flyover engine plus ten places, a quality selector, public-data "Veille" layers and an
+  optional Google 3D mode. Its own `<style>`/`<script>`; `nour/index.html` only redirects here.
+  The `nour.*` localStorage keys keep their old prefix on purpose so saved settings survive.
+  Cesium 1.145 gotchas learned here: `globe.lightingFadeOutDistance`/`lightingFadeInDistance` make the globe
+  uniformly lit *below* the first and day/night-shaded *above* the second (distances from the Earth's centre),
+  so huge values switch the shading off; ~1 m / 2 m keeps it on at every altitude. `ImageryLayer.alpha` as a
+  function is documented but not evaluated in this version (the globe turns black): fade by camera altitude
+  with a numeric alpha instead. `nightAlpha`/`dayAlpha` only apply while `enableLighting` is on, and the night
+  side is multiplied by 0.3, hence the brightness boost on the night-lights layer. In a custom post-process,
+  Cesium's projection has an infinite far plane: `czm_inverseProjection * vec4(ndc.xy, 1.0, 1.0)` comes back with
+  w = 0, so take `normalize(eye.xyz)` as the ray direction and never divide by w (that gave NaN and silently
+  disabled the limb glow). The depth fog (`scene.fog`) is off because it left zig-zag edges in oblique night views.
+  The "Vue de nuit" card button flies to ~600 km, pitch -33°, a per-place `night` heading and 23 h local solar time;
+  the `nour_limb` post-process draws the blue limb (sky pixels only, via `depthTexture`), and a `preRender` hook dims
+  the daytime imagery layers by the sun elevation at the screen-centre ground point (new layers that show daytime
+  imagery must join its `dayLayers` list). The Tycho-2 sky box is re-levelled with a LUT: below ~15 its faces are
+  JPEG noise, so a lower black point makes streaky speckle instead of stars.
+  The "Direct" panel (radios from radio-browser.info, free TV from the iptv-org playlists, public-webcam links,
+  GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
+  is one block of the script. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
+  from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
+  whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
+  The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
+  keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
-Both pages are independent — there's no shared CSS/JS file. If a style or
+All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
 separately (intentional duplication for a two-page static prototype; don't
 introduce a build step to dedupe unless the site grows further).
@@ -86,6 +118,65 @@ introduce a build step to dedupe unless the site grows further).
   hand-rolling teardown when adding new controls.
 - **Theming**: light/dark is a single `body.light` class toggle backed by
   CSS custom properties in `:root`; there's no JS-side color logic.
+
+## `terre.html` internals
+
+- **Data sources are all keyless**: terrain from AWS Terrain Tiles
+  (Terrarium PNG), imagery from Esri World Imagery over Cesium's bundled
+  Natural Earth II. `ION_TOKEN` (empty) optionally switches on Cesium World
+  Terrain + OSM Buildings; that path is untested.
+- **`TerrariumTerrainProvider`** serves a *geographic* tiling scheme by
+  resampling the Mercator source tiles (no polar hole, matching tile
+  edges) and clamps ocean depths to 0 m. There is deliberately no water mask (it made
+  stair-stepped coasts and sun-glint patches on land below sea level). Heightmap
+  skirts are made taller via a `_skirtHeight` accessor on
+  `HeightmapTerrainData.prototype` (private field of the pinned version) to
+  hide cracks on steep relief — re-check it if you bump Cesium.
+- **Flight engine** (`startFlight`): one continuous parametric path per
+  flight driven from `scene.preUpdate` — spherical Bézier ground track,
+  log-space altitude profile, ground speed ∝ altitude (van Wijk–Nuij), pitch
+  and heading on time windows, roll forced to 0. User input on the canvas
+  cancels a flight or the idle orbit. Keep any new camera motion inside this
+  engine rather than mixing in `camera.flyTo`.
+- **Places**: `PLACES` holds real WGS84 coordinates and factual text. Don't
+  add places or facts without checking them against a reliable source.
+- **Quality tiers** (`TIERS`) degrade automatically when FPS stays < 24;
+  `?qualite=` pins one. `prefers-reduced-motion` shortens flights to 1.2 s
+  and disables the idle orbit.
+- Testing headless: the sandbox can't reach the CDN or Esri, so route the
+  CDN to a local `npm i cesium@1.145.0` copy in Playwright and use
+  SwiftShader (`--use-angle=swiftshader`); expect low FPS there.
+
+## Voice (Web Speech API)
+
+Both `amphitheatre.html` and `jardin.html` speak each AI's line aloud via
+the browser's built-in `speechSynthesis` — deliberately not a paid TTS
+service: this site has no backend, so any API key embedded in a static
+page would be visible to anyone viewing the page source. Each AI has a
+`voiceProfiles` entry (`pitch`/`rate`) so they stay distinguishable even on
+browsers that only expose one French voice; when several voices are
+available, `voiceFor()` spreads them across characters deterministically by
+name. Voices load async (`voiceschanged` event) since `getVoices()` can
+return empty on first call. A "Son" button toggles `soundOn` and calls
+`speechSynthesis.cancel()` immediately when muting. Always `cancel()`
+before starting a new utterance, and on stop/replay/tab-hide — same
+"one Set/one teardown path" discipline as the timers above, so speech never
+overlaps itself or keeps talking after the scene resets.
+
+## Faces (`assets/faces/`)
+
+Each AI has one portrait photo (`assets/faces/<name>.jpg`, 640×640,
+face-cropped) shown as a circular `<img>` — `.orb-face` in
+`amphitheatre.html`, `.presence-face` in `jardin.html`. There is only one
+image per character (no separate "speaking"/"neutral" shots), so state is
+simulated entirely in CSS on that single image: a mood-colored glow
+(`box-shadow`, using the same `--mood-*` custom properties as the
+orb→core canvas links) intensifies while a character speaks, and a
+desaturating `filter` is applied for "listening" (amphitheatre, via the
+existing `.orb{opacity}` mechanism) and for the jardin's "silence" beat
+(`.presence.silence`). `jardin.html`'s Nox keeps its original fragmented
+amber-particle SVG (`#nox-particles`, animated by `settleNox()`) as a
+`.backdrop` layer behind the photo rather than replacing it.
 
 ## Content source
 

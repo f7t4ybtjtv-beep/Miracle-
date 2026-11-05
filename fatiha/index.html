@@ -1,0 +1,2244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Fatiha, maman d’Amine</title>
+<meta name="description" content="Fatiha, maman d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers dix lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<meta name="theme-color" content="#0B0E14" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwQjBFMTQiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMSIgZmlsbD0iI0UzQjA2MiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNFM0IwNjIiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
+<link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
+<style>
+  :root {
+    /* Fatiha: warm light on a night sky. */
+    --bg-deep: #0B0E14;
+    --bg-warm: #151A24;
+    --panel: rgba(14, 18, 26, 0.72);
+    --panel-solid: #10141C;
+    --border: #262D3A;
+    --border-strong: #3A4354;
+    --accent: #E3B062;
+    --accent-2: #F1CF8E;
+    --text: #F4ECDF;
+    --text-2: #BDB5A8;
+    --muted: #7F786D;
+    --font-ui: 'Inter', Arial, sans-serif;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'JetBrains Mono', Consolas, monospace;
+    --gutter: 20px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; overflow: hidden;
+    background: var(--bg-deep); color: var(--text);
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+  }
+  #globe { position: fixed; inset: 0; }
+  #globe .cesium-viewer-bottom, #globe .cesium-widget-credits { display: none !important; }
+  /* Cinematic vignette: purely optical, keeps the eye on the centre of frame. */
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(5, 2, 1, 0.55) 100%);
+  }
+
+  .ui { position: fixed; z-index: 5; pointer-events: none; }
+  .ui > * { pointer-events: auto; }
+  .glass {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(14px) saturate(1.1);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1);
+    border-radius: 14px;
+  }
+  .kicker {
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
+    text-transform: uppercase; color: var(--muted);
+  }
+
+  /* Top bar */
+  .top {
+    top: calc(var(--gutter) + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    pointer-events: none;
+  }
+  .brand { display: flex; align-items: center; gap: 14px; padding: 10px 16px; pointer-events: auto; }
+  .brand a { color: var(--text-2); text-decoration: none; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+  .brand a:hover { color: var(--text); }
+  .brand .sep { width: 1px; height: 16px; background: var(--border-strong); }
+  .brand h1 { margin: 0; font: 600 22px/1 var(--font-serif); letter-spacing: .02em; color: var(--accent-2); }
+  .brand .tag { font: italic 500 15px var(--font-serif); color: var(--text-2); white-space: nowrap; }
+  .tools { display: flex; gap: 8px; pointer-events: auto; }
+  .btn {
+    font: 500 12px var(--font-ui); color: var(--text-2);
+    background: var(--panel); border: 1px solid var(--border);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-radius: 999px; padding: 9px 14px; cursor: pointer;
+    transition: color .2s, border-color .2s, background .2s;
+  }
+  .btn:hover { color: var(--text); border-color: var(--border-strong); }
+  .btn[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+  .btn:focus-visible, .place:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+
+  /* Places list */
+  .places {
+    /* Top-right, ending above the Sources panel (about 240 px tall with the quality row) so the two never overlap. */
+    top: calc(var(--gutter) + 64px + env(safe-area-inset-top)); right: var(--gutter);
+    width: 260px; max-height: calc(100vh - var(--gutter) - 64px - 240px - env(safe-area-inset-top)); overflow: auto;
+    padding: 14px; scrollbar-width: thin;
+  }
+  .places .kicker {
+    position: sticky; top: -14px; z-index: 1; margin: -14px -14px 0; padding: 16px 20px 10px;
+    background: linear-gradient(var(--panel-solid) 70%, transparent);
+  }
+  .places ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .place {
+    width: 100%; text-align: left; cursor: pointer;
+    background: transparent; border: 1px solid transparent; border-radius: 10px;
+    padding: 9px 10px; color: var(--text); font: 500 13.5px var(--font-ui);
+    display: grid; gap: 2px; transition: background .2s, border-color .2s;
+  }
+  .place small { font: 400 11px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
+  .place:hover { background: rgba(242, 227, 213, 0.05); }
+  .place[aria-current="true"] { border-color: var(--border-strong); background: rgba(217, 72, 42, 0.10); }
+
+  /* Info card */
+  .card {
+    left: var(--gutter); bottom: calc(var(--gutter) + 56px + env(safe-area-inset-bottom));
+    width: min(380px, calc(100vw - 2 * var(--gutter)));
+    padding: 18px 20px; opacity: 0; transform: translateY(8px);
+    transition: opacity .6s ease, transform .6s ease; pointer-events: none;
+  }
+  .card.show { opacity: 1; transform: none; pointer-events: auto; }
+  .card h2 { margin: 4px 0 4px; font: 600 28px/1.1 var(--font-serif); letter-spacing: 0; }
+  .card .coords { font: 400 11.5px var(--font-mono); color: var(--text-2); }
+  .card p { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
+  .card .meta { margin-top: 12px; font: 400 11px var(--font-mono); color: var(--muted); }
+  .card .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; }
+  .card a.earth, .card button.earth { font: 500 12px var(--font-mono); color: var(--accent); text-decoration: none; border: 0; border-bottom: 1px solid var(--border-strong); background: none; padding: 0; cursor: pointer; }
+  .card a.earth:hover, .card button.earth:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .card a.earth:focus-visible, .card button.earth:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+
+  /* HUD */
+  .hud {
+    left: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+    display: flex; gap: 18px; align-items: center; padding: 10px 16px;
+    font: 400 11.5px var(--font-mono); color: var(--text-2);
+  }
+  .hud b { color: var(--text); font-weight: 500; }
+  .hud .phase { color: var(--accent-2); }
+
+  .credits {
+    right: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
+    max-width: 52vw; padding: 7px 12px; font: 400 10px/1.5 var(--font-mono); color: var(--muted);
+    text-align: right;
+  }
+  .credits a { color: var(--text-2); }
+  .credits summary { cursor: pointer; list-style: none; color: var(--text-2); }
+  .credits summary::-webkit-details-marker { display: none; }
+  .credits[open] summary { margin-bottom: 4px; }
+
+  /* Loader / fallback */
+  .loader {
+    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
+    background: radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
+    transition: opacity 1.2s ease;
+  }
+  .loader.done { opacity: 0; pointer-events: none; }
+  .loader {
+    background:
+      radial-gradient(ellipse 60% 45% at 50% 42%, rgba(227, 176, 98, 0.14), transparent 70%),
+      radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
+  }
+  .loader .inner { text-align: center; max-width: 560px; padding: 0 24px; }
+  .loader h2 { margin: 10px 0 6px; font: 500 clamp(64px, 14vw, 120px)/0.95 var(--font-serif); color: var(--text); letter-spacing: .02em; }
+  .loader .tagline { margin: 0 0 22px; font: italic 500 clamp(20px, 4vw, 26px) var(--font-serif); color: var(--accent-2); }
+  .loader p { color: var(--text-2); font-size: 15px; line-height: 1.65; }
+  .loader .start {
+    margin-top: 26px; font: 500 14px var(--font-ui); letter-spacing: .02em;
+    color: var(--bg-deep); background: var(--accent); border: 0; border-radius: 999px;
+    padding: 13px 26px; cursor: pointer; transition: background .2s, opacity .3s;
+  }
+  .loader .start:hover { background: var(--accent-2); }
+  .loader .start:disabled { opacity: .45; cursor: progress; }
+  .loader .start:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+  .loader .bar { width: 160px; height: 2px; margin: 18px auto 0; background: var(--border); overflow: hidden; border-radius: 2px; }
+  .loader .bar i { display: block; height: 100%; width: 40%; background: var(--accent); animation: slide 1.4s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
+  .fallback-list { text-align: left; margin-top: 18px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
+
+  /* Veille mondiale panel */
+  .watch {
+    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
+    width: 300px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
+    display: none; pointer-events: auto; scrollbar-width: thin;
+  }
+  .watch.open { display: block; }
+  .watch .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 12px; }
+  .watch .toggles .btn { text-align: left; border-radius: 10px; padding: 9px 11px; }
+  .watch .toggles .wide { grid-column: 1 / -1; }
+  .watch .status { margin: 0 0 12px; font: 400 11px/1.65 var(--font-mono); color: var(--text-2); white-space: pre-line; }
+  .watch .sub { margin: 12px 0 6px; }
+  .watch ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .watch li button {
+    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px; padding: 6px 8px;
+    color: var(--text-2); font: 400 12px/1.4 var(--font-mono); cursor: pointer;
+    display: grid; grid-template-columns: 40px 1fr; gap: 8px;
+  }
+  .watch li button:hover { background: rgba(244, 236, 223, 0.06); color: var(--text); }
+  .watch li button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+  .watch .mag { color: var(--accent); font-weight: 500; }
+  .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
+  .watch .journal li b { color: var(--text-2); font-weight: 400; }
+  .quality { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 10px; font: 400 10px var(--font-mono); color: var(--muted); }
+  .quality button { font: 500 11px var(--font-ui); color: var(--text-2); background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .quality button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+  .quality button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  #cesium-credits { margin-top: 8px; font: 400 10px/1.5 var(--font-mono); color: var(--text-2); text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 10px; }
+  #cesium-credits[hidden] { display: none; }
+  #cesium-credits a { color: var(--text-2); }
+  #cesium-credits img { max-height: 18px; vertical-align: middle; }
+  .sit-only { display: none; }
+  body.sitroom .sit-only { display: inline; }
+  body.sitroom .places, body.sitroom .card { display: none; }
+  body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
+
+  /* Direct: radios, free TV, public webcams, conflict headlines */
+  .live {
+    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
+    width: 340px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
+    display: none; pointer-events: auto; scrollbar-width: thin;
+    background: rgba(14, 18, 26, 0.93);     /* more opaque than other panels: small grey text over a bright sky */
+  }
+  .live.open { display: block; }
+  body.live-open .card { display: none; }   /* the place card would sit on top of the panel */
+  .live .row { display: flex; gap: 8px; margin: 10px 0 6px; align-items: center; }
+  .live select {
+    flex: 1; min-width: 0; color-scheme: dark; font: 500 13px var(--font-ui); color: var(--text);
+    background: var(--panel-solid); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 10px;
+  }
+  .live select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  .live .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 10px 0; }
+  .live .tabs .btn { padding: 7px 2px; border-radius: 10px; text-align: center; font-size: 11.5px; }
+  .live .pane { display: none; }
+  .live .pane.on { display: block; }
+  .live .note { margin: 8px 0; font: 400 11px/1.6 var(--font-mono); color: var(--muted); }
+  .live .status { margin: 6px 0; font: 400 11px/1.6 var(--font-mono); color: var(--text-2); }
+  .live ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .live li > button, .live li > a {
+    display: grid; gap: 2px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px;
+    padding: 7px 8px; color: var(--text); font: 500 12.5px/1.4 var(--font-ui); cursor: pointer; text-decoration: none;
+  }
+  .live li > button:hover, .live li > a:hover { background: rgba(244, 236, 223, 0.06); }
+  .live li > button:focus-visible, .live li > a:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+  .live li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .live video { display: none; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; margin-bottom: 6px; }
+  .live video.on { display: block; }
+  .live audio { display: none; width: 100%; margin: 6px 0; color-scheme: dark; }
+  .live audio.on { display: block; }
+  .live .chips { display: flex; gap: 6px; margin: 6px 0; }
+  .live .chips .btn { padding: 4px 10px; font-size: 11px; }
+  .live .refs a { color: var(--accent); }
+  #hud-radio { display: inline-flex; gap: 6px; align-items: center; max-width: 46vw; }
+  #hud-radio[hidden] { display: none; }
+  #hud-radio b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #hud-radio button { font: 500 10px var(--font-mono); color: var(--text-2); background: transparent; border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 6px; cursor: pointer; }
+  .quality button:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* Narrow screens: places become a horizontal strip, card stacks above it. */
+  @media (max-width: 760px) {
+    :root { --gutter: 16px; }
+    .brand .tag, .brand .sep { display: none; }
+    .brand { padding: 9px 14px; }
+    .tools .btn { padding: 8px 11px; }
+    .tools { flex-wrap: wrap; justify-content: flex-end; }
+    .top { align-items: flex-start; }
+    .watch { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 38vh; }
+    .live { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 52vh; }
+    .places {
+      top: auto; transform: none; right: var(--gutter); left: var(--gutter);
+      bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
+      width: auto; max-height: none; padding: 8px; overflow-x: auto; overflow-y: hidden;
+    }
+    .places .kicker { display: none; }
+    .places ul { grid-auto-flow: column; grid-auto-columns: max-content; }
+    .place { padding: 8px 12px; font-size: 13px; }
+    .card { bottom: calc(var(--gutter) + 124px + env(safe-area-inset-bottom)); padding: 14px 16px; }
+    .card h2 { font-size: 18px; }
+    .card p { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+    .hud { gap: 12px; padding: 8px 12px; font-size: 10.5px; }
+    .hud .opt { display: none; }
+    .credits { left: auto; right: var(--gutter); max-width: calc(100vw - 2 * var(--gutter)); bottom: auto; top: calc(var(--gutter) + 98px + env(safe-area-inset-top)); font-size: 9.5px; padding: 5px 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .card, .loader { transition: none; }
+    .loader .bar i { animation: none; width: 100%; }
+  }
+</style>
+</head>
+<body>
+  <div id="globe" aria-label="Globe terrestre interactif"></div>
+  <div class="vignette"></div>
+
+  <div class="ui top">
+    <div class="brand glass">
+      <h1>Fatiha</h1>
+      <span class="sep"></span>
+      <span class="tag">maman d’Amine</span>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btn-orbit" type="button">Orbite</button>
+      <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
+      <button class="btn" id="btn-google" type="button" aria-pressed="false" hidden>Google 3D</button>
+      <button class="btn" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch">Veille</button>
+      <button class="btn" id="btn-live" type="button" aria-pressed="false" aria-controls="live">Direct</button>
+      <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
+    </div>
+  </div>
+
+  <nav class="ui places glass" aria-label="Lieux">
+    <div class="kicker">Lieux de rencontre</div>
+    <ul id="place-list"></ul>
+  </nav>
+
+  <aside class="ui watch glass" id="watch" aria-label="Veille mondiale">
+    <div class="kicker">Veille mondiale · données publiques</div>
+    <div class="toggles">
+      <button class="btn" type="button" data-layer="quakes" aria-pressed="false">Séismes 24 h</button>
+      <button class="btn" type="button" data-layer="iss" aria-pressed="false">Station spatiale</button>
+      <button class="btn" type="button" data-layer="clouds" aria-pressed="true">Nuages réels</button>
+      <button class="btn" type="button" data-layer="lights" aria-pressed="true">Lumières de nuit</button>
+      <button class="btn" type="button" data-layer="rain" aria-pressed="false">Précipitations</button>
+      <button class="btn" type="button" data-layer="live" aria-pressed="false">Jour/nuit réel</button>
+      <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
+    </div>
+    <p class="status" id="watch-status" aria-live="polite"></p>
+    <div class="kicker sub">Séismes les plus forts</div>
+    <ul id="watch-quakes"></ul>
+    <div class="kicker sub">Journal</div>
+    <ul id="watch-journal" class="journal"></ul>
+  </aside>
+
+  <aside class="ui live glass" id="live" aria-label="Direct : radios, télés, caméras et actualité">
+    <div class="kicker">Direct · radios, télés, caméras, actualité</div>
+    <div class="row">
+      <select id="live-country" aria-label="Pays"></select>
+      <button class="btn" id="live-random" type="button">Au hasard</button>
+    </div>
+    <p class="note" id="live-hint"></p>
+    <div class="tabs" role="group" aria-label="Rubriques">
+      <button class="btn" type="button" data-tab="radio" aria-pressed="true">Radios</button>
+      <button class="btn" type="button" data-tab="tv" aria-pressed="false">Télé</button>
+      <button class="btn" type="button" data-tab="cam" aria-pressed="false">Caméras</button>
+      <button class="btn" type="button" data-tab="war" aria-pressed="false">Conflits</button>
+    </div>
+    <section class="pane on" id="pane-radio">
+      <audio id="radio-audio" controls preload="none"></audio>
+      <p class="status" id="radio-status" aria-live="polite"></p>
+      <ul id="radio-list"></ul>
+      <p class="note">Annuaire communautaire radio-browser.info. Seuls les flux sécurisés (https) sont proposés ; certains peuvent être hors ligne.</p>
+    </section>
+    <section class="pane" id="pane-tv">
+      <video id="tv-video" controls playsinline></video>
+      <p class="status" id="tv-status" aria-live="polite"></p>
+      <ul id="tv-list"></ul>
+      <p class="note">Playlists communautaires iptv-org : chaînes gratuites en accès libre. Beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+    </section>
+    <section class="pane" id="pane-cam">
+      <p class="status">Webcams publiques : ouvertes dans un nouvel onglet, chez des annuaires qui les référencent avec l’accord de leurs propriétaires.</p>
+      <ul id="cam-links"></ul>
+      <p class="note">Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
+    </section>
+    <section class="pane" id="pane-war">
+      <p class="status" id="war-status" aria-live="polite"></p>
+      <div class="chips" role="group" aria-label="Langue des titres">
+        <button class="btn" type="button" data-warlang="all" aria-pressed="true">Toutes</button>
+        <button class="btn" type="button" data-warlang="French" aria-pressed="false">FR</button>
+        <button class="btn" type="button" data-warlang="English" aria-pressed="false">EN</button>
+        <button class="btn" type="button" id="war-refresh">Actualiser</button>
+      </div>
+      <ul id="war-list"></ul>
+      <p class="note">Titres repérés par mots-clés (guerre, frappes, cessez-le-feu…) dans la base d’actualité GDELT, mise à jour environ toutes les 15 minutes. Ils ne sont pas vérifiés : en temps de guerre les faits sont contestés et certains médias dépendent d’un État. Ni images de guerre ni positions de troupes ne sont affichées.</p>
+      <p class="note refs">Sources de référence :
+        <a href="https://news.un.org/fr/news/topic/peace-and-security" target="_blank" rel="noopener noreferrer">ONU Info</a> ·
+        <a href="https://www.icrc.org/fr" target="_blank" rel="noopener noreferrer">CICR</a> ·
+        <a href="https://reliefweb.int/" target="_blank" rel="noopener noreferrer">ReliefWeb</a> ·
+        <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer">UCDP</a> ·
+        <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a></p>
+    </section>
+    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
+  </aside>
+
+  <section class="ui card glass" id="card" aria-live="polite">
+    <div class="kicker" id="card-kicker"></div>
+    <h2 id="card-title"></h2>
+    <div class="coords" id="card-coords"></div>
+    <p id="card-text"></p>
+    <div class="meta" id="card-meta"></div>
+    <div class="links">
+      <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
+      <button class="earth" id="card-night" type="button">Voir la nuit depuis l’orbite ↗</button>
+    </div>
+  </section>
+
+  <div class="ui hud glass" aria-live="off">
+    <span class="phase" id="hud-phase">Orbite</span>
+    <span>Alt. <b id="hud-alt">—</b></span>
+    <span class="opt"><b id="hud-pos">—</b></span>
+    <span class="opt" id="hud-quality"></span>
+    <span id="hud-radio" hidden>♪ <b id="hud-radio-name"></b><button id="hud-radio-stop" type="button" aria-label="Arrêter la radio">■</button></span>
+    <span class="sit-only"><b id="hud-utc">—</b></span>
+  </div>
+
+  <details class="ui credits glass" id="credits-box">
+    <summary>Sources et qualité</summary>
+    <div id="credits"></div>
+    <div class="quality" role="group" aria-label="Qualité d'image">
+      <span>Qualité</span>
+      <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
+      <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
+      <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
+      <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
+    </div>
+    <div class="quality">
+      <span>Image</span>
+      <button type="button" id="btn-shot">Enregistrer en 5K</button>
+    </div>
+    <div id="cesium-credits" hidden></div>
+  </details>
+
+  <div class="loader" id="loader">
+    <div class="inner">
+      <h2>Fatiha</h2>
+      <p class="tagline">maman d’Amine</p>
+      <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à dix lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
+      <div class="bar" id="loader-bar"><i></i></div>
+      <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
+      <div id="fallback"></div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  // Optional: a Cesium ion token enables Cesium World Terrain (with vertex
+  // normals, so relief is lit by the sun) and OSM 3D buildings. Left empty,
+  // the page uses only keyless open data sources.
+  const ION_TOKEN = '';
+
+  // Real coordinates (WGS84, decimal degrees). `view` frames the final
+  // approach: heading/pitch in degrees, range in metres from the site.
+  // `night` is the heading (degrees) of the oblique night view from low orbit.
+  // `solarHour` only says whether to light the place in the morning (<12) or the afternoon;
+  // the actual hour is computed below from the real sun so no place arrives in the dark.
+  const PLACES = [
+    { id: 'tolede', name: 'Tolède', country: 'Espagne', cc: ['ES'], lat: 39.8570, lon: -4.0237,
+      text: "Aux XIIe et XIIIe siècles, des traducteurs y firent passer en latin puis en castillan des œuvres scientifiques et philosophiques écrites en arabe : c'est ce qu'on appelle l'« école des traducteurs de Tolède ». La ville est bâtie sur un méandre du Tage.",
+      meta: 'UNESCO 1986 · Ville historique de Tolède', view: { heading: 330, pitch: -20, range: 3200 }, solarHour: 17.5, night: 20 },
+    { id: 'cordoue', name: 'Mosquée-cathédrale de Cordoue', country: 'Espagne', cc: ['ES'], lat: 37.8789, lon: -4.7794,
+      text: "Commencée en 785 sous l'émir omeyyade Abd al-Rahman Ier, la grande mosquée fut transformée en cathédrale après la prise de la ville par Ferdinand III de Castille en 1236. Ses arcs bicolores et la cathédrale insérée en son centre portent ces deux histoires.",
+      meta: 'UNESCO 1984 · Centre historique de Cordoue', view: { heading: 200, pitch: -22, range: 1800 }, solarHour: 9.5, night: 20 },
+    { id: 'alhambra', name: 'Alhambra', country: 'Espagne', cc: ['ES'], lat: 37.1761, lon: -3.5881,
+      text: "Palais et forteresse des souverains nasrides, élevés pour l'essentiel aux XIIIe–XIVe siècles sur la colline de la Sabika, dernier contrefort de la Sierra Nevada, à Grenade. Après 1492, Charles Quint y fit élever un palais Renaissance accolé aux palais nasrides.",
+      meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17, night: 20 },
+    { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', cc: ['ML'], lat: 16.7711, lon: -3.0105,
+      text: "Aux portes du Sahara, près du fleuve Niger, la ville fut un foyer de savoir dont témoignent des milliers de manuscrits. La mosquée Djingareyber, en terre crue, fut élevée au XIVe siècle, au retour de pèlerinage du souverain du Mali Kankou Moussa.",
+      meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5, night: 0 },
+    { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', cc: ['EG'], lat: 31.2089, lon: 29.9092,
+      text: "Inaugurée en 2002 sur le front de mer d'Alexandrie, près de l'emplacement présumé de la bibliothèque antique fondée sous les Ptolémées. Son mur de granit porte des caractères de nombreux systèmes d'écriture.",
+      meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16, night: 180 },
+    { id: 'jerusalem', name: 'Vieille ville de Jérusalem', country: 'Proche-Orient', cc: [], lat: 31.7767, lon: 35.2345,
+      text: "Sur moins d'un kilomètre carré, la vieille ville réunit des lieux saints du judaïsme, du christianisme et de l'islam, dont le mur des Lamentations, l'église du Saint-Sépulcre et le Dôme du Rocher.",
+      meta: 'UNESCO 1981', view: { heading: 250, pitch: -24, range: 2400 }, solarHour: 9, night: 80 },
+    { id: 'petra', name: 'Petra', country: 'Jordanie', cc: ['JO'], lat: 30.3222, lon: 35.4515,
+      text: "Capitale des Nabatéens, mi-bâtie, mi-taillée dans le grès d'un bassin montagneux près de Wadi Musa. Grand centre caravanier de l'encens d'Arabie, au carrefour de l'Arabie, de l'Égypte et de la Syrie-Phénicie, la cité mêle traditions nabatéennes, architecture hellénistique et apports romains.",
+      meta: 'UNESCO 1985', view: { heading: 200, pitch: -32, range: 1800 }, solarHour: 10, night: 0 },
+    { id: 'istanbul', name: 'Sainte-Sophie', country: 'Turquie', cc: ['TR'], lat: 41.0086, lon: 28.9802,
+      text: "Construite de 532 à 537 sous l'empereur Justinien, la basilique devint mosquée en 1453, musée en 1934, puis de nouveau mosquée en 2020. Elle domine la péninsule historique, bordée par la Corne d'Or, le Bosphore et la mer de Marmara.",
+      meta: "UNESCO 1985 · Zones historiques d'Istanbul", view: { heading: 300, pitch: -20, range: 2600 }, solarHour: 16.5, night: 10 },
+    { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', cc: ['UZ'], lat: 39.6547, lon: 66.9758,
+      text: "Place bordée de trois madrasas, dont celle d'Ouloug Beg (1417–1420), prince astronome. Samarcande fut une étape majeure des routes de la soie, entre la Chine, l'Inde, la Perse et la Méditerranée.",
+      meta: 'UNESCO 2001 · Samarkand – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5, night: 340 },
+    { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', cc: ['KH'], lat: 13.4125, lon: 103.8670,
+      text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
+      meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5, night: 350 },
+  ];
+
+  // Pick the local solar hour at which the sun stands ~32° high today at this
+  // latitude (bright, with readable shadows). If it never gets that high today
+  // (high latitude in winter), use solar noon. Declination: standard
+  // cosine approximation, accurate to about 1°.
+  function niceSolarHour(lat, preferred, now) {
+    const day = Math.floor((now - Date.UTC(now.getUTCFullYear(), 0, 0)) / 864e5);
+    const dec = -23.44 * Math.PI / 180 * Math.cos(2 * Math.PI / 365 * (day + 10));
+    const la = lat * Math.PI / 180, el = 32 * Math.PI / 180;
+    const cosH = (Math.sin(el) - Math.sin(la) * Math.sin(dec)) / (Math.cos(la) * Math.cos(dec));
+    const H = cosH >= 1 ? 0 : cosH <= -1 ? Math.PI : Math.acos(cosH);
+    const hour = 12 + (preferred < 12 ? -1 : 1) * (H * 180 / Math.PI) / 15;
+    return Math.round(hour * 4) / 4;
+  }
+  PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
+
+  const NOUR_BUILD = '2026-11-05.7';
+  const $ = (id) => document.getElementById(id);
+  const loader = $('loader');
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function fail(message) {
+    $('loader-text').textContent = message;
+    loader.querySelector('.bar').style.display = 'none';
+    $('btn-start').style.display = 'none';
+    const list = PLACES.map(p => `<div><b>${p.name}</b> — ${p.country} · ${p.lat.toFixed(4)}°, ${p.lon.toFixed(4)}°</div>`).join('');
+    $('fallback').innerHTML = `<div class="fallback-list">${list}</div>`;
+  }
+
+  if (typeof Cesium === 'undefined') {
+    fail("La bibliothèque 3D n'a pas pu être chargée (connexion ou bloqueur). Voici les lieux et leurs coordonnées :");
+    return;
+  }
+  const probe = document.createElement('canvas');
+  if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) {
+    fail("Votre navigateur ne prend pas en charge WebGL : le globe 3D ne peut pas s'afficher. Voici les lieux et leurs coordonnées :");
+    return;
+  }
+
+  const C = Cesium;
+  const R2D = C.Math.toDegrees, D2R = C.Math.toRadians;
+
+  // ---------- Device tier (graceful degradation) ----------
+  const TIERS = {
+    // dpr = highest device-pixel ratio rendered. Phones are 3x: rendering at native 3x is what keeps
+    // imagery crisp. msaa is the sample count used only when the effective ratio is below 2; at 2x and
+    // above, pixels are small enough that multisampling and FXAA (which also softens textures) are off.
+    high:     { label: 'Haute',     sse: 1.0, dpr: 3, msaa: 4, clouds: 48, shadows: true  },
+    balanced: { label: 'Équilibrée', sse: 1.4, dpr: 3, msaa: 2, clouds: 28, shadows: false },
+    light:    { label: 'Légère',    sse: 3.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
+  };
+  const TIER_ORDER = ['high', 'balanced', 'light'];
+  const renderScale = (t) => Math.min(1, t.dpr / (window.devicePixelRatio || 1));
+  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr);
+  const msaaFor = (t) => (effectiveDpr(t) >= 2 ? 1 : t.msaa);
+  const fxaaFor = (t) => effectiveDpr(t) < 2;
+  // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
+  // so a missing value must not count against the device. Only a clear low-end signal selects "light".
+  function detectTier() {
+    const coarse = matchMedia('(pointer: coarse)').matches;
+    const cores = navigator.hardwareConcurrency || 4;
+    const mem = navigator.deviceMemory;                    // Chrome/Android only
+    if (mem !== undefined && mem <= 2) return 'light';
+    if (coarse) return cores <= 2 ? 'light' : 'balanced';  // phones and tablets
+    return cores >= 8 ? 'high' : 'balanced';
+  }
+  // Quality choice: 'auto' (detected, and lowered if the frame rate stays low) or a pinned tier.
+  // Pinned by ?qualite=haute|equilibree|legere, or by the selector in the Sources panel (saved in this browser).
+  const QUALITY_KEY = 'nour.quality';
+  const TIER_BY_CHOICE = { haute: 'high', equilibree: 'balanced', legere: 'light' };
+  function readQuality() {
+    let choice = new URLSearchParams(location.search).get('qualite');
+    if (!TIER_BY_CHOICE[choice]) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
+    return TIER_BY_CHOICE[choice] ? choice : 'auto';
+  }
+  let quality = readQuality();
+  let tierName = TIER_BY_CHOICE[quality] || detectTier();
+  let tier = TIERS[tierName];
+
+  // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
+  // Real elevation from SRTM, GMTED2010, ETOPO1 and others, aggregated by
+  // Mapzen/Tilezen. Ocean depths are clamped to 0 m (sea surface) and flagged
+  // as water; land below sea level is flattened to 0 m as a side effect.
+  const TERRAIN_URL = 'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png';
+  const TERRAIN_MAX_LEVEL = 15;
+  const GRID = 97;
+
+  // Cesium sizes heightmap skirts at 4× the estimated tile error, which is
+  // too short on steep relief (Andes, Himalaya) where tiles of different
+  // levels meet: background shows through as thin streaks. Taller skirts
+  // hide those cracks. Relies on a private field of the pinned 1.145.0
+  // release; if it changes, this silently falls back to Cesium's default.
+  // Applied to the base prototype so tiles Cesium upsamples past the last
+  // source level get the same skirts.
+  Object.defineProperty(C.HeightmapTerrainData.prototype, '_skirtHeight', {
+    get() { return this.__skirt; },
+    set(v) { this.__skirt = v === undefined ? v : Math.min(v * 4, 2000); },
+    configurable: true,
+  });
+
+  // Served on a geographic grid so the globe has no Mercator hole at the
+  // poles: each geographic tile at level L resamples the Mercator source
+  // tiles of zoom L it overlaps. Beyond ±85.05° (no source data) the
+  // nearest source row is extended. Adjacent tiles sample the same
+  // continuous function, so their shared edges match exactly.
+  const MERC_MAX_LAT = 85.0511287798 * Math.PI / 180;
+  const mercY = (lat) => (1 - Math.log(Math.tan(Math.PI / 4 + lat / 2)) / Math.PI) / 2;
+
+  class TerrariumTerrainProvider {
+    constructor() {
+      this.tilingScheme = new C.GeographicTilingScheme();
+      this.errorEvent = new C.Event();
+      this.credit = new C.Credit('Relief : Tilezen/Mapzen Terrain Tiles (AWS Open Data) — SRTM, GMTED2010, ETOPO1');
+      // No water mask: sea level (0 m) cannot tell ocean from land below sea level (chotts, Qattara,
+      // polders), and the mask's coarse cells gave stair-stepped coasts and sun-glint patches inland.
+      this.hasWaterMask = false;
+      this.hasVertexNormals = false;
+      this.availability = undefined;
+      this._levelZeroError = C.TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
+        this.tilingScheme.ellipsoid, GRID, this.tilingScheme.getNumberOfXTilesAtLevel(0));
+      this._canvas = document.createElement('canvas');
+      this._canvas.width = this._canvas.height = 256;
+      this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });
+      this._cache = new Map(); // "z/x/y" → Promise<Float32Array>, small LRU
+    }
+    getLevelMaximumGeometricError(level) { return this._levelZeroError / (1 << level); }
+    getTileDataAvailable(x, y, level) { return level <= TERRAIN_MAX_LEVEL ? undefined : false; }
+    loadTileDataAvailability() { return undefined; }
+
+    _source(z, x, y, request) {
+      const key = `${z}/${x}/${y}`;
+      const hit = this._cache.get(key);
+      if (hit) { this._cache.delete(key); this._cache.set(key, hit); return hit; }
+      const url = TERRAIN_URL.replace('{z}', z).replace('{x}', x).replace('{y}', y);
+      const img = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
+      if (!img) return undefined; // throttled by Cesium's request scheduler
+      const p = img.then((im) => {
+        this._ctx.drawImage(im, 0, 0, 256, 256);
+        if (im.close) im.close();
+        const px = this._ctx.getImageData(0, 0, 256, 256).data;
+        const h = new Float32Array(256 * 256);
+        for (let i = 0, j = 0; i < h.length; i++, j += 4) {
+          const v = px[j] * 256 + px[j + 1] + px[j + 2] / 256 - 32768;
+          h[i] = v > 0 ? v : 0; // ocean floor → sea surface
+        }
+        return h;
+      });
+      p.catch(() => this._cache.delete(key));
+      this._cache.set(key, p);
+      if (this._cache.size > 48) this._cache.delete(this._cache.keys().next().value);
+      return p;
+    }
+
+    requestTileGeometry(x, y, level, request) {
+      const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
+      const z = Math.min(level, TERRAIN_MAX_LEVEL), n = 1 << z, size = n * 256;
+      const toPx = (lon, lat) => [
+        (lon + Math.PI) / (2 * Math.PI) * size - 0.5,
+        mercY(C.Math.clamp(lat, -MERC_MAX_LAT, MERC_MAX_LAT)) * size - 0.5,
+      ];
+      const [x0] = toPx(rect.west, rect.north), [x1] = toPx(rect.east, rect.south);
+      const ya = toPx(0, rect.north)[1], yb = toPx(0, rect.south)[1];
+      const tx0 = Math.floor(Math.max(x0 - 1, 0) / 256), tx1 = Math.floor(Math.min(x1 + 1, size - 1) / 256);
+      const ty0 = Math.floor(Math.max(ya - 1, 0) / 256), ty1 = Math.floor(Math.min(yb + 1, size - 1) / 256);
+      const keys = [];
+      for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) keys.push([tx, ty]);
+      // Only the first fetch goes through Cesium's scheduler; if it is
+      // throttled, Cesium retries the whole tile later.
+      const first = this._source(z, keys[0][0], keys[0][1], request);
+      if (!first) return undefined;
+      const rest = keys.slice(1).map(([tx, ty]) => this._source(z, tx, ty));
+      if (rest.some((p) => !p)) return undefined;
+      return Promise.all([first, ...rest]).then((tiles) => {
+        const lookup = new Map(keys.map(([tx, ty], i) => [ty * n + tx, tiles[i]]));
+        const pixel = (X, Y) => {
+          X = C.Math.clamp(X, 0, size - 1); Y = C.Math.clamp(Y, 0, size - 1);
+          const t = lookup.get((Y >> 8) * n + (X >> 8));
+          return t ? t[(Y & 255) * 256 + (X & 255)] : 0;
+        };
+        const sample = (lon, lat) => {
+          const [fx, fy] = toPx(lon, lat);
+          const X = Math.floor(fx), Y = Math.floor(fy), u = fx - X, v = fy - Y;
+          return (pixel(X, Y) * (1 - u) + pixel(X + 1, Y) * u) * (1 - v)
+               + (pixel(X, Y + 1) * (1 - u) + pixel(X + 1, Y + 1) * u) * v;
+        };
+        const dLon = rect.east - rect.west, dLat = rect.north - rect.south;
+        const out = new Float32Array(GRID * GRID);
+        for (let r = 0; r < GRID; r++) {
+          const lat = rect.north - r / (GRID - 1) * dLat;
+          for (let c = 0; c < GRID; c++) out[r * GRID + c] = sample(rect.west + c / (GRID - 1) * dLon, lat);
+        }
+        return new C.HeightmapTerrainData({
+          buffer: out, width: GRID, height: GRID,
+          childTileMask: level < TERRAIN_MAX_LEVEL ? 15 : 0,
+        });
+      });
+    }
+  }
+
+  // ---------- Viewer ----------
+  const naturalEarth = C.ImageryLayer.fromProviderAsync(
+    C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl('Assets/Textures/NaturalEarthII')));
+
+  const viewer = new C.Viewer('globe', {
+    baseLayer: naturalEarth,
+    terrainProvider: new TerrariumTerrainProvider(),
+    animation: false, timeline: false, baseLayerPicker: false, geocoder: false,
+    homeButton: false, sceneModePicker: false, navigationHelpButton: false,
+    fullscreenButton: false, infoBox: false, selectionIndicator: false,
+    creditContainer: $('cesium-credits'),
+    msaaSamples: msaaFor(tier),
+    shadows: tier.shadows,
+    terrainShadows: tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED,
+    useBrowserRecommendedResolution: false,
+  });
+  const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
+  const canvas = scene.canvas;
+
+  // Satellite imagery (Esri World Imagery). If a tile fails, Natural Earth
+  // underneath stays visible instead of a hole.
+  const satellite = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    maximumLevel: 19,
+    credit: new C.Credit('Imagerie : Esri, Maxar, Earthstar Geographics, GIS User Community'),
+  }));
+  satellite.brightness = 1.02; satellite.contrast = 1.06; satellite.saturation = 1.0;
+  satellite.gamma = 1.04;
+
+  // Relief shading baked from the same elevation tiles as the terrain: the
+  // 3D mesh has no vertex normals, so slopes would otherwise look flat.
+  // Output is black (shadow) / white (highlight) with alpha, drawn over
+  // the satellite imagery. Light comes from the north-west, as on printed maps.
+  class HillshadeImageryProvider {
+    constructor() {
+      this.tilingScheme = new C.WebMercatorTilingScheme();
+      this.rectangle = this.tilingScheme.rectangle;
+      this.tileWidth = 256; this.tileHeight = 256;
+      this.minimumLevel = 3; this.maximumLevel = TERRAIN_MAX_LEVEL;
+      this.tileDiscardPolicy = undefined;
+      this.errorEvent = new C.Event();
+      this.credit = undefined;
+      this.proxy = undefined;
+      this.hasAlphaChannel = true;
+    }
+    getTileCredits() { return []; }
+    pickFeatures() { return undefined; }
+    requestImage(x, y, level, request) {
+      const url = TERRAIN_URL.replace('{z}', level).replace('{x}', x).replace('{y}', y);
+      const loading = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
+      if (!loading) return undefined;
+      return loading.then((img) => {
+        const cv = document.createElement('canvas');
+        cv.width = cv.height = 256;
+        const ctx = cv.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, 256, 256);
+        if (img.close) img.close();
+        const src = ctx.getImageData(0, 0, 256, 256).data;
+        const h = new Float32Array(256 * 256);
+        for (let i = 0, j = 0; i < h.length; i++, j += 4) {
+          const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
+          h[i] = v > 0 ? v : 0;
+        }
+        const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
+        const cell = 156543.03392 * Math.cos((rect.north + rect.south) / 2) / (1 << level);
+        const zf = 1.6;                                   // gentle vertical exaggeration
+        const zen = D2R(45), azm = D2R(135);              // light from the north-west
+        const cz = Math.cos(zen), sz = Math.sin(zen), flat = cz;
+        const out = ctx.createImageData(256, 256), o = out.data;
+        const at = (r, c) => h[Math.min(255, Math.max(0, r)) * 256 + Math.min(255, Math.max(0, c))];
+        for (let r = 0; r < 256; r++) {
+          for (let c = 0; c < 256; c++) {
+            const a = at(r - 1, c - 1), b = at(r - 1, c), cc = at(r - 1, c + 1);
+            const d = at(r, c - 1), f = at(r, c + 1);
+            const g = at(r + 1, c - 1), hh = at(r + 1, c), i = at(r + 1, c + 1);
+            const dx = ((cc + 2 * f + i) - (a + 2 * d + g)) / (8 * cell);
+            const dy = ((g + 2 * hh + i) - (a + 2 * b + cc)) / (8 * cell);
+            const slope = Math.atan(zf * Math.hypot(dx, dy));
+            const aspect = Math.atan2(dy, -dx);
+            const shade = cz * Math.cos(slope) + sz * Math.sin(slope) * Math.cos(azm - aspect);
+            const dlt = shade - flat, k = (r * 256 + c) * 4;
+            if (dlt < 0) { o[k + 3] = Math.min(0.5, -dlt * 1.3) * 255; }
+            else { o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = Math.min(0.1, dlt * 0.4) * 255; }
+          }
+        }
+        ctx.putImageData(out, 0, 0);
+        return cv;
+      });
+    }
+  }
+  const hillshade = viewer.imageryLayers.addImageryProvider(new HillshadeImageryProvider());
+  hillshade.alpha = 0.9;
+
+  const labels = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    maximumLevel: 19,
+    credit: new C.Credit('Toponymes : Esri'),
+  }));
+  labels.show = false;
+
+  // ---------- Real Earth from NASA GIBS: recent daily imagery (real clouds) and city lights ----------
+  // Public tile services with CORS. Each layer switches itself off after repeated tile errors, and the
+  // map falls back to the Esri / Natural Earth imagery.
+  const gibsUrl = (layer, matrix, ext, time) =>
+    `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/${time}/${matrix}/{z}/{y}/{x}.${ext}`;
+  function addGibsLayer(url, maximumLevel, credit, name, options) {
+    const provider = new C.UrlTemplateImageryProvider({ url, maximumLevel, credit: new C.Credit(credit) });
+    let errors = 0;
+    provider.errorEvent.addEventListener((e) => { e.retry = false; if (++errors === 12) gibsUnavailable(name); });
+    const layer = viewer.imageryLayers.addImageryProvider(provider, viewer.imageryLayers.length - 1); // under the place names
+    Object.assign(layer, options);
+    return layer;
+  }
+  // Daily true-colour mosaic (real clouds), two days back: the newest day that is always complete.
+  // Black = no data, made transparent so the map shows through. Faded out with altitude (see below).
+  const twoDaysAgo = new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10);
+  const realEarth = addGibsLayer(gibsUrl('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', twoDaysAgo),
+    9, 'Images : NASA GIBS / VIIRS', 'clouds', {
+      colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.05,
+    });
+  // Night lights (VIIRS Black Marble, 2016): drawn only on the night side. Cesium dims the night side to 30 %,
+  // so the layer is brightened to compensate.
+  const nightLights = addGibsLayer(gibsUrl('VIIRS_Black_Marble', 'GoogleMapsCompatible_Level8', 'png', '2016-01-01'),
+    8, 'Lumières : NASA GIBS / VIIRS Black Marble', 'lights', {
+      dayAlpha: 0.0, nightAlpha: 1.0, brightness: 3.0, colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.04,
+    });
+  // Cesium 1.145 does not evaluate a per-tile alpha function (it hands the function itself to the shader and
+  // the globe turns black), so fade with the camera altitude instead: the real clouds give way to the sharper
+  // Esri imagery between 800 km and 150 km (arrivals end at 1-5 km), and the 600 m-per-pixel city lights fade
+  // out between 80 km and 30 km where they would only look like soft blobs.
+  const ramp = (h, lo, hi) => Math.min(1, Math.max(0, (h - lo) / (hi - lo)));
+  scene.preRender.addEventListener(() => {
+    const h = camera.positionCartographic.height;
+    realEarth.alpha = ramp(h, 1.5e5, 8e5);
+    nightLights.alpha = ramp(h, 3e4, 8e4);
+  });
+  // Night look. Cesium keeps 30 % of the daytime colours on the night side, which reads as dusk, not night.
+  // When the camera looks at ground that is in the dark from low orbit (the "Vue de nuit" shots), dim the
+  // daytime imagery further so the city lights and the blue limb carry the picture, as in photographs from the
+  // Space Station. The sun elevation at the look point drives it, so it eases in and out with the clock.
+  const dayLayers = [[naturalEarth, 1.0], [satellite, satellite.brightness], [realEarth, 1.0]];
+  const lookPoint = new C.Cartesian3(), screenCentre = new C.Cartesian2();
+  scene.preRender.addEventListener(() => {
+    const h = camera.positionCartographic.height;
+    let k = 1;
+    if (h < 4e6) {
+      screenCentre.x = canvas.clientWidth / 2; screenCentre.y = canvas.clientHeight / 2;
+      if (!camera.pickEllipsoid(screenCentre, globe.ellipsoid, lookPoint)) C.Cartesian3.clone(camera.positionWC, lookPoint);
+      const sunElevationSin = C.Cartesian3.dot(C.Cartesian3.normalize(lookPoint, lookPoint), scene.context.uniformState.sunDirectionWC);
+      k = 1 - 0.45 * ramp(-sunElevationSin, 0.05, 0.35) * (1 - ramp(h, 1.5e6, 4e6));
+    }
+    for (const [layer, base] of dayLayers) layer.brightness = base * k;
+  });
+
+  // Sun lighting and atmosphere from the real sun position at the clock time.
+  globe.enableLighting = true;
+  globe.dynamicAtmosphereLighting = true;
+  globe.dynamicAtmosphereLightingFromSun = true;
+  globe.showGroundAtmosphere = true;
+  globe.showWaterEffect = false;
+  globe.depthTestAgainstTerrain = true;
+  globe.maximumScreenSpaceError = tier.sse;
+  globe.tileCacheSize = 1000;
+  globe.preloadSiblings = true;
+  globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
+  globe.atmosphereLightIntensity = 10;
+  // Cesium lights the whole globe uniformly when the camera is closer than lightingFadeOutDistance and
+  // applies the sun's day/night shading beyond lightingFadeInDistance (distances from the Earth's centre).
+  // Both at ~0 m means the shading applies at every altitude, so the night side stays dark (30 % of its
+  // daytime brightness) and the terminator is visible from orbit down to the ground.
+  globe.lightingFadeOutDistance = 1.0;
+  globe.lightingFadeInDistance = 2.0;
+  scene.skyAtmosphere.show = true;
+  // No depth fog: it darkened distant terrain tile by tile and left zig-zag edges in oblique night views.
+  // The ground atmosphere still gives the aerial haze.
+  scene.fog.enabled = false;
+  scene.highDynamicRange = tierName === 'high';      // HDR doubles framebuffer bandwidth: high tier only
+  scene.postProcessStages.fxaa.enabled = fxaaFor(tier);
+  // Mild unsharp mask: restores edge contrast lost to upsampled imagery and anti-aliasing.
+  scene.postProcessStages.add(new C.PostProcessStage({
+    name: 'nour_sharpen',
+    uniforms: { amount: () => 0.4 },
+    fragmentShader: `
+      uniform sampler2D colorTexture;
+      uniform float amount;
+      in vec2 v_textureCoordinates;
+      void main() {
+        vec2 px = 1.0 / czm_viewport.zw;
+        vec3 c = texture(colorTexture, v_textureCoordinates).rgb;
+        vec3 n = texture(colorTexture, v_textureCoordinates + vec2(0.0, px.y)).rgb
+               + texture(colorTexture, v_textureCoordinates - vec2(0.0, px.y)).rgb
+               + texture(colorTexture, v_textureCoordinates + vec2(px.x, 0.0)).rgb
+               + texture(colorTexture, v_textureCoordinates - vec2(px.x, 0.0)).rgb;
+        vec3 detail = clamp(amount * (c - n * 0.25), -0.05, 0.05);
+        out_FragColor = vec4(max(c + detail, 0.0), 1.0);
+      }`,
+  }));
+  // Atmospheric glow along the dark limb, as in photographs of the night side. For each sky pixel, the ray's closest
+  // approach to the Earth gives the altitude it grazes; a thin bright layer plus a broader halo fall off with that
+  // altitude, and only where the sun does not light the grazed point (Cesium already draws the day-side limb).
+  // This is an approximation of how the limb looks, not a physical model of airglow. Terrain at the limb hides it
+  // (depth test: sky pixels only).
+  scene.postProcessStages.add(new C.PostProcessStage({
+    name: 'nour_limb',
+    fragmentShader: `
+      uniform sampler2D colorTexture;
+      uniform sampler2D depthTexture;
+      in vec2 v_textureCoordinates;
+      void main() {
+        vec3 color = texture(colorTexture, v_textureCoordinates).rgb;
+        if (texture(depthTexture, v_textureCoordinates).r >= 0.9999) {
+          // Cesium's projection has an infinite far plane (w = 0 there), so the eye-space ray is the xyz part as
+          // is: dividing by w would give NaN.
+          vec4 eye = czm_inverseProjection * vec4(v_textureCoordinates * 2.0 - 1.0, 1.0, 1.0);
+          vec3 dirWC = normalize((czm_inverseView * vec4(normalize(eye.xyz), 0.0)).xyz);
+          vec3 radii = czm_ellipsoidRadii;
+          vec3 c = czm_viewerPositionWC / radii;
+          vec3 d = normalize(dirWC / radii);
+          float t = -dot(c, d);
+          if (t > 0.0) {
+            vec3 closest = c + t * d;
+            float b = length(closest);
+            if (b > 1.0) {
+              float h = (b - 1.0) * 6371.0;
+              float core = exp(-h / 9.0), halo = exp(-h / 50.0);
+              float lit = clamp(dot(normalize(closest * radii), czm_sunDirectionWC) * 4.0 + 0.5, 0.0, 1.0);
+              vec3 glow = mix(vec3(0.10, 0.30, 0.68), vec3(0.50, 0.78, 1.0), core) * (0.7 * halo + 0.8 * core);
+              color += glow * (1.0 - lit);
+            }
+          }
+        }
+        out_FragColor = vec4(color, 1.0);
+      }`,
+  }));
+  scene.sun.show = true; scene.moon.show = false;
+  // Cesium's Tycho-2 star sky box is very dim. Re-level each face (drop the dark noise floor, then amplify)
+  // so the real stars read as in orbital photographs. Star positions are unchanged; on any failure the
+  // default sky box stays.
+  (() => {
+    const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
+    const keys = Object.keys(faces);
+    // Black point 15 (below it the texture is mostly JPEG noise), white point 115, gentle gamma so faint stars rise
+    // with the bright ones.
+    const lut = new Uint8ClampedArray(256);
+    for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.min(1, Math.max(0, (v - 15) / (115 - 15))), 0.85);
+    Promise.all(keys.map((k) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img); img.onerror = reject;
+      img.src = C.buildModuleUrl(`Assets/Textures/SkyBox/tycho2t3_80_${faces[k]}.jpg`);
+    }))).then((imgs) => {
+      const sources = {};
+      keys.forEach((k, i) => {
+        const cv = document.createElement('canvas');
+        cv.width = imgs[i].width; cv.height = imgs[i].height;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(imgs[i], 0, 0);
+        const px = ctx.getImageData(0, 0, cv.width, cv.height), d = px.data;
+        for (let j = 0; j < d.length; j += 4) { d[j] = lut[d[j]]; d[j + 1] = lut[d[j + 1]]; d[j + 2] = lut[d[j + 2]]; }
+        ctx.putImageData(px, 0, 0);
+        sources[k] = cv;
+      });
+      const previous = scene.skyBox;
+      scene.skyBox = new C.SkyBox({ sources });
+      if (previous && !previous.isDestroyed()) previous.destroy();
+    }).catch(() => { /* keep Cesium's default sky box */ });
+  })();
+  viewer.resolutionScale = renderScale(tier);
+  if (scene.shadowMap) { scene.shadowMap.softShadows = true; scene.shadowMap.darkness = 0.45; scene.shadowMap.maximumDistance = 25000; }
+
+  // Inertia tuned for a heavier, steadier camera feel.
+  const ctl = scene.screenSpaceCameraController;
+  ctl.inertiaSpin = 0.93; ctl.inertiaTranslate = 0.93; ctl.inertiaZoom = 0.85;
+  ctl.minimumZoomDistance = 120;
+  ctl.maximumZoomDistance = 4.0e7;
+  ctl.enableCollisionDetection = true;
+
+  if (ION_TOKEN) {
+    C.Ion.defaultAccessToken = ION_TOKEN;
+    C.createWorldTerrainAsync({ requestVertexNormals: true, requestWaterMask: true })
+      .then((t) => { viewer.terrainProvider = t; })
+      .catch((e) => console.warn('Cesium World Terrain indisponible', e));
+    C.createOsmBuildingsAsync().then((b) => scene.primitives.add(b))
+      .catch((e) => console.warn('OSM Buildings indisponible', e));
+  }
+
+  // ---------- Clock: real sun, eased between local solar times ----------
+  viewer.clock.shouldAnimate = false;
+  const clock = viewer.clock;
+  function timeForSolarHour(lon, hour) {
+    // Local mean solar time ≈ UTC + lon/15 (equation of time ignored, ±16 min).
+    const now = C.JulianDate.now();
+    const g = C.JulianDate.toGregorianDate(now);
+    const midnight = C.JulianDate.fromGregorianDate(new C.GregorianDate(g.year, g.month, g.day, 0, 0, 0, 0, false));
+    let t = C.JulianDate.addHours(midnight, hour - lon / 15, new C.JulianDate());
+    // Keep within ±12 h of the current clock so the sun never spins round.
+    const diff = C.JulianDate.secondsDifference(t, clock.currentTime);
+    if (diff > 43200) t = C.JulianDate.addDays(t, -1, t);
+    if (diff < -43200) t = C.JulianDate.addDays(t, 1, t);
+    return t;
+  }
+
+  // ---------- Place markers ----------
+  const markerColor = C.Color.fromCssColorString('#F4ECDF');
+  PLACES.forEach((p) => {
+    viewer.entities.add({
+      id: p.id,
+      position: C.Cartesian3.fromDegrees(p.lon, p.lat),
+      point: {
+        pixelSize: 7, color: markerColor.withAlpha(0.95),
+        outlineColor: C.Color.fromCssColorString('#E3B062'), outlineWidth: 2,
+        heightReference: C.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        scaleByDistance: new C.NearFarScalar(2e5, 1.2, 2e7, 0.7),
+        distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 5e7),
+      },
+      label: {
+        text: p.name, font: '600 16px "Cormorant Garamond", Georgia, serif',
+        fillColor: markerColor, outlineColor: C.Color.fromCssColorString('#0B0E14'),
+        outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+        pixelOffset: new C.Cartesian2(0, -16),
+        heightReference: C.HeightReference.CLAMP_TO_GROUND,
+        disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 4.5e6),
+      },
+    });
+  });
+
+  // ---------- Decorative clouds (not weather data) ----------
+  const clouds = scene.primitives.add(new C.CloudCollection({ noiseDetail: 16.0 }));
+  let cloudsOn = tier.clouds > 0;
+  $('btn-clouds').setAttribute('aria-pressed', String(cloudsOn));
+  function seededRandom(seed) {
+    let s = seed >>> 0;
+    return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+  }
+  // Scatter a cloud bank along the final approach so the camera passes
+  // through it on the way down.
+  function placeClouds(p, groundHeight) {
+    clouds.removeAll();
+    // Light tier has none by default; a few if the visitor turns them on.
+    const count = tier.clouds || 12;
+    if (!cloudsOn) return;
+    const rnd = seededRandom(p.id.split('').reduce((a, c) => a * 31 + c.charCodeAt(0), 7));
+    const target = C.Cartographic.fromDegrees(p.lon, p.lat);
+    // The bank starts ~40 km back along the arrival heading.
+    const enu = C.Transforms.eastNorthUpToFixedFrame(C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight));
+    const hd = D2R(p.view.heading);
+    const approachStart = ellipsoid.cartesianToCartographic(C.Matrix4.multiplyByPoint(enu,
+      new C.Cartesian3(-Math.sin(hd) * 40000, -Math.cos(hd) * 40000, 0), new C.Cartesian3()));
+    const base = Math.max(groundHeight, 0) + 1800;
+    for (let i = 0; i < count; i++) {
+      const f = rnd();
+      const lon = C.Math.lerp(approachStart.longitude, target.longitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.06);
+      const lat = C.Math.lerp(approachStart.latitude, target.latitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.05);
+      const w = 1600 + rnd() * 2800, hgt = w * (0.3 + rnd() * 0.2);
+      clouds.add({
+        position: C.Cartesian3.fromRadians(lon, lat, base + rnd() * 1600),
+        scale: new C.Cartesian2(w, hgt),
+        // Same units as `scale` (metres): the volume the cloud may fill.
+        maximumSize: new C.Cartesian3(w * 0.95, hgt * 0.95, hgt * (0.6 + rnd() * 0.3)),
+        slice: 0.3 + rnd() * 0.3,
+        brightness: 0.95 + rnd() * 0.05,
+      });
+    }
+  }
+
+  // ---------- Cinematic flight engine ----------
+  // One continuous parametric path (no chained waypoints, so the camera never
+  // stops mid-way). Following van Wijk & Nuij's smooth zoom-and-pan model,
+  // ground speed is kept proportional to altitude: the globe turns quickly
+  // from orbit and the terrain scrolls at a steady apparent speed near the
+  // ground. Altitude is interpolated in log space (equal time per decade),
+  // pitch follows altitude, and roll stays at zero for a level horizon.
+  const tmp = { a: new C.Cartesian3(), b: new C.Cartesian3(), c: new C.Cartesian3() };
+  const smooth = (e0, e1, x) => { const t = C.Math.clamp((x - e0) / (e1 - e0), 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+  const easeInOutSine = (t) => -(Math.cos(Math.PI * t) - 1) / 2;
+  function slerpUnit(a, b, t, out) {
+    const d = C.Math.clamp(C.Cartesian3.dot(a, b), -1, 1);
+    const w = Math.acos(d);
+    if (w < 1e-9) return C.Cartesian3.clone(a, out);
+    const s = Math.sin(w), ka = Math.sin((1 - t) * w) / s, kb = Math.sin(t * w) / s;
+    out.x = a.x * ka + b.x * kb; out.y = a.y * ka + b.y * kb; out.z = a.z * ka + b.z * kb;
+    return C.Cartesian3.normalize(out, out);
+  }
+  // Quadratic Bézier on the sphere (de Casteljau with slerp): leaves `a`
+  // towards `ctrl` and reaches `b` along the ctrl→b direction.
+  function bezierUnit(a, ctrl, b, q, out) {
+    const p1 = slerpUnit(a, ctrl, q, new C.Cartesian3());
+    const p2 = slerpUnit(ctrl, b, q, new C.Cartesian3());
+    return slerpUnit(p1, p2, q, out);
+  }
+  const lerpAngle = (a, b, t) => a + C.Math.negativePiToPi(b - a) * t;
+  const ellipsoid = C.Ellipsoid.WGS84;
+  function unitOf(carto) { return C.Cartesian3.normalize(C.Cartesian3.fromRadians(carto.longitude, carto.latitude, 0), new C.Cartesian3()); }
+  function cartoOfUnit(u, height) {
+    const c = ellipsoid.cartesianToCartographic(C.Cartesian3.multiplyByScalar(u, ellipsoid.maximumRadius, tmp.a)) || new C.Cartographic();
+    c.height = height; return c;
+  }
+
+  let flight = null;
+  let orbit = null;           // idle orbit around the arrived place
+  let activePlace = null;
+
+  function releaseLookAt() { camera.lookAtTransform(C.Matrix4.IDENTITY); }
+
+  function cancelFlight() {
+    if (!flight) return;
+    flight = null;
+    ctl.enableInputs = true;
+    setPhase(activePlace ? 'Survol libre' : 'Exploration libre');
+  }
+  function stopOrbit() { orbit = null; }
+
+  /**
+   * target: Cartesian3 on the ground the camera must end up looking at.
+   * view: { heading, pitch, range } in degrees / metres, ENU frame at target.
+   */
+  function startFlight(target, view, opts) {
+    stopOrbit(); releaseLookAt(); flight = null;
+    const startCarto = camera.positionCartographic.clone();
+    const startHeading = camera.heading, startPitch = camera.pitch, startRoll = C.Math.negativePiToPi(camera.roll);
+
+    // Final camera pose from heading/pitch/range around the target.
+    const H = D2R(view.heading), P = Math.max(D2R(view.pitch), D2R(-89.5));
+    const enu = C.Transforms.eastNorthUpToFixedFrame(target);
+    const offset = new C.Cartesian3(
+      view.range * Math.cos(P) * -Math.sin(H),
+      view.range * Math.cos(P) * -Math.cos(H),
+      -view.range * Math.sin(P));
+    const endCarto = ellipsoid.cartesianToCartographic(C.Matrix4.multiplyByPoint(enu, offset, new C.Cartesian3()));
+
+    const uStart = unitOf(startCarto), uEnd = unitOf(endCarto);
+    const arc = Math.acos(C.Math.clamp(C.Cartesian3.dot(uStart, uEnd), -1, 1));
+    const arcMeters = arc * 6371000;
+    // Control point behind the site along the final heading, so the last
+    // stretch glides in over the territory rather than dropping vertically.
+    const entryDist = Math.min(Math.max(view.range * 10, 25000), 80000, arcMeters * 0.5 + 1);
+    const uCtrl = C.Cartesian3.normalize(C.Matrix4.multiplyByPoint(enu,
+      new C.Cartesian3(-Math.sin(H) * entryDist, -Math.cos(H) * entryDist, 0), new C.Cartesian3()), new C.Cartesian3());
+
+    const h0 = Math.max(startCarto.height, 50);
+    const hEnd = Math.max(endCarto.height, 50);
+    const hPeak = Math.max(h0, hEnd, C.Math.clamp(arcMeters * 0.6, 0, 9.0e6));
+    const L0 = Math.log(h0), Lf = Math.log(hEnd), Lp = Math.log(hPeak);
+    const altitudeAt = (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
+
+    // Pitch: tilt down towards nadir during the climb, then open up to the
+    // arrival pitch over the second half of the flight. Time-based windows
+    // bound the tilt rate whatever the altitude change.
+    const NADIR = D2R(-89.5);
+    const climbing = hPeak > h0 * 1.5;
+    const pitchAt = (s) => {
+      const up = climbing ? C.Math.lerp(startPitch, NADIR, smooth(0, 0.45, s)) : startPitch;
+      const down = C.Math.lerp(NADIR, P, smooth(0.5, 1.0, s));
+      return C.Math.lerp(up, down, smooth(0.3, 0.5, s));
+    };
+    const longHaul = hPeak > 1e6;
+
+    // Precompute arc-length of the ground track and the time→distance map
+    // (weight ∝ altitude, windowed so speed eases in and out).
+    const N = 400;
+    const trackLen = new Float64Array(N + 1);
+    let prev = uStart;
+    for (let i = 1; i <= N; i++) {
+      const u = bezierUnit(uStart, uCtrl, uEnd, i / N, new C.Cartesian3());
+      trackLen[i] = trackLen[i - 1] + Math.acos(C.Math.clamp(C.Cartesian3.dot(prev, u), -1, 1));
+      prev = u;
+    }
+    const progress = new Float64Array(N + 1);
+    for (let i = 1; i <= N; i++) {
+      const s = (i - 0.5) / N;
+      const w = altitudeAt(s) * smooth(0, 0.18, s) * (1 - smooth(0.82, 1, s)) + 1e-6;
+      progress[i] = progress[i - 1] + w;
+    }
+    for (let i = 0; i <= N; i++) progress[i] /= progress[N];
+    const lookup = (table, x) => { // x in [0,1] → interpolated table value
+      const f = C.Math.clamp(x, 0, 1) * N, i = Math.min(Math.floor(f), N - 1);
+      return table[i] + (table[i + 1] - table[i]) * (f - i);
+    };
+    const qForDistance = (d) => { // inverse of trackLen (monotonic)
+      let lo = 0, hi = N;
+      while (hi - lo > 1) { const m = (lo + hi) >> 1; if (trackLen[m] < d) lo = m; else hi = m; }
+      const span = trackLen[hi] - trackLen[lo];
+      return (lo + (span > 0 ? (d - trackLen[lo]) / span : 0)) / N;
+    };
+
+    const reduced = prefersReduced.matches;
+    const decades = (Math.abs(Lp - L0) + Math.abs(Lp - Lf)) / Math.LN10;
+    const duration = reduced ? 1200
+      : (opts && opts.duration) || C.Math.clamp(4000 + decades * 1500 + arc * 2000, 7000, 18000);
+
+    const t0 = performance.now();
+    const time0 = C.JulianDate.clone(clock.currentTime);
+    const time1 = opts && opts.time ? opts.time : time0;
+    const dt = C.JulianDate.secondsDifference(time1, time0);
+    const pos = new C.Cartesian3();
+    const hpr = new C.HeadingPitchRoll();
+
+    flight = {
+      t0, duration, onDone: opts && opts.onDone,
+      step(now) {
+        const t = C.Math.clamp((now - t0) / duration, 0, 1);
+        const s = reduced ? t : easeInOutSine(t);
+
+        const q = qForDistance(lookup(progress, s) * trackLen[N]);
+        const g = bezierUnit(uStart, uCtrl, uEnd, q, tmp.b);
+        const carto = cartoOfUnit(g, altitudeAt(s));
+        // Never go below the loaded terrain.
+        const ground = globe.getHeight(carto);
+        if (ground !== undefined && carto.height < ground + 80) carto.height = ground + 80;
+        C.Cartographic.toCartesian(carto, ellipsoid, pos);
+
+        // Heading: on long flights settle to north while in orbit, then turn
+        // to the arrival heading over the whole descent.
+        const toNorth = longHaul ? smooth(0, 0.4, s) : 0;
+        hpr.heading = lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
+        hpr.pitch = pitchAt(s);
+        hpr.roll = startRoll * (1 - smooth(0, 0.2, s));
+        camera.setView({ destination: pos, orientation: hpr });
+
+        if (dt !== 0) clock.currentTime = C.JulianDate.addSeconds(time0, dt * smooth(0, 1, t), new C.JulianDate());
+        if (opts && opts.onProgress) opts.onProgress(s, carto.height);
+        return t >= 1;
+      },
+    };
+    ctl.enableInputs = false;
+  }
+
+  function startOrbit(target) {
+    if (prefersReduced.matches) return;
+    // Express the current pose as heading/pitch/range so lookAt starts exactly here.
+    const enuInv = C.Matrix4.inverseTransformation(C.Transforms.eastNorthUpToFixedFrame(target), new C.Matrix4());
+    const local = C.Matrix4.multiplyByPoint(enuInv, camera.positionWC, new C.Cartesian3());
+    const range = C.Cartesian3.magnitude(local);
+    const heading = Math.atan2(-local.x, -local.y);
+    const pitch = -Math.asin(C.Math.clamp(local.z / range, -1, 1));
+    camera.lookAt(target, new C.HeadingPitchRange(heading, pitch, range));
+    orbit = { target, rate: 0, t: performance.now() };
+  }
+
+  // Cancel automated motion as soon as the visitor takes the controls.
+  ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
+    canvas.addEventListener(ev, () => {
+      if (flight) { cancelFlight(); }
+      if (orbit) { stopOrbit(); }
+    }, { passive: true });
+  });
+
+  let last = performance.now();
+  scene.preUpdate.addEventListener(() => {
+    const now = performance.now();
+    const dtMs = now - last; last = now;
+    if (flight) {
+      const f = flight;
+      if (f.step(now)) {
+        flight = null; ctl.enableInputs = true;
+        if (f.onDone) f.onDone();
+      }
+    } else if (orbit) {
+      // The orbit pivots on the lookAt frame; without it rotateLeft would
+      // circle the Earth's centre instead of the site.
+      if (C.Matrix4.equals(camera.transform, C.Matrix4.IDENTITY)) { orbit = null; return; }
+      // Ease into a slow 1.6°/s orbit.
+      orbit.rate = Math.min(orbit.rate + dtMs * 0.000004, D2R(1.6) / 1000);
+      camera.rotateLeft(orbit.rate * dtMs);
+    }
+  });
+
+  // ---------- UI ----------
+  const list = $('place-list');
+  PLACES.forEach((p) => {
+    const li = document.createElement('li');
+    const btn = document.createElement('button');
+    btn.className = 'place'; btn.type = 'button'; btn.dataset.id = p.id;
+    btn.innerHTML = `<span>${p.name}</span><small>${p.country}</small>`;
+    btn.addEventListener('click', () => flyToPlace(p));
+    li.appendChild(btn); list.appendChild(li);
+  });
+
+  function fmtCoord(lat, lon) {
+    const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'O';
+    return `${Math.abs(lat).toFixed(4)}° ${ns} · ${Math.abs(lon).toFixed(4)}° ${ew}`;
+  }
+  function showCard(p, groundHeight) {
+    $('card-kicker').textContent = p.country;
+    $('card-title').textContent = p.name;
+    $('card-coords').textContent = fmtCoord(p.lat, p.lon)
+      + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
+    $('card-text').textContent = p.text;
+    const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
+    $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
+    // Google Earth Web deep link: @lat,lon,groundAltitude a, distance d, fov y, heading h, tilt t (0 = straight down), roll r.
+    const tilt = Math.round(90 + p.view.pitch);
+    $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
+    p.ground = groundHeight;
+    nightView = false; setNightButton();
+    $('card').classList.add('show');
+  }
+  function hideCard() { $('card').classList.remove('show'); }
+
+  // Night view: an oblique shot of the place after dark from ~600 km up, like a photograph from the Space Station.
+  let nightView = false;     // the night card is showing
+  let nightClock = false;    // the clock was moved to night for a night view and not brought back yet
+  const NIGHT_VIEW = { pitch: -33, range: 1.05e6, solarHour: 23 };
+  function setNightButton() {
+    $('card-night').textContent = nightView ? 'Revenir au lieu, de jour ↺' : 'Voir la nuit depuis l’orbite ↗';
+    // Google 3D tiles carry their own daytime lighting, so a night view over them would not be one. The way back
+    // stays available if the visitor switches to Google 3D while a night view is showing.
+    $('card-night').hidden = googleOn && googleReady && !nightView;
+  }
+  function showNightCard(p) {
+    nightView = true; setNightButton();
+    $('card-kicker').textContent = 'Vue de nuit';
+    $('card-title').textContent = p.name;
+    $('card-coords').textContent = fmtCoord(p.lat, p.lon);
+    // Short on purpose: phones show three lines, and the caveat about the lights must stay in them. The layer may
+    // be off (switched off by the visitor, or by itself after repeated NASA tile errors): say so rather than
+    // credit lights that are not there.
+    const lights = veille.lights;
+    $('card-text').textContent = 'Vue oblique d’environ 600 km, comme depuis la Station spatiale (≈ 400 km). '
+      + (lights ? 'Lumières : archive NASA Black Marble, pas l’éclairage d’aujourd’hui.' : 'Lumières indisponibles : la couche NASA est désactivée.');
+    $('card-meta').textContent = 'Heure solaire locale ≈ 23h00' + (lights ? ' · lumières : NASA Black Marble' : '');
+    $('card').classList.add('show');
+  }
+  async function flyToNight(p) {
+    const token = ++flightToken;
+    nightClock = true;
+    hideCard(); stopOrbit(); cancelFlight();
+    if (veille.live) setLayer('live', false);      // a running real-time clock would override the chosen hour
+    if (!veille.lights && !gibsFailed.has('lights')) setLayer('lights', true);   // not a layer that already failed
+    clouds.removeAll();
+    setPhase('Montée en orbite');
+    const groundHeight = p.ground ?? await sampleGround(p);
+    if (token !== flightToken) return;
+    startFlight(C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight), { heading: p.night, pitch: NIGHT_VIEW.pitch, range: NIGHT_VIEW.range }, {
+      time: timeForSolarHour(p.lon, NIGHT_VIEW.solarHour),
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
+      onDone: () => { setPhase('Vue de nuit'); showNightCard(p); },
+    });
+  }
+  $('card-night').addEventListener('click', () => {
+    const p = activePlace;
+    if (p) (nightView ? flyToPlace(p) : flyToNight(p));
+  });
+
+  function setActive(p) {
+    activePlace = p;
+    if (p) liveOnPlace(p);
+    list.querySelectorAll('.place').forEach((b) => {
+      const on = !!p && b.dataset.id === p.id;
+      b.setAttribute('aria-current', String(on));
+      if (on) b.scrollIntoView({ block: 'nearest', inline: 'center', behavior: prefersReduced.matches ? 'auto' : 'smooth' });
+    });
+  }
+
+  function sampleGround(p) {
+    const carto = C.Cartographic.fromDegrees(p.lon, p.lat);
+    const timeout = new Promise((res) => setTimeout(() => res(null), 4000));
+    const sample = C.sampleTerrain(viewer.terrainProvider, 13, [carto]).then((r) => r[0].height).catch(() => null);
+    return Promise.race([sample, timeout]).then((h) => (Number.isFinite(h) ? h : 0));
+  }
+
+  let flightToken = 0;
+  async function flyToPlace(p) {
+    const token = ++flightToken;
+    setActive(p); hideCard(); stopOrbit(); cancelFlight();
+    setPhase('Préparation');
+    const groundHeight = await sampleGround(p);
+    if (token !== flightToken) return;
+    const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
+    placeClouds(p, groundHeight);
+    nightClock = false;
+
+    startFlight(target, p.view, {
+      time: veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour),
+      onProgress: (s, h) => {
+        setPhase(h > 1.2e5 ? 'Orbite' : h > 1.2e4 ? 'Traversée de l\'atmosphère' : 'Approche');
+      },
+      onDone: () => {
+        setPhase('Arrivée');
+        showCard(p, groundHeight);
+        startOrbit(target);
+      },
+    });
+  }
+
+  function returnToOrbit() {
+    ++flightToken;
+    setActive(null); hideCard(); stopOrbit(); cancelFlight();
+    clouds.removeAll();
+    const c = camera.positionCartographic;
+    const target = C.Cartesian3.fromRadians(c.longitude, C.Math.clamp(c.latitude, D2R(-60), D2R(60)), 0);
+    // After a night view the clock is still at night: bring daylight back so the globe is not left dark.
+    const daylight = nightClock && !veille.live;
+    nightClock = false; nightView = false; setNightButton();
+    startFlight(target, { heading: 0, pitch: -90, range: 1.9e7 }, {
+      time: daylight ? timeForSolarHour(C.Math.toDegrees(c.longitude), 13) : undefined,
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Ascension'),
+      onDone: () => setPhase('Orbite'),
+    });
+  }
+
+  function setPhase(t) { $('hud-phase').textContent = t; }
+
+  $('btn-orbit').addEventListener('click', returnToOrbit);
+  $('btn-labels').addEventListener('click', (e) => {
+    labels.show = !labels.show;
+    e.currentTarget.setAttribute('aria-pressed', String(labels.show));
+  });
+  $('btn-clouds').addEventListener('click', (e) => {
+    cloudsOn = !cloudsOn;
+    e.currentTarget.setAttribute('aria-pressed', String(cloudsOn));
+    if (!cloudsOn) clouds.removeAll();
+    else if (activePlace) {
+      const p = activePlace;
+      sampleGround(p).then((h) => { if (activePlace === p) placeClouds(p, h); });
+    }
+  });
+
+  // Click a marker on the globe to fly there.
+  const handler = new C.ScreenSpaceEventHandler(canvas);
+  handler.setInputAction((m) => {
+    const picked = scene.pick(m.position);
+    const id = picked && picked.id && picked.id.id;
+    const p = PLACES.find((x) => x.id === id);
+    if (p) flyToPlace(p);
+    else if (liveOpen) pickCountry(m.position);     // the Direct panel is open: a touch picks the country
+  }, C.ScreenSpaceEventType.LEFT_CLICK);
+
+  // HUD readout + adaptive quality (steps down if frame rate stays low).
+  const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
+    : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
+  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
+  let capturing = false;     // a high-resolution capture is slow on purpose: never read it as a weak device
+  function applyTier(name) {
+    tierName = name; tier = TIERS[name];
+    globe.maximumScreenSpaceError = tier.sse;
+    viewer.resolutionScale = renderScale(tier);
+    viewer.shadows = tier.shadows;
+    viewer.terrainShadows = tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED;
+    scene.highDynamicRange = name === 'high';
+    scene.postProcessStages.fxaa.enabled = fxaaFor(tier);
+    hillshade.alpha = name === 'light' ? 0.6 : 0.9;
+    if (googleTileset) googleTileset.maximumScreenSpaceError = TILESET_SSE[name];
+    if (!tier.clouds) clouds.removeAll();
+    try { scene.msaaSamples = msaaFor(tier); } catch (e) { /* no multisampling on this device */ }
+    $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
+  }
+  $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
+  function syncQualityButtons() {
+    document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
+  }
+  function setQuality(choice) {
+    quality = choice;
+    try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
+    catch (e) { /* storage blocked: the choice applies to this visit only */ }
+    slowWindows = 0; warmUntil = performance.now() + 6000;
+    applyTier(TIER_BY_CHOICE[choice] || detectTier());
+    syncQualityButtons();
+  }
+  document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
+  syncQualityButtons();
+  // A hidden tab stops frames: do not count that gap as slowness.
+  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
+  scene.postRender.addEventListener(() => {
+    frames++;
+    const now = performance.now();
+    if (now - fpsT > 2500) {
+      const fps = frames * 1000 / (now - fpsT);
+      frames = 0; fpsT = now;
+      // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
+      slowWindows = (now > warmUntil && fps < 24 && !capturing) ? slowWindows + 1 : 0;
+      const i = TIER_ORDER.indexOf(tierName);
+      if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
+    }
+    if (now - hudT > 200) {
+      hudT = now;
+      const c = camera.positionCartographic;
+      const g = globe.getHeight(c);
+      const agl = g !== undefined ? c.height - g : c.height;
+      $('hud-alt').textContent = fmtAlt(Math.max(agl, 0));
+      $('hud-pos').textContent = fmtCoord(R2D(c.latitude), R2D(c.longitude));
+      if (veille.sit) $('hud-utc').textContent = fmtUTC(new Date());
+    }
+  });
+
+  // Credits come from the layers actually in use.
+  $('credits').innerHTML = [
+    'Imagerie : Esri, Maxar, Earthstar Geographics · Natural Earth II',
+    'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
+    `Version : ${NOUR_BUILD}`,
+    'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
+    'Direct : radio-browser.info (radios) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
+    'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · halo du limbe de nuit : approximation',
+  ].join('<br>');
+
+  // Credits are open on wide screens, folded behind "Sources" on phones.
+  if (matchMedia('(min-width: 761px)').matches) $('credits-box').open = true;
+
+  // ---------- Veille mondiale: open public data layers ----------
+  // Everything here is public, read-only and aggregate (earthquakes, one
+  // satellite, weather imagery). Nothing tracks or identifies people.
+  const veille = { quakes: false, iss: false, rain: false, live: false, sit: false, clouds: true, lights: true };
+  const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
+  const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
+  const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
+
+  const quakeSource = new C.CustomDataSource('quakes');
+  const issSource = new C.CustomDataSource('iss');
+  quakeSource.show = false; issSource.show = false;
+  viewer.dataSources.add(quakeSource);
+  viewer.dataSources.add(issSource);
+  const rain = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+    url: RAIN_URL, maximumLevel: 6, credit: new C.Credit('Précipitations : NASA GIBS / IMERG'),
+  }), 4);                       // above the real-Earth imagery, under the night lights and place names
+  rain.show = false; rain.alpha = 0.75;
+
+  const fmtUTC = (d) => `${d.toISOString().slice(11, 16)} UTC`;
+  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '' };
+  function renderStatus() {
+    $('watch-status').textContent = Object.values(statusLines).filter(Boolean).join('\n');
+  }
+  function journal(msg) {
+    const li = document.createElement('li');
+    const t = document.createElement('b');
+    t.textContent = fmtUTC(new Date()) + ' ';
+    li.append(t, document.createTextNode(msg));
+    const ul = $('watch-journal');
+    ul.prepend(li);
+    while (ul.children.length > 8) ul.lastChild.remove();
+  }
+
+  // Fly the camera to a point on the ground using the same engine as the places.
+  function flyToPoint(lat, lon, range) {
+    ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight();
+    clouds.removeAll(); setPhase('Veille');
+    startFlight(C.Cartesian3.fromDegrees(lon, lat, 0), { heading: 0, pitch: -55, range }, {
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Veille'),
+      onDone: () => setPhase('Veille'),
+    });
+  }
+
+  // Earthquakes (USGS GeoJSON summary feed, magnitude 2.5+, past 24 h).
+  const quakeSeen = new Set();
+  let quakeTimer = null, quakeFirstLoad = true;
+  async function loadQuakes() {
+    try {
+      const res = await fetch(QUAKE_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const feats = (Array.isArray(data.features) ? data.features : []).filter((f) => f && f.geometry
+        && Array.isArray(f.geometry.coordinates) && f.properties && Number.isFinite(f.properties.mag));
+      quakeSource.entities.removeAll();
+      feats.forEach((f) => {
+        const [lon, lat] = f.geometry.coordinates, m = f.properties.mag;
+        const col = C.Color.lerp(C.Color.fromCssColorString('#F1CF8E'), C.Color.fromCssColorString('#D9482A'),
+          C.Math.clamp((m - 2.5) / 4.5, 0, 1), new C.Color());
+        quakeSource.entities.add({
+          position: C.Cartesian3.fromDegrees(lon, lat),
+          point: {
+            pixelSize: C.Math.clamp(4 + m * 2.2, 6, 28), color: col.withAlpha(0.75),
+            outlineColor: C.Color.fromCssColorString('#F4ECDF').withAlpha(0.7), outlineWidth: 1,
+            heightReference: C.HeightReference.CLAMP_TO_GROUND,
+            disableDepthTestDistance: Number.POSITIVE_INFINITY,
+          },
+          label: m >= 5.5 ? {
+            text: `M${m.toFixed(1)}`, font: '600 14px Inter, Arial, sans-serif', fillColor: C.Color.WHITE,
+            outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
+            pixelOffset: new C.Cartesian2(0, -18), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+            heightReference: C.HeightReference.CLAMP_TO_GROUND,
+          } : undefined,
+        });
+        const id = f.id || `${lat},${lon},${f.properties.time}`;
+        if (!quakeSeen.has(id)) {
+          quakeSeen.add(id);
+          if (!quakeFirstLoad && m >= 4.5) journal(`Séisme M${m.toFixed(1)} · ${f.properties.place || 'lieu inconnu'}`);
+        }
+      });
+      quakeFirstLoad = false;
+      const top = feats.slice().sort((a, b) => b.properties.mag - a.properties.mag).slice(0, 8);
+      const ul = $('watch-quakes'); ul.replaceChildren();
+      top.forEach((f) => {
+        const [lon, lat] = f.geometry.coordinates;
+        const li = document.createElement('li'), b = document.createElement('button');
+        b.type = 'button';
+        const mag = document.createElement('span'); mag.className = 'mag'; mag.textContent = `M${f.properties.mag.toFixed(1)}`;
+        const where = document.createElement('span'); where.textContent = f.properties.place || '—';
+        b.append(mag, where);
+        b.addEventListener('click', () => flyToPoint(lat, lon, 450000));
+        li.append(b); ul.append(li);
+      });
+      statusLines.quakes = `Séismes : ${feats.length} sur 24 h (M2,5+) · mis à jour ${fmtUTC(new Date())}`;
+    } catch (e) {
+      statusLines.quakes = 'Séismes : données indisponibles (réseau ou source)';
+    }
+    renderStatus();
+  }
+
+  // International Space Station (wheretheiss.at: lat/lon in degrees, altitude km, velocity km/h).
+  const issTrail = [];
+  let issPos, issTimer = null;
+  issSource.entities.add({
+    id: 'iss',
+    position: new C.CallbackProperty(() => issPos, false),
+    point: { pixelSize: 10, color: C.Color.fromCssColorString('#F1CF8E'), outlineColor: C.Color.WHITE, outlineWidth: 2,
+      disableDepthTestDistance: Number.POSITIVE_INFINITY },
+    label: { text: 'ISS', font: '600 14px Inter, Arial, sans-serif', fillColor: C.Color.WHITE, outlineColor: C.Color.BLACK,
+      outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -18),
+      disableDepthTestDistance: Number.POSITIVE_INFINITY },
+    polyline: { positions: new C.CallbackProperty(() => issTrail.slice(), false), width: 2,
+      arcType: C.ArcType.NONE, material: C.Color.fromCssColorString('#F1CF8E').withAlpha(0.7) },
+  });
+  let issLast = null;
+  async function loadISS() {
+    try {
+      const res = await fetch(ISS_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const d = await res.json();
+      if (![d.latitude, d.longitude, d.altitude].every(Number.isFinite)) throw new Error('format');
+      issPos = C.Cartesian3.fromDegrees(d.longitude, d.latitude, d.altitude * 1000);
+      issTrail.push(issPos); if (issTrail.length > 90) issTrail.shift();
+      issLast = d;
+      statusLines.iss = `ISS : ${fmtCoord(d.latitude, d.longitude)} · ${Math.round(d.altitude)} km · ${Math.round(d.velocity || 0).toLocaleString('fr-FR')} km/h`;
+    } catch (e) {
+      statusLines.iss = 'ISS : données indisponibles (réseau ou source)';
+    }
+    renderStatus();
+  }
+
+  function setLive(on) {
+    if (on) {
+      clock.currentTime = C.JulianDate.now();
+      clock.clockStep = C.ClockStep.SYSTEM_CLOCK_MULTIPLIER; clock.multiplier = 1; clock.shouldAnimate = true;
+      statusLines.live = 'Jour/nuit : heure réelle (terminateur calculé par le soleil)';
+    } else {
+      clock.shouldAnimate = false;
+      statusLines.live = '';
+    }
+    renderStatus();
+  }
+
+  const layerOn = {
+    quakes(on) {
+      quakeSource.show = on;
+      clearInterval(quakeTimer);
+      if (on) { loadQuakes(); quakeTimer = setInterval(loadQuakes, 300000); }
+      else { statusLines.quakes = ''; renderStatus(); $('watch-quakes').replaceChildren(); }
+    },
+    iss(on) {
+      issSource.show = on;
+      clearInterval(issTimer);
+      if (on) { loadISS(); issTimer = setInterval(loadISS, 5000); }
+      else { statusLines.iss = ''; renderStatus(); }
+    },
+    clouds(on) { realEarth.show = on; },
+    lights(on) { nightLights.show = on; },
+    rain(on) {
+      rain.show = on;
+      statusLines.rain = on ? 'Précipitations : NASA GIBS / IMERG (dernier relevé disponible)' : '';
+      renderStatus();
+    },
+    live: setLive,
+    sit(on) {
+      document.body.classList.toggle('sitroom', on);
+      if (on) { hideCard(); setPhase('Veille'); setLayer('quakes', true); setLayer('iss', true); setLayer('live', true); }
+    },
+  };
+  // Called by a NASA layer after repeated tile errors: switch it off and say so.
+  const gibsFailed = new Set();
+  function gibsUnavailable(name) {
+    if (!veille[name]) return;
+    gibsFailed.add(name);
+    veille[name] = false;
+    layerOn[name](false);
+    const button = document.querySelector(`#watch [data-layer="${name}"]`);
+    button.setAttribute('aria-pressed', 'false');
+    statusLines[name] = `${button.textContent} : source NASA indisponible, couche désactivée.`;
+    renderStatus();
+    journal(statusLines[name]);
+  }
+  function setLayer(name, on) {
+    if (veille[name] === on) return;
+    veille[name] = on;
+    document.querySelector(`#watch [data-layer="${name}"]`).setAttribute('aria-pressed', String(on));
+    layerOn[name](on);
+    journal(`${on ? 'Activé' : 'Désactivé'} : ${document.querySelector(`#watch [data-layer="${name}"]`).textContent}`);
+  }
+  document.querySelectorAll('#watch [data-layer]').forEach((b) => {
+    b.addEventListener('click', () => setLayer(b.dataset.layer, !veille[b.dataset.layer]));
+  });
+  $('btn-watch').addEventListener('click', (e) => {
+    const open = !$('watch').classList.contains('open');
+    if (open) setLiveOpen(false);
+    $('watch').classList.toggle('open', open);
+    e.currentTarget.setAttribute('aria-pressed', String(open));
+  });
+  // Stop polling when the tab is hidden; resume when it comes back.
+  document.addEventListener('visibilitychange', () => {
+    clearInterval(quakeTimer); clearInterval(issTimer);
+    if (document.hidden) return;
+    if (veille.quakes) { loadQuakes(); quakeTimer = setInterval(loadQuakes, 300000); }
+    if (veille.iss) { loadISS(); issTimer = setInterval(loadISS, 5000); }
+  });
+
+  // ---------- Google Earth 3D (optional: needs a Google Maps Platform key) ----------
+  // Google Photorealistic 3D Tiles are served by Google's Map Tiles API. A key is required and
+  // usage is billed to that key's Google Cloud project, so nothing loads without one. Keys are
+  // taken from (in order): the GOOGLE_MAPS_KEY constant, ?gkey=... in the address (saved in this
+  // browser only, then removed from the address bar; ?gkey=off forgets it), or the saved value.
+  // Restrict the key in Google Cloud to this site's address and to the Map Tiles API.
+  const GOOGLE_MAPS_KEY = '';
+  function readGoogleKey() {
+    const valid = (k) => (/^[A-Za-z0-9_-]{20,80}$/.test(k || '') ? k : '');
+    let fromUrl = '', stored = '';
+    try {
+      const params = new URLSearchParams(location.search);
+      if (params.has('gkey')) {
+        fromUrl = params.get('gkey');
+        params.delete('gkey');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+      }
+    } catch (e) { /* no history API: the key just stays in the address */ }
+    try {
+      if (fromUrl === 'off') localStorage.removeItem('nour.gkey');
+      else if (valid(fromUrl)) localStorage.setItem('nour.gkey', fromUrl);
+      stored = localStorage.getItem('nour.gkey') || '';
+    } catch (e) { /* storage blocked: a key from the address is used for this visit only */ }
+    return valid(GOOGLE_MAPS_KEY) || valid(fromUrl) || valid(stored);
+  }
+  const googleKey = readGoogleKey();
+  const TILESET_SSE = { high: 8, balanced: 12, light: 20 };           // lower = sharper
+  const TILESET_CACHE_MB = { high: [512, 256], balanced: [256, 128], light: [128, 64] };
+  let googleTileset = null, googleOn = false, googleReady = false, googleBusy = false, googleFailures = 0;
+  statusLines.google = '';
+
+  function applyGoogleVisibility() {
+    // The photorealistic mesh replaces the globe once its first tiles are in; until then keep the globe.
+    globe.show = !(googleOn && googleReady);
+    if (googleTileset) googleTileset.show = googleOn;
+    $('cesium-credits').hidden = !googleOn;       // Google requires its logo and data credits on screen
+    if (googleOn) $('credits-box').open = true;
+    $('btn-google').setAttribute('aria-pressed', String(googleOn));
+    statusLines.google = googleOn && googleReady
+      ? 'Google 3D actif : satellite Esri, relief ombré et précipitations masqués.' : statusLines.google;
+    renderStatus();
+    setNightButton(); syncShotButton();
+  }
+  function leaveGoogle(message) {
+    googleOn = false;
+    statusLines.google = message || '';
+    applyGoogleVisibility();
+    if (message) journal(message);
+  }
+  async function enterGoogle() {
+    if (googleBusy) return;
+    googleBusy = true; googleOn = true;
+    statusLines.google = 'Google 3D : chargement…'; renderStatus();
+    $('btn-google').setAttribute('aria-pressed', 'true');
+    try {
+      if (!googleTileset) {
+        const [cache, overflow] = TILESET_CACHE_MB[tierName];
+        googleTileset = await C.createGooglePhotorealistic3DTileset(
+          { key: googleKey, onlyUsingWithGoogleGeocoder: true },
+          { maximumScreenSpaceError: TILESET_SSE[tierName], showCreditsOnScreen: true,
+            cacheBytes: cache * 1048576, maximumCacheOverflowBytes: overflow * 1048576 });
+        scene.primitives.add(googleTileset);
+        googleTileset.initialTilesLoaded.addEventListener(() => { googleReady = true; if (googleOn) applyGoogleVisibility(); });
+        googleTileset.tileFailed.addEventListener(() => {
+          // A few failed tiles are normal; many in a row mean a bad key, a disabled API or no billing.
+          if (++googleFailures === 6 && googleOn) leaveGoogle('Google 3D indisponible : tuiles refusées (clé, API Map Tiles ou facturation). Retour à la carte.');
+        });
+      }
+      googleFailures = 0;
+      applyGoogleVisibility();
+      journal('Activé : Google 3D');
+    } catch (e) {
+      googleTileset = null; googleReady = false;
+      leaveGoogle('Google 3D indisponible : clé refusée, API Map Tiles non activée ou facturation absente. Retour à la carte.');
+    }
+    googleBusy = false;
+  }
+  if (googleKey) {
+    $('btn-google').hidden = false;
+    $('btn-google').addEventListener('click', () => (googleOn ? leaveGoogle() : enterGoogle()));
+  }
+
+  // ---------- Direct: radios, free TV, public webcams, conflict headlines ----------
+  // Nothing loads until the visitor opens the panel and picks a country. Each tab then calls a public service
+  // that sees the visitor's address: radio-browser.info (radio directory), the iptv-org playlists on GitHub
+  // Pages (free TV), GDELT (news headlines), and jsDelivr (hls.js, country outlines). Cameras are only links
+  // to public webcam directories. None of these services could be reached from the development sandbox, so
+  // this code was tested against simulated responses in the documented formats, not against the real services.
+  const COUNTRY_CODES = 'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK XK YE YT ZA ZM ZW'.split(' ');
+  const NUMERIC_TO_A2 = {"100":"BG","104":"MM","108":"BI","112":"BY","116":"KH","120":"CM","124":"CA","140":"CF","144":"LK","148":"TD","152":"CL","156":"CN","158":"TW","170":"CO","178":"CG","180":"CD","188":"CR","191":"HR","192":"CU","196":"CY","203":"CZ","204":"BJ","208":"DK","214":"DO","218":"EC","222":"SV","226":"GQ","231":"ET","232":"ER","233":"EE","238":"FK","242":"FJ","246":"FI","250":"FR","260":"TF","262":"DJ","266":"GA","268":"GE","270":"GM","275":"PS","276":"DE","288":"GH","300":"GR","304":"GL","320":"GT","324":"GN","328":"GY","332":"HT","340":"HN","348":"HU","352":"IS","356":"IN","360":"ID","364":"IR","368":"IQ","372":"IE","376":"IL","380":"IT","384":"CI","388":"JM","392":"JP","398":"KZ","400":"JO","404":"KE","408":"KP","410":"KR","414":"KW","417":"KG","418":"LA","422":"LB","426":"LS","428":"LV","430":"LR","434":"LY","440":"LT","442":"LU","450":"MG","454":"MW","458":"MY","466":"ML","478":"MR","484":"MX","496":"MN","498":"MD","499":"ME","504":"MA","508":"MZ","512":"OM","516":"NA","524":"NP","528":"NL","540":"NC","548":"VU","554":"NZ","558":"NI","562":"NE","566":"NG","578":"NO","586":"PK","591":"PA","598":"PG","600":"PY","604":"PE","608":"PH","616":"PL","620":"PT","624":"GW","626":"TL","630":"PR","634":"QA","642":"RO","643":"RU","646":"RW","682":"SA","686":"SN","688":"RS","694":"SL","703":"SK","704":"VN","705":"SI","706":"SO","710":"ZA","716":"ZW","724":"ES","728":"SS","729":"SD","732":"EH","740":"SR","748":"SZ","752":"SE","756":"CH","760":"SY","762":"TJ","764":"TH","768":"TG","780":"TT","784":"AE","788":"TN","792":"TR","795":"TM","800":"UG","804":"UA","807":"MK","818":"EG","826":"GB","834":"TZ","840":"US","854":"BF","858":"UY","860":"UZ","862":"VE","887":"YE","894":"ZM","032":"AR","044":"BS","076":"BR","068":"BO","084":"BZ","072":"BW","024":"AO","012":"DZ","050":"BD","064":"BT","004":"AF","051":"AM","040":"AT","008":"AL","056":"BE","090":"SB","036":"AU","031":"AZ","096":"BN","010":"AQ","070":"BA"};
+  const COUNTRIES_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json';
+  const HLS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
+  let regionFr = null, regionEn = null;
+  try { regionFr = new Intl.DisplayNames(['fr'], { type: 'region' }); regionEn = new Intl.DisplayNames(['en'], { type: 'region' }); }
+  catch (e) { /* older browsers: country codes are shown as they are */ }
+  const nameFr = (cc) => { try { return (regionFr && regionFr.of(cc)) || cc; } catch (e) { return cc; } };
+  const nameEn = (cc) => { try { return (regionEn && regionEn.of(cc)) || cc; } catch (e) { return cc; } };
+  const say = (id, text) => { $(id).textContent = text; };
+  const liveEl = $('live'), selectEl = $('live-country'), radioEl = $('radio-audio'), tvEl = $('tv-video');
+  const live = { cc: '', lat: null, lon: null, label: '', tab: 'radio', loaded: { radio: '', tv: '', war: '' } };
+  let liveOpen = false, warTimer = 0, warItems = [], warLang = 'all', warLast = 0;
+
+  const placeholder = document.createElement('option');
+  placeholder.value = ''; placeholder.textContent = 'Choisis un pays…';
+  selectEl.appendChild(placeholder);
+  COUNTRY_CODES.map((cc) => ({ cc, name: nameFr(cc) })).sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach((c) => {
+    const o = document.createElement('option'); o.value = c.cc; o.textContent = c.name; selectEl.appendChild(o);
+  });
+
+  async function fetchText(url, ms = 9000) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(url, { signal: ctl.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.text();
+    } finally { clearTimeout(t); }
+  }
+  // Streams must be https from an https page (browsers block mixed content); plain http only for local tests.
+  const okStream = (u) => typeof u === 'string' && (u.startsWith('https://') || (location.protocol === 'http:' && u.startsWith('http://')));
+  function fillList(ul, rows, build) {
+    ul.replaceChildren();
+    rows.forEach((r) => { const li = document.createElement('li'); li.appendChild(build(r)); ul.appendChild(li); });
+  }
+  function itemButton(title, sub, onClick) {
+    const b = document.createElement('button'); b.type = 'button';
+    const t = document.createElement('span'); t.textContent = title;
+    const s = document.createElement('small'); s.textContent = sub;
+    b.append(t, s); b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function updateHint(note) {
+    $('live-hint').textContent = note || (live.cc
+      ? `${nameFr(live.cc)} · touche un autre pays sur le globe pour changer.`
+      : 'Touche un pays sur le globe ou choisis-le dans la liste.');
+  }
+  function setLiveOpen(open) {
+    liveOpen = open;
+    liveEl.classList.toggle('open', open);
+    document.body.classList.toggle('live-open', open);
+    $('btn-live').setAttribute('aria-pressed', String(open));
+    if (open) {
+      $('watch').classList.remove('open'); $('btn-watch').setAttribute('aria-pressed', 'false');
+      updateHint(); loadTab();
+    } else { clearInterval(warTimer); warTimer = 0; }
+  }
+  $('btn-live').addEventListener('click', () => setLiveOpen(!liveOpen));
+  function setTab(tab) {
+    live.tab = tab;
+    liveEl.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
+    ['radio', 'tv', 'cam', 'war'].forEach((t) => $(`pane-${t}`).classList.toggle('on', t === tab));
+    loadTab();
+  }
+  liveEl.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  function loadTab() {
+    clearInterval(warTimer); warTimer = 0;
+    if (!liveOpen) return;
+    if (live.tab === 'cam') { renderCam(); return; }
+    if (live.tab === 'war') {
+      if (live.loaded.war !== (live.cc || '*')) loadWar();
+      warTimer = setInterval(() => { if (!document.hidden) loadWar(); }, 300000);
+      return;
+    }
+    if (!live.cc) { say(`${live.tab}-status`, 'Choisis un pays (liste ci-dessus ou globe).'); return; }
+    if (live.tab === 'radio' && live.loaded.radio !== live.cc) loadRadios(live.cc);
+    if (live.tab === 'tv' && live.loaded.tv !== live.cc) loadTv(live.cc);
+  }
+  // `where` carries what is known about the spot: coordinates, a label, an optional note.
+  function setCountry(cc, where) {
+    live.cc = cc || '';
+    live.lat = where && where.lat != null ? where.lat : null;
+    live.lon = where && where.lon != null ? where.lon : null;
+    live.label = (where && where.label) || (cc ? nameFr(cc) : '');
+    if (cc && ![...selectEl.options].some((o) => o.value === cc)) {
+      const o = document.createElement('option'); o.value = cc; o.textContent = nameFr(cc); selectEl.appendChild(o);
+    }
+    selectEl.value = live.cc;
+    live.loaded = { radio: '', tv: '', war: '' };
+    fillList($('radio-list'), [], () => null); fillList($('tv-list'), [], () => null); fillList($('war-list'), [], () => null);
+    say('radio-status', ''); say('tv-status', ''); say('war-status', '');
+    updateHint(where && where.note);
+    if (liveOpen) loadTab();
+  }
+  selectEl.addEventListener('change', () => setCountry(selectEl.value, null));
+  $('live-random').addEventListener('click', () => {
+    const pool = COUNTRY_CODES.filter((c) => !['AQ', 'BV', 'HM', 'GS', 'TF', 'UM'].includes(c));
+    setCountry(pool[Math.floor(Math.random() * pool.length)], null);
+  });
+  // A place brings its country along; Jerusalem has none on purpose (its status is disputed).
+  function liveOnPlace(p) {
+    const cc = (p.cc && p.cc[0]) || '';
+    setCountry(cc, { lat: p.lat, lon: p.lon, label: p.name, note: cc ? '' : 'Ce site ne rattache pas ce lieu à un pays : choisis-en un dans la liste.' });
+  }
+
+  // ----- Playback (one stream at a time: radio or TV) -----
+  let hlsInstance = null, playToken = 0, nowPlaying = null, hlsLoading = null;
+  function detachHls() { if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; } }
+  function loadHlsLib() {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    if (!hlsLoading) {
+      hlsLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script'); s.src = HLS_URL; s.async = true;
+        s.onload = () => resolve(window.Hls); s.onerror = () => { hlsLoading = null; reject(new Error('hls.js indisponible')); };
+        document.head.appendChild(s);
+      });
+    }
+    return hlsLoading;
+  }
+  function showNowPlaying() {
+    const on = !!nowPlaying && nowPlaying.kind === 'radio';
+    $('hud-radio').hidden = !on;
+    if (on) $('hud-radio-name').textContent = nowPlaying.name;
+  }
+  function stopMedia() {
+    ++playToken; detachHls();
+    [radioEl, tvEl].forEach((el) => { el.pause(); el.removeAttribute('src'); el.load(); el.classList.remove('on'); });
+    nowPlaying = null; showNowPlaying();
+  }
+  $('hud-radio-stop').addEventListener('click', () => { stopMedia(); say('radio-status', 'Radio arrêtée.'); });
+  async function attachStream(el, url, isHls, onLost) {
+    detachHls();
+    if (isHls && !el.canPlayType('application/vnd.apple.mpegurl')) {
+      const Hls = await loadHlsLib();
+      if (!Hls || !Hls.isSupported()) throw new Error('HLS non pris en charge');
+      await new Promise((resolve, reject) => {
+        const h = new Hls(); hlsInstance = h;
+        let started = false;
+        h.on(Hls.Events.MANIFEST_PARSED, () => { started = true; resolve(); });
+        h.on(Hls.Events.ERROR, (ev, d) => { if (d && d.fatal) { if (started) onLost(); else reject(new Error(d.details || 'erreur HLS')); } });
+        h.loadSource(url); h.attachMedia(el);
+      });
+    } else {
+      el.src = url;
+    }
+    await el.play();
+  }
+  async function playMedia(kind, item, statusId) {
+    const token = ++playToken;
+    stopMedia(); playToken = token;
+    const el = kind === 'tv' ? tvEl : radioEl;
+    el.classList.add('on');
+    say(statusId, `Connexion à « ${item.name} »…`);
+    const wait = setTimeout(() => { if (token === playToken && el.paused) say(statusId, 'Toujours en attente : le flux est peut-être hors ligne, géobloqué ou refusé par le navigateur.'); }, 15000);
+    try {
+      await attachStream(el, item.url, item.hls, () => { if (token === playToken) say(statusId, `Flux interrompu : « ${item.name} ».`); });
+      if (token !== playToken) return;
+      nowPlaying = { kind, name: item.name }; showNowPlaying();
+      say(statusId, `En lecture : ${item.name}`);
+    } catch (e) {
+      if (token !== playToken) return;
+      detachHls(); el.classList.remove('on');
+      say(statusId, `Lecture impossible : « ${item.name} » (flux hors ligne, géobloqué ou incompatible avec ce navigateur). Essaie une autre entrée.`);
+    } finally { clearTimeout(wait); }
+  }
+
+  // ----- Radios: radio-browser.info (community directory, no key) -----
+  const RADIO_FALLBACK = ['de1', 'de2', 'fi1', 'at1'].map((h) => `https://${h}.api.radio-browser.info`);
+  let radioBases = null;
+  async function radioFetch(path) {
+    if (!radioBases) {
+      try {
+        const list = JSON.parse(await fetchText('https://all.api.radio-browser.info/json/servers', 5000));
+        radioBases = list.map((s) => s && s.name).filter(Boolean).map((n) => `https://${n}`);
+      } catch (e) { /* the directory of servers is optional */ }
+      if (!radioBases || !radioBases.length) radioBases = RADIO_FALLBACK.slice();
+      radioBases.sort(() => Math.random() - 0.5);
+    }
+    let last;
+    for (const base of radioBases) {
+      try { return await fetchText(base + path); } catch (e) { last = e; }
+    }
+    throw last || new Error('aucun serveur');
+  }
+  let radioToken = 0;
+  async function loadRadios(cc) {
+    const token = ++radioToken;
+    say('radio-status', 'Recherche des radios…'); fillList($('radio-list'), [], () => null);
+    const secure = location.protocol === 'https:' ? '&is_https=true' : '';
+    let rows;
+    try {
+      rows = JSON.parse(await radioFetch(`/json/stations/search?countrycode=${encodeURIComponent(cc)}&hidebroken=true&order=clickcount&reverse=true&limit=60${secure}`));
+    } catch (e) {
+      if (token === radioToken) say('radio-status', 'Annuaire des radios indisponible pour le moment (service injoignable ou bloqué).');
+      return;
+    }
+    if (token !== radioToken) return;
+    const seen = new Set(), stations = [];
+    for (const s of Array.isArray(rows) ? rows : []) {
+      const url = s && (s.url_resolved || s.url), name = s && typeof s.name === 'string' ? s.name.trim() : '';
+      if (!name || !okStream(url) || seen.has(name.toLowerCase())) continue;
+      seen.add(name.toLowerCase());
+      stations.push({ name, url, hls: s.hls === 1 || /\.m3u8(\?|$)/i.test(url), sub: [s.codec, s.bitrate ? `${s.bitrate} kb/s` : '', (s.tags || '').split(',').slice(0, 2).join(', ')].filter(Boolean).join(' · ') });
+      if (stations.length >= 15) break;
+    }
+    live.loaded.radio = cc;
+    say('radio-status', stations.length ? `${nameFr(cc)} : ${stations.length} radios, les plus écoutées d’abord.` : `${nameFr(cc)} : aucune radio sécurisée listée.`);
+    fillList($('radio-list'), stations, (st) => itemButton(st.name, st.sub || 'flux direct', () => playMedia('radio', st, 'radio-status')));
+  }
+
+  // ----- Free TV: iptv-org playlists (community lists of free, publicly available streams) -----
+  function parseM3u(text) {
+    const out = []; let cur = null;
+    for (const raw of text.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line.startsWith('#EXTINF')) {
+        const attrs = {};
+        line.replace(/([\w-]+)="([^"]*)"/g, (m, k, v) => { attrs[k] = v; return m; });
+        let inQuote = false, comma = -1;
+        for (let i = 0; i < line.length; i++) { const ch = line[i]; if (ch === '"') inQuote = !inQuote; else if (ch === ',' && !inQuote) { comma = i; break; } }
+        cur = { name: (comma >= 0 ? line.slice(comma + 1) : attrs['tvg-name'] || '').trim(), group: attrs['group-title'] || '', needsHeaders: false };
+      } else if (line.startsWith('#EXTVLCOPT') && cur) {
+        if (/http-(referrer|user-agent)/i.test(line)) cur.needsHeaders = true;   // browsers cannot send these headers
+      } else if (!line.startsWith('#') && cur) { cur.url = line; out.push(cur); cur = null; }
+    }
+    return out;
+  }
+  let tvToken = 0;
+  async function loadTv(cc) {
+    const token = ++tvToken;
+    say('tv-status', 'Recherche des chaînes…'); fillList($('tv-list'), [], () => null);
+    const codes = cc === 'GB' ? ['uk', 'gb'] : [cc.toLowerCase()];
+    let text = null;
+    for (const code of codes) {
+      try { text = await fetchText(`https://iptv-org.github.io/iptv/countries/${code}.m3u`, 12000); break; } catch (e) { /* try the next spelling */ }
+    }
+    if (token !== tvToken) return;
+    if (text === null) { say('tv-status', `${nameFr(cc)} : aucune playlist disponible (ou service injoignable).`); return; }
+    const channels = parseM3u(text)
+      .filter((c) => c.name && !c.needsHeaders && okStream(c.url) && !/xxx|adult|porn/i.test(`${c.group} ${c.name}`))
+      .sort((a, b) => /news|info/i.test(b.group) - /news|info/i.test(a.group))
+      .slice(0, 80);
+    live.loaded.tv = cc;
+    say('tv-status', channels.length ? `${nameFr(cc)} : ${channels.length} chaînes (infos en premier).` : `${nameFr(cc)} : aucune chaîne sécurisée listée.`);
+    fillList($('tv-list'), channels, (c) => itemButton(c.name, c.group || 'chaîne', () => playMedia('tv', { name: c.name, url: c.url, hls: !/\.(mp4|webm)(\?|$)/i.test(c.url) }, 'tv-status')));
+  }
+
+  // ----- Public webcams: links only -----
+  function renderCam() {
+    const name = live.label || (live.cc ? nameFr(live.cc) : '');
+    const links = [];
+    if (live.lat != null) links.push(['Carte Windy des webcams autour de ce point', 'fond cartographique avec les webcams publiques', `https://www.windy.com/-Webcams-webcams?${live.lat.toFixed(3)},${live.lon.toFixed(3)},9`]);
+    if (name) links.push([`Webcams en direct sur YouTube : ${name}`, 'recherche filtrée sur les directs', `https://www.youtube.com/results?search_query=${encodeURIComponent(`webcam live ${name}`)}&sp=EgJAAQ%253D%253D`]);
+    const ul = $('cam-links'); ul.replaceChildren();
+    if (!links.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Choisis un pays ou un lieu pour voir les liens.'; ul.appendChild(li); return; }
+    links.forEach(([title, sub, href]) => {
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = title; const s = document.createElement('small'); s.textContent = `${sub} ↗`;
+      a.append(t, s); li.appendChild(a); ul.appendChild(li);
+    });
+  }
+
+  // ----- Conflict headlines: GDELT DOC API (news index, no key) -----
+  const WAR_TERMS = '(war OR airstrike OR shelling OR "missile strike" OR ceasefire OR offensive OR "armed conflict" OR invasion)';
+  const gdeltQuery = () => (live.cc ? `"${nameEn(live.cc)}" ${WAR_TERMS}` : WAR_TERMS);
+  const gdeltUrl = (format) => `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(gdeltQuery())}&mode=artlist&maxrecords=60&format=${format}&sort=datedesc&timespan=24h`;
+  const seenDate = (s) => { const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(s || ''); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : 0; };
+  function ago(ts) {
+    if (!ts) return '';
+    const min = Math.max(0, Math.round((Date.now() - ts) / 60000));
+    return min < 60 ? `il y a ${min} min` : min < 1440 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`;
+  }
+  function renderWar() {
+    const shown = warItems.filter((a) => warLang === 'all' || a.language === warLang).slice(0, 30);
+    fillList($('war-list'), shown, (a) => {
+      const link = document.createElement('a');
+      link.href = a.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = a.title;
+      const s = document.createElement('small'); s.textContent = [a.domain, a.language, ago(a.when)].filter(Boolean).join(' · ');
+      link.append(t, s); return link;
+    });
+  }
+  async function loadWar() {
+    const wait = warLast + 5000 - Date.now();      // GDELT asks for at most one request every 5 seconds
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    warLast = Date.now();
+    const key = live.cc || '*', where = live.cc ? nameFr(live.cc) : 'Monde';
+    say('war-status', `${where} : recherche des titres…`);
+    try {
+      const text = await fetchText(gdeltUrl('json'), 15000);
+      let data; try { data = JSON.parse(text); } catch (e) { throw new Error(text.slice(0, 120)); }
+      if (key !== (live.cc || '*')) return;           // the visitor moved on while we waited
+      const seen = new Set(); warItems = [];
+      for (const a of Array.isArray(data.articles) ? data.articles : []) {
+        const title = typeof a.title === 'string' ? a.title.trim() : '';
+        if (!title || !/^https?:\/\//i.test(a.url || '') || seen.has(title.toLowerCase())) continue;
+        seen.add(title.toLowerCase());
+        warItems.push({ title, url: a.url, domain: a.domain || '', language: a.language || '', when: seenDate(a.seendate) });
+      }
+      live.loaded.war = key;
+      say('war-status', warItems.length ? `${where} : ${warItems.length} titres des dernières 24 h (mis à jour à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}).` : `${where} : aucun titre trouvé dans les dernières 24 h.`);
+      renderWar();
+    } catch (e) {
+      warItems = []; renderWar();
+      say('war-status', 'Actualité indisponible pour le moment (service injoignable, bloqué ou requête refusée).');
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = gdeltUrl('html'); a.target = '_blank'; a.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = 'Ouvrir la recherche directement chez GDELT'; const s = document.createElement('small'); s.textContent = 'nouvel onglet ↗';
+      a.append(t, s); li.appendChild(a); $('war-list').appendChild(li);
+    }
+  }
+  liveEl.querySelectorAll('[data-warlang]').forEach((b) => b.addEventListener('click', () => {
+    warLang = b.dataset.warlang;
+    liveEl.querySelectorAll('[data-warlang]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    renderWar();
+  }));
+  $('war-refresh').addEventListener('click', () => loadWar());
+
+  // ----- Touch a country on the globe: Natural Earth outlines (110 m, via the world-atlas package) -----
+  let shapes = null, shapesLoading = null;
+  function loadShapes() {
+    if (shapes) return Promise.resolve(shapes);
+    if (!shapesLoading) {
+      shapesLoading = fetchText(COUNTRIES_URL, 15000).then((text) => {
+        const topo = JSON.parse(text), [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+        const arcs = topo.arcs.map((arc) => { let x = 0, y = 0; return arc.map(([dx, dy]) => { x += dx; y += dy; return [x * sx + tx, y * sy + ty]; }); });
+        const ring = (idx) => { const pts = []; idx.forEach((i) => { (i < 0 ? arcs[~i].slice().reverse() : arcs[i]).forEach((p, k) => { if (!(pts.length && k === 0)) pts.push(p); }); }); return pts; };
+        shapes = topo.objects.countries.geometries.map((g) => {
+          const polys = (g.type === 'Polygon' ? [g.arcs] : g.arcs).map((rings) => {
+            const rs = rings.map(ring); let w = 180, e = -180, s = 90, n = -90;
+            rs[0].forEach(([x, y]) => { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); });
+            return { rs, w, e, s, n };
+          });
+          const a2 = NUMERIC_TO_A2[g.id] || (g.properties && g.properties.name === 'Kosovo' ? 'XK' : '');
+          return { a2, polys };
+        });
+        return shapes;
+      }).catch((e) => { shapesLoading = null; throw e; });
+    }
+    return shapesLoading;
+  }
+  function inRing(x, y, r) {
+    let inside = false;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      const [xi, yi] = r[i], [xj, yj] = r[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function countryAt(lat, lon) {
+    for (const c of shapes) {
+      for (const p of c.polys) {
+        if (lon < p.w || lon > p.e || lat < p.s || lat > p.n) continue;
+        let hits = 0; p.rs.forEach((r) => { if (inRing(lon, lat, r)) hits++; });
+        if (hits % 2 === 1) return c.a2 || '?';
+      }
+    }
+    return '';
+  }
+  async function pickCountry(position) {
+    const cart = globe.pick(camera.getPickRay(position), scene) || camera.pickEllipsoid(position, globe.ellipsoid);
+    if (!cart) { updateHint('Touche la Terre pour choisir un pays.'); return; }
+    const g = C.Cartographic.fromCartesian(cart), lat = R2D(g.latitude), lon = R2D(g.longitude);
+    try { await loadShapes(); } catch (e) { updateHint('Contours des pays indisponibles : choisis le pays dans la liste.'); return; }
+    const cc = countryAt(lat, lon);
+    if (!cc) updateHint('Pas de pays ici (mer ou zone non reconnue).');
+    else if (cc === '?') updateHint('Territoire non reconnu par la liste : choisis le pays dans la liste.');
+    else setCountry(cc, { lat, lon });
+  }
+
+  // ---------- Image up to 5120 px on the long side ----------
+  // Renders the current view into a bigger drawing buffer, adds the credits and downloads a PNG. Not offered
+  // over Google 3D tiles: Google's terms do not allow exporting its imagery.
+  const shotButton = $('btn-shot');
+  function syncShotButton() {
+    const blocked = googleOn && googleReady;
+    shotButton.disabled = blocked || capturing;
+    shotButton.title = blocked ? 'Indisponible avec Google 3D : les conditions d’utilisation de Google n’autorisent pas l’export d’images.' : '';
+  }
+  const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  async function captureImage() {
+    if (capturing || (googleOn && googleReady)) return;
+    capturing = true; syncShotButton();
+    const label = shotButton.textContent, phase = $('hud-phase').textContent;
+    const prev = { scale: viewer.resolutionScale, msaa: scene.msaaSamples, fxaa: scene.postProcessStages.fxaa.enabled };
+    try {
+      const gl = scene.context._gl;
+      const limit = Math.min(5120, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+      const scale = limit / (Math.max(canvas.clientWidth, canvas.clientHeight) * (window.devicePixelRatio || 1));
+      shotButton.textContent = 'Préparation…'; setPhase('Image : préparation');
+      scene.msaaSamples = 1; scene.postProcessStages.fxaa.enabled = false;   // memory: the buffer is already huge
+      viewer.resolutionScale = scale;
+      await nextFrame(); await nextFrame();
+      // Let tiles refine for the bigger buffer (at most 25 s).
+      const end = performance.now() + 25000; let calm = 0;
+      while (performance.now() < end && calm < 8) { await nextFrame(); calm = globe.tilesLoaded ? calm + 1 : 0; }
+      await nextFrame();
+      scene.render();
+      const out = document.createElement('canvas');
+      out.width = canvas.width; out.height = canvas.height;
+      const ctx = out.getContext('2d');
+      ctx.drawImage(canvas, 0, 0);
+      const px = Math.max(14, Math.round(out.width / 190));
+      const line = `Fatiha, maman d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
+      ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
+      ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
+      ctx.fillStyle = 'rgba(244, 236, 223, 0.9)'; ctx.textBaseline = 'middle';
+      ctx.fillText(line, px, out.height - px * 1.05, out.width - 2 * px);
+      const blob = await new Promise((resolve) => out.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('export impossible');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `fatiha-${activePlace ? activePlace.id : 'terre'}-${out.width}x${out.height}.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      shotButton.textContent = `Enregistré (${out.width} × ${out.height})`;
+    } catch (e) {
+      shotButton.textContent = 'Échec : mémoire insuffisante ?';
+    } finally {
+      viewer.resolutionScale = prev.scale; scene.msaaSamples = prev.msaa; scene.postProcessStages.fxaa.enabled = prev.fxaa;
+      setPhase(phase); capturing = false; syncShotButton();
+      setTimeout(() => { if (!capturing) shotButton.textContent = label; }, 5000);
+    }
+  }
+  shotButton.addEventListener('click', captureImage);
+  syncShotButton();
+
+  // ---------- Opening shot ----------
+  // Start far out with the sunlit side facing the viewer, then settle in.
+  // Dusk over Asia: the terminator crosses the east of the first view, so the night side and its city lights show.
+  clock.currentTime = timeForSolarHour(25, 14.7);
+  camera.setView({
+    destination: C.Cartesian3.fromDegrees(10, 22, 1.1e8),
+    orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
+  });
+  const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
+  let opened = false;
+  // The intro stays up until the visitor starts the journey; a deep link
+  // (index.html#alhambra) skips it.
+  function ready() {
+    if (opened) return;
+    opened = true; removeTileListener();
+    $('loader-bar').style.visibility = 'hidden';
+    const btn = $('btn-start');
+    btn.disabled = false; btn.textContent = 'Commencer le voyage';
+    btn.addEventListener('click', open);
+    if (placeFromHash()) open(); else btn.focus();
+  }
+  function open() {
+    if (loader.classList.contains('done')) return;
+    loader.classList.add('done');
+    // Deep link (index.html#alhambra) or a place picked during loading
+    // takes over from the opening shot.
+    const p = placeFromHash();
+    if (p && !activePlace) flyToPlace(p);
+    else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
+      duration: 7500,
+      onDone: () => setPhase('Orbite'),
+    });
+  }
+  const removeTileListener = globe.tileLoadProgressEvent.addEventListener((queued) => {
+    if (queued === 0 && globe.tilesLoaded) ready();
+  });
+  // Never keep the loader up forever on a slow network.
+  setTimeout(ready, 12000);
+  window.addEventListener('hashchange', () => {
+    const p = placeFromHash();
+    if (p) { open(); flyToPlace(p); }
+  });
+
+  // Exposed for automated tests only.
+  window.__terre = { viewer, PLACES, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+})();
+</script>
+</body>
+</html>
