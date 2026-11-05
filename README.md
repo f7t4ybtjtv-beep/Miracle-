@@ -25,22 +25,22 @@ dossier projet.
 - **Bâtiments 3D** : aucun par défaut (pas de bâtiments inventés). Renseigner `ION_TOKEN` dans le script active Cesium World Terrain et OSM Buildings (chemin non testé faute de jeton).
 - **Paramètres d'URL** : `terre.html#machupicchu` vole directement vers un lieu ; `?qualite=haute|equilibree|legere` fixe la qualité (sinon détection automatique puis abaissement si la fréquence d'images reste sous 24 i/s).
 
-## Nour
+## Fatiha
 
-`nour/index.html` — **Nour, la lumière du dialogue** : un site autonome qui
+`fatiha/index.html` — **Fatiha, maman d’Amine** (anciennement « Nour, la lumière du dialogue ») : un site autonome qui
 reprend le moteur de survol de `terre.html` avec sa propre identité (lumière
 dorée sur fond de nuit, titres en Cormorant Garamond). Un écran d'accueil
 précède un voyage vers dix lieux où des cultures se sont rencontrées : Tolède,
 Cordoue, l'Alhambra, Tombouctou, Alexandrie, Jérusalem, Petra, Sainte-Sophie,
 Samarcande et Angkor. Coordonnées réelles ; textes limités à des faits
-vérifiables. Lien direct vers un lieu : `nour/index.html#samarcande`. Les
+vérifiables. L'ancienne adresse `nour/` redirige vers `fatiha/`. Lien direct vers un lieu : `fatiha/index.html#samarcande`. Les
 données et limites sont les mêmes que pour `terre.html`.
 
-### Nour : qualité d'image
+### Fatiha : qualité d'image
 
 Le panneau « Sources et qualité » propose **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans ce même panneau. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
 
-### Nour : veille mondiale (bouton « Veille »)
+### Fatiha : veille mondiale (bouton « Veille »)
 
 Couches de données **publiques et agrégées**, activables une à une ou toutes
 d'un coup via « Salle de situation » :
@@ -57,9 +57,9 @@ Les trois flux étaient injoignables depuis l'environnement de développement :
 l'interface a été testée avec des données simulées au format documenté, pas
 avec les flux réels.
 
-### Nour : Google Earth 3D (optionnel, clé Google requise)
+### Fatiha : Google Earth 3D (optionnel, clé Google requise)
 
-Un bouton **Google 3D** apparaît dans Nour uniquement si une clé Google Maps
+Un bouton **Google 3D** apparaît dans Fatiha uniquement si une clé Google Maps
 Platform est présente. Il remplace la carte (satellite Esri, relief ombré)
 par les *Photorealistic 3D Tiles* de Google (Map Tiles API), avec le logo et
 les mentions de sources exigés par Google. Sans clé, rien ne change et aucune
@@ -67,8 +67,8 @@ requête n'est envoyée à Google.
 
 1. Google Cloud : créer un projet, activer la facturation, activer **Map Tiles API**.
 2. Créer une clé API, la **restreindre** : sites web autorisés `https://f7t4ybtjtv-beep.github.io/*`, et API autorisée **Map Tiles API** seulement. Ajouter une alerte de budget et un plafond de quota.
-3. Essai privé : ouvrir `nour/index.html?gkey=VOTRE_CLE`. La clé est mémorisée dans ce navigateur uniquement et retirée de l'adresse ; `?gkey=off` l'oublie.
-4. Pour tous les visiteurs : renseigner la constante `GOOGLE_MAPS_KEY` dans `nour/index.html`. Une clé côté navigateur est visible de tous : seules ses restrictions la protègent, et l'usage est facturé au projet Google Cloud de la clé.
+3. Essai privé : ouvrir `fatiha/index.html?gkey=VOTRE_CLE`. La clé est mémorisée dans ce navigateur uniquement et retirée de l'adresse ; `?gkey=off` l'oublie.
+4. Pour tous les visiteurs : renseigner la constante `GOOGLE_MAPS_KEY` dans `fatiha/index.html`. Une clé côté navigateur est visible de tous : seules ses restrictions la protègent, et l'usage est facturé au projet Google Cloud de la clé.
 
 Limites : testé uniquement avec une fausse tuile et de fausses réponses de Google
 (le service est injoignable depuis l'environnement de développement), jamais avec
