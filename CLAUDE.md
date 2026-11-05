@@ -74,10 +74,14 @@ introduce a build step to dedupe unless the site grows further).
   `matchMedia` query). The typing effect in `setActive()` and canvas
   transitions must keep respecting it — don't add new animations that
   bypass this check.
-- **Cycle flow**: `startCycle()` picks the next orb round-robin, calls
-  `setActive()` (typewriter quote + active-orb highlighting) and
-  `record()` (feed list + per-orb counters), then drives `#progress` via a
-  separate interval. `stopCycle()` (bound to the "Arrêter" button) must
+- **Cycle flow**: `startCycle()` runs a first `tick()` immediately, then
+  `schedule()` repeats it every `cycleMs` (changing the speed slider
+  reschedules a running cycle). `tick()` picks the next orb round-robin,
+  calls `setActive()` (typewriter quote, active-orb highlighting, and
+  `draw(name)` to thicken that orb's link) and `record()` (feed list +
+  per-orb counters), then drives the read-only `<progress id="progress">`
+  via a separate interval. Any canvas resize or star regeneration must be
+  followed by `draw(activeName)` — resizing a canvas clears it. `stopCycle()` (bound to the "Arrêter" button) must
   reset everything to a clean, resumable state — reuse it rather than
   hand-rolling teardown when adding new controls.
 - **Theming**: light/dark is a single `body.light` class toggle backed by
