@@ -208,6 +208,48 @@
   body.sitroom .places, body.sitroom .card { display: none; }
   body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
 
+  /* Direct: radios, free TV, public webcams, conflict headlines */
+  .live {
+    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
+    width: 340px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
+    display: none; pointer-events: auto; scrollbar-width: thin;
+    background: rgba(14, 18, 26, 0.93);     /* more opaque than other panels: small grey text over a bright sky */
+  }
+  .live.open { display: block; }
+  body.live-open .card { display: none; }   /* the place card would sit on top of the panel */
+  .live .row { display: flex; gap: 8px; margin: 10px 0 6px; align-items: center; }
+  .live select {
+    flex: 1; min-width: 0; color-scheme: dark; font: 500 13px var(--font-ui); color: var(--text);
+    background: var(--panel-solid); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 10px;
+  }
+  .live select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  .live .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 10px 0; }
+  .live .tabs .btn { padding: 7px 2px; border-radius: 10px; text-align: center; font-size: 11.5px; }
+  .live .pane { display: none; }
+  .live .pane.on { display: block; }
+  .live .note { margin: 8px 0; font: 400 11px/1.6 var(--font-mono); color: var(--muted); }
+  .live .status { margin: 6px 0; font: 400 11px/1.6 var(--font-mono); color: var(--text-2); }
+  .live ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .live li > button, .live li > a {
+    display: grid; gap: 2px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px;
+    padding: 7px 8px; color: var(--text); font: 500 12.5px/1.4 var(--font-ui); cursor: pointer; text-decoration: none;
+  }
+  .live li > button:hover, .live li > a:hover { background: rgba(244, 236, 223, 0.06); }
+  .live li > button:focus-visible, .live li > a:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+  .live li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .live video { display: none; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; margin-bottom: 6px; }
+  .live video.on { display: block; }
+  .live audio { display: none; width: 100%; margin: 6px 0; color-scheme: dark; }
+  .live audio.on { display: block; }
+  .live .chips { display: flex; gap: 6px; margin: 6px 0; }
+  .live .chips .btn { padding: 4px 10px; font-size: 11px; }
+  .live .refs a { color: var(--accent); }
+  #hud-radio { display: inline-flex; gap: 6px; align-items: center; max-width: 46vw; }
+  #hud-radio[hidden] { display: none; }
+  #hud-radio b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #hud-radio button { font: 500 10px var(--font-mono); color: var(--text-2); background: transparent; border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 6px; cursor: pointer; }
+  .quality button:disabled { opacity: .4; cursor: not-allowed; }
+
   /* Narrow screens: places become a horizontal strip, card stacks above it. */
   @media (max-width: 760px) {
     :root { --gutter: 16px; }
@@ -217,6 +259,7 @@
     .tools { flex-wrap: wrap; justify-content: flex-end; }
     .top { align-items: flex-start; }
     .watch { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 38vh; }
+    .live { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 52vh; }
     .places {
       top: auto; transform: none; right: var(--gutter); left: var(--gutter);
       bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
@@ -253,6 +296,7 @@
       <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
       <button class="btn" id="btn-google" type="button" aria-pressed="false" hidden>Google 3D</button>
       <button class="btn" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch">Veille</button>
+      <button class="btn" id="btn-live" type="button" aria-pressed="false" aria-controls="live">Direct</button>
       <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
     </div>
   </div>
@@ -280,6 +324,56 @@
     <ul id="watch-journal" class="journal"></ul>
   </aside>
 
+  <aside class="ui live glass" id="live" aria-label="Direct : radios, télés, caméras et actualité">
+    <div class="kicker">Direct · radios, télés, caméras, actualité</div>
+    <div class="row">
+      <select id="live-country" aria-label="Pays"></select>
+      <button class="btn" id="live-random" type="button">Au hasard</button>
+    </div>
+    <p class="note" id="live-hint"></p>
+    <div class="tabs" role="group" aria-label="Rubriques">
+      <button class="btn" type="button" data-tab="radio" aria-pressed="true">Radios</button>
+      <button class="btn" type="button" data-tab="tv" aria-pressed="false">Télé</button>
+      <button class="btn" type="button" data-tab="cam" aria-pressed="false">Caméras</button>
+      <button class="btn" type="button" data-tab="war" aria-pressed="false">Conflits</button>
+    </div>
+    <section class="pane on" id="pane-radio">
+      <audio id="radio-audio" controls preload="none"></audio>
+      <p class="status" id="radio-status" aria-live="polite"></p>
+      <ul id="radio-list"></ul>
+      <p class="note">Annuaire communautaire radio-browser.info. Seuls les flux sécurisés (https) sont proposés ; certains peuvent être hors ligne.</p>
+    </section>
+    <section class="pane" id="pane-tv">
+      <video id="tv-video" controls playsinline></video>
+      <p class="status" id="tv-status" aria-live="polite"></p>
+      <ul id="tv-list"></ul>
+      <p class="note">Playlists communautaires iptv-org : chaînes gratuites en accès libre. Beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+    </section>
+    <section class="pane" id="pane-cam">
+      <p class="status">Webcams publiques : ouvertes dans un nouvel onglet, chez des annuaires qui les référencent avec l’accord de leurs propriétaires.</p>
+      <ul id="cam-links"></ul>
+      <p class="note">Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
+    </section>
+    <section class="pane" id="pane-war">
+      <p class="status" id="war-status" aria-live="polite"></p>
+      <div class="chips" role="group" aria-label="Langue des titres">
+        <button class="btn" type="button" data-warlang="all" aria-pressed="true">Toutes</button>
+        <button class="btn" type="button" data-warlang="French" aria-pressed="false">FR</button>
+        <button class="btn" type="button" data-warlang="English" aria-pressed="false">EN</button>
+        <button class="btn" type="button" id="war-refresh">Actualiser</button>
+      </div>
+      <ul id="war-list"></ul>
+      <p class="note">Titres repérés par mots-clés (guerre, frappes, cessez-le-feu…) dans la base d’actualité GDELT, mise à jour environ toutes les 15 minutes. Ils ne sont pas vérifiés : en temps de guerre les faits sont contestés et certains médias dépendent d’un État. Ni images de guerre ni positions de troupes ne sont affichées.</p>
+      <p class="note refs">Sources de référence :
+        <a href="https://news.un.org/fr/news/topic/peace-and-security" target="_blank" rel="noopener noreferrer">ONU Info</a> ·
+        <a href="https://www.icrc.org/fr" target="_blank" rel="noopener noreferrer">CICR</a> ·
+        <a href="https://reliefweb.int/" target="_blank" rel="noopener noreferrer">ReliefWeb</a> ·
+        <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer">UCDP</a> ·
+        <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a></p>
+    </section>
+    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
+  </aside>
+
   <section class="ui card glass" id="card" aria-live="polite">
     <div class="kicker" id="card-kicker"></div>
     <h2 id="card-title"></h2>
@@ -297,6 +391,7 @@
     <span>Alt. <b id="hud-alt">—</b></span>
     <span class="opt"><b id="hud-pos">—</b></span>
     <span class="opt" id="hud-quality"></span>
+    <span id="hud-radio" hidden>♪ <b id="hud-radio-name"></b><button id="hud-radio-stop" type="button" aria-label="Arrêter la radio">■</button></span>
     <span class="sit-only"><b id="hud-utc">—</b></span>
   </div>
 
@@ -309,6 +404,10 @@
       <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
       <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
       <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
+    </div>
+    <div class="quality">
+      <span>Image</span>
+      <button type="button" id="btn-shot">Enregistrer en 5K</button>
     </div>
     <div id="cesium-credits" hidden></div>
   </details>
@@ -340,34 +439,34 @@
   // `solarHour` only says whether to light the place in the morning (<12) or the afternoon;
   // the actual hour is computed below from the real sun so no place arrives in the dark.
   const PLACES = [
-    { id: 'tolede', name: 'Tolède', country: 'Espagne', lat: 39.8570, lon: -4.0237,
+    { id: 'tolede', name: 'Tolède', country: 'Espagne', cc: ['ES'], lat: 39.8570, lon: -4.0237,
       text: "Aux XIIe et XIIIe siècles, des traducteurs y firent passer en latin puis en castillan des œuvres scientifiques et philosophiques écrites en arabe : c'est ce qu'on appelle l'« école des traducteurs de Tolède ». La ville est bâtie sur un méandre du Tage.",
       meta: 'UNESCO 1986 · Ville historique de Tolède', view: { heading: 330, pitch: -20, range: 3200 }, solarHour: 17.5, night: 20 },
-    { id: 'cordoue', name: 'Mosquée-cathédrale de Cordoue', country: 'Espagne', lat: 37.8789, lon: -4.7794,
+    { id: 'cordoue', name: 'Mosquée-cathédrale de Cordoue', country: 'Espagne', cc: ['ES'], lat: 37.8789, lon: -4.7794,
       text: "Commencée en 785 sous l'émir omeyyade Abd al-Rahman Ier, la grande mosquée fut transformée en cathédrale après la prise de la ville par Ferdinand III de Castille en 1236. Ses arcs bicolores et la cathédrale insérée en son centre portent ces deux histoires.",
       meta: 'UNESCO 1984 · Centre historique de Cordoue', view: { heading: 200, pitch: -22, range: 1800 }, solarHour: 9.5, night: 20 },
-    { id: 'alhambra', name: 'Alhambra', country: 'Espagne', lat: 37.1761, lon: -3.5881,
+    { id: 'alhambra', name: 'Alhambra', country: 'Espagne', cc: ['ES'], lat: 37.1761, lon: -3.5881,
       text: "Palais et forteresse des souverains nasrides, élevés pour l'essentiel aux XIIIe–XIVe siècles sur la colline de la Sabika, dernier contrefort de la Sierra Nevada, à Grenade. Après 1492, Charles Quint y fit élever un palais Renaissance accolé aux palais nasrides.",
       meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17, night: 20 },
-    { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', lat: 16.7711, lon: -3.0105,
+    { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', cc: ['ML'], lat: 16.7711, lon: -3.0105,
       text: "Aux portes du Sahara, près du fleuve Niger, la ville fut un foyer de savoir dont témoignent des milliers de manuscrits. La mosquée Djingareyber, en terre crue, fut élevée au XIVe siècle, au retour de pèlerinage du souverain du Mali Kankou Moussa.",
       meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5, night: 0 },
-    { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', lat: 31.2089, lon: 29.9092,
+    { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', cc: ['EG'], lat: 31.2089, lon: 29.9092,
       text: "Inaugurée en 2002 sur le front de mer d'Alexandrie, près de l'emplacement présumé de la bibliothèque antique fondée sous les Ptolémées. Son mur de granit porte des caractères de nombreux systèmes d'écriture.",
       meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16, night: 180 },
-    { id: 'jerusalem', name: 'Vieille ville de Jérusalem', country: 'Proche-Orient', lat: 31.7767, lon: 35.2345,
+    { id: 'jerusalem', name: 'Vieille ville de Jérusalem', country: 'Proche-Orient', cc: [], lat: 31.7767, lon: 35.2345,
       text: "Sur moins d'un kilomètre carré, la vieille ville réunit des lieux saints du judaïsme, du christianisme et de l'islam, dont le mur des Lamentations, l'église du Saint-Sépulcre et le Dôme du Rocher.",
       meta: 'UNESCO 1981', view: { heading: 250, pitch: -24, range: 2400 }, solarHour: 9, night: 80 },
-    { id: 'petra', name: 'Petra', country: 'Jordanie', lat: 30.3222, lon: 35.4515,
+    { id: 'petra', name: 'Petra', country: 'Jordanie', cc: ['JO'], lat: 30.3222, lon: 35.4515,
       text: "Capitale des Nabatéens, mi-bâtie, mi-taillée dans le grès d'un bassin montagneux près de Wadi Musa. Grand centre caravanier de l'encens d'Arabie, au carrefour de l'Arabie, de l'Égypte et de la Syrie-Phénicie, la cité mêle traditions nabatéennes, architecture hellénistique et apports romains.",
       meta: 'UNESCO 1985', view: { heading: 200, pitch: -32, range: 1800 }, solarHour: 10, night: 0 },
-    { id: 'istanbul', name: 'Sainte-Sophie', country: 'Turquie', lat: 41.0086, lon: 28.9802,
+    { id: 'istanbul', name: 'Sainte-Sophie', country: 'Turquie', cc: ['TR'], lat: 41.0086, lon: 28.9802,
       text: "Construite de 532 à 537 sous l'empereur Justinien, la basilique devint mosquée en 1453, musée en 1934, puis de nouveau mosquée en 2020. Elle domine la péninsule historique, bordée par la Corne d'Or, le Bosphore et la mer de Marmara.",
       meta: "UNESCO 1985 · Zones historiques d'Istanbul", view: { heading: 300, pitch: -20, range: 2600 }, solarHour: 16.5, night: 10 },
-    { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', lat: 39.6547, lon: 66.9758,
+    { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', cc: ['UZ'], lat: 39.6547, lon: 66.9758,
       text: "Place bordée de trois madrasas, dont celle d'Ouloug Beg (1417–1420), prince astronome. Samarcande fut une étape majeure des routes de la soie, entre la Chine, l'Inde, la Perse et la Méditerranée.",
       meta: 'UNESCO 2001 · Samarkand – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5, night: 340 },
-    { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', lat: 13.4125, lon: 103.8670,
+    { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', cc: ['KH'], lat: 13.4125, lon: 103.8670,
       text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
       meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5, night: 350 },
   ];
@@ -387,7 +486,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.6';
+  const NOUR_BUILD = '2026-11-05.7';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1218,6 +1317,7 @@
 
   function setActive(p) {
     activePlace = p;
+    if (p) liveOnPlace(p);
     list.querySelectorAll('.place').forEach((b) => {
       const on = !!p && b.dataset.id === p.id;
       b.setAttribute('aria-current', String(on));
@@ -1296,12 +1396,14 @@
     const id = picked && picked.id && picked.id.id;
     const p = PLACES.find((x) => x.id === id);
     if (p) flyToPlace(p);
+    else if (liveOpen) pickCountry(m.position);     // the Direct panel is open: a touch picks the country
   }, C.ScreenSpaceEventType.LEFT_CLICK);
 
   // HUD readout + adaptive quality (steps down if frame rate stays low).
   const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
     : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
   let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
+  let capturing = false;     // a high-resolution capture is slow on purpose: never read it as a weak device
   function applyTier(name) {
     tierName = name; tier = TIERS[name];
     globe.maximumScreenSpaceError = tier.sse;
@@ -1339,7 +1441,7 @@
       const fps = frames * 1000 / (now - fpsT);
       frames = 0; fpsT = now;
       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
-      slowWindows = (now > warmUntil && fps < 24) ? slowWindows + 1 : 0;
+      slowWindows = (now > warmUntil && fps < 24 && !capturing) ? slowWindows + 1 : 0;
       const i = TIER_ORDER.indexOf(tierName);
       if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
     }
@@ -1360,6 +1462,7 @@
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
     `Version : ${NOUR_BUILD}`,
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
+    'Direct : radio-browser.info (radios) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · halo du limbe de nuit : approximation',
   ].join('<br>');
 
@@ -1559,6 +1662,7 @@
   });
   $('btn-watch').addEventListener('click', (e) => {
     const open = !$('watch').classList.contains('open');
+    if (open) setLiveOpen(false);
     $('watch').classList.toggle('open', open);
     e.currentTarget.setAttribute('aria-pressed', String(open));
   });
@@ -1612,7 +1716,7 @@
     statusLines.google = googleOn && googleReady
       ? 'Google 3D actif : satellite Esri, relief ombré et précipitations masqués.' : statusLines.google;
     renderStatus();
-    setNightButton();
+    setNightButton(); syncShotButton();
   }
   function leaveGoogle(message) {
     googleOn = false;
@@ -1652,6 +1756,442 @@
     $('btn-google').hidden = false;
     $('btn-google').addEventListener('click', () => (googleOn ? leaveGoogle() : enterGoogle()));
   }
+
+  // ---------- Direct: radios, free TV, public webcams, conflict headlines ----------
+  // Nothing loads until the visitor opens the panel and picks a country. Each tab then calls a public service
+  // that sees the visitor's address: radio-browser.info (radio directory), the iptv-org playlists on GitHub
+  // Pages (free TV), GDELT (news headlines), and jsDelivr (hls.js, country outlines). Cameras are only links
+  // to public webcam directories. None of these services could be reached from the development sandbox, so
+  // this code was tested against simulated responses in the documented formats, not against the real services.
+  const COUNTRY_CODES = 'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK XK YE YT ZA ZM ZW'.split(' ');
+  const NUMERIC_TO_A2 = {"100":"BG","104":"MM","108":"BI","112":"BY","116":"KH","120":"CM","124":"CA","140":"CF","144":"LK","148":"TD","152":"CL","156":"CN","158":"TW","170":"CO","178":"CG","180":"CD","188":"CR","191":"HR","192":"CU","196":"CY","203":"CZ","204":"BJ","208":"DK","214":"DO","218":"EC","222":"SV","226":"GQ","231":"ET","232":"ER","233":"EE","238":"FK","242":"FJ","246":"FI","250":"FR","260":"TF","262":"DJ","266":"GA","268":"GE","270":"GM","275":"PS","276":"DE","288":"GH","300":"GR","304":"GL","320":"GT","324":"GN","328":"GY","332":"HT","340":"HN","348":"HU","352":"IS","356":"IN","360":"ID","364":"IR","368":"IQ","372":"IE","376":"IL","380":"IT","384":"CI","388":"JM","392":"JP","398":"KZ","400":"JO","404":"KE","408":"KP","410":"KR","414":"KW","417":"KG","418":"LA","422":"LB","426":"LS","428":"LV","430":"LR","434":"LY","440":"LT","442":"LU","450":"MG","454":"MW","458":"MY","466":"ML","478":"MR","484":"MX","496":"MN","498":"MD","499":"ME","504":"MA","508":"MZ","512":"OM","516":"NA","524":"NP","528":"NL","540":"NC","548":"VU","554":"NZ","558":"NI","562":"NE","566":"NG","578":"NO","586":"PK","591":"PA","598":"PG","600":"PY","604":"PE","608":"PH","616":"PL","620":"PT","624":"GW","626":"TL","630":"PR","634":"QA","642":"RO","643":"RU","646":"RW","682":"SA","686":"SN","688":"RS","694":"SL","703":"SK","704":"VN","705":"SI","706":"SO","710":"ZA","716":"ZW","724":"ES","728":"SS","729":"SD","732":"EH","740":"SR","748":"SZ","752":"SE","756":"CH","760":"SY","762":"TJ","764":"TH","768":"TG","780":"TT","784":"AE","788":"TN","792":"TR","795":"TM","800":"UG","804":"UA","807":"MK","818":"EG","826":"GB","834":"TZ","840":"US","854":"BF","858":"UY","860":"UZ","862":"VE","887":"YE","894":"ZM","032":"AR","044":"BS","076":"BR","068":"BO","084":"BZ","072":"BW","024":"AO","012":"DZ","050":"BD","064":"BT","004":"AF","051":"AM","040":"AT","008":"AL","056":"BE","090":"SB","036":"AU","031":"AZ","096":"BN","010":"AQ","070":"BA"};
+  const COUNTRIES_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json';
+  const HLS_URL = 'https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js';
+  let regionFr = null, regionEn = null;
+  try { regionFr = new Intl.DisplayNames(['fr'], { type: 'region' }); regionEn = new Intl.DisplayNames(['en'], { type: 'region' }); }
+  catch (e) { /* older browsers: country codes are shown as they are */ }
+  const nameFr = (cc) => { try { return (regionFr && regionFr.of(cc)) || cc; } catch (e) { return cc; } };
+  const nameEn = (cc) => { try { return (regionEn && regionEn.of(cc)) || cc; } catch (e) { return cc; } };
+  const say = (id, text) => { $(id).textContent = text; };
+  const liveEl = $('live'), selectEl = $('live-country'), radioEl = $('radio-audio'), tvEl = $('tv-video');
+  const live = { cc: '', lat: null, lon: null, label: '', tab: 'radio', loaded: { radio: '', tv: '', war: '' } };
+  let liveOpen = false, warTimer = 0, warItems = [], warLang = 'all', warLast = 0;
+
+  const placeholder = document.createElement('option');
+  placeholder.value = ''; placeholder.textContent = 'Choisis un pays…';
+  selectEl.appendChild(placeholder);
+  COUNTRY_CODES.map((cc) => ({ cc, name: nameFr(cc) })).sort((a, b) => a.name.localeCompare(b.name, 'fr')).forEach((c) => {
+    const o = document.createElement('option'); o.value = c.cc; o.textContent = c.name; selectEl.appendChild(o);
+  });
+
+  async function fetchText(url, ms = 9000) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(url, { signal: ctl.signal, credentials: 'omit', referrerPolicy: 'no-referrer' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.text();
+    } finally { clearTimeout(t); }
+  }
+  // Streams must be https from an https page (browsers block mixed content); plain http only for local tests.
+  const okStream = (u) => typeof u === 'string' && (u.startsWith('https://') || (location.protocol === 'http:' && u.startsWith('http://')));
+  function fillList(ul, rows, build) {
+    ul.replaceChildren();
+    rows.forEach((r) => { const li = document.createElement('li'); li.appendChild(build(r)); ul.appendChild(li); });
+  }
+  function itemButton(title, sub, onClick) {
+    const b = document.createElement('button'); b.type = 'button';
+    const t = document.createElement('span'); t.textContent = title;
+    const s = document.createElement('small'); s.textContent = sub;
+    b.append(t, s); b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function updateHint(note) {
+    $('live-hint').textContent = note || (live.cc
+      ? `${nameFr(live.cc)} · touche un autre pays sur le globe pour changer.`
+      : 'Touche un pays sur le globe ou choisis-le dans la liste.');
+  }
+  function setLiveOpen(open) {
+    liveOpen = open;
+    liveEl.classList.toggle('open', open);
+    document.body.classList.toggle('live-open', open);
+    $('btn-live').setAttribute('aria-pressed', String(open));
+    if (open) {
+      $('watch').classList.remove('open'); $('btn-watch').setAttribute('aria-pressed', 'false');
+      updateHint(); loadTab();
+    } else { clearInterval(warTimer); warTimer = 0; }
+  }
+  $('btn-live').addEventListener('click', () => setLiveOpen(!liveOpen));
+  function setTab(tab) {
+    live.tab = tab;
+    liveEl.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
+    ['radio', 'tv', 'cam', 'war'].forEach((t) => $(`pane-${t}`).classList.toggle('on', t === tab));
+    loadTab();
+  }
+  liveEl.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
+  function loadTab() {
+    clearInterval(warTimer); warTimer = 0;
+    if (!liveOpen) return;
+    if (live.tab === 'cam') { renderCam(); return; }
+    if (live.tab === 'war') {
+      if (live.loaded.war !== (live.cc || '*')) loadWar();
+      warTimer = setInterval(() => { if (!document.hidden) loadWar(); }, 300000);
+      return;
+    }
+    if (!live.cc) { say(`${live.tab}-status`, 'Choisis un pays (liste ci-dessus ou globe).'); return; }
+    if (live.tab === 'radio' && live.loaded.radio !== live.cc) loadRadios(live.cc);
+    if (live.tab === 'tv' && live.loaded.tv !== live.cc) loadTv(live.cc);
+  }
+  // `where` carries what is known about the spot: coordinates, a label, an optional note.
+  function setCountry(cc, where) {
+    live.cc = cc || '';
+    live.lat = where && where.lat != null ? where.lat : null;
+    live.lon = where && where.lon != null ? where.lon : null;
+    live.label = (where && where.label) || (cc ? nameFr(cc) : '');
+    if (cc && ![...selectEl.options].some((o) => o.value === cc)) {
+      const o = document.createElement('option'); o.value = cc; o.textContent = nameFr(cc); selectEl.appendChild(o);
+    }
+    selectEl.value = live.cc;
+    live.loaded = { radio: '', tv: '', war: '' };
+    fillList($('radio-list'), [], () => null); fillList($('tv-list'), [], () => null); fillList($('war-list'), [], () => null);
+    say('radio-status', ''); say('tv-status', ''); say('war-status', '');
+    updateHint(where && where.note);
+    if (liveOpen) loadTab();
+  }
+  selectEl.addEventListener('change', () => setCountry(selectEl.value, null));
+  $('live-random').addEventListener('click', () => {
+    const pool = COUNTRY_CODES.filter((c) => !['AQ', 'BV', 'HM', 'GS', 'TF', 'UM'].includes(c));
+    setCountry(pool[Math.floor(Math.random() * pool.length)], null);
+  });
+  // A place brings its country along; Jerusalem has none on purpose (its status is disputed).
+  function liveOnPlace(p) {
+    const cc = (p.cc && p.cc[0]) || '';
+    setCountry(cc, { lat: p.lat, lon: p.lon, label: p.name, note: cc ? '' : 'Ce site ne rattache pas ce lieu à un pays : choisis-en un dans la liste.' });
+  }
+
+  // ----- Playback (one stream at a time: radio or TV) -----
+  let hlsInstance = null, playToken = 0, nowPlaying = null, hlsLoading = null;
+  function detachHls() { if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; } }
+  function loadHlsLib() {
+    if (window.Hls) return Promise.resolve(window.Hls);
+    if (!hlsLoading) {
+      hlsLoading = new Promise((resolve, reject) => {
+        const s = document.createElement('script'); s.src = HLS_URL; s.async = true;
+        s.onload = () => resolve(window.Hls); s.onerror = () => { hlsLoading = null; reject(new Error('hls.js indisponible')); };
+        document.head.appendChild(s);
+      });
+    }
+    return hlsLoading;
+  }
+  function showNowPlaying() {
+    const on = !!nowPlaying && nowPlaying.kind === 'radio';
+    $('hud-radio').hidden = !on;
+    if (on) $('hud-radio-name').textContent = nowPlaying.name;
+  }
+  function stopMedia() {
+    ++playToken; detachHls();
+    [radioEl, tvEl].forEach((el) => { el.pause(); el.removeAttribute('src'); el.load(); el.classList.remove('on'); });
+    nowPlaying = null; showNowPlaying();
+  }
+  $('hud-radio-stop').addEventListener('click', () => { stopMedia(); say('radio-status', 'Radio arrêtée.'); });
+  async function attachStream(el, url, isHls, onLost) {
+    detachHls();
+    if (isHls && !el.canPlayType('application/vnd.apple.mpegurl')) {
+      const Hls = await loadHlsLib();
+      if (!Hls || !Hls.isSupported()) throw new Error('HLS non pris en charge');
+      await new Promise((resolve, reject) => {
+        const h = new Hls(); hlsInstance = h;
+        let started = false;
+        h.on(Hls.Events.MANIFEST_PARSED, () => { started = true; resolve(); });
+        h.on(Hls.Events.ERROR, (ev, d) => { if (d && d.fatal) { if (started) onLost(); else reject(new Error(d.details || 'erreur HLS')); } });
+        h.loadSource(url); h.attachMedia(el);
+      });
+    } else {
+      el.src = url;
+    }
+    await el.play();
+  }
+  async function playMedia(kind, item, statusId) {
+    const token = ++playToken;
+    stopMedia(); playToken = token;
+    const el = kind === 'tv' ? tvEl : radioEl;
+    el.classList.add('on');
+    say(statusId, `Connexion à « ${item.name} »…`);
+    const wait = setTimeout(() => { if (token === playToken && el.paused) say(statusId, 'Toujours en attente : le flux est peut-être hors ligne, géobloqué ou refusé par le navigateur.'); }, 15000);
+    try {
+      await attachStream(el, item.url, item.hls, () => { if (token === playToken) say(statusId, `Flux interrompu : « ${item.name} ».`); });
+      if (token !== playToken) return;
+      nowPlaying = { kind, name: item.name }; showNowPlaying();
+      say(statusId, `En lecture : ${item.name}`);
+    } catch (e) {
+      if (token !== playToken) return;
+      detachHls(); el.classList.remove('on');
+      say(statusId, `Lecture impossible : « ${item.name} » (flux hors ligne, géobloqué ou incompatible avec ce navigateur). Essaie une autre entrée.`);
+    } finally { clearTimeout(wait); }
+  }
+
+  // ----- Radios: radio-browser.info (community directory, no key) -----
+  const RADIO_FALLBACK = ['de1', 'de2', 'fi1', 'at1'].map((h) => `https://${h}.api.radio-browser.info`);
+  let radioBases = null;
+  async function radioFetch(path) {
+    if (!radioBases) {
+      try {
+        const list = JSON.parse(await fetchText('https://all.api.radio-browser.info/json/servers', 5000));
+        radioBases = list.map((s) => s && s.name).filter(Boolean).map((n) => `https://${n}`);
+      } catch (e) { /* the directory of servers is optional */ }
+      if (!radioBases || !radioBases.length) radioBases = RADIO_FALLBACK.slice();
+      radioBases.sort(() => Math.random() - 0.5);
+    }
+    let last;
+    for (const base of radioBases) {
+      try { return await fetchText(base + path); } catch (e) { last = e; }
+    }
+    throw last || new Error('aucun serveur');
+  }
+  let radioToken = 0;
+  async function loadRadios(cc) {
+    const token = ++radioToken;
+    say('radio-status', 'Recherche des radios…'); fillList($('radio-list'), [], () => null);
+    const secure = location.protocol === 'https:' ? '&is_https=true' : '';
+    let rows;
+    try {
+      rows = JSON.parse(await radioFetch(`/json/stations/search?countrycode=${encodeURIComponent(cc)}&hidebroken=true&order=clickcount&reverse=true&limit=60${secure}`));
+    } catch (e) {
+      if (token === radioToken) say('radio-status', 'Annuaire des radios indisponible pour le moment (service injoignable ou bloqué).');
+      return;
+    }
+    if (token !== radioToken) return;
+    const seen = new Set(), stations = [];
+    for (const s of Array.isArray(rows) ? rows : []) {
+      const url = s && (s.url_resolved || s.url), name = s && typeof s.name === 'string' ? s.name.trim() : '';
+      if (!name || !okStream(url) || seen.has(name.toLowerCase())) continue;
+      seen.add(name.toLowerCase());
+      stations.push({ name, url, hls: s.hls === 1 || /\.m3u8(\?|$)/i.test(url), sub: [s.codec, s.bitrate ? `${s.bitrate} kb/s` : '', (s.tags || '').split(',').slice(0, 2).join(', ')].filter(Boolean).join(' · ') });
+      if (stations.length >= 15) break;
+    }
+    live.loaded.radio = cc;
+    say('radio-status', stations.length ? `${nameFr(cc)} : ${stations.length} radios, les plus écoutées d’abord.` : `${nameFr(cc)} : aucune radio sécurisée listée.`);
+    fillList($('radio-list'), stations, (st) => itemButton(st.name, st.sub || 'flux direct', () => playMedia('radio', st, 'radio-status')));
+  }
+
+  // ----- Free TV: iptv-org playlists (community lists of free, publicly available streams) -----
+  function parseM3u(text) {
+    const out = []; let cur = null;
+    for (const raw of text.split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line) continue;
+      if (line.startsWith('#EXTINF')) {
+        const attrs = {};
+        line.replace(/([\w-]+)="([^"]*)"/g, (m, k, v) => { attrs[k] = v; return m; });
+        let inQuote = false, comma = -1;
+        for (let i = 0; i < line.length; i++) { const ch = line[i]; if (ch === '"') inQuote = !inQuote; else if (ch === ',' && !inQuote) { comma = i; break; } }
+        cur = { name: (comma >= 0 ? line.slice(comma + 1) : attrs['tvg-name'] || '').trim(), group: attrs['group-title'] || '', needsHeaders: false };
+      } else if (line.startsWith('#EXTVLCOPT') && cur) {
+        if (/http-(referrer|user-agent)/i.test(line)) cur.needsHeaders = true;   // browsers cannot send these headers
+      } else if (!line.startsWith('#') && cur) { cur.url = line; out.push(cur); cur = null; }
+    }
+    return out;
+  }
+  let tvToken = 0;
+  async function loadTv(cc) {
+    const token = ++tvToken;
+    say('tv-status', 'Recherche des chaînes…'); fillList($('tv-list'), [], () => null);
+    const codes = cc === 'GB' ? ['uk', 'gb'] : [cc.toLowerCase()];
+    let text = null;
+    for (const code of codes) {
+      try { text = await fetchText(`https://iptv-org.github.io/iptv/countries/${code}.m3u`, 12000); break; } catch (e) { /* try the next spelling */ }
+    }
+    if (token !== tvToken) return;
+    if (text === null) { say('tv-status', `${nameFr(cc)} : aucune playlist disponible (ou service injoignable).`); return; }
+    const channels = parseM3u(text)
+      .filter((c) => c.name && !c.needsHeaders && okStream(c.url) && !/xxx|adult|porn/i.test(`${c.group} ${c.name}`))
+      .sort((a, b) => /news|info/i.test(b.group) - /news|info/i.test(a.group))
+      .slice(0, 80);
+    live.loaded.tv = cc;
+    say('tv-status', channels.length ? `${nameFr(cc)} : ${channels.length} chaînes (infos en premier).` : `${nameFr(cc)} : aucune chaîne sécurisée listée.`);
+    fillList($('tv-list'), channels, (c) => itemButton(c.name, c.group || 'chaîne', () => playMedia('tv', { name: c.name, url: c.url, hls: !/\.(mp4|webm)(\?|$)/i.test(c.url) }, 'tv-status')));
+  }
+
+  // ----- Public webcams: links only -----
+  function renderCam() {
+    const name = live.label || (live.cc ? nameFr(live.cc) : '');
+    const links = [];
+    if (live.lat != null) links.push(['Carte Windy des webcams autour de ce point', 'fond cartographique avec les webcams publiques', `https://www.windy.com/-Webcams-webcams?${live.lat.toFixed(3)},${live.lon.toFixed(3)},9`]);
+    if (name) links.push([`Webcams en direct sur YouTube : ${name}`, 'recherche filtrée sur les directs', `https://www.youtube.com/results?search_query=${encodeURIComponent(`webcam live ${name}`)}&sp=EgJAAQ%253D%253D`]);
+    const ul = $('cam-links'); ul.replaceChildren();
+    if (!links.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Choisis un pays ou un lieu pour voir les liens.'; ul.appendChild(li); return; }
+    links.forEach(([title, sub, href]) => {
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = title; const s = document.createElement('small'); s.textContent = `${sub} ↗`;
+      a.append(t, s); li.appendChild(a); ul.appendChild(li);
+    });
+  }
+
+  // ----- Conflict headlines: GDELT DOC API (news index, no key) -----
+  const WAR_TERMS = '(war OR airstrike OR shelling OR "missile strike" OR ceasefire OR offensive OR "armed conflict" OR invasion)';
+  const gdeltQuery = () => (live.cc ? `"${nameEn(live.cc)}" ${WAR_TERMS}` : WAR_TERMS);
+  const gdeltUrl = (format) => `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(gdeltQuery())}&mode=artlist&maxrecords=60&format=${format}&sort=datedesc&timespan=24h`;
+  const seenDate = (s) => { const m = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/.exec(s || ''); return m ? Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]) : 0; };
+  function ago(ts) {
+    if (!ts) return '';
+    const min = Math.max(0, Math.round((Date.now() - ts) / 60000));
+    return min < 60 ? `il y a ${min} min` : min < 1440 ? `il y a ${Math.round(min / 60)} h` : `il y a ${Math.round(min / 1440)} j`;
+  }
+  function renderWar() {
+    const shown = warItems.filter((a) => warLang === 'all' || a.language === warLang).slice(0, 30);
+    fillList($('war-list'), shown, (a) => {
+      const link = document.createElement('a');
+      link.href = a.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = a.title;
+      const s = document.createElement('small'); s.textContent = [a.domain, a.language, ago(a.when)].filter(Boolean).join(' · ');
+      link.append(t, s); return link;
+    });
+  }
+  async function loadWar() {
+    const wait = warLast + 5000 - Date.now();      // GDELT asks for at most one request every 5 seconds
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+    warLast = Date.now();
+    const key = live.cc || '*', where = live.cc ? nameFr(live.cc) : 'Monde';
+    say('war-status', `${where} : recherche des titres…`);
+    try {
+      const text = await fetchText(gdeltUrl('json'), 15000);
+      let data; try { data = JSON.parse(text); } catch (e) { throw new Error(text.slice(0, 120)); }
+      if (key !== (live.cc || '*')) return;           // the visitor moved on while we waited
+      const seen = new Set(); warItems = [];
+      for (const a of Array.isArray(data.articles) ? data.articles : []) {
+        const title = typeof a.title === 'string' ? a.title.trim() : '';
+        if (!title || !/^https?:\/\//i.test(a.url || '') || seen.has(title.toLowerCase())) continue;
+        seen.add(title.toLowerCase());
+        warItems.push({ title, url: a.url, domain: a.domain || '', language: a.language || '', when: seenDate(a.seendate) });
+      }
+      live.loaded.war = key;
+      say('war-status', warItems.length ? `${where} : ${warItems.length} titres des dernières 24 h (mis à jour à ${new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}).` : `${where} : aucun titre trouvé dans les dernières 24 h.`);
+      renderWar();
+    } catch (e) {
+      warItems = []; renderWar();
+      say('war-status', 'Actualité indisponible pour le moment (service injoignable, bloqué ou requête refusée).');
+      const li = document.createElement('li'), a = document.createElement('a');
+      a.href = gdeltUrl('html'); a.target = '_blank'; a.rel = 'noopener noreferrer';
+      const t = document.createElement('span'); t.textContent = 'Ouvrir la recherche directement chez GDELT'; const s = document.createElement('small'); s.textContent = 'nouvel onglet ↗';
+      a.append(t, s); li.appendChild(a); $('war-list').appendChild(li);
+    }
+  }
+  liveEl.querySelectorAll('[data-warlang]').forEach((b) => b.addEventListener('click', () => {
+    warLang = b.dataset.warlang;
+    liveEl.querySelectorAll('[data-warlang]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    renderWar();
+  }));
+  $('war-refresh').addEventListener('click', () => loadWar());
+
+  // ----- Touch a country on the globe: Natural Earth outlines (110 m, via the world-atlas package) -----
+  let shapes = null, shapesLoading = null;
+  function loadShapes() {
+    if (shapes) return Promise.resolve(shapes);
+    if (!shapesLoading) {
+      shapesLoading = fetchText(COUNTRIES_URL, 15000).then((text) => {
+        const topo = JSON.parse(text), [sx, sy] = topo.transform.scale, [tx, ty] = topo.transform.translate;
+        const arcs = topo.arcs.map((arc) => { let x = 0, y = 0; return arc.map(([dx, dy]) => { x += dx; y += dy; return [x * sx + tx, y * sy + ty]; }); });
+        const ring = (idx) => { const pts = []; idx.forEach((i) => { (i < 0 ? arcs[~i].slice().reverse() : arcs[i]).forEach((p, k) => { if (!(pts.length && k === 0)) pts.push(p); }); }); return pts; };
+        shapes = topo.objects.countries.geometries.map((g) => {
+          const polys = (g.type === 'Polygon' ? [g.arcs] : g.arcs).map((rings) => {
+            const rs = rings.map(ring); let w = 180, e = -180, s = 90, n = -90;
+            rs[0].forEach(([x, y]) => { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); });
+            return { rs, w, e, s, n };
+          });
+          const a2 = NUMERIC_TO_A2[g.id] || (g.properties && g.properties.name === 'Kosovo' ? 'XK' : '');
+          return { a2, polys };
+        });
+        return shapes;
+      }).catch((e) => { shapesLoading = null; throw e; });
+    }
+    return shapesLoading;
+  }
+  function inRing(x, y, r) {
+    let inside = false;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
+      const [xi, yi] = r[i], [xj, yj] = r[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function countryAt(lat, lon) {
+    for (const c of shapes) {
+      for (const p of c.polys) {
+        if (lon < p.w || lon > p.e || lat < p.s || lat > p.n) continue;
+        let hits = 0; p.rs.forEach((r) => { if (inRing(lon, lat, r)) hits++; });
+        if (hits % 2 === 1) return c.a2 || '?';
+      }
+    }
+    return '';
+  }
+  async function pickCountry(position) {
+    const cart = globe.pick(camera.getPickRay(position), scene) || camera.pickEllipsoid(position, globe.ellipsoid);
+    if (!cart) { updateHint('Touche la Terre pour choisir un pays.'); return; }
+    const g = C.Cartographic.fromCartesian(cart), lat = R2D(g.latitude), lon = R2D(g.longitude);
+    try { await loadShapes(); } catch (e) { updateHint('Contours des pays indisponibles : choisis le pays dans la liste.'); return; }
+    const cc = countryAt(lat, lon);
+    if (!cc) updateHint('Pas de pays ici (mer ou zone non reconnue).');
+    else if (cc === '?') updateHint('Territoire non reconnu par la liste : choisis le pays dans la liste.');
+    else setCountry(cc, { lat, lon });
+  }
+
+  // ---------- Image up to 5120 px on the long side ----------
+  // Renders the current view into a bigger drawing buffer, adds the credits and downloads a PNG. Not offered
+  // over Google 3D tiles: Google's terms do not allow exporting its imagery.
+  const shotButton = $('btn-shot');
+  function syncShotButton() {
+    const blocked = googleOn && googleReady;
+    shotButton.disabled = blocked || capturing;
+    shotButton.title = blocked ? 'Indisponible avec Google 3D : les conditions d’utilisation de Google n’autorisent pas l’export d’images.' : '';
+  }
+  const nextFrame = () => new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  async function captureImage() {
+    if (capturing || (googleOn && googleReady)) return;
+    capturing = true; syncShotButton();
+    const label = shotButton.textContent, phase = $('hud-phase').textContent;
+    const prev = { scale: viewer.resolutionScale, msaa: scene.msaaSamples, fxaa: scene.postProcessStages.fxaa.enabled };
+    try {
+      const gl = scene.context._gl;
+      const limit = Math.min(5120, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+      const scale = limit / (Math.max(canvas.clientWidth, canvas.clientHeight) * (window.devicePixelRatio || 1));
+      shotButton.textContent = 'Préparation…'; setPhase('Image : préparation');
+      scene.msaaSamples = 1; scene.postProcessStages.fxaa.enabled = false;   // memory: the buffer is already huge
+      viewer.resolutionScale = scale;
+      await nextFrame(); await nextFrame();
+      // Let tiles refine for the bigger buffer (at most 25 s).
+      const end = performance.now() + 25000; let calm = 0;
+      while (performance.now() < end && calm < 8) { await nextFrame(); calm = globe.tilesLoaded ? calm + 1 : 0; }
+      await nextFrame();
+      scene.render();
+      const out = document.createElement('canvas');
+      out.width = canvas.width; out.height = canvas.height;
+      const ctx = out.getContext('2d');
+      ctx.drawImage(canvas, 0, 0);
+      const px = Math.max(14, Math.round(out.width / 190));
+      const line = `Fatiha, maman d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
+      ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
+      ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
+      ctx.fillStyle = 'rgba(244, 236, 223, 0.9)'; ctx.textBaseline = 'middle';
+      ctx.fillText(line, px, out.height - px * 1.05, out.width - 2 * px);
+      const blob = await new Promise((resolve) => out.toBlob(resolve, 'image/png'));
+      if (!blob) throw new Error('export impossible');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `fatiha-${activePlace ? activePlace.id : 'terre'}-${out.width}x${out.height}.png`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      shotButton.textContent = `Enregistré (${out.width} × ${out.height})`;
+    } catch (e) {
+      shotButton.textContent = 'Échec : mémoire insuffisante ?';
+    } finally {
+      viewer.resolutionScale = prev.scale; scene.msaaSamples = prev.msaa; scene.postProcessStages.fxaa.enabled = prev.fxaa;
+      setPhase(phase); capturing = false; syncShotButton();
+      setTimeout(() => { if (!capturing) shotButton.textContent = label; }, 5000);
+    }
+  }
+  shotButton.addEventListener('click', captureImage);
+  syncShotButton();
 
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.

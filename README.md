@@ -78,6 +78,37 @@ Limites : cette vue n'a été vue qu'avec de fausses tuiles de lumières et une
 imagerie unie (NASA et Esri sont injoignables depuis l'environnement de
 développement). Son aspect avec les vraies données n'est pas vérifié.
 
+### Fatiha : Direct (bouton « Direct »)
+
+Un panneau pour écouter, regarder et s'informer sur le pays d'un lieu, d'un pays
+touché sur le globe ou choisi dans la liste. Rien n'est chargé avant l'ouverture
+d'une rubrique.
+
+- **Radios** : annuaire communautaire radio-browser.info, radios les plus écoutées du pays, flux https seulement. La radio continue pendant le survol, avec un bouton d'arrêt dans la barre d'état.
+- **Télé** : playlists communautaires iptv-org (chaînes gratuites en accès libre), lues par hls.js (chargé à la demande) ou nativement sous Safari. Beaucoup de flux sont géobloqués, hors ligne ou refusés par le navigateur : le panneau le dit. Les chaînes d'un pays peuvent dépendre de l'État.
+- **Caméras** : uniquement des liens vers des annuaires de webcams publiques (carte Windy, directs YouTube filtrés). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée.
+- **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec des liens vers des sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
+- Jérusalem n'est rattachée à aucun pays (son statut est disputé) : le panneau demande d'en choisir un.
+
+Vie privée : ouvrir une rubrique contacte radio-browser.info, GitHub (iptv-org),
+GDELT, jsDelivr et les serveurs des radios et des chaînes, qui voient l'adresse IP
+du visiteur.
+
+Limites : aucun de ces services n'est joignable depuis l'environnement de
+développement. Le code a été testé avec des réponses simulées au format
+documenté, jamais avec les vrais services ; leurs en-têtes CORS (surtout ceux de
+GDELT) et leurs formats actuels ne sont pas vérifiés. Si un service refuse,
+l'interface l'indique.
+
+### Fatiha : image jusqu'à 5K
+
+« Enregistrer en 5K » (panneau « Sources et qualité ») rend la vue courante dans
+un tampon de jusqu'à 5120 px sur le grand côté (moins si l'appareil ne le permet
+pas), ajoute les crédits en bas et télécharge un PNG. L'image est calculée sur
+l'appareil du visiteur, avec les vraies données. Elle demande beaucoup de
+mémoire graphique. Le bouton est désactivé avec Google 3D : les conditions de
+Google n'autorisent pas l'export de ses images.
+
 ### Fatiha : Google Earth 3D (optionnel, clé Google requise)
 
 Un bouton **Google 3D** apparaît dans Fatiha uniquement si une clé Google Maps

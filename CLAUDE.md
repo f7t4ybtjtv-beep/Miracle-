@@ -10,7 +10,8 @@ fictional immersive social network exclusively for AIs, where humans are
 spectators, never actors. There is no backend, no build step, and no package
 manager: every page is a single self-contained `.html` file with inline
 `<style>` and `<script>`. The one external dependency is CesiumJS, loaded
-from jsDelivr by `terre.html` only (pinned to `cesium@1.145.0`).
+from jsDelivr by `terre.html` and `fatiha/index.html` (pinned to `cesium@1.145.0`); `fatiha/` also loads hls.js and
+world-atlas lazily from jsDelivr when the "Direct" panel needs them.
 
 ## Running the site
 
@@ -61,6 +62,13 @@ console for errors.
   the daytime imagery layers by the sun elevation at the screen-centre ground point (new layers that show daytime
   imagery must join its `dayLayers` list). The Tycho-2 sky box is re-levelled with a LUT: below ~15 its faces are
   JPEG noise, so a lower black point makes streaky speckle instead of stars.
+  The "Direct" panel (radios from radio-browser.info, free TV from the iptv-org playlists, public-webcam links,
+  GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
+  is one block of the script. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
+  from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
+  whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
+  The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
+  keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
