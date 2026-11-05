@@ -60,6 +60,24 @@ développement : l'interface a été testée avec des données simulées au form
 documenté, pas avec les flux réels. Une couche NASA se désactive d'elle-même
 après une douzaine d'erreurs de tuiles.
 
+### Fatiha : vue de nuit depuis l'orbite
+
+Chaque fiche de lieu propose **« Voir la nuit depuis l'orbite »** : un vol vers
+une vue oblique à environ 600 km d'altitude (la Station spatiale
+internationale évolue vers 400 km), inclinée de 33°, avec l'horloge réglée sur
+23 h, heure solaire locale, et un cap choisi pour chaque lieu. **« Revenir au
+lieu, de jour »** ramène à l'arrivée habituelle.
+
+- Les lumières sont celles du composite NASA Black Marble (2016) : elles montrent l'éclairage d'une année passée, pas celui d'aujourd'hui. La couche est activée à l'ouverture de cette vue.
+- Cesium garde 30 % des couleurs de jour sur la face nocturne, ce qui ressemble au crépuscule plus qu'à la nuit : à moins de 1 500 km d'altitude, l'imagerie de jour est assombrie de 45 % en douceur quand le soleil est sous l'horizon au point regardé (progressif de −3° à −20°).
+- Les étoiles sont celles du ciel Tycho-2 fourni avec Cesium (positions réelles), avec des niveaux relevés pour qu'elles ressortent. Si ce ciel ne se charge pas, celui de Cesium reste en place.
+- Le halo bleu du limbe est une **approximation** (un dégradé selon l'altitude rasée par chaque rayon, côté nuit seulement), pas un modèle physique de la luminescence nocturne. Le relief au limbe le masque.
+- La brume de profondeur de Cesium est désactivée : elle assombrissait les tuiles lointaines une à une et laissait des zigzags dans les vues obliques de nuit.
+
+Limites : cette vue n'a été vue qu'avec de fausses tuiles de lumières et une
+imagerie unie (NASA et Esri sont injoignables depuis l'environnement de
+développement). Son aspect avec les vraies données n'est pas vérifié.
+
 ### Fatiha : Google Earth 3D (optionnel, clé Google requise)
 
 Un bouton **Google 3D** apparaît dans Fatiha uniquement si une clé Google Maps
@@ -77,7 +95,7 @@ Limites : testé uniquement avec une fausse tuile et de fausses réponses de Goo
 (le service est injoignable depuis l'environnement de développement), jamais avec
 les vraies données. En mode Google 3D, la lumière du soleil réelle, les
 précipitations et le relief ombré ne s'appliquent plus (la lumière est celle des
-tuiles).
+tuiles), et la vue de nuit n'est pas proposée.
 
 ## Lancer le projet
 
