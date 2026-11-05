@@ -36,6 +36,10 @@ Samarcande et Angkor. Coordonnées réelles ; textes limités à des faits
 vérifiables. Lien direct vers un lieu : `nour/index.html#samarcande`. Les
 données et limites sont les mêmes que pour `terre.html`.
 
+### Nour : qualité d'image
+
+Le panneau « Sources et qualité » propose **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans ce même panneau. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+
 ### Nour : veille mondiale (bouton « Veille »)
 
 Couches de données **publiques et agrégées**, activables une à une ou toutes

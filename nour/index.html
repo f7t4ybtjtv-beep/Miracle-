@@ -193,6 +193,10 @@
   .watch .mag { color: var(--accent); font-weight: 500; }
   .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
   .watch .journal li b { color: var(--text-2); font-weight: 400; }
+  .quality { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 10px; font: 400 10px var(--font-mono); color: var(--muted); }
+  .quality button { font: 500 11px var(--font-ui); color: var(--text-2); background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+  .quality button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
+  .quality button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
   #cesium-credits { margin-top: 8px; font: 400 10px/1.5 var(--font-mono); color: var(--text-2); text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 10px; }
   #cesium-credits[hidden] { display: none; }
   #cesium-credits a { color: var(--text-2); }
@@ -290,8 +294,15 @@
   </div>
 
   <details class="ui credits glass" id="credits-box">
-    <summary>Sources</summary>
+    <summary>Sources et qualité</summary>
     <div id="credits"></div>
+    <div class="quality" role="group" aria-label="Qualité d'image">
+      <span>Qualité</span>
+      <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
+      <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
+      <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
+      <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
+    </div>
     <div id="cesium-credits" hidden></div>
   </details>
 
@@ -368,6 +379,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
+  const NOUR_BUILD = '2026-11-05.3';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -403,16 +415,27 @@
   };
   const TIER_ORDER = ['high', 'balanced', 'light'];
   const renderScale = (t) => Math.min(1, t.dpr / (window.devicePixelRatio || 1));
+  // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
+  // so a missing value must not count against the device. Only a clear low-end signal selects "light".
   function detectTier() {
     const coarse = matchMedia('(pointer: coarse)').matches;
     const cores = navigator.hardwareConcurrency || 4;
-    const mem = navigator.deviceMemory || 4;
-    if (coarse || cores <= 4 || mem <= 4) return (cores <= 4 || mem <= 2) ? 'light' : 'balanced';
-    return 'high';
+    const mem = navigator.deviceMemory;                    // Chrome/Android only
+    if (mem !== undefined && mem <= 2) return 'light';
+    if (coarse) return cores <= 2 ? 'light' : 'balanced';  // phones and tablets
+    return cores >= 8 ? 'high' : 'balanced';
   }
-  // ?qualite=haute|equilibree|legere pins a tier and turns off auto-downgrade.
-  const forcedTier = { haute: 'high', equilibree: 'balanced', legere: 'light' }[new URLSearchParams(location.search).get('qualite')];
-  let tierName = forcedTier || detectTier();
+  // Quality choice: 'auto' (detected, and lowered if the frame rate stays low) or a pinned tier.
+  // Pinned by ?qualite=haute|equilibree|legere, or by the selector in the Sources panel (saved in this browser).
+  const QUALITY_KEY = 'nour.quality';
+  const TIER_BY_CHOICE = { haute: 'high', equilibree: 'balanced', legere: 'light' };
+  function readQuality() {
+    let choice = new URLSearchParams(location.search).get('qualite');
+    if (!TIER_BY_CHOICE[choice]) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
+    return TIER_BY_CHOICE[choice] ? choice : 'auto';
+  }
+  let quality = readQuality();
+  let tierName = TIER_BY_CHOICE[quality] || detectTier();
   let tier = TIERS[tierName];
 
   // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
@@ -443,14 +466,15 @@
   // continuous function, so their shared edges match exactly.
   const MERC_MAX_LAT = 85.0511287798 * Math.PI / 180;
   const mercY = (lat) => (1 - Math.log(Math.tan(Math.PI / 4 + lat / 2)) / Math.PI) / 2;
-  const WATER_RES = 128;
 
   class TerrariumTerrainProvider {
     constructor() {
       this.tilingScheme = new C.GeographicTilingScheme();
       this.errorEvent = new C.Event();
       this.credit = new C.Credit('Relief : Tilezen/Mapzen Terrain Tiles (AWS Open Data) — SRTM, GMTED2010, ETOPO1');
-      this.hasWaterMask = true;
+      // No water mask: sea level (0 m) cannot tell ocean from land below sea level (chotts, Qattara,
+      // polders), and the mask's coarse cells gave stair-stepped coasts and sun-glint patches inland.
+      this.hasWaterMask = false;
       this.hasVertexNormals = false;
       this.availability = undefined;
       this._levelZeroError = C.TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
@@ -526,20 +550,9 @@
           const lat = rect.north - r / (GRID - 1) * dLat;
           for (let c = 0; c < GRID; c++) out[r * GRID + c] = sample(rect.west + c / (GRID - 1) * dLon, lat);
         }
-        // Water where the source height is at or below sea level.
-        const water = new Uint8Array(WATER_RES * WATER_RES);
-        let any = 0;
-        for (let r = 0; r < WATER_RES; r++) {
-          const lat = rect.north - (r + 0.5) / WATER_RES * dLat;
-          for (let c = 0; c < WATER_RES; c++) {
-            const [fx, fy] = toPx(rect.west + (c + 0.5) / WATER_RES * dLon, lat);
-            if (pixel(Math.round(fx), Math.round(fy)) === 0) { water[r * WATER_RES + c] = 255; any++; }
-          }
-        }
         return new C.HeightmapTerrainData({
           buffer: out, width: GRID, height: GRID,
           childTileMask: level < TERRAIN_MAX_LEVEL ? 15 : 0,
-          waterMask: any === 0 ? new Uint8Array([0]) : any === water.length ? new Uint8Array([255]) : water,
         });
       });
     }
@@ -650,7 +663,7 @@
   globe.dynamicAtmosphereLighting = true;
   globe.dynamicAtmosphereLightingFromSun = true;
   globe.showGroundAtmosphere = true;
-  globe.showWaterEffect = true;
+  globe.showWaterEffect = false;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
   globe.tileCacheSize = 1000;
@@ -681,7 +694,8 @@
                + texture(colorTexture, v_textureCoordinates - vec2(0.0, px.y)).rgb
                + texture(colorTexture, v_textureCoordinates + vec2(px.x, 0.0)).rgb
                + texture(colorTexture, v_textureCoordinates - vec2(px.x, 0.0)).rgb;
-        out_FragColor = vec4(max(c + amount * (c - n * 0.25), 0.0), 1.0);
+        vec3 detail = clamp(amount * (c - n * 0.25), -0.05, 0.05);
+        out_FragColor = vec4(max(c + detail, 0.0), 1.0);
       }`,
   }));
   scene.sun.show = true; scene.moon.show = false;
@@ -1097,7 +1111,7 @@
   // HUD readout + adaptive quality (steps down if frame rate stays low).
   const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
     : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
-  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0;
+  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
   function applyTier(name) {
     tierName = name; tier = TIERS[name];
     globe.maximumScreenSpaceError = tier.sse;
@@ -1109,18 +1123,35 @@
     hillshade.alpha = name === 'light' ? 0.6 : 0.9;
     if (googleTileset) googleTileset.maximumScreenSpaceError = TILESET_SSE[name];
     if (!tier.clouds) clouds.removeAll();
-    $('hud-quality').textContent = `Qualité ${tier.label}`;
+    try { scene.msaaSamples = tier.msaa; } catch (e) { /* no multisampling on this device */ }
+    $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   }
-  $('hud-quality').textContent = `Qualité ${tier.label}`;
+  $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
+  function syncQualityButtons() {
+    document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
+  }
+  function setQuality(choice) {
+    quality = choice;
+    try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
+    catch (e) { /* storage blocked: the choice applies to this visit only */ }
+    slowWindows = 0; warmUntil = performance.now() + 6000;
+    applyTier(TIER_BY_CHOICE[choice] || detectTier());
+    syncQualityButtons();
+  }
+  document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
+  syncQualityButtons();
+  // A hidden tab stops frames: do not count that gap as slowness.
+  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
   scene.postRender.addEventListener(() => {
     frames++;
     const now = performance.now();
     if (now - fpsT > 2500) {
       const fps = frames * 1000 / (now - fpsT);
       frames = 0; fpsT = now;
-      slowWindows = fps < 24 ? slowWindows + 1 : 0;
+      // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
+      slowWindows = (now > warmUntil && fps < 24) ? slowWindows + 1 : 0;
       const i = TIER_ORDER.indexOf(tierName);
-      if (!forcedTier && slowWindows >= 2 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; }
+      if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
     }
     if (now - hudT > 200) {
       hudT = now;
@@ -1137,6 +1168,7 @@
   $('credits').innerHTML = [
     'Imagerie : Esri, Maxar, Earthstar Geographics · Natural Earth II',
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
+    `Version : ${NOUR_BUILD}`,
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS / IMERG (précipitations)',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques)',
   ].join('<br>');

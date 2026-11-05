@@ -347,14 +347,15 @@
   // continuous function, so their shared edges match exactly.
   const MERC_MAX_LAT = 85.0511287798 * Math.PI / 180;
   const mercY = (lat) => (1 - Math.log(Math.tan(Math.PI / 4 + lat / 2)) / Math.PI) / 2;
-  const WATER_RES = 128;
 
   class TerrariumTerrainProvider {
     constructor() {
       this.tilingScheme = new C.GeographicTilingScheme();
       this.errorEvent = new C.Event();
       this.credit = new C.Credit('Relief : Tilezen/Mapzen Terrain Tiles (AWS Open Data) — SRTM, GMTED2010, ETOPO1');
-      this.hasWaterMask = true;
+      // No water mask: sea level (0 m) cannot tell ocean from land below sea level (chotts, Qattara,
+      // polders), and the mask's coarse cells gave stair-stepped coasts and sun-glint patches inland.
+      this.hasWaterMask = false;
       this.hasVertexNormals = false;
       this.availability = undefined;
       this._levelZeroError = C.TerrainProvider.getEstimatedLevelZeroGeometricErrorForAHeightmap(
@@ -430,20 +431,9 @@
           const lat = rect.north - r / (GRID - 1) * dLat;
           for (let c = 0; c < GRID; c++) out[r * GRID + c] = sample(rect.west + c / (GRID - 1) * dLon, lat);
         }
-        // Water where the source height is at or below sea level.
-        const water = new Uint8Array(WATER_RES * WATER_RES);
-        let any = 0;
-        for (let r = 0; r < WATER_RES; r++) {
-          const lat = rect.north - (r + 0.5) / WATER_RES * dLat;
-          for (let c = 0; c < WATER_RES; c++) {
-            const [fx, fy] = toPx(rect.west + (c + 0.5) / WATER_RES * dLon, lat);
-            if (pixel(Math.round(fx), Math.round(fy)) === 0) { water[r * WATER_RES + c] = 255; any++; }
-          }
-        }
         return new C.HeightmapTerrainData({
           buffer: out, width: GRID, height: GRID,
           childTileMask: level < TERRAIN_MAX_LEVEL ? 15 : 0,
-          waterMask: any === 0 ? new Uint8Array([0]) : any === water.length ? new Uint8Array([255]) : water,
         });
       });
     }
@@ -490,7 +480,7 @@
   globe.dynamicAtmosphereLighting = true;
   globe.dynamicAtmosphereLightingFromSun = true;
   globe.showGroundAtmosphere = true;
-  globe.showWaterEffect = true;
+  globe.showWaterEffect = false;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
   globe.tileCacheSize = 400;
