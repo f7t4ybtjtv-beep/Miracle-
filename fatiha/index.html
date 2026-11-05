@@ -87,8 +87,9 @@
 
   /* Places list */
   .places {
-    top: 50%; right: var(--gutter); transform: translateY(-50%);
-    width: 260px; max-height: calc(100vh - 200px); overflow: auto;
+    /* Top-right, ending above the Sources panel (about 240 px tall with the quality row) so the two never overlap. */
+    top: calc(var(--gutter) + 64px + env(safe-area-inset-top)); right: var(--gutter);
+    width: 260px; max-height: calc(100vh - var(--gutter) - 64px - 240px - env(safe-area-inset-top)); overflow: auto;
     padding: 14px; scrollbar-width: thin;
   }
   .places .kicker {
@@ -265,6 +266,8 @@
     <div class="toggles">
       <button class="btn" type="button" data-layer="quakes" aria-pressed="false">Séismes 24 h</button>
       <button class="btn" type="button" data-layer="iss" aria-pressed="false">Station spatiale</button>
+      <button class="btn" type="button" data-layer="clouds" aria-pressed="true">Nuages réels</button>
+      <button class="btn" type="button" data-layer="lights" aria-pressed="true">Lumières de nuit</button>
       <button class="btn" type="button" data-layer="rain" aria-pressed="false">Précipitations</button>
       <button class="btn" type="button" data-layer="live" aria-pressed="false">Jour/nuit réel</button>
       <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
@@ -379,7 +382,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.4';
+  const NOUR_BUILD = '2026-11-05.5';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -662,6 +665,43 @@
   }));
   labels.show = false;
 
+  // ---------- Real Earth from NASA GIBS: recent daily imagery (real clouds) and city lights ----------
+  // Public tile services with CORS. Each layer switches itself off after repeated tile errors, and the
+  // map falls back to the Esri / Natural Earth imagery.
+  const gibsUrl = (layer, matrix, ext, time) =>
+    `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/${layer}/default/${time}/${matrix}/{z}/{y}/{x}.${ext}`;
+  function addGibsLayer(url, maximumLevel, credit, name, options) {
+    const provider = new C.UrlTemplateImageryProvider({ url, maximumLevel, credit: new C.Credit(credit) });
+    let errors = 0;
+    provider.errorEvent.addEventListener((e) => { e.retry = false; if (++errors === 12) gibsUnavailable(name); });
+    const layer = viewer.imageryLayers.addImageryProvider(provider, viewer.imageryLayers.length - 1); // under the place names
+    Object.assign(layer, options);
+    return layer;
+  }
+  // Daily true-colour mosaic (real clouds), two days back: the newest day that is always complete.
+  // Black = no data, made transparent so the map shows through. Faded out with altitude (see below).
+  const twoDaysAgo = new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10);
+  const realEarth = addGibsLayer(gibsUrl('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', twoDaysAgo),
+    9, 'Images : NASA GIBS / VIIRS', 'clouds', {
+      colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.05,
+    });
+  // Night lights (VIIRS Black Marble, 2016): drawn only on the night side. Cesium dims the night side to 30 %,
+  // so the layer is brightened to compensate.
+  const nightLights = addGibsLayer(gibsUrl('VIIRS_Black_Marble', 'GoogleMapsCompatible_Level8', 'png', '2016-01-01'),
+    8, 'Lumières : NASA GIBS / VIIRS Black Marble', 'lights', {
+      dayAlpha: 0.0, nightAlpha: 1.0, brightness: 3.0, colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.04,
+    });
+  // Cesium 1.145 does not evaluate a per-tile alpha function (it hands the function itself to the shader and
+  // the globe turns black), so fade with the camera altitude instead: the real clouds give way to the sharper
+  // Esri imagery between 800 km and 150 km (arrivals end at 1-5 km), and the 600 m-per-pixel city lights fade
+  // out between 80 km and 30 km where they would only look like soft blobs.
+  const ramp = (h, lo, hi) => Math.min(1, Math.max(0, (h - lo) / (hi - lo)));
+  scene.preRender.addEventListener(() => {
+    const h = camera.positionCartographic.height;
+    realEarth.alpha = ramp(h, 1.5e5, 8e5);
+    nightLights.alpha = ramp(h, 3e4, 8e4);
+  });
+
   // Sun lighting and atmosphere from the real sun position at the clock time.
   globe.enableLighting = true;
   globe.dynamicAtmosphereLighting = true;
@@ -674,9 +714,12 @@
   globe.preloadSiblings = true;
   globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
   globe.atmosphereLightIntensity = 10;
-  // Keep sun lighting at every distance so the terminator shows from orbit.
-  globe.lightingFadeOutDistance = 1.0e9;
-  globe.lightingFadeInDistance = 1.1e9;
+  // Cesium lights the whole globe uniformly when the camera is closer than lightingFadeOutDistance and
+  // applies the sun's day/night shading beyond lightingFadeInDistance (distances from the Earth's centre).
+  // Both at ~0 m means the shading applies at every altitude, so the night side stays dark (30 % of its
+  // daytime brightness) and the terminator is visible from orbit down to the ground.
+  globe.lightingFadeOutDistance = 1.0;
+  globe.lightingFadeInDistance = 2.0;
   scene.skyAtmosphere.show = true;
   scene.fog.enabled = true;
   scene.fog.density = 8.0e-5;
@@ -1173,7 +1216,7 @@
     'Imagerie : Esri, Maxar, Earthstar Geographics · Natural Earth II',
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
     `Version : ${NOUR_BUILD}`,
-    'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS / IMERG (précipitations)',
+    'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques)',
   ].join('<br>');
 
@@ -1183,7 +1226,7 @@
   // ---------- Veille mondiale: open public data layers ----------
   // Everything here is public, read-only and aggregate (earthquakes, one
   // satellite, weather imagery). Nothing tracks or identifies people.
-  const veille = { quakes: false, iss: false, rain: false, live: false, sit: false };
+  const veille = { quakes: false, iss: false, rain: false, live: false, sit: false, clouds: true, lights: true };
   const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
   const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
   const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
@@ -1195,11 +1238,11 @@
   viewer.dataSources.add(issSource);
   const rain = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
     url: RAIN_URL, maximumLevel: 6, credit: new C.Credit('Précipitations : NASA GIBS / IMERG'),
-  }), 3);                       // under the place-name layer
+  }), 4);                       // above the real-Earth imagery, under the night lights and place names
   rain.show = false; rain.alpha = 0.75;
 
   const fmtUTC = (d) => `${d.toISOString().slice(11, 16)} UTC`;
-  const statusLines = { quakes: '', iss: '', rain: '', live: '' };
+  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '' };
   function renderStatus() {
     $('watch-status').textContent = Object.values(statusLines).filter(Boolean).join('\n');
   }
@@ -1335,6 +1378,8 @@
       if (on) { loadISS(); issTimer = setInterval(loadISS, 5000); }
       else { statusLines.iss = ''; renderStatus(); }
     },
+    clouds(on) { realEarth.show = on; },
+    lights(on) { nightLights.show = on; },
     rain(on) {
       rain.show = on;
       statusLines.rain = on ? 'Précipitations : NASA GIBS / IMERG (dernier relevé disponible)' : '';
@@ -1346,6 +1391,17 @@
       if (on) { hideCard(); setPhase('Veille'); setLayer('quakes', true); setLayer('iss', true); setLayer('live', true); }
     },
   };
+  // Called by a NASA layer after repeated tile errors: switch it off and say so.
+  function gibsUnavailable(name) {
+    if (!veille[name]) return;
+    veille[name] = false;
+    layerOn[name](false);
+    const button = document.querySelector(`#watch [data-layer="${name}"]`);
+    button.setAttribute('aria-pressed', 'false');
+    statusLines[name] = `${button.textContent} : source NASA indisponible, couche désactivée.`;
+    renderStatus();
+    journal(statusLines[name]);
+  }
   function setLayer(name, on) {
     if (veille[name] === on) return;
     veille[name] = on;
@@ -1453,9 +1509,10 @@
 
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.
-  clock.currentTime = timeForSolarHour(25, 13);
+  // Dusk over Asia: the terminator crosses the east of the first view, so the night side and its city lights show.
+  clock.currentTime = timeForSolarHour(25, 14.7);
   camera.setView({
-    destination: C.Cartesian3.fromDegrees(10, 22, 3.2e7),
+    destination: C.Cartesian3.fromDegrees(10, 22, 1.1e8),
     orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
   });
   const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
@@ -1479,7 +1536,7 @@
     const p = placeFromHash();
     if (p && !activePlace) flyToPlace(p);
     else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
-      duration: 5500,
+      duration: 7500,
       onDone: () => setPhase('Orbite'),
     });
   }

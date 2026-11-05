@@ -45,17 +45,20 @@ Le panneau « Sources et qualité » propose **Auto**, **Haute**, **Équilibrée
 Couches de données **publiques et agrégées**, activables une à une ou toutes
 d'un coup via « Salle de situation » :
 
+- **Nuages réels** (activé par défaut) : mosaïque quotidienne NASA GIBS / VIIRS, datée de deux jours (le dernier jour toujours complet), visible depuis l'orbite et fondue vers l'imagerie Esri entre 800 et 150 km d'altitude. Le noir (absence de donnée) est rendu transparent.
+- **Lumières de nuit** (activé par défaut) : NASA Black Marble 2016, dessiné uniquement du côté nuit du globe et estompé sous 80 km d'altitude.
 - **Séismes 24 h** : flux GeoJSON public de l'USGS (M2,5+), rafraîchi toutes les 5 min ; clic sur un séisme de la liste pour y voler.
 - **Station spatiale** : position et trace de l'ISS via wheretheiss.at, toutes les 5 s.
 - **Précipitations** : imagerie NASA GIBS / IMERG (dernier relevé disponible).
 - **Jour/nuit réel** : horloge réelle, terminateur calculé par la position du soleil.
 - **Salle de situation** : affichage type centre de contrôle (heure UTC, journal d'événements).
 
-Aucune de ces couches ne suit ni n'identifie de personnes. Elles dépendent de
+L'éclairage du globe suit la vraie position du soleil à toute altitude : la face nocturne est assombrie (30 % de sa luminosité de jour) et le terminateur est visible. Les arrivées aux lieux se font en plein jour (soleil à ~32°). Aucune de ces couches ne suit ni n'identifie de personnes. Elles dépendent de
 services tiers : si une source est indisponible, un message l'indique.
-Les trois flux étaient injoignables depuis l'environnement de développement :
-l'interface a été testée avec des données simulées au format documenté, pas
-avec les flux réels.
+Les flux (USGS, ISS, NASA GIBS) étaient injoignables depuis l'environnement de
+développement : l'interface a été testée avec des données simulées au format
+documenté, pas avec les flux réels. Une couche NASA se désactive d'elle-même
+après une douzaine d'erreurs de tuiles.
 
 ### Fatiha : Google Earth 3D (optionnel, clé Google requise)
 
