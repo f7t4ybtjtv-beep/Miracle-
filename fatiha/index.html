@@ -119,9 +119,10 @@
   .card .coords { font: 400 11.5px var(--font-mono); color: var(--text-2); }
   .card p { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
   .card .meta { margin-top: 12px; font: 400 11px var(--font-mono); color: var(--muted); }
-  .card a.earth { display: inline-block; margin-top: 12px; font: 500 12px var(--font-mono); color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
-  .card a.earth:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
-  .card a.earth:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+  .card .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; }
+  .card a.earth, .card button.earth { font: 500 12px var(--font-mono); color: var(--accent); text-decoration: none; border: 0; border-bottom: 1px solid var(--border-strong); background: none; padding: 0; cursor: pointer; }
+  .card a.earth:hover, .card button.earth:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
+  .card a.earth:focus-visible, .card button.earth:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
 
   /* HUD */
   .hud {
@@ -285,7 +286,10 @@
     <div class="coords" id="card-coords"></div>
     <p id="card-text"></p>
     <div class="meta" id="card-meta"></div>
-    <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
+    <div class="links">
+      <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
+      <button class="earth" id="card-night" type="button">Voir la nuit depuis l’orbite ↗</button>
+    </div>
   </section>
 
   <div class="ui hud glass" aria-live="off">
@@ -332,39 +336,40 @@
 
   // Real coordinates (WGS84, decimal degrees). `view` frames the final
   // approach: heading/pitch in degrees, range in metres from the site.
+  // `night` is the heading (degrees) of the oblique night view from low orbit.
   // `solarHour` only says whether to light the place in the morning (<12) or the afternoon;
   // the actual hour is computed below from the real sun so no place arrives in the dark.
   const PLACES = [
     { id: 'tolede', name: 'Tolède', country: 'Espagne', lat: 39.8570, lon: -4.0237,
       text: "Aux XIIe et XIIIe siècles, des traducteurs y firent passer en latin puis en castillan des œuvres scientifiques et philosophiques écrites en arabe : c'est ce qu'on appelle l'« école des traducteurs de Tolède ». La ville est bâtie sur un méandre du Tage.",
-      meta: 'UNESCO 1986 · Ville historique de Tolède', view: { heading: 330, pitch: -20, range: 3200 }, solarHour: 17.5 },
+      meta: 'UNESCO 1986 · Ville historique de Tolède', view: { heading: 330, pitch: -20, range: 3200 }, solarHour: 17.5, night: 20 },
     { id: 'cordoue', name: 'Mosquée-cathédrale de Cordoue', country: 'Espagne', lat: 37.8789, lon: -4.7794,
       text: "Commencée en 785 sous l'émir omeyyade Abd al-Rahman Ier, la grande mosquée fut transformée en cathédrale après la prise de la ville par Ferdinand III de Castille en 1236. Ses arcs bicolores et la cathédrale insérée en son centre portent ces deux histoires.",
-      meta: 'UNESCO 1984 · Centre historique de Cordoue', view: { heading: 200, pitch: -22, range: 1800 }, solarHour: 9.5 },
+      meta: 'UNESCO 1984 · Centre historique de Cordoue', view: { heading: 200, pitch: -22, range: 1800 }, solarHour: 9.5, night: 20 },
     { id: 'alhambra', name: 'Alhambra', country: 'Espagne', lat: 37.1761, lon: -3.5881,
       text: "Palais et forteresse des souverains nasrides, élevés pour l'essentiel aux XIIIe–XIVe siècles sur la colline de la Sabika, dernier contrefort de la Sierra Nevada, à Grenade. Après 1492, Charles Quint y fit élever un palais Renaissance accolé aux palais nasrides.",
-      meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17 },
+      meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17, night: 20 },
     { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', lat: 16.7711, lon: -3.0105,
       text: "Aux portes du Sahara, près du fleuve Niger, la ville fut un foyer de savoir dont témoignent des milliers de manuscrits. La mosquée Djingareyber, en terre crue, fut élevée au XIVe siècle, au retour de pèlerinage du souverain du Mali Kankou Moussa.",
-      meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5 },
+      meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5, night: 0 },
     { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', lat: 31.2089, lon: 29.9092,
       text: "Inaugurée en 2002 sur le front de mer d'Alexandrie, près de l'emplacement présumé de la bibliothèque antique fondée sous les Ptolémées. Son mur de granit porte des caractères de nombreux systèmes d'écriture.",
-      meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16 },
+      meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16, night: 180 },
     { id: 'jerusalem', name: 'Vieille ville de Jérusalem', country: 'Proche-Orient', lat: 31.7767, lon: 35.2345,
       text: "Sur moins d'un kilomètre carré, la vieille ville réunit des lieux saints du judaïsme, du christianisme et de l'islam, dont le mur des Lamentations, l'église du Saint-Sépulcre et le Dôme du Rocher.",
-      meta: 'UNESCO 1981', view: { heading: 250, pitch: -24, range: 2400 }, solarHour: 9 },
+      meta: 'UNESCO 1981', view: { heading: 250, pitch: -24, range: 2400 }, solarHour: 9, night: 80 },
     { id: 'petra', name: 'Petra', country: 'Jordanie', lat: 30.3222, lon: 35.4515,
       text: "Capitale des Nabatéens, mi-bâtie, mi-taillée dans le grès d'un bassin montagneux près de Wadi Musa. Grand centre caravanier de l'encens d'Arabie, au carrefour de l'Arabie, de l'Égypte et de la Syrie-Phénicie, la cité mêle traditions nabatéennes, architecture hellénistique et apports romains.",
-      meta: 'UNESCO 1985', view: { heading: 200, pitch: -32, range: 1800 }, solarHour: 10 },
+      meta: 'UNESCO 1985', view: { heading: 200, pitch: -32, range: 1800 }, solarHour: 10, night: 0 },
     { id: 'istanbul', name: 'Sainte-Sophie', country: 'Turquie', lat: 41.0086, lon: 28.9802,
       text: "Construite de 532 à 537 sous l'empereur Justinien, la basilique devint mosquée en 1453, musée en 1934, puis de nouveau mosquée en 2020. Elle domine la péninsule historique, bordée par la Corne d'Or, le Bosphore et la mer de Marmara.",
-      meta: "UNESCO 1985 · Zones historiques d'Istanbul", view: { heading: 300, pitch: -20, range: 2600 }, solarHour: 16.5 },
+      meta: "UNESCO 1985 · Zones historiques d'Istanbul", view: { heading: 300, pitch: -20, range: 2600 }, solarHour: 16.5, night: 10 },
     { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', lat: 39.6547, lon: 66.9758,
       text: "Place bordée de trois madrasas, dont celle d'Ouloug Beg (1417–1420), prince astronome. Samarcande fut une étape majeure des routes de la soie, entre la Chine, l'Inde, la Perse et la Méditerranée.",
-      meta: 'UNESCO 2001 · Samarkand – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5 },
+      meta: 'UNESCO 2001 · Samarkand – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5, night: 340 },
     { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', lat: 13.4125, lon: 103.8670,
       text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
-      meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5 },
+      meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5, night: 350 },
   ];
 
   // Pick the local solar hour at which the sun stands ~32° high today at this
@@ -382,7 +387,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.5';
+  const NOUR_BUILD = '2026-11-05.6';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -701,6 +706,23 @@
     realEarth.alpha = ramp(h, 1.5e5, 8e5);
     nightLights.alpha = ramp(h, 3e4, 8e4);
   });
+  // Night look. Cesium keeps 30 % of the daytime colours on the night side, which reads as dusk, not night.
+  // When the camera looks at ground that is in the dark from low orbit (the "Vue de nuit" shots), dim the
+  // daytime imagery further so the city lights and the blue limb carry the picture, as in photographs from the
+  // Space Station. The sun elevation at the look point drives it, so it eases in and out with the clock.
+  const dayLayers = [[naturalEarth, 1.0], [satellite, satellite.brightness], [realEarth, 1.0]];
+  const lookPoint = new C.Cartesian3(), screenCentre = new C.Cartesian2();
+  scene.preRender.addEventListener(() => {
+    const h = camera.positionCartographic.height;
+    let k = 1;
+    if (h < 4e6) {
+      screenCentre.x = canvas.clientWidth / 2; screenCentre.y = canvas.clientHeight / 2;
+      if (!camera.pickEllipsoid(screenCentre, globe.ellipsoid, lookPoint)) C.Cartesian3.clone(camera.positionWC, lookPoint);
+      const sunElevationSin = C.Cartesian3.dot(C.Cartesian3.normalize(lookPoint, lookPoint), scene.context.uniformState.sunDirectionWC);
+      k = 1 - 0.45 * ramp(-sunElevationSin, 0.05, 0.35) * (1 - ramp(h, 1.5e6, 4e6));
+    }
+    for (const [layer, base] of dayLayers) layer.brightness = base * k;
+  });
 
   // Sun lighting and atmosphere from the real sun position at the clock time.
   globe.enableLighting = true;
@@ -721,9 +743,9 @@
   globe.lightingFadeOutDistance = 1.0;
   globe.lightingFadeInDistance = 2.0;
   scene.skyAtmosphere.show = true;
-  scene.fog.enabled = true;
-  scene.fog.density = 8.0e-5;
-  scene.fog.minimumBrightness = 0.03;
+  // No depth fog: it darkened distant terrain tile by tile and left zig-zag edges in oblique night views.
+  // The ground atmosphere still gives the aerial haze.
+  scene.fog.enabled = false;
   scene.highDynamicRange = tierName === 'high';      // HDR doubles framebuffer bandwidth: high tier only
   scene.postProcessStages.fxaa.enabled = fxaaFor(tier);
   // Mild unsharp mask: restores edge contrast lost to upsampled imagery and anti-aliasing.
@@ -745,7 +767,76 @@
         out_FragColor = vec4(max(c + detail, 0.0), 1.0);
       }`,
   }));
+  // Atmospheric glow along the dark limb, as in photographs of the night side. For each sky pixel, the ray's closest
+  // approach to the Earth gives the altitude it grazes; a thin bright layer plus a broader halo fall off with that
+  // altitude, and only where the sun does not light the grazed point (Cesium already draws the day-side limb).
+  // This is an approximation of how the limb looks, not a physical model of airglow. Terrain at the limb hides it
+  // (depth test: sky pixels only).
+  scene.postProcessStages.add(new C.PostProcessStage({
+    name: 'nour_limb',
+    fragmentShader: `
+      uniform sampler2D colorTexture;
+      uniform sampler2D depthTexture;
+      in vec2 v_textureCoordinates;
+      void main() {
+        vec3 color = texture(colorTexture, v_textureCoordinates).rgb;
+        if (texture(depthTexture, v_textureCoordinates).r >= 0.9999) {
+          // Cesium's projection has an infinite far plane (w = 0 there), so the eye-space ray is the xyz part as
+          // is: dividing by w would give NaN.
+          vec4 eye = czm_inverseProjection * vec4(v_textureCoordinates * 2.0 - 1.0, 1.0, 1.0);
+          vec3 dirWC = normalize((czm_inverseView * vec4(normalize(eye.xyz), 0.0)).xyz);
+          vec3 radii = czm_ellipsoidRadii;
+          vec3 c = czm_viewerPositionWC / radii;
+          vec3 d = normalize(dirWC / radii);
+          float t = -dot(c, d);
+          if (t > 0.0) {
+            vec3 closest = c + t * d;
+            float b = length(closest);
+            if (b > 1.0) {
+              float h = (b - 1.0) * 6371.0;
+              float core = exp(-h / 9.0), halo = exp(-h / 50.0);
+              float lit = clamp(dot(normalize(closest * radii), czm_sunDirectionWC) * 4.0 + 0.5, 0.0, 1.0);
+              vec3 glow = mix(vec3(0.10, 0.30, 0.68), vec3(0.50, 0.78, 1.0), core) * (0.7 * halo + 0.8 * core);
+              color += glow * (1.0 - lit);
+            }
+          }
+        }
+        out_FragColor = vec4(color, 1.0);
+      }`,
+  }));
   scene.sun.show = true; scene.moon.show = false;
+  // Cesium's Tycho-2 star sky box is very dim. Re-level each face (drop the dark noise floor, then amplify)
+  // so the real stars read as in orbital photographs. Star positions are unchanged; on any failure the
+  // default sky box stays.
+  (() => {
+    const faces = { positiveX: 'px', negativeX: 'mx', positiveY: 'py', negativeY: 'my', positiveZ: 'pz', negativeZ: 'mz' };
+    const keys = Object.keys(faces);
+    // Black point 15 (below it the texture is mostly JPEG noise), white point 115, gentle gamma so faint stars rise
+    // with the bright ones.
+    const lut = new Uint8ClampedArray(256);
+    for (let v = 0; v < 256; v++) lut[v] = 255 * Math.pow(Math.min(1, Math.max(0, (v - 15) / (115 - 15))), 0.85);
+    Promise.all(keys.map((k) => new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => resolve(img); img.onerror = reject;
+      img.src = C.buildModuleUrl(`Assets/Textures/SkyBox/tycho2t3_80_${faces[k]}.jpg`);
+    }))).then((imgs) => {
+      const sources = {};
+      keys.forEach((k, i) => {
+        const cv = document.createElement('canvas');
+        cv.width = imgs[i].width; cv.height = imgs[i].height;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(imgs[i], 0, 0);
+        const px = ctx.getImageData(0, 0, cv.width, cv.height), d = px.data;
+        for (let j = 0; j < d.length; j += 4) { d[j] = lut[d[j]]; d[j + 1] = lut[d[j + 1]]; d[j + 2] = lut[d[j + 2]]; }
+        ctx.putImageData(px, 0, 0);
+        sources[k] = cv;
+      });
+      const previous = scene.skyBox;
+      scene.skyBox = new C.SkyBox({ sources });
+      if (previous && !previous.isDestroyed()) previous.destroy();
+    }).catch(() => { /* keep Cesium's default sky box */ });
+  })();
   viewer.resolutionScale = renderScale(tier);
   if (scene.shadowMap) { scene.shadowMap.softShadows = true; scene.shadowMap.darkness = 0.45; scene.shadowMap.maximumDistance = 25000; }
 
@@ -1074,9 +1165,56 @@
     // Google Earth Web deep link: @lat,lon,groundAltitude a, distance d, fov y, heading h, tilt t (0 = straight down), roll r.
     const tilt = Math.round(90 + p.view.pitch);
     $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
+    p.ground = groundHeight;
+    nightView = false; setNightButton();
     $('card').classList.add('show');
   }
   function hideCard() { $('card').classList.remove('show'); }
+
+  // Night view: an oblique shot of the place after dark from ~600 km up, like a photograph from the Space Station.
+  let nightView = false;     // the night card is showing
+  let nightClock = false;    // the clock was moved to night for a night view and not brought back yet
+  const NIGHT_VIEW = { pitch: -33, range: 1.05e6, solarHour: 23 };
+  function setNightButton() {
+    $('card-night').textContent = nightView ? 'Revenir au lieu, de jour ↺' : 'Voir la nuit depuis l’orbite ↗';
+    // Google 3D tiles carry their own daytime lighting, so a night view over them would not be one. The way back
+    // stays available if the visitor switches to Google 3D while a night view is showing.
+    $('card-night').hidden = googleOn && googleReady && !nightView;
+  }
+  function showNightCard(p) {
+    nightView = true; setNightButton();
+    $('card-kicker').textContent = 'Vue de nuit';
+    $('card-title').textContent = p.name;
+    $('card-coords').textContent = fmtCoord(p.lat, p.lon);
+    // Short on purpose: phones show three lines, and the caveat about the lights must stay in them. The layer may
+    // be off (switched off by the visitor, or by itself after repeated NASA tile errors): say so rather than
+    // credit lights that are not there.
+    const lights = veille.lights;
+    $('card-text').textContent = 'Vue oblique d’environ 600 km, comme depuis la Station spatiale (≈ 400 km). '
+      + (lights ? 'Lumières : archive NASA Black Marble, pas l’éclairage d’aujourd’hui.' : 'Lumières indisponibles : la couche NASA est désactivée.');
+    $('card-meta').textContent = 'Heure solaire locale ≈ 23h00' + (lights ? ' · lumières : NASA Black Marble' : '');
+    $('card').classList.add('show');
+  }
+  async function flyToNight(p) {
+    const token = ++flightToken;
+    nightClock = true;
+    hideCard(); stopOrbit(); cancelFlight();
+    if (veille.live) setLayer('live', false);      // a running real-time clock would override the chosen hour
+    if (!veille.lights && !gibsFailed.has('lights')) setLayer('lights', true);   // not a layer that already failed
+    clouds.removeAll();
+    setPhase('Montée en orbite');
+    const groundHeight = p.ground ?? await sampleGround(p);
+    if (token !== flightToken) return;
+    startFlight(C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight), { heading: p.night, pitch: NIGHT_VIEW.pitch, range: NIGHT_VIEW.range }, {
+      time: timeForSolarHour(p.lon, NIGHT_VIEW.solarHour),
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
+      onDone: () => { setPhase('Vue de nuit'); showNightCard(p); },
+    });
+  }
+  $('card-night').addEventListener('click', () => {
+    const p = activePlace;
+    if (p) (nightView ? flyToPlace(p) : flyToNight(p));
+  });
 
   function setActive(p) {
     activePlace = p;
@@ -1103,6 +1241,7 @@
     if (token !== flightToken) return;
     const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
     placeClouds(p, groundHeight);
+    nightClock = false;
 
     startFlight(target, p.view, {
       time: veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour),
@@ -1123,7 +1262,11 @@
     clouds.removeAll();
     const c = camera.positionCartographic;
     const target = C.Cartesian3.fromRadians(c.longitude, C.Math.clamp(c.latitude, D2R(-60), D2R(60)), 0);
+    // After a night view the clock is still at night: bring daylight back so the globe is not left dark.
+    const daylight = nightClock && !veille.live;
+    nightClock = false; nightView = false; setNightButton();
     startFlight(target, { heading: 0, pitch: -90, range: 1.9e7 }, {
+      time: daylight ? timeForSolarHour(C.Math.toDegrees(c.longitude), 13) : undefined,
       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Ascension'),
       onDone: () => setPhase('Orbite'),
     });
@@ -1217,7 +1360,7 @@
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
     `Version : ${NOUR_BUILD}`,
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
-    'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques)',
+    'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · halo du limbe de nuit : approximation',
   ].join('<br>');
 
   // Credits are open on wide screens, folded behind "Sources" on phones.
@@ -1392,8 +1535,10 @@
     },
   };
   // Called by a NASA layer after repeated tile errors: switch it off and say so.
+  const gibsFailed = new Set();
   function gibsUnavailable(name) {
     if (!veille[name]) return;
+    gibsFailed.add(name);
     veille[name] = false;
     layerOn[name](false);
     const button = document.querySelector(`#watch [data-layer="${name}"]`);
@@ -1467,6 +1612,7 @@
     statusLines.google = googleOn && googleReady
       ? 'Google 3D actif : satellite Esri, relief ombré et précipitations masqués.' : statusLines.google;
     renderStatus();
+    setNightButton();
   }
   function leaveGoogle(message) {
     googleOn = false;

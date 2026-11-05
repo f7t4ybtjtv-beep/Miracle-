@@ -52,7 +52,15 @@ console for errors.
   so huge values switch the shading off; ~1 m / 2 m keeps it on at every altitude. `ImageryLayer.alpha` as a
   function is documented but not evaluated in this version (the globe turns black): fade by camera altitude
   with a numeric alpha instead. `nightAlpha`/`dayAlpha` only apply while `enableLighting` is on, and the night
-  side is multiplied by 0.3, hence the brightness boost on the night-lights layer.
+  side is multiplied by 0.3, hence the brightness boost on the night-lights layer. In a custom post-process,
+  Cesium's projection has an infinite far plane: `czm_inverseProjection * vec4(ndc.xy, 1.0, 1.0)` comes back with
+  w = 0, so take `normalize(eye.xyz)` as the ray direction and never divide by w (that gave NaN and silently
+  disabled the limb glow). The depth fog (`scene.fog`) is off because it left zig-zag edges in oblique night views.
+  The "Vue de nuit" card button flies to ~600 km, pitch -33°, a per-place `night` heading and 23 h local solar time;
+  the `nour_limb` post-process draws the blue limb (sky pixels only, via `depthTexture`), and a `preRender` hook dims
+  the daytime imagery layers by the sun elevation at the screen-centre ground point (new layers that show daytime
+  imagery must join its `dayLayers` list). The Tycho-2 sky box is re-levelled with a LUT: below ~15 its faces are
+  JPEG noise, so a lower black point makes streaky speckle instead of stars.
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block
