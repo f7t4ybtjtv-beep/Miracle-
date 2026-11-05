@@ -193,6 +193,10 @@
   .watch .mag { color: var(--accent); font-weight: 500; }
   .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
   .watch .journal li b { color: var(--text-2); font-weight: 400; }
+  #cesium-credits { margin-top: 8px; font: 400 10px/1.5 var(--font-mono); color: var(--text-2); text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 10px; }
+  #cesium-credits[hidden] { display: none; }
+  #cesium-credits a { color: var(--text-2); }
+  #cesium-credits img { max-height: 18px; vertical-align: middle; }
   .sit-only { display: none; }
   body.sitroom .sit-only { display: inline; }
   body.sitroom .places, body.sitroom .card { display: none; }
@@ -241,6 +245,7 @@
     <div class="tools">
       <button class="btn" id="btn-orbit" type="button">Orbite</button>
       <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
+      <button class="btn" id="btn-google" type="button" aria-pressed="false" hidden>Google 3D</button>
       <button class="btn" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch">Veille</button>
       <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
     </div>
@@ -287,6 +292,7 @@
   <details class="ui credits glass" id="credits-box">
     <summary>Sources</summary>
     <div id="credits"></div>
+    <div id="cesium-credits" hidden></div>
   </details>
 
   <div class="loader" id="loader">
@@ -549,7 +555,7 @@
     animation: false, timeline: false, baseLayerPicker: false, geocoder: false,
     homeButton: false, sceneModePicker: false, navigationHelpButton: false,
     fullscreenButton: false, infoBox: false, selectionIndicator: false,
-    creditContainer: document.createElement('div'),
+    creditContainer: $('cesium-credits'),
     msaaSamples: tier.msaa,
     shadows: tier.shadows,
     terrainShadows: tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED,
@@ -1101,6 +1107,7 @@
     scene.highDynamicRange = name !== 'light';
     scene.postProcessStages.fxaa.enabled = tier.fxaa;
     hillshade.alpha = name === 'light' ? 0.6 : 0.9;
+    if (googleTileset) googleTileset.maximumScreenSpaceError = TILESET_SSE[name];
     if (!tier.clouds) clouds.removeAll();
     $('hud-quality').textContent = `Qualité ${tier.label}`;
   }
@@ -1325,6 +1332,88 @@
     if (veille.quakes) { loadQuakes(); quakeTimer = setInterval(loadQuakes, 300000); }
     if (veille.iss) { loadISS(); issTimer = setInterval(loadISS, 5000); }
   });
+
+  // ---------- Google Earth 3D (optional: needs a Google Maps Platform key) ----------
+  // Google Photorealistic 3D Tiles are served by Google's Map Tiles API. A key is required and
+  // usage is billed to that key's Google Cloud project, so nothing loads without one. Keys are
+  // taken from (in order): the GOOGLE_MAPS_KEY constant, ?gkey=... in the address (saved in this
+  // browser only, then removed from the address bar; ?gkey=off forgets it), or the saved value.
+  // Restrict the key in Google Cloud to this site's address and to the Map Tiles API.
+  const GOOGLE_MAPS_KEY = '';
+  function readGoogleKey() {
+    const valid = (k) => (/^[A-Za-z0-9_-]{20,80}$/.test(k || '') ? k : '');
+    let fromUrl = '', stored = '';
+    try {
+      const params = new URLSearchParams(location.search);
+      if (params.has('gkey')) {
+        fromUrl = params.get('gkey');
+        params.delete('gkey');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+      }
+    } catch (e) { /* no history API: the key just stays in the address */ }
+    try {
+      if (fromUrl === 'off') localStorage.removeItem('nour.gkey');
+      else if (valid(fromUrl)) localStorage.setItem('nour.gkey', fromUrl);
+      stored = localStorage.getItem('nour.gkey') || '';
+    } catch (e) { /* storage blocked: a key from the address is used for this visit only */ }
+    return valid(GOOGLE_MAPS_KEY) || valid(fromUrl) || valid(stored);
+  }
+  const googleKey = readGoogleKey();
+  const TILESET_SSE = { high: 8, balanced: 12, light: 20 };           // lower = sharper
+  const TILESET_CACHE_MB = { high: [512, 256], balanced: [256, 128], light: [128, 64] };
+  let googleTileset = null, googleOn = false, googleReady = false, googleBusy = false, googleFailures = 0;
+  statusLines.google = '';
+
+  function applyGoogleVisibility() {
+    // The photorealistic mesh replaces the globe once its first tiles are in; until then keep the globe.
+    globe.show = !(googleOn && googleReady);
+    if (googleTileset) googleTileset.show = googleOn;
+    $('cesium-credits').hidden = !googleOn;       // Google requires its logo and data credits on screen
+    if (googleOn) $('credits-box').open = true;
+    $('btn-google').setAttribute('aria-pressed', String(googleOn));
+    statusLines.google = googleOn && googleReady
+      ? 'Google 3D actif : satellite Esri, relief ombré et précipitations masqués.' : statusLines.google;
+    renderStatus();
+  }
+  function leaveGoogle(message) {
+    googleOn = false;
+    statusLines.google = message || '';
+    applyGoogleVisibility();
+    if (message) journal(message);
+  }
+  async function enterGoogle() {
+    if (googleBusy) return;
+    googleBusy = true; googleOn = true;
+    statusLines.google = 'Google 3D : chargement…'; renderStatus();
+    $('btn-google').setAttribute('aria-pressed', 'true');
+    try {
+      if (!googleTileset) {
+        const [cache, overflow] = TILESET_CACHE_MB[tierName];
+        googleTileset = await C.createGooglePhotorealistic3DTileset(
+          { key: googleKey, onlyUsingWithGoogleGeocoder: true },
+          { maximumScreenSpaceError: TILESET_SSE[tierName], showCreditsOnScreen: true,
+            cacheBytes: cache * 1048576, maximumCacheOverflowBytes: overflow * 1048576 });
+        scene.primitives.add(googleTileset);
+        googleTileset.initialTilesLoaded.addEventListener(() => { googleReady = true; if (googleOn) applyGoogleVisibility(); });
+        googleTileset.tileFailed.addEventListener(() => {
+          // A few failed tiles are normal; many in a row mean a bad key, a disabled API or no billing.
+          if (++googleFailures === 6 && googleOn) leaveGoogle('Google 3D indisponible : tuiles refusées (clé, API Map Tiles ou facturation). Retour à la carte.');
+        });
+      }
+      googleFailures = 0;
+      applyGoogleVisibility();
+      journal('Activé : Google 3D');
+    } catch (e) {
+      googleTileset = null; googleReady = false;
+      leaveGoogle('Google 3D indisponible : clé refusée, API Map Tiles non activée ou facturation absente. Retour à la carte.');
+    }
+    googleBusy = false;
+  }
+  if (googleKey) {
+    $('btn-google').hidden = false;
+    $('btn-google').addEventListener('click', () => (googleOn ? leaveGoogle() : enterGoogle()));
+  }
 
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.

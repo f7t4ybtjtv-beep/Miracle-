@@ -53,6 +53,25 @@ Les trois flux étaient injoignables depuis l'environnement de développement :
 l'interface a été testée avec des données simulées au format documenté, pas
 avec les flux réels.
 
+### Nour : Google Earth 3D (optionnel, clé Google requise)
+
+Un bouton **Google 3D** apparaît dans Nour uniquement si une clé Google Maps
+Platform est présente. Il remplace la carte (satellite Esri, relief ombré)
+par les *Photorealistic 3D Tiles* de Google (Map Tiles API), avec le logo et
+les mentions de sources exigés par Google. Sans clé, rien ne change et aucune
+requête n'est envoyée à Google.
+
+1. Google Cloud : créer un projet, activer la facturation, activer **Map Tiles API**.
+2. Créer une clé API, la **restreindre** : sites web autorisés `https://f7t4ybtjtv-beep.github.io/*`, et API autorisée **Map Tiles API** seulement. Ajouter une alerte de budget et un plafond de quota.
+3. Essai privé : ouvrir `nour/index.html?gkey=VOTRE_CLE`. La clé est mémorisée dans ce navigateur uniquement et retirée de l'adresse ; `?gkey=off` l'oublie.
+4. Pour tous les visiteurs : renseigner la constante `GOOGLE_MAPS_KEY` dans `nour/index.html`. Une clé côté navigateur est visible de tous : seules ses restrictions la protègent, et l'usage est facturé au projet Google Cloud de la clé.
+
+Limites : testé uniquement avec une fausse tuile et de fausses réponses de Google
+(le service est injoignable depuis l'environnement de développement), jamais avec
+les vraies données. En mode Google 3D, la lumière du soleil réelle, les
+précipitations et le relief ombré ne s'appliquent plus (la lumière est celle des
+tuiles).
+
 ## Lancer le projet
 
 Aucun serveur ni installation requis : ouvrez `index.html` directement dans
