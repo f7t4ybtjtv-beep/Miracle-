@@ -1,0 +1,10 @@
+(4,4) graphs=65536 SAT=37823 UNSAT=27713 failures=0 time=1.2s
+(3,2) graphs=64 SAT=0 UNSAT=64 failures=0 time=0.0s
+(4,3) graphs=4096 SAT=0 UNSAT=4096 failures=0 time=0.1s
+K_{2,1}: vars=2 clauses=3 status=UNSAT proof_lines=1 satlab_checker=True drat_trim_verified=True t=0.1s
+K_{3,2}: vars=6 clauses=9 status=UNSAT proof_lines=2 satlab_checker=True drat_trim_verified=True t=0.1s
+K_{4,3}: vars=12 clauses=22 status=UNSAT proof_lines=7 satlab_checker=True drat_trim_verified=True t=0.1s
+K_{5,4}: vars=20 clauses=45 status=UNSAT proof_lines=30 satlab_checker=True drat_trim_verified=True t=0.1s
+K_{6,5}: vars=30 clauses=81 status=UNSAT proof_lines=146 satlab_checker=True drat_trim_verified=True t=0.1s
+K_{7,6}: vars=42 clauses=133 status=UNSAT proof_lines=767 satlab_checker=True drat_trim_verified=True t=0.2s
+certified rc=0

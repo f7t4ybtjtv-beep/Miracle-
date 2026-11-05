@@ -128,6 +128,15 @@ les vraies données. En mode Google 3D, la lumière du soleil réelle, les
 précipitations et le relief ombré ne s'appliquent plus (la lumière est celle des
 tuiles), et la vue de nuit n'est pas proposée.
 
+## Outil de recherche SAT (`satlab/`)
+
+Indépendamment du site, `satlab/` est un outil Python (bibliothèque standard
+uniquement) pour l'étude empirique de SAT : générateurs d'instances,
+solveur CDCL instrumenté émettant des preuves DRUP, vérificateur de
+certificats autonome, contre-tests et campagnes reproductibles. Voir
+[`satlab/README.md`](satlab/README.md) et les résultats dans
+[`results/standard/REPORT.md`](results/standard/REPORT.md).
+
 ## Lancer le projet
 
 Aucun serveur ni installation requis : ouvrez `index.html` directement dans

@@ -1,0 +1,72 @@
+== (a) n disjoint K_{1,2}: expect models 3^n, matchings 2^n ==
+n= 1 vars= 2 bf=3 own=3 3^n=3 match=2 ratio=3/2 k=1
+n= 2 vars= 4 bf=9 own=9 3^n=9 match=4 ratio=9/4 k=2
+n= 3 vars= 6 bf=27 own=27 3^n=27 match=8 ratio=27/8 k=3
+n= 4 vars= 8 bf=81 own=81 3^n=81 match=16 ratio=81/16 k=4
+n= 5 vars=10 bf=243 own=243 3^n=243 match=32 ratio=243/32 k=5
+n= 6 vars=12 bf=729 own=729 3^n=729 match=64 ratio=729/64 k=6
+n= 7 vars=14 bf=2187 own=2187 3^n=2187 match=128 ratio=2187/128 k=7
+n= 8 vars=16 bf=6561 own=6561 3^n=6561 match=256 ratio=6561/256 k=8
+n= 9 vars=18 bf=19683 own=19683 3^n=19683 match=512 ratio=19683/512 k=9
+n=10 vars=20 bf=59049 own=59049 3^n=59049 match=1024 ratio=59049/1024 k=10
+n=11 vars=22 bf=None own=177147 3^n=177147 match=2048 ratio=177147/2048 k=11
+n=12 vars=24 bf=None own=531441 3^n=531441 match=4096 ratio=531441/4096 k=12
+== (d) n disjoint K_{1,d}: expect (2^d-1)^n vs d^n ==
+d=1 n=1 vars= 1 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=1 n=2 vars= 2 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=1 n=3 vars= 3 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=1 n=4 vars= 4 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=1 n=5 vars= 5 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=1 n=6 vars= 6 bf=1 own=1 match=1 ratio=1.0000 closed=((2^d-1)/d)^n=1.0000
+d=2 n=1 vars= 2 bf=3 own=3 match=2 ratio=1.5000 closed=((2^d-1)/d)^n=1.5000
+d=2 n=2 vars= 4 bf=9 own=9 match=4 ratio=2.2500 closed=((2^d-1)/d)^n=2.2500
+d=2 n=3 vars= 6 bf=27 own=27 match=8 ratio=3.3750 closed=((2^d-1)/d)^n=3.3750
+d=2 n=4 vars= 8 bf=81 own=81 match=16 ratio=5.0625 closed=((2^d-1)/d)^n=5.0625
+d=2 n=5 vars=10 bf=243 own=243 match=32 ratio=7.5938 closed=((2^d-1)/d)^n=7.5938
+d=2 n=6 vars=12 bf=729 own=729 match=64 ratio=11.3906 closed=((2^d-1)/d)^n=11.3906
+d=3 n=1 vars= 3 bf=7 own=7 match=3 ratio=2.3333 closed=((2^d-1)/d)^n=2.3333
+d=3 n=2 vars= 6 bf=49 own=49 match=9 ratio=5.4444 closed=((2^d-1)/d)^n=5.4444
+d=3 n=3 vars= 9 bf=343 own=343 match=27 ratio=12.7037 closed=((2^d-1)/d)^n=12.7037
+d=3 n=4 vars=12 bf=2401 own=2401 match=81 ratio=29.6420 closed=((2^d-1)/d)^n=29.6420
+d=3 n=5 vars=15 bf=16807 own=16807 match=243 ratio=69.1646 closed=((2^d-1)/d)^n=69.1646
+d=3 n=6 vars=18 bf=117649 own=117649 match=729 ratio=161.3841 closed=((2^d-1)/d)^n=161.3841
+d=4 n=1 vars= 4 bf=15 own=15 match=4 ratio=3.7500 closed=((2^d-1)/d)^n=3.7500
+d=4 n=2 vars= 8 bf=225 own=225 match=16 ratio=14.0625 closed=((2^d-1)/d)^n=14.0625
+d=4 n=3 vars=12 bf=3375 own=3375 match=64 ratio=52.7344 closed=((2^d-1)/d)^n=52.7344
+d=4 n=4 vars=16 bf=50625 own=50625 match=256 ratio=197.7539 closed=((2^d-1)/d)^n=197.7539
+d=4 n=5 vars=20 bf=759375 own=759375 match=1024 ratio=741.5771 closed=((2^d-1)/d)^n=741.5771
+d=5 n=1 vars= 5 bf=31 own=31 match=5 ratio=6.2000 closed=((2^d-1)/d)^n=6.2000
+d=5 n=2 vars=10 bf=961 own=961 match=25 ratio=38.4400 closed=((2^d-1)/d)^n=38.4400
+d=5 n=3 vars=15 bf=29791 own=29791 match=125 ratio=238.3280 closed=((2^d-1)/d)^n=238.3280
+d=5 n=4 vars=20 bf=923521 own=923521 match=625 ratio=1477.6336 closed=((2^d-1)/d)^n=1477.6336
+d=6 n=1 vars= 6 bf=63 own=63 match=6 ratio=10.5000 closed=((2^d-1)/d)^n=10.5000
+d=6 n=2 vars=12 bf=3969 own=3969 match=36 ratio=110.2500 closed=((2^d-1)/d)^n=110.2500
+d=6 n=3 vars=18 bf=250047 own=250047 match=216 ratio=1157.6250 closed=((2^d-1)/d)^n=1157.6250
+== (d) multiplicativity on mixed disjoint unions ==
+blocks=(0,) vars=2 bf=3 own=3 prod=3 match=2 prodmatch=2
+blocks=(1,) vars=6 bf=12 own=12 prod=12 match=6 prodmatch=6
+blocks=(2,) vars=3 bf=1 own=1 prod=1 match=1 prodmatch=1
+blocks=(3,) vars=3 bf=7 own=7 prod=7 match=3 prodmatch=3
+blocks=(4,) vars=5 bf=13 own=13 prod=13 match=5 prodmatch=5
+blocks=(0, 1) vars=8 bf=36 own=36 prod=36 match=12 prodmatch=12
+blocks=(0, 2) vars=5 bf=3 own=3 prod=3 match=2 prodmatch=2
+blocks=(0, 3) vars=5 bf=21 own=21 prod=21 match=6 prodmatch=6
+blocks=(0, 4) vars=7 bf=39 own=39 prod=39 match=10 prodmatch=10
+blocks=(1, 2) vars=9 bf=12 own=12 prod=12 match=6 prodmatch=6
+blocks=(1, 3) vars=9 bf=84 own=84 prod=84 match=18 prodmatch=18
+blocks=(1, 4) vars=11 bf=156 own=156 prod=156 match=30 prodmatch=30
+blocks=(2, 3) vars=6 bf=7 own=7 prod=7 match=3 prodmatch=3
+blocks=(2, 4) vars=8 bf=13 own=13 prod=13 match=5 prodmatch=5
+blocks=(3, 4) vars=8 bf=91 own=91 prod=91 match=15 prodmatch=15
+blocks=(0, 1, 2) vars=11 bf=36 own=36 prod=36 match=12 prodmatch=12
+blocks=(0, 1, 3) vars=11 bf=252 own=252 prod=252 match=36 prodmatch=36
+blocks=(0, 1, 4) vars=13 bf=468 own=468 prod=468 match=60 prodmatch=60
+blocks=(0, 2, 3) vars=8 bf=21 own=21 prod=21 match=6 prodmatch=6
+blocks=(0, 2, 4) vars=10 bf=39 own=39 prod=39 match=10 prodmatch=10
+blocks=(0, 3, 4) vars=10 bf=273 own=273 prod=273 match=30 prodmatch=30
+blocks=(1, 2, 3) vars=12 bf=84 own=84 prod=84 match=18 prodmatch=18
+blocks=(1, 2, 4) vars=14 bf=156 own=156 prod=156 match=30 prodmatch=30
+blocks=(1, 3, 4) vars=14 bf=1092 own=1092 prod=1092 match=90 prodmatch=90
+blocks=(2, 3, 4) vars=11 bf=91 own=91 prod=91 match=15 prodmatch=15
+time 5.5s
+rc=0

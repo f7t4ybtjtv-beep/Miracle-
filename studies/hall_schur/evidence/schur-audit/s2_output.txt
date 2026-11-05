@@ -1,0 +1,17 @@
+CDCL Schur(14,3) seed=0: UNSAT {'conflicts': 218, 'decisions': 241, 'propagations': 3311, 'learned': 217, 'deleted': 0, 'restarts': 2}
+proof lines=218 lemmas=218 deletions=0 sha256=1fc7ae50d2bec481a2939eefc39adc5e1c682e65e42db368df89272abb184f7a
+max variable in proof: 42
+N=14 vars=42 clauses=203 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 147 of 203 clauses in core; c 213 of 219 lemmas in core using 2985 resolution steps
+N=15 vars=45 clauses=228 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 147 of 228 clauses in core; c 213 of 219 lemmas in core using 2980 resolution steps
+N=20 vars=60 clauses=380 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 147 of 380 clauses in core; c 213 of 219 lemmas in core using 2984 resolution steps
+N=30 vars=90 clauses=795 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 146 of 795 clauses in core; c 213 of 219 lemmas in core using 2984 resolution steps
+N=40 vars=120 clauses=1360 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 146 of 1360 clauses in core; c 213 of 219 lemmas in core using 2984 resolution steps
+N=50 vars=150 clauses=2075 | satlab.checker: True preuve valide (218 lemmes, 0 suppressions) | drat-trim VERIFIED=True | c 146 of 2075 clauses in core; c 213 of 219 lemmas in core using 2984 resolution steps
+CDCL seed=0 status=UNSAT conflicts=218 decisions=241
+CDCL seed=1 status=UNSAT conflicts=217 decisions=235
+CDCL seed=2 status=UNSAT conflicts=242 decisions=261
+CDCL seed=3 status=UNSAT conflicts=203 decisions=223
+CDCL seed=4 status=UNSAT conflicts=198 decisions=213
+satlab.reference.dpll Schur(13,3): status=True nodes=61 time=0.0s
+  model check: (True, 'modèle valide (178 clauses satisfaites)')
+satlab.reference.dpll Schur(14,3): status=False nodes=751 time=0.0s
