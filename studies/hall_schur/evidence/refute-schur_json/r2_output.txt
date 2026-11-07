@@ -1,0 +1,23 @@
+own CDCL seed3: UNSAT 176
+their proof sha256 1fc7ae50d2bec481a2939eefc39adc5e1c682e65e42db368df89272abb184f7a
+their proof lines 218 deletions 0 maxvar 42
+14 42 203 theirs drat VERIFIED ['c 147 of 203 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+14 42 203 mine drat VERIFIED ['c 145 of 203 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+15 45 228 theirs drat VERIFIED ['c 147 of 228 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+15 45 228 mine drat VERIFIED ['c 149 of 228 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+20 60 380 theirs drat VERIFIED ['c 147 of 380 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+20 60 380 mine drat VERIFIED ['c 153 of 380 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+30 90 795 theirs drat VERIFIED ['c 147 of 795 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+30 90 795 mine drat VERIFIED ['c 153 of 795 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+40 120 1360 theirs drat VERIFIED ['c 147 of 1360 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+40 120 1360 mine drat VERIFIED ['c 153 of 1360 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+50 150 2075 theirs drat VERIFIED ['c 147 of 2075 clauses in core'] | satlab (True, 'preuve valide (218 lemmes, 0 suppressions)')
+50 150 2075 mine drat VERIFIED ['c 153 of 2075 clauses in core'] | satlab (True, 'preuve valide (176 lemmes, 0 suppressions)')
+control F13 with their proof: False (False, 'étape 4 : littéral hors domaine')
+dpll 13 (True, 61)
+dpll 14 (False, 751)
+cdcl seed 0 UNSAT 218
+cdcl seed 1 UNSAT 186
+cdcl seed 2 UNSAT 246
+cdcl seed 3 UNSAT 176
+cdcl seed 4 UNSAT 198

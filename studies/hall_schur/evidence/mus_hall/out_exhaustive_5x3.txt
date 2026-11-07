@@ -1,0 +1,290 @@
+done |X|=1 |Y|=0  iso classes=1  t=0.0s
+done |X|=1 |Y|=1  iso classes=2  t=0.0s
+done |X|=1 |Y|=2  iso classes=3  t=0.0s
+done |X|=1 |Y|=3  iso classes=4  t=0.0s
+done |X|=2 |Y|=0  iso classes=1  t=0.0s
+done |X|=2 |Y|=1  iso classes=3  t=0.0s
+done |X|=2 |Y|=2  iso classes=7  t=0.0s
+done |X|=2 |Y|=3  iso classes=13  t=0.0s
+done |X|=3 |Y|=0  iso classes=1  t=0.0s
+  strict-defmax connected S without MUS: 3 1 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=1  iso classes=4  t=0.0s
+  strict-defmax connected S without MUS: 3 2 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=2  iso classes=13  t=0.0s
+  strict-defmax connected S without MUS: 3 3 (1, 1, 1) [0, 1, 2]
+done |X|=3 |Y|=3  iso classes=36  t=0.0s
+done |X|=4 |Y|=0  iso classes=1  t=0.0s
+  strict-defmax connected S without MUS: 4 1 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 1 (1, 1, 1, 1) [0, 1, 2, 3]
+done |X|=4 |Y|=1  iso classes=5  t=0.0s
+  strict-defmax connected S without MUS: 4 2 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 2 (1, 1, 2, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 2 (1, 2, 3, 3) [0, 1, 2, 3]
+done |X|=4 |Y|=2  iso classes=22  t=0.0s
+  strict-defmax connected S without MUS: 4 3 (0, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 1, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 4 3 (1, 1, 2, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 4 3 (1, 2, 3, 3) [0, 1, 2, 3]
+done |X|=4 |Y|=3  iso classes=87  t=0.2s
+done |X|=5 |Y|=0  iso classes=1  t=0.2s
+  strict-defmax connected S without MUS: 5 1 (0, 0, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (0, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 1 (0, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 1 (0, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (0, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (0, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 2, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 1 (1, 1, 1, 1, 1) [0, 1, 2, 3, 4]
+done |X|=5 |Y|=1  iso classes=6  t=0.2s
+  strict-defmax connected S without MUS: 5 2 (0, 0, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 2) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 1, 3) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 1, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (0, 1, 2, 3, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 1) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 2) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 2) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 2) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 2) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 3) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 3) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 3) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 1, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 3) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 2, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 3, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 1, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 2, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 2, 3) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 2, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 2, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 3, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 3, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 3, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 3, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 2, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 1, 3, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 2, 3, 3, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 2 (1, 2, 3, 3, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 2 (1, 2, 3, 3, 3) [0, 1, 3, 4]
+done |X|=5 |Y|=2  iso classes=34  t=0.7s
+  strict-defmax connected S without MUS: 5 3 (0, 0, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 2) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 3) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 6) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 1, 7) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 1, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (0, 1, 2, 3, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 1) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 2) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 2) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 2) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 2) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 3) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 3) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 3) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 6) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 6) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 6) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 6) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 7) [0, 1, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 7) [0, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 7) [1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 1, 7) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 2) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 3) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 4) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 5) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 2, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 3, 3) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 3, 5) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 3, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 3, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 6, 6) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 6, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 1, 7, 7) [0, 1, 2]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 2, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 2, 3) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 2, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 2, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 2, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 3) [0, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 3) [1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 4) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 5) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 6) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 3, 7) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 4, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 5, 6) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 2, 6, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 3, 3, 3) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 3, 6, 6) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 1, 6, 6, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 3) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 3) [0, 1, 2, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 3) [0, 1, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 4) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 5) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 3, 7) [0, 1, 2, 3]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 4, 5) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 4, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 3, 5, 6) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 4, 7, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 5, 5, 6) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 2, 5, 6, 7) [0, 1, 2, 3, 4]
+  strict-defmax connected S without MUS: 5 3 (1, 3, 5, 6, 6) [0, 1, 2, 3, 4]
+done |X|=5 |Y|=3  iso classes=190  t=7.6s
+{
+ "graphs_iso": 434,
+ "graphs_lab": 38879,
+ "exhaustive_crosschecked_iso": 425,
+ "mw_iso": 1196,
+ "mw_lab": 112587,
+ "mw_mus_iso": 918,
+ "mw_mus_lab": 67923,
+ "induced_unsat_fail": 0,
+ "pigeon_unnecessary": 0,
+ "criterion_mismatch": 0,
+ "hole_clause_criterion_mismatch": 0,
+ "mus_total_iso": 4144,
+ "mus_total_lab": 206835,
+ "mus_bad_hole_clause": 0,
+ "mus_no_violator": 0,
+ "mus_pigeonset_not_violator": 0,
+ "mus_pigeonset_minimal_witness": 1196,
+ "mus_pigeonset_not_minimal": 2948,
+ "mus_minwit_not_subset_of_induced": 0,
+ "minwit_without_mus": 0,
+ "mus_verify_fail": 0,
+ "mus_not_strict_defmax": 0,
+ "strict_defmax_sets": 2182,
+ "strict_defmax_sets_with_mus": 1310,
+ "strict_defmax_connected": 1520,
+ "strict_defmax_connected_with_mus": 1310,
+ "mus_deficiency_hist": {
+  "1": 1196,
+  "2": 2204,
+  "3": 744
+ }
+}
+fraction of minimal witnesses (labelled, with multiplicity) whose induced CNF is MUS: 67923/112587 = 0.6033
+same over iso classes: 918/1196 = 0.7676
+smallest non-MUS induced CNF (|X|+|Y|, |E|, nX, nY, adj, S): (5, 5, 3, 2, (1, 3, 3), [0, 1, 2])
+smallest MUS with non-minimal pigeon set (|X|+|Y|, |E|, nX, nY, adj, P, |MUS|): (6, 6, 4, 2, (1, 1, 3, 3), [0, 1, 2, 3], 7)
+per (|X|,|Y|): iso, labelled graphs, minimal witnesses(lab), induced=MUS(lab), MUSes(lab), MUSes with non-minimal pigeon set(lab)
+(1, 0) 1 1 1 1 1 0
+(1, 1) 2 2 1 1 1 0
+(1, 2) 3 4 1 1 1 0
+(1, 3) 4 8 1 1 1 0
+(2, 0) 1 1 2 2 2 0
+(2, 1) 3 4 5 5 5 0
+(2, 2) 7 16 10 10 10 0
+(2, 3) 13 64 19 19 19 0
+(3, 0) 1 1 3 3 3 0
+(3, 1) 4 8 18 18 18 0
+(3, 2) 13 64 85 79 85 0
+(3, 3) 36 512 303 285 303 0
+(4, 0) 1 1 4 4 4 0
+(4, 1) 5 16 56 56 56 0
+(4, 2) 22 256 656 560 722 66
+(4, 3) 87 4096 5457 4113 5655 198
+(5, 0) 1 1 5 5 5 0
+(5, 1) 6 32 160 160 160 0
+(5, 2) 34 1024 4640 3680 6662 2022
+(5, 3) 190 32768 101160 58920 193122 91962
+time 7.6s
+exit 0

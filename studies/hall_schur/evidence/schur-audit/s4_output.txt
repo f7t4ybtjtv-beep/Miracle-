@@ -1,0 +1,6 @@
+N=14 VERIFIED=True core=147 {'ALO': 14, 'AMO': 6, 'TRI': 127} clauses_using_vars>42=0
+N=15 VERIFIED=True core=147 {'ALO': 14, 'AMO': 6, 'TRI': 127} clauses_using_vars>42=0
+N=20 VERIFIED=True core=147 {'ALO': 14, 'AMO': 6, 'TRI': 127} clauses_using_vars>42=0
+N=30 VERIFIED=True core=146 {'ALO': 14, 'AMO': 6, 'TRI': 126} clauses_using_vars>42=0
+N=40 VERIFIED=True core=146 {'ALO': 14, 'AMO': 6, 'TRI': 126} clauses_using_vars>42=0
+N=50 VERIFIED=True core=146 {'ALO': 14, 'AMO': 6, 'TRI': 126} clauses_using_vars>42=0

@@ -1,0 +1,4 @@
+A {'graphs': 4188, 'w': 49066, 'mus': 18181, 'maxS': 9, 'pig_fail': 0, 'crit_mis': 0, 'holes': 746826, 'xcheck': 9813}
+B {'mus': 8376, 'bad_hole': 0, 'not_strict': 0, 'd1_not_minwit': 0, 'minwit_not_d1': 0, 'hist': {1: 7450, 2: 776, 3: 133, 4: 16, 5: 1}, 'maxP': 9, 'verify_fail': 0}
+time 150.1
+A fraction 18181/49066 = 0.3705

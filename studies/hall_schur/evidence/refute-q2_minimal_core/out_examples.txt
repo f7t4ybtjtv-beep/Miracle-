@@ -1,0 +1,24 @@
+== ExA adj (5, 5, 3, 3)
+ minimal witnesses: [['a', 'b', 'c', 'd']]
+ #clauses 12 UNSAT drat-trim/satlab-checker (True, True)
+  removing H(y1:a,b) -> still UNSAT; drat-trim,checker: (True, True)
+  removing H(y1:c,d) -> still UNSAT; drat-trim,checker: (True, True)
+ redundant count: 2 MUS: False
+== ExB adj (1, 3, 3)
+ minimal witnesses: [['a', 'b', 'c']]
+ #clauses 7 UNSAT drat-trim/satlab-checker (True, True)
+  removing H(y1:b,c) -> still UNSAT; drat-trim,checker: (True, True)
+ redundant count: 1 MUS: False
+== ExD adj (1, 1, 3, 3)
+ minimal witnesses: [['a', 'b'], ['a', 'c', 'd'], ['b', 'c', 'd']]
+ #clauses 7 UNSAT drat-trim/satlab-checker (True, True)
+ redundant count: 0 MUS: True
+== ExC adj (3, 3, 3, 3)
+ minimal witnesses: [['a', 'b', 'c'], ['a', 'b', 'd'], ['a', 'c', 'd'], ['b', 'c', 'd']]
+ #clauses 10 UNSAT drat-trim/satlab-checker (True, True)
+ redundant count: 0 MUS: True
+K_{2,1} minwit True #cl 3 MUS(choice) True MUS(dpll) True
+K_{3,2} minwit True #cl 9 MUS(choice) True MUS(dpll) True
+K_{4,3} minwit True #cl 22 MUS(choice) True MUS(dpll) True
+K_{5,4} minwit True #cl 45 MUS(choice) True MUS(dpll) True
+K_{6,5} minwit True #cl 81 MUS(choice) True MUS(dpll) skip
