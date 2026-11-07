@@ -487,7 +487,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.9';
+  const NOUR_BUILD = '2026-11-05.10';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1132,6 +1132,17 @@
 
   // ---------- Decorative clouds (not weather data) ----------
   const clouds = scene.primitives.add(new C.CloudCollection({ noiseDetail: 16.0 }));
+  // Cesium 1.145's CloudCollection draws without a bounding volume. Where order-independent translucency is missing
+  // (Safari on iPhone has no float blending), Cesium sorts translucent draws by distance and reads that volume: the
+  // render loop then stopped with "boundingVolume.distanceSquaredTo". Give the draws a sphere around the clouds
+  // (`_colorCommands` is a private field of the pinned version), and draw nothing at all when there are no clouds.
+  const cloudBounds = new C.BoundingSphere();
+  const cloudsUpdate = clouds.update.bind(clouds);
+  clouds.update = (frameState) => {
+    if (clouds.length === 0) return;
+    cloudsUpdate(frameState);
+    for (const command of clouds._colorCommands || []) command.boundingVolume = cloudBounds;
+  };
   let cloudsOn = tier.clouds > 0;
   $('btn-clouds').setAttribute('aria-pressed', String(cloudsOn));
   function seededRandom(seed) {
@@ -1153,13 +1164,16 @@
     const approachStart = ellipsoid.cartesianToCartographic(C.Matrix4.multiplyByPoint(enu,
       new C.Cartesian3(-Math.sin(hd) * 40000, -Math.cos(hd) * 40000, 0), new C.Cartesian3()));
     const base = Math.max(groundHeight, 0) + 1800;
+    const positions = [];
     for (let i = 0; i < count; i++) {
       const f = rnd();
       const lon = C.Math.lerp(approachStart.longitude, target.longitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.06);
       const lat = C.Math.lerp(approachStart.latitude, target.latitude, 0.15 + f * 0.7) + (rnd() - 0.5) * D2R(0.05);
       const w = 1600 + rnd() * 2800, hgt = w * (0.3 + rnd() * 0.2);
+      const position = C.Cartesian3.fromRadians(lon, lat, base + rnd() * 1600);
+      positions.push(position);
       clouds.add({
-        position: C.Cartesian3.fromRadians(lon, lat, base + rnd() * 1600),
+        position,
         scale: new C.Cartesian2(w, hgt),
         // Same units as `scale` (metres): the volume the cloud may fill.
         maximumSize: new C.Cartesian3(w * 0.95, hgt * 0.95, hgt * (0.6 + rnd() * 0.3)),
@@ -1167,6 +1181,8 @@
         brightness: 0.95 + rnd() * 0.05,
       });
     }
+    C.BoundingSphere.fromPoints(positions, cloudBounds);
+    cloudBounds.radius += 5000;     // half the widest cloud, with room to spare
   }
 
   // ---------- Cinematic flight engine ----------
