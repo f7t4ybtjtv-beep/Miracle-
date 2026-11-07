@@ -383,6 +383,7 @@
     <div class="links">
       <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
       <button class="earth" id="card-night" type="button">Voir la nuit depuis l’orbite ↗</button>
+      <button class="earth" id="card-dive" type="button">Plonger depuis l’espace ↓</button>
     </div>
   </section>
 
@@ -486,7 +487,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.8';
+  const NOUR_BUILD = '2026-11-05.9';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -814,6 +815,7 @@
   const dayLayers = [[naturalEarth, 1.0], [satellite, satellite.brightness], [realEarth, 1.0]];
   const lookPoint = new C.Cartesian3(), screenCentre = new C.Cartesian2();
   let nightLook = 0, starGain = 1;
+  let rush = 0, haze = 0, prevH = 0, prevT = 0;     // dive blur and haze, see the "nour_rush" stage
   scene.preRender.addEventListener(() => {
     const h = camera.positionCartographic.height;
     screenCentre.x = canvas.clientWidth / 2; screenCentre.y = canvas.clientHeight / 2;
@@ -824,6 +826,18 @@
     const k = 1 - 0.45 * nightLook;
     for (const [layer, base] of dayLayers) layer.brightness = base * k;
     glowFx.enabled = nightLook > 0.02 && tierName !== 'light';   // no halo passes by day or on the light tier
+    // Dive: blur from how fast the altitude changes (e-folds per second), only once below a few hundred km, and a
+    // grey haze around 6 km up where the cloud layer is. Off outside a dive, and with reduced motion.
+    const nowMs = performance.now();
+    if (diving && !prefersReduced.matches) {
+      if (prevH > 0) {
+        const rate = Math.abs(Math.log(h / prevH)) / Math.max((nowMs - prevT) / 1000, 1e-3);
+        rush += (Math.min(1, rate / 2.0) * (1 - ramp(h, 4e5, 4e6)) - rush) * 0.25;
+      }
+      prevH = h; prevT = nowMs;
+      haze = cloudsOn ? Math.exp(-0.5 * Math.pow(Math.log(Math.max(h, 1) / 6000) / 0.55, 2)) : 0;
+    } else { rush = 0; haze = 0; prevH = 0; }
+    rushFx.enabled = rush > 0.02 || haze > 0.02;
   });
 
   // Sun lighting and atmosphere from the real sun position at the clock time.
@@ -989,6 +1003,39 @@
   const glowFx = new C.PostProcessStageComposite({ name: 'nour_glow_fx', stages: [glowSource, glowAdd], inputPreviousStageTexture: false });
   glowFx.enabled = false;
   scene.postProcessStages.add(glowFx);
+  // Dive finish (last stage): radial blur towards the screen centre, strength `rush`, and a cloud haze of strength `haze`.
+  const rushFx = new C.PostProcessStage({
+    name: 'nour_rush',
+    uniforms: { rush: () => rush, haze: () => haze, seed: () => (performance.now() % 100000) / 1000 },
+    fragmentShader: `
+      uniform sampler2D colorTexture;
+      uniform float rush;
+      uniform float haze;
+      uniform float seed;
+      in vec2 v_textureCoordinates;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float noise(vec2 p) {
+        vec2 i = floor(p), f = fract(p);
+        f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+      }
+      void main() {
+        vec2 uv = v_textureCoordinates;
+        vec2 toCentre = uv - 0.5;
+        vec3 sum = vec3(0.0);
+        for (int i = 0; i < 12; i++) sum += texture(colorTexture, uv - toCentre * (rush * 0.10 * float(i) / 11.0)).rgb;
+        vec3 color = sum / 12.0;
+        if (haze > 0.0) {
+          vec2 q = uv * vec2(2.2, 3.4) + toCentre * 1.5 + seed * 0.25;
+          float n = 0.55 * noise(q) + 0.3 * noise(q * 2.1 + 7.0) + 0.15 * noise(q * 4.3 + 3.0);
+          vec3 fog = vec3(0.60, 0.64, 0.70) * (0.55 + 0.6 * n);
+          color = mix(color, fog, clamp(haze * (0.55 + 0.4 * n), 0.0, 0.92));
+        }
+        out_FragColor = vec4(color, 1.0);
+      }`,
+  });
+  rushFx.enabled = false;
+  scene.postProcessStages.add(rushFx);
   scene.sun.show = true; scene.moon.show = false;
   // Cesium's Tycho-2 star sky box is very dim. Re-level each face (drop the dark noise floor, then amplify)
   // so the real stars read as in orbital photographs. Star positions are unchanged; on any failure the
@@ -1175,6 +1222,7 @@
    */
   function startFlight(target, view, opts) {
     stopOrbit(); releaseLookAt(); flight = null;
+    diving = !!(opts && opts.dive);     // the dive drives its own speed blur and cloud haze
     const startCarto = camera.positionCartographic.clone();
     const startHeading = camera.heading, startPitch = camera.pitch, startRoll = C.Math.negativePiToPi(camera.roll);
 
@@ -1200,14 +1248,17 @@
     const hEnd = Math.max(endCarto.height, 50);
     const hPeak = Math.max(h0, hEnd, C.Math.clamp(arcMeters * 0.6, 0, 9.0e6));
     const L0 = Math.log(h0), Lf = Math.log(hEnd), Lp = Math.log(hPeak);
-    const altitudeAt = (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
+    // A dive (straight down from space) descends the whole time instead of holding at the top first.
+    const altitudeAt = diving
+      ? (s) => Math.exp(L0 + (Lf - L0) * Math.pow(s, 1.35))
+      : (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
 
     // Pitch: tilt down towards nadir during the climb, then open up to the
     // arrival pitch over the second half of the flight. Time-based windows
     // bound the tilt rate whatever the altitude change.
     const NADIR = D2R(-89.5);
     const climbing = hPeak > h0 * 1.5;
-    const pitchAt = (s) => {
+    const pitchAt = diving ? (s) => C.Math.lerp(startPitch, NADIR, smooth(0, 0.12, s)) : (s) => {
       const up = climbing ? C.Math.lerp(startPitch, NADIR, smooth(0, 0.45, s)) : startPitch;
       const down = C.Math.lerp(NADIR, P, smooth(0.5, 1.0, s));
       return C.Math.lerp(up, down, smooth(0.3, 0.5, s));
@@ -1271,7 +1322,8 @@
         // Heading: on long flights settle to north while in orbit, then turn
         // to the arrival heading over the whole descent.
         const toNorth = longHaul ? smooth(0, 0.4, s) : 0;
-        hpr.heading = lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
+        hpr.heading = diving ? lerpAngle(startHeading, H, smooth(0, 1, s))   // a slow turn all the way down
+          : lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
         hpr.pitch = pitchAt(s);
         hpr.roll = startRoll * (1 - smooth(0, 0.2, s));
         camera.setView({ destination: pos, orientation: hpr });
@@ -1351,7 +1403,7 @@
     const tilt = Math.round(90 + p.view.pitch);
     $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
     p.ground = groundHeight;
-    nightView = false; setNightButton();
+    nightView = false; diveView = false; setNightButton(); setDiveButton();
     $('card').classList.add('show');
   }
   function hideCard() { $('card').classList.remove('show'); }
@@ -1364,10 +1416,10 @@
     $('card-night').textContent = nightView ? 'Revenir au lieu, de jour ↺' : 'Voir la nuit depuis l’orbite ↗';
     // Google 3D tiles carry their own daytime lighting, so a night view over them would not be one. The way back
     // stays available if the visitor switches to Google 3D while a night view is showing.
-    $('card-night').hidden = googleOn && googleReady && !nightView;
+    $('card-night').hidden = diveView || (googleOn && googleReady && !nightView);
   }
   function showNightCard(p) {
-    nightView = true; setNightButton();
+    nightView = true; diveView = false; setNightButton(); setDiveButton();
     $('card-kicker').textContent = 'Vue de nuit';
     $('card-title').textContent = p.name;
     $('card-coords').textContent = fmtCoord(p.lat, p.lon);
@@ -1399,6 +1451,54 @@
   $('card-night').addEventListener('click', () => {
     const p = activePlace;
     if (p) (nightView ? flyToPlace(p) : flyToNight(p));
+  });
+
+  // Dive: the whole way down from space with the camera straight down, through the clouds, ending around 300 m up,
+  // with the speed blur of a free fall (see the "nour_rush" stage). Satellite imagery cannot show passers-by, so the
+  // card says what the last frame can and cannot show.
+  let diveView = false;      // the dive card is showing
+  let diving = false;        // a dive is under way
+  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000 };
+  function setDiveButton() {
+    $('card-dive').textContent = diveView ? 'Revenir au lieu, de jour ↺' : 'Plonger depuis l’espace ↓';
+    $('card-dive').hidden = nightView;
+  }
+  function showDiveCard(p, groundHeight) {
+    diveView = true; nightView = false; setDiveButton(); setNightButton();
+    $('card-kicker').textContent = 'Vue du dessus';
+    $('card-title').textContent = p.name;
+    $('card-coords').textContent = fmtCoord(p.lat, p.lon) + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
+    $('card-text').textContent = 'Plongée de l’espace jusqu’à ~300 m, caméra à la verticale. Les satellites ne montrent pas les passants : la netteté dépend de l’imagerie d’ici.';
+    $('card-meta').textContent = `Imagerie : Esri, Maxar, Earthstar Geographics · heure solaire ≈ ${String(Math.floor(p.solarHour)).padStart(2, '0')}h${String(Math.round((p.solarHour % 1) * 60)).padStart(2, '0')}`;
+    $('card').classList.add('show');
+  }
+  async function flyToDive(p) {
+    const token = ++flightToken;
+    hideCard(); stopOrbit(); cancelFlight();
+    setPhase('Préparation');
+    const groundHeight = p.ground ?? await sampleGround(p);
+    if (token !== flightToken) return;
+    const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
+    placeClouds(p, groundHeight);
+    nightClock = false;
+    const time = veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour);
+    // Leg 1: up to a straight-down view over the place where the Earth fills the frame. Leg 2: the dive.
+    startFlight(target, { heading: 0, pitch: -90, range: DIVE.startRange }, {
+      duration: camera.positionCartographic.height > 5e6 ? 3500 : 6500, time,
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
+      onDone: () => {
+        if (token !== flightToken) return;
+        startFlight(target, { heading: 110, pitch: -90, range: DIVE.endRange }, {
+          dive: true, duration: DIVE.duration,
+          onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : h > 1.5e4 ? 'Traversée des nuages' : 'Plongée'),
+          onDone: () => { diving = false; setPhase('Vue du dessus'); showDiveCard(p, groundHeight); },
+        });
+      },
+    });
+  }
+  $('card-dive').addEventListener('click', () => {
+    const p = activePlace;
+    if (p) (diveView ? flyToPlace(p) : flyToDive(p));
   });
 
   function setActive(p) {
@@ -1450,7 +1550,7 @@
     const target = C.Cartesian3.fromRadians(c.longitude, C.Math.clamp(c.latitude, D2R(-60), D2R(60)), 0);
     // After a night view the clock is still at night: bring daylight back so the globe is not left dark.
     const daylight = nightClock && !veille.live;
-    nightClock = false; nightView = false; setNightButton();
+    nightClock = false; nightView = false; diveView = false; setNightButton(); setDiveButton();
     startFlight(target, { heading: 0, pitch: -90, range: 1.9e7 }, {
       time: daylight ? timeForSolarHour(C.Math.toDegrees(c.longitude), 13) : undefined,
       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Ascension'),
@@ -2325,7 +2425,7 @@
   });
 
   // Exposed for automated tests only.
-  window.__terre = { viewer, PLACES, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
 })();
 </script>
 </body>
