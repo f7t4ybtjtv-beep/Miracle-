@@ -1,0 +1,13 @@
+F14 = 203 clauses: {'ALO': 14, 'AMO': 42, 'TRI3': 126, 'TRI2': 21}
+F14 minus all 42 AMO clauses: 161 clauses, UNSAT certified (satlab.checker + drat-trim): (True, 'preuve valide (231 lemmes, 0 suppressions)')
+[natural ALO,AMO,TRI] MUS size=137 composition={'ALO': 14, 'AMO': 0, 'TRI3': 102, 'TRI2': 21} certified_UNSAT=True every-single-deletion-SAT=True
+[AMO first, then TRI, then ALO] MUS size=137 composition={'ALO': 14, 'AMO': 0, 'TRI3': 102, 'TRI2': 21} certified_UNSAT=True every-single-deletion-SAT=True
+[TRI first, then AMO, then ALO] MUS size=137 composition={'ALO': 14, 'AMO': 0, 'TRI3': 102, 'TRI2': 21} certified_UNSAT=True every-single-deletion-SAT=True
+[random shuffle #0 (Random(12345))] MUS size=134 composition={'ALO': 14, 'AMO': 0, 'TRI3': 101, 'TRI2': 19} certified_UNSAT=True every-single-deletion-SAT=True
+[random shuffle #1 (Random(12345))] MUS size=136 composition={'ALO': 14, 'AMO': 0, 'TRI3': 101, 'TRI2': 21} certified_UNSAT=True every-single-deletion-SAT=True
+[random shuffle #2 (Random(12345))] MUS size=134 composition={'ALO': 14, 'AMO': 0, 'TRI3': 100, 'TRI2': 20} certified_UNSAT=True every-single-deletion-SAT=True
+[random shuffle #3 (Random(12345))] MUS size=133 composition={'ALO': 14, 'AMO': 0, 'TRI3': 100, 'TRI2': 19} certified_UNSAT=True every-single-deletion-SAT=True
+[random shuffle #4 (Random(12345))] MUS size=134 composition={'ALO': 14, 'AMO': 0, 'TRI3': 100, 'TRI2': 20} certified_UNSAT=True every-single-deletion-SAT=True
+MUS sizes found: [137, 137, 137, 134, 136, 134, 133, 134]
+numbers i whose ALO clause is necessary in F14\AMO: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+triple clauses individually necessary in full F14: 87

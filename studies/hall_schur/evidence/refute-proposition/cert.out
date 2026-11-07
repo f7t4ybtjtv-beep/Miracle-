@@ -1,0 +1,10 @@
+n=4 SAT=37823 UNSAT=27713 fail=0 t=1.0s
+K_{2,1} UNSAT vars 2 prooflines 1 satlab True drat-trim True
+K_{3,2} UNSAT vars 6 prooflines 2 satlab True drat-trim True
+K_{4,3} UNSAT vars 12 prooflines 7 satlab True drat-trim True
+K_{5,4} UNSAT vars 20 prooflines 29 satlab True drat-trim True
+K_{6,5} UNSAT vars 30 prooflines 140 satlab True drat-trim True
+K_{7,6} UNSAT vars 42 prooflines 918 satlab True drat-trim True
+negative control fake proof on K_{4,3}: drat-trim verified = False
+drat-trim on n=4 nontrivial UNSAT sample: 300 / 300
+cert rc=0

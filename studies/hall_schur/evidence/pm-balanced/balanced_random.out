@@ -1,0 +1,5 @@
+n=5 set A brute: graphs=300 mismatches=0 |E| range=5..18 perm>0: 210 max perm=22 time=2.4s
+n=5 set B dpll: graphs=300 mismatches=0 |E| range=4..25 perm>0: 231 max perm=120 time=2.4s
+n=6 set A brute: graphs=300 mismatches=0 |E| range=5..18 perm>0: 136 max perm=14 time=4.8s
+n=6 set B dpll: graphs=300 mismatches=0 |E| range=7..36 perm>0: 250 max perm=720 time=4.8s
+balanced_random rc=0

@@ -1,0 +1,15 @@
+E1 restriction F|rho == F_S exactly: 100/100 instances
+E2 K_{9,8} + K_{2,1}: nv=74 ncl=300, contains PHP^9_8 sub-CNF: True; explicit proof lemmas=2 satlab=True drat=True; CDCL UNSAT conflicts=0
+E3 m lemmas lits closed_lits lits/(m^3 2^m) log2(lemmas)/m
+   2      7        12        12 0.375 1.404
+   3     19        63        63 0.292 1.416
+   4     47       252       252 0.246 1.389
+   5    111       875       875 0.219 1.359
+   6    255      2778      2778 0.201 1.332
+   7    575      8281      8281 0.189 1.310
+   8   1279     23544     23544 0.180 1.290
+   9   2815     64503     64503 0.173 1.273
+  10   6143    171510    171510 0.167 1.258
+  11  13311    444917    444917 0.163 1.245
+  12  28671   1130484   1130484 0.160 1.234
+E3 closed forms hold for m=2..12

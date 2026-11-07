@@ -1,0 +1,19 @@
+(1, 0) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 1 0.0s
+(1, 1) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 3 0.0s
+(1, 2) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 6 0.0s
+(1, 3) labelled MUS {'mus': 1, 'nonminwit': 0} iso classes so far 10 0.0s
+(2, 0) labelled MUS {'mus': 2, 'nonminwit': 0} iso classes so far 11 0.0s
+(2, 1) labelled MUS {'mus': 5, 'nonminwit': 0} iso classes so far 14 0.0s
+(2, 2) labelled MUS {'mus': 10, 'nonminwit': 0} iso classes so far 21 0.0s
+(2, 3) labelled MUS {'mus': 19, 'nonminwit': 0} iso classes so far 34 0.0s
+(3, 0) labelled MUS {'mus': 3, 'nonminwit': 0} iso classes so far 35 0.0s
+(3, 1) labelled MUS {'mus': 18, 'nonminwit': 0} iso classes so far 39 0.0s
+(3, 2) labelled MUS {'mus': 85, 'nonminwit': 0} iso classes so far 52 0.0s
+(3, 3) labelled MUS {'mus': 303, 'nonminwit': 0} iso classes so far 88 0.1s
+(4, 0) labelled MUS {'mus': 4, 'nonminwit': 0} iso classes so far 89 0.1s
+(4, 1) labelled MUS {'mus': 56, 'nonminwit': 0} iso classes so far 94 0.1s
+(4, 2) labelled MUS {'mus': 722, 'nonminwit': 66} iso classes so far 116 0.2s
+(4, 3) labelled MUS {'mus': 5655, 'nonminwit': 198} iso classes so far 203 1.2s
+iso classes 203
+aggregate over iso-class representatives: {'mus': 361, 'nonminwit': 46, 'bad_hole': 0, 'not_strict': 0, 'verify_fail': 0, 'd1_not_minwit': 0, 'minwit_not_d1': 0, 'minwit_without_mus': 0, 'd1_hole_outside_induced': 0, 'brute_checked': 195, 'brute_mismatch': 0, 'sd_sets': 498, 'sd_with_mus': 321, 'sd_conn': 352, 'sd_conn_with_mus': 321, 'hist': {1: 315, 2: 46}, 'uniq_H_fail': 0}
+smallest graph with MUS whose pigeon set is not a minimal witness (n+m,|E|,n,m,adj): (6, 6, 4, 2, (3, 3, 1, 1))

@@ -1,0 +1,17 @@
+recon == my set: True
+their schur14.cnf == recon order: False
+cdcl recon-order seed 0 UNSAT 218
+cdcl recon-order seed 1 UNSAT 217
+cdcl recon-order seed 2 UNSAT 242
+cdcl recon-order seed 3 UNSAT 203
+cdcl recon-order seed 4 UNSAT 198
+mus0.cnf 137 {'ALO': 14, 'SUM2': 21, 'SUM3': 102} dpll UNSAT minimal
+mus1.cnf 137 {'SUM2': 21, 'SUM3': 102, 'ALO': 14} dpll UNSAT minimal
+mus2.cnf 137 {'SUM2': 21, 'SUM3': 102, 'ALO': 14} dpll UNSAT minimal
+mus3.cnf 134 {'SUM2': 19, 'SUM3': 101, 'ALO': 14} dpll UNSAT minimal
+mus4.cnf 136 {'SUM2': 21, 'SUM3': 101, 'ALO': 14} dpll UNSAT minimal
+mus5.cnf 134 {'SUM3': 100, 'SUM2': 20, 'ALO': 14} dpll UNSAT minimal
+mus6.cnf 133 {'SUM3': 100, 'ALO': 14, 'SUM2': 19} dpll UNSAT minimal
+mus7.cnf 134 {'SUM3': 100, 'ALO': 14, 'SUM2': 20} dpll UNSAT minimal
+individually necessary clauses in F14: 101 {'ALO': 14, 'SUM2': 15, 'SUM3': 72}
+F14\AMO dpll: False 161

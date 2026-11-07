@@ -1,0 +1,59 @@
+======================================================================
+ExA task candidate adj: {'a': ['y1', 'y3'], 'b': ['y1', 'y3'], 'c': ['y1', 'y2'], 'd': ['y1', 'y2']}
+minimal Hall witnesses: [['a', 'b', 'c', 'd']]
+formula (12 clauses): UNSAT [satlab proof ok + drat-trim VERIFIED]
+  remove P(a)           -> SAT (#models=2; model ok)
+  remove P(b)           -> SAT (#models=2; model ok)
+  remove P(c)           -> SAT (#models=2; model ok)
+  remove P(d)           -> SAT (#models=2; model ok)
+  remove H(y1:a,b)      -> UNSAT (#models=0; satlab proof ok + drat-trim VERIFIED) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y1:a,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:a,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:b,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:b,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:c,d)      -> UNSAT (#models=0; satlab proof ok + drat-trim VERIFIED) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y2:c,d)      -> SAT (#models=2; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y3:a,b)      -> SAT (#models=2; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+======================================================================
+ExB 3x2 adj: {'a': ['y1'], 'b': ['y1', 'y2'], 'c': ['y1', 'y2']}
+minimal Hall witnesses: [['a', 'b', 'c']]
+formula (7 clauses): UNSAT [satlab proof ok + drat-trim VERIFIED]
+  remove P(a)           -> SAT (#models=2; model ok)
+  remove P(b)           -> SAT (#models=1; model ok)
+  remove P(c)           -> SAT (#models=1; model ok)
+  remove H(y1:a,b)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:a,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+  remove H(y1:b,c)      -> UNSAT (#models=0; satlab proof ok + drat-trim VERIFIED) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y2:b,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => necessary
+======================================================================
+ExC K42 MUS adj: {'a': ['y1', 'y2'], 'b': ['y1', 'y2'], 'c': ['y1', 'y2'], 'd': ['y1', 'y2']}
+minimal Hall witnesses: [['a', 'b', 'c'], ['a', 'b', 'd'], ['a', 'c', 'd'], ['b', 'c', 'd']]
+formula (10 clauses): UNSAT [satlab proof ok + drat-trim VERIFIED]
+  remove P(a)           -> SAT (#models=5; model ok)
+  remove P(b)           -> SAT (#models=5; model ok)
+  remove P(c)           -> SAT (#models=5; model ok)
+  remove P(d)           -> SAT (#models=5; model ok)
+  remove H(y1:a,b)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y1:a,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y1:b,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y1:c,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y2:a,d)      -> SAT (#models=5; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y2:b,c)      -> SAT (#models=5; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+ExC: N(S)=2 holes, |S|=4; minimal Hall witnesses are the 3-subsets, so the MUS pigeon set {a,b,c,d} is NOT a minimal witness
+======================================================================
+ExD smallest nonminimal MUS adj: {'a': ['y1'], 'b': ['y1'], 'c': ['y1', 'y2'], 'd': ['y1', 'y2']}
+minimal Hall witnesses: [['a', 'b'], ['a', 'c', 'd'], ['b', 'c', 'd']]
+formula (7 clauses): UNSAT [satlab proof ok + drat-trim VERIFIED]
+  remove P(a)           -> SAT (#models=1; model ok)
+  remove P(b)           -> SAT (#models=1; model ok)
+  remove P(c)           -> SAT (#models=1; model ok)
+  remove P(d)           -> SAT (#models=1; model ok)
+  remove H(y1:a,c)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y1:b,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+  remove H(y2:c,d)      -> SAT (#models=1; model ok) criterion(matching of S-{x1,x2} into N(S)-{y}) => redundant
+ExD: pigeon set {a,b,c,d}, |N|=2, deficiency 2; minimal witness is only {a,b}
+K_{2,1}: induced CNF UNSAT, 3/3 clauses necessary (models checked); criterion says MUS=True
+K_{3,2}: induced CNF UNSAT, 9/9 clauses necessary (models checked); criterion says MUS=True
+K_{4,3}: induced CNF UNSAT, 22/22 clauses necessary (models checked); criterion says MUS=True
+K_{5,4}: induced CNF UNSAT, 45/45 clauses necessary (models checked); criterion says MUS=True
+K_{6,5}: induced CNF UNSAT, 81/81 clauses necessary (models checked); criterion says MUS=True
