@@ -65,7 +65,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   silence" beat and a "Rejouer" reset.
 - `terre.html` — interactive Earth flyover on CesiumJS (see below).
 - `fatiha/index.html` — the Fatiha site ("Fatiha, maman d'Amine", formerly Nour): the `terre.html`
-  flyover engine plus ten places, a quality selector, public-data "Veille" layers and an
+  flyover engine plus thirteen places, a quality selector, public-data "Veille" layers and an
   optional Google 3D mode. Its own `<style>`/`<script>`; `nour/index.html` only redirects here.
   The `nour.*` localStorage keys keep their old prefix on purpose so saved settings survive.
   Cesium 1.145 gotchas learned here: `globe.lightingFadeOutDistance`/`lightingFadeInDistance` make the globe
@@ -100,6 +100,10 @@ python3 -m satlab bench --campaign standard --out results/standard
   by `boundingVolume`; Cesium 1.145's `CloudCollection` sets none, which stopped the render loop on iPhones only. The page wraps
   `clouds.update` to give those draws a sphere (and skip empty updates). To reproduce in Playwright, set
   `scene.view.oit._translucentMRTSupport` and `_translucentMultipassSupport` to false before starting.
+  Guided tour (`tour`): one `setTimeout` in `tour.timer`, cleared only by `stopTour()`/`pauseTour()`; it reuses
+  `flyToPlace(p, { tour: true })`, and any other flight (place, night, dive, Orbite) ends it. Touching the globe or
+  hiding the tab pauses it. The hash names the view (`#id`, `#id/nuit`, `#id/plongee`, `#visite`) and is written with
+  `replaceState` on arrival so it never re-triggers a flight. The route arcs (`routeSource`) only show above 80 km.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
