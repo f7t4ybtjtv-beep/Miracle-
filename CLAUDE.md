@@ -96,6 +96,10 @@ python3 -m satlab bench --campaign standard --out results/standard
   the `preRender` hook derives `rush` from the altitude rate (e-folds per second) and `haze` from altitude (cloud layer ~6 km)
   for the last stage `nour_rush`; tests can shorten the dive with `window.__terre.DIVE.duration` and read `diveState`.
   Cesium's `PostProcessStage.uniforms` is not a plain object of your functions: read your own variables in tests instead.
+  Safari on iPhone has no float blending, so Cesium has no order-independent translucency there and sorts translucent draws
+  by `boundingVolume`; Cesium 1.145's `CloudCollection` sets none, which stopped the render loop on iPhones only. The page wraps
+  `clouds.update` to give those draws a sphere (and skip empty updates). To reproduce in Playwright, set
+  `scene.view.oit._translucentMRTSupport` and `_translucentMultipassSupport` to false before starting.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
