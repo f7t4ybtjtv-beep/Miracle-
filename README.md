@@ -71,12 +71,16 @@ lieu, de jour »** ramène à l'arrivée habituelle.
 - Les lumières sont celles du composite NASA Black Marble (2016) : elles montrent l'éclairage d'une année passée, pas celui d'aujourd'hui. La couche est activée à l'ouverture de cette vue.
 - Cesium garde 30 % des couleurs de jour sur la face nocturne, ce qui ressemble au crépuscule plus qu'à la nuit : à moins de 1 500 km d'altitude, l'imagerie de jour est assombrie de 45 % en douceur quand le soleil est sous l'horizon au point regardé (progressif de −3° à −20°).
 - Les étoiles sont celles du ciel Tycho-2 fourni avec Cesium (positions réelles), avec des niveaux relevés pour qu'elles ressortent. Si ce ciel ne se charge pas, celui de Cesium reste en place.
-- Le halo bleu du limbe est une **approximation** (un dégradé selon l'altitude rasée par chaque rayon, côté nuit seulement), pas un modèle physique de la luminescence nocturne. Le relief au limbe le masque.
+- Le limbe est une **approximation** de l'aspect des photos de l'ISS : un limbe bleu fin avec son halo et une fine bande verte (là où l'on voit la luminescence nocturne de l'atmosphère), selon l'altitude rasée par chaque rayon, côté nuit seulement. Ce n'est pas un modèle physique. Le relief au limbe le masque.
+- Les zones sombres prennent une teinte bleu nuit froide, sans toucher aux lumières chaudes. Les lumières les plus vives ont un léger halo (flou à demi-résolution, seulement la nuit, absent en qualité Légère) ; `?bloom=0` à `?bloom=3` règle son intensité (1 par défaut, 0 le supprime).
+- De loin, au-dessus d'un globe éclairé (vue d'ensemble, ouverture), les étoiles s'estompent : une photo de la Terre éclairée est exposée pour elle et montre un ciel noir. C'est un choix d'exposition, pas une règle physique. Elles reviennent en volant bas ou de nuit.
 - La brume de profondeur de Cesium est désactivée : elle assombrissait les tuiles lointaines une à une et laissait des zigzags dans les vues obliques de nuit.
 
-Limites : cette vue n'a été vue qu'avec de fausses tuiles de lumières et une
-imagerie unie (NASA et Esri sont injoignables depuis l'environnement de
-développement). Son aspect avec les vraies données n'est pas vérifié.
+Limites : cette vue n'a été vue qu'avec de fausses tuiles de lumières (de petits
+points regroupés en villes) et une imagerie unie (NASA et Esri sont injoignables
+depuis l'environnement de développement). Le halo et la teinte ont été réglés
+sur ces simulations : leur intensité avec le vrai Black Marble n'est pas
+vérifiée, d'où le réglage `?bloom=`.
 
 ### Fatiha : Direct (bouton « Direct »)
 

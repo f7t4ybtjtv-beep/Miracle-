@@ -58,10 +58,14 @@ console for errors.
   w = 0, so take `normalize(eye.xyz)` as the ray direction and never divide by w (that gave NaN and silently
   disabled the limb glow). The depth fog (`scene.fog`) is off because it left zig-zag edges in oblique night views.
   The "Vue de nuit" card button flies to ~600 km, pitch -33°, a per-place `night` heading and 23 h local solar time;
-  the `nour_limb` post-process draws the blue limb (sky pixels only, via `depthTexture`), and a `preRender` hook dims
+  the `nour_night` post-process draws the blue limb and a faint green airglow band (sky pixels only, via `depthTexture`), fades the stars over a
+  sunlit globe seen from far (`starGain`) and tints dark ground blue; the `nour_glow_fx` composite (half-resolution blur of bright ground pixels, `?bloom=`)
+  is switched on only at night from the same hook, and a `preRender` hook dims
   the daytime imagery layers by the sun elevation at the screen-centre ground point (new layers that show daytime
   imagery must join its `dayLayers` list). The Tycho-2 sky box is re-levelled with a LUT: below ~15 its faces are
   JPEG noise, so a lower black point makes streaky speckle instead of stars.
+  GLSL ES 3.00 pitfalls hit here: `cast` is a reserved word (a variable with that name stopped the whole render loop), and
+  `textureSize()` is the safe way to get a stage's texel size when it uses `textureScale`.
   The "Direct" panel (radios from radio-browser.info, free TV from the iptv-org playlists, public-webcam links,
   GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
   is one block of the script. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
