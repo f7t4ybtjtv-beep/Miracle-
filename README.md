@@ -82,6 +82,23 @@ depuis l'environnement de développement). Le halo et la teinte ont été régl�
 sur ces simulations : leur intensité avec le vrai Black Marble n'est pas
 vérifiée, d'où le réglage `?bloom=`.
 
+### Fatiha : plongée depuis l'espace
+
+Chaque fiche propose aussi **« Plonger depuis l'espace »** : un vol vers une vue
+d'ensemble où la Terre remplit l'écran, puis une chute de 13 s caméra à la
+verticale jusqu'à environ 300 m au-dessus du lieu, avec une lente rotation. Elle
+reprend l'idée d'une plongée filmée de l'espace jusqu'à la rue :
+
+- les étoiles s'effacent au départ (ciel noir autour d'une Terre éclairée) ;
+- un **flou de vitesse** radial, calculé d'après la vitesse de descente réelle (il n'apparaît qu'en dessous de quelques centaines de km et retombe quand la caméra ralentit) ;
+- une **brume grise** vers 6 km d'altitude, à la hauteur des nuages (elle suit le bouton « Nuages » : sans nuages, pas de brume). C'est un effet décoratif, pas la météo réelle ;
+- « Revenir au lieu, de jour » ramène à l'arrivée habituelle. Avec « réduire les animations » activé, le vol est raccourci et le flou supprimé.
+
+Limite : la netteté de la dernière image est celle de l'imagerie satellite (Esri)
+à cet endroit. Elle ne montre ni les passants ni les détails d'une vidéo tournée
+au drone. Testé avec une imagerie unie simulée (trajectoire, flou, brume et
+retour vérifiés) ; l'aspect avec la vraie imagerie n'est pas vérifié.
+
 ### Fatiha : Direct (bouton « Direct »)
 
 Un panneau pour écouter, regarder et s'informer sur le pays d'un lieu, d'un pays

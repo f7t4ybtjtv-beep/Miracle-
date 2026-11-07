@@ -91,6 +91,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   is one block of the script. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
   from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
   whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
+  The "Plonger depuis l'espace" card button chains two `startFlight` legs (straight-down orbit view, then `dive: true`, which
+  descends the whole time and sets the module flag `diving`); `startFlight` resets `diving` on every start. While `diving`,
+  the `preRender` hook derives `rush` from the altitude rate (e-folds per second) and `haze` from altitude (cloud layer ~6 km)
+  for the last stage `nour_rush`; tests can shorten the dive with `window.__terre.DIVE.duration` and read `diveState`.
+  Cesium's `PostProcessStage.uniforms` is not a plain object of your functions: read your own variables in tests instead.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
