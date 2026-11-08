@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Fatiha, maman d’Amine</title>
-<meta name="description" content="Fatiha, maman d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers dix lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<meta name="description" content="Fatiha, maman d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
 <meta name="theme-color" content="#0B0E14" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwQjBFMTQiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMSIgZmlsbD0iI0UzQjA2MiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNFM0IwNjIiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -106,6 +106,10 @@
   .place small { font: 400 11px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
   .place:hover { background: rgba(242, 227, 213, 0.05); }
   .place[aria-current="true"] { border-color: var(--border-strong); background: rgba(217, 72, 42, 0.10); }
+  .place[data-visited] small::after { content: ' · vu'; color: var(--accent-2); }
+  .places-tools { display: flex; gap: 6px; margin: 2px 0 10px; }
+  .places-tools .btn { padding: 7px 11px; font-size: 11.5px; white-space: nowrap; }
+  #btn-tour { flex: 1; }
 
   /* Info card */
   .card {
@@ -266,6 +270,9 @@
       width: auto; max-height: none; padding: 8px; overflow-x: auto; overflow-y: hidden;
     }
     .places .kicker { display: none; }
+    .places { display: flex; align-items: center; gap: 6px; }
+    .places-tools { margin: 0; flex: none; }
+    .places ul { flex: none; }
     .places ul { grid-auto-flow: column; grid-auto-columns: max-content; }
     .place { padding: 8px 12px; font-size: 13px; }
     .card { bottom: calc(var(--gutter) + 124px + env(safe-area-inset-bottom)); padding: 14px 16px; }
@@ -303,6 +310,10 @@
 
   <nav class="ui places glass" aria-label="Lieux">
     <div class="kicker">Lieux de rencontre</div>
+    <div class="places-tools">
+      <button class="btn" id="btn-tour" type="button" aria-pressed="false" title="Enchaîne les lieux, un arrêt de 12 s à chacun">▶ Visite guidée</button>
+      <button class="btn" id="btn-route" type="button" aria-pressed="true" title="Arcs entre les lieux visités, vus depuis l’espace">Trajet</button>
+    </div>
     <ul id="place-list"></ul>
   </nav>
 
@@ -384,6 +395,7 @@
       <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
       <button class="earth" id="card-night" type="button">Voir la nuit depuis l’orbite ↗</button>
       <button class="earth" id="card-dive" type="button">Plonger depuis l’espace ↓</button>
+      <button class="earth" id="card-share" type="button">Partager ⧉</button>
     </div>
   </section>
 
@@ -417,7 +429,7 @@
     <div class="inner">
       <h2>Fatiha</h2>
       <p class="tagline">maman d’Amine</p>
-      <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à dix lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
+      <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à treize lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
       <div class="bar" id="loader-bar"><i></i></div>
       <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
       <div id="fallback"></div>
@@ -449,9 +461,15 @@
     { id: 'alhambra', name: 'Alhambra', country: 'Espagne', cc: ['ES'], lat: 37.1761, lon: -3.5881,
       text: "Palais et forteresse des souverains nasrides, élevés pour l'essentiel aux XIIIe–XIVe siècles sur la colline de la Sabika, dernier contrefort de la Sierra Nevada, à Grenade. Après 1492, Charles Quint y fit élever un palais Renaissance accolé aux palais nasrides.",
       meta: 'UNESCO 1984', view: { heading: 160, pitch: -22, range: 2400 }, solarHour: 17, night: 20 },
+    { id: 'fes', name: 'Al Quaraouiyine, Fès', country: 'Maroc', cc: ['MA'], lat: 34.0650, lon: -4.9736,
+      text: "Selon la tradition, la mosquée fut fondée en 857 ou 859 par Fatima al-Fihri, une femme venue de Kairouan. Elle devint un grand foyer d'enseignement, que le Guinness tient pour le plus ancien établissement d'enseignement supérieur encore en activité. Elle est au cœur de la médina de Fès.",
+      meta: 'UNESCO 1981 · Médina de Fès', view: { heading: 30, pitch: -30, range: 1600 }, solarHour: 16, night: 20 },
     { id: 'tombouctou', name: 'Tombouctou', country: 'Mali', cc: ['ML'], lat: 16.7711, lon: -3.0105,
       text: "Aux portes du Sahara, près du fleuve Niger, la ville fut un foyer de savoir dont témoignent des milliers de manuscrits. La mosquée Djingareyber, en terre crue, fut élevée au XIVe siècle, au retour de pèlerinage du souverain du Mali Kankou Moussa.",
       meta: 'UNESCO 1988', view: { heading: 20, pitch: -20, range: 2600 }, solarHour: 8.5, night: 0 },
+    { id: 'palerme', name: 'Chapelle Palatine, Palerme', country: 'Italie', cc: ['IT'], lat: 38.1108, lon: 13.3531,
+      text: "Sous les rois normands du XIIe siècle, des peuples d'origine musulmane, byzantine et latine vécurent ensemble à Palerme. Dans le palais des Normands, la chapelle voulue par Roger II réunit mosaïques byzantines, plafond de muqarnas en bois et inscriptions en arabe, en grec et en latin.",
+      meta: 'UNESCO 2015 · Palerme arabo-normande', view: { heading: 60, pitch: -24, range: 1800 }, solarHour: 10, night: 200 },
     { id: 'alexandrie', name: 'Bibliotheca Alexandrina', country: 'Égypte', cc: ['EG'], lat: 31.2089, lon: 29.9092,
       text: "Inaugurée en 2002 sur le front de mer d'Alexandrie, près de l'emplacement présumé de la bibliothèque antique fondée sous les Ptolémées. Son mur de granit porte des caractères de nombreux systèmes d'écriture.",
       meta: 'Inaugurée en 2002', view: { heading: 170, pitch: -18, range: 2000 }, solarHour: 16, night: 180 },
@@ -467,6 +485,9 @@
     { id: 'samarcande', name: 'Le Registan, Samarcande', country: 'Ouzbékistan', cc: ['UZ'], lat: 39.6547, lon: 66.9758,
       text: "Place bordée de trois madrasas, dont celle d'Ouloug Beg (1417–1420), prince astronome. Samarcande fut une étape majeure des routes de la soie, entre la Chine, l'Inde, la Perse et la Méditerranée.",
       meta: 'UNESCO 2001 · Samarkand – carrefour de cultures', view: { heading: 180, pitch: -24, range: 1600 }, solarHour: 15.5, night: 340 },
+    { id: 'nalanda', name: 'Nalanda', country: 'Inde', cc: ['IN'], lat: 25.1367, lon: 85.4439,
+      text: "Vestiges d'un grand monastère et centre d'étude bouddhiste, du IIIe siècle av. J.-C. au XIIIe siècle, que l'UNESCO décrit comme la première université de l'Inde ancienne. Le pèlerin chinois Xuanzang y étudia au VIIe siècle. Saccagée vers 1200, elle resta ensevelie jusqu'aux fouilles du XXe siècle.",
+      meta: 'UNESCO 2016 · Nalanda Mahavihara', view: { heading: 20, pitch: -30, range: 1400 }, solarHour: 9, night: 0 },
     { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', cc: ['KH'], lat: 13.4125, lon: 103.8670,
       text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
       meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5, night: 350 },
@@ -487,7 +508,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.10';
+  const NOUR_BUILD = '2026-11-07.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1369,6 +1390,7 @@
     canvas.addEventListener(ev, () => {
       if (flight) { cancelFlight(); }
       if (orbit) { stopOrbit(); }
+      if (tour && !tour.paused) pauseTour();
     }, { passive: true });
   });
 
@@ -1451,7 +1473,7 @@
   async function flyToNight(p) {
     const token = ++flightToken;
     nightClock = true;
-    hideCard(); stopOrbit(); cancelFlight();
+    stopTour(); hideCard(); stopOrbit(); cancelFlight();
     if (veille.live) setLayer('live', false);      // a running real-time clock would override the chosen hour
     if (!veille.lights && !gibsFailed.has('lights')) setLayer('lights', true);   // not a layer that already failed
     clouds.removeAll();
@@ -1461,7 +1483,7 @@
     startFlight(C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight), { heading: p.night, pitch: NIGHT_VIEW.pitch, range: NIGHT_VIEW.range }, {
       time: timeForSolarHour(p.lon, NIGHT_VIEW.solarHour),
       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
-      onDone: () => { setPhase('Vue de nuit'); showNightCard(p); },
+      onDone: () => { setPhase('Vue de nuit'); showNightCard(p); setHash(`${p.id}/nuit`); },
     });
   }
   $('card-night').addEventListener('click', () => {
@@ -1490,7 +1512,7 @@
   }
   async function flyToDive(p) {
     const token = ++flightToken;
-    hideCard(); stopOrbit(); cancelFlight();
+    stopTour(); hideCard(); stopOrbit(); cancelFlight();
     setPhase('Préparation');
     const groundHeight = p.ground ?? await sampleGround(p);
     if (token !== flightToken) return;
@@ -1507,7 +1529,7 @@
         startFlight(target, { heading: 110, pitch: -90, range: DIVE.endRange }, {
           dive: true, duration: DIVE.duration,
           onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : h > 1.5e4 ? 'Traversée des nuages' : 'Plongée'),
-          onDone: () => { diving = false; setPhase('Vue du dessus'); showDiveCard(p, groundHeight); },
+          onDone: () => { diving = false; setPhase('Vue du dessus'); showDiveCard(p, groundHeight); setHash(`${p.id}/plongee`); },
         });
       },
     });
@@ -1535,7 +1557,10 @@
   }
 
   let flightToken = 0;
-  async function flyToPlace(p) {
+  // opts.tour: the flight is a stop of the guided tour (any other flight ends the tour).
+  async function flyToPlace(p, opts) {
+    const inTour = !!(opts && opts.tour);
+    if (!inTour) stopTour();
     const token = ++flightToken;
     setActive(p); hideCard(); stopOrbit(); cancelFlight();
     setPhase('Préparation');
@@ -1554,12 +1579,16 @@
         setPhase('Arrivée');
         showCard(p, groundHeight);
         startOrbit(target);
+        recordVisit(p);
+        setHash(p.id);
+        if (inTour) tourArrived();
       },
     });
   }
 
   function returnToOrbit() {
     ++flightToken;
+    stopTour(); setHash('');
     setActive(null); hideCard(); stopOrbit(); cancelFlight();
     clouds.removeAll();
     const c = camera.positionCartographic;
@@ -1575,6 +1604,152 @@
   }
 
   function setPhase(t) { $('hud-phase').textContent = t; }
+
+  // ---------- Guided tour ----------
+  // Flies to every place in list order with a dwell on each, using the same flights as a click. Taking the
+  // controls on the globe pauses it; any other flight (a place, the night view, the dive, Orbite) ends it.
+  // Its one timer lives in `tour.timer` and stopTour()/pauseTour() are the only places that clear it.
+  const TOUR_DWELL = 12000;
+  let tour = null;           // { i, paused, arrived, timer }
+  const tourBtn = $('btn-tour');
+  function syncTour() {
+    const n = PLACES.length;
+    tourBtn.setAttribute('aria-pressed', String(!!tour));
+    tourBtn.textContent = !tour ? '▶ Visite guidée'
+      : tour.paused ? `▶ Reprendre · ${tour.i + 1}/${n}` : `❚❚ Pause · ${tour.i + 1}/${n}`;
+  }
+  function clearTourTimer() { if (tour && tour.timer) { clearTimeout(tour.timer); tour.timer = 0; } }
+  function stopTour() { if (!tour) return; clearTourTimer(); tour = null; syncTour(); }
+  function tourGo() {
+    tour.arrived = false; syncTour();
+    flyToPlace(PLACES[tour.i], { tour: true });
+  }
+  function tourArrived() {
+    if (!tour) return;
+    tour.arrived = true;
+    if (!tour.paused) { clearTourTimer(); tour.timer = setTimeout(tourNext, TOUR_DWELL); }
+    syncTour();
+  }
+  function tourNext() {
+    if (!tour) return;
+    tour.timer = 0;
+    if (tour.i + 1 >= PLACES.length) { stopTour(); returnToOrbit(); return; }
+    tour.i++; tourGo();
+  }
+  function startTour() {
+    stopTour();
+    const from = activePlace ? PLACES.indexOf(activePlace) : 0;
+    clearRoute();              // each tour draws its own route
+    tour = { i: Math.max(0, from), paused: false, arrived: false, timer: 0 };
+    tourGo();
+  }
+  function pauseTour() {
+    if (!tour || tour.paused) return;
+    clearTourTimer(); tour.paused = true;
+    if (flight) { ++flightToken; cancelFlight(); }
+    syncTour();
+  }
+  function resumeTour() {
+    if (!tour || !tour.paused) return;
+    tour.paused = false;
+    if (tour.arrived) tourNext(); else tourGo();
+  }
+  tourBtn.addEventListener('click', () => (!tour ? startTour() : tour.paused ? resumeTour() : pauseTour()));
+  // A hidden tab freezes the render loop but not the timer: pause rather than fly on unseen.
+  document.addEventListener('visibilitychange', () => { if (document.hidden) pauseTour(); });
+
+  // ---------- Route ----------
+  // A lifted great-circle arc between each pair of places visited in a row, drawn only from high up (near the
+  // ground the arc would stand in the view like a beam). Kept for the visit only; the tour starts a new one.
+  const route = [];          // place ids, in visit order
+  const routeSource = new C.CustomDataSource('route');
+  viewer.dataSources.add(routeSource);
+  const ROUTE_KEY = 'nour.route';
+  let routeOn = true;
+  try { routeOn = localStorage.getItem(ROUTE_KEY) !== '0'; } catch (e) { /* storage blocked: keep the default */ }
+  const routeBtn = $('btn-route');
+  routeBtn.setAttribute('aria-pressed', String(routeOn));
+  const routeMaterial = new C.PolylineGlowMaterialProperty({ glowPower: 0.22, taperPower: 1, color: C.Color.fromCssColorString('#F2A65A').withAlpha(0.95) });
+  function addArc(a, b) {
+    const ua = C.Cartesian3.normalize(C.Cartesian3.fromDegrees(a.lon, a.lat, 0), new C.Cartesian3());
+    const ub = C.Cartesian3.normalize(C.Cartesian3.fromDegrees(b.lon, b.lat, 0), new C.Cartesian3());
+    const dist = Math.acos(C.Math.clamp(C.Cartesian3.dot(ua, ub), -1, 1)) * 6371000;
+    const peak = C.Math.clamp(dist * 0.12, 3e4, 9e5);
+    const N = Math.max(16, Math.min(96, Math.round(dist / 50000)));
+    const positions = [];
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const c = cartoOfUnit(slerpUnit(ua, ub, t, new C.Cartesian3()), 2000 + peak * Math.sin(Math.PI * t));
+      positions.push(C.Cartographic.toCartesian(c, ellipsoid));
+    }
+    routeSource.entities.add({ id: `route-${route.length}`, polyline: { positions, width: 7, arcType: C.ArcType.NONE, material: routeMaterial } });
+  }
+  function recordVisit(p) {
+    const prevId = route[route.length - 1];
+    list.querySelector(`.place[data-id="${p.id}"]`).dataset.visited = '';
+    if (prevId === p.id) return;
+    route.push(p.id);
+    const prev = prevId && PLACES.find((x) => x.id === prevId);
+    if (prev) addArc(prev, p);
+  }
+  function clearRoute() {
+    route.length = 0; routeSource.entities.removeAll();
+    list.querySelectorAll('.place[data-visited]').forEach((b) => delete b.dataset.visited);
+  }
+  scene.preRender.addEventListener(() => {
+    routeSource.show = routeOn && camera.positionCartographic.height > 8e4;
+  });
+  routeBtn.addEventListener('click', () => {
+    routeOn = !routeOn;
+    routeBtn.setAttribute('aria-pressed', String(routeOn));
+    try { localStorage.setItem(ROUTE_KEY, routeOn ? '1' : '0'); } catch (e) { /* not saved: fine */ }
+  });
+
+  // ---------- Shareable link ----------
+  // The hash names what is on screen: #alhambra, #alhambra/nuit, #alhambra/plongee, or #visite for the tour.
+  // replaceState does not fire `hashchange`, so writing it never starts a flight.
+  function setHash(h) {
+    const url = location.pathname + location.search + (h ? `#${h}` : '');
+    if (url !== location.pathname + location.search + location.hash) history.replaceState(null, '', url);
+  }
+  function parseHash() {
+    const [id, mode] = decodeURIComponent(location.hash.slice(1)).split('/');
+    if (id === 'visite') return { tour: true };
+    const p = PLACES.find((x) => x.id === id);
+    return p ? { p, mode: mode === 'nuit' || mode === 'plongee' ? mode : '' } : null;
+  }
+  function goToHash(h) {
+    if (h.tour) { if (!tour) startTour(); return; }
+    if (h.mode) { setActive(h.p); (h.mode === 'nuit' ? flyToNight : flyToDive)(h.p); } else flyToPlace(h.p);
+  }
+  const shareBtn = $('card-share');
+  let shareT = 0;
+  function shareFeedback(text) {
+    shareBtn.textContent = text;
+    clearTimeout(shareT);
+    shareT = setTimeout(() => { shareBtn.textContent = 'Partager ⧉'; }, 2500);
+  }
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+    // file:// or plain http: the async clipboard is missing, fall back to a selected field.
+    const field = document.createElement('textarea');
+    field.value = text; field.setAttribute('readonly', ''); field.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(field); field.select();
+    const ok = document.execCommand('copy'); field.remove();
+    return ok ? Promise.resolve() : Promise.reject(new Error('copy'));
+  }
+  shareBtn.addEventListener('click', async () => {
+    const p = activePlace;
+    if (!p) return;
+    const h = p.id + (nightView ? '/nuit' : diveView ? '/plongee' : '');
+    setHash(h);
+    const url = location.href.split('#')[0] + '#' + h;
+    const title = `Fatiha · ${p.name}`;
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try { await navigator.share({ title, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    copyText(url).then(() => shareFeedback('Lien copié ✓'), () => shareFeedback(url));
+  });
 
   $('btn-orbit').addEventListener('click', returnToOrbit);
   $('btn-labels').addEventListener('click', (e) => {
@@ -2405,7 +2580,6 @@
     destination: C.Cartesian3.fromDegrees(10, 22, 1.1e8),
     orientation: { heading: 0, pitch: -Math.PI / 2, roll: 0 },
   });
-  const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
   let opened = false;
   // The intro stays up until the visitor starts the journey; a deep link
   // (index.html#alhambra) skips it.
@@ -2416,15 +2590,15 @@
     const btn = $('btn-start');
     btn.disabled = false; btn.textContent = 'Commencer le voyage';
     btn.addEventListener('click', open);
-    if (placeFromHash()) open(); else btn.focus();
+    if (parseHash()) open(); else btn.focus();
   }
   function open() {
     if (loader.classList.contains('done')) return;
     loader.classList.add('done');
     // Deep link (index.html#alhambra) or a place picked during loading
     // takes over from the opening shot.
-    const p = placeFromHash();
-    if (p && !activePlace) flyToPlace(p);
+    const h = parseHash();
+    if (h && !activePlace && !tour) goToHash(h);
     else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
       duration: 7500,
       onDone: () => setPhase('Orbite'),
@@ -2436,12 +2610,14 @@
   // Never keep the loader up forever on a slow network.
   setTimeout(ready, 12000);
   window.addEventListener('hashchange', () => {
-    const p = placeFromHash();
-    if (p) { open(); flyToPlace(p); }
+    const h = parseHash();
+    if (!h) return;
+    if (!loader.classList.contains('done')) open();
+    else goToHash(h);
   });
 
   // Exposed for automated tests only.
-  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled }; }, flyToPlace, returnToOrbit, startTour, get tour() { return tour && { ...tour }; }, get route() { return route.slice(); }, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
 })();
 </script>
 </body>
