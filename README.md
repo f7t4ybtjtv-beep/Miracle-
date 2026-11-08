@@ -30,10 +30,13 @@ dossier projet.
 `fatiha/index.html` — **Fatiha, maman d’Amine** (anciennement « Nour, la lumière du dialogue ») : un site autonome qui
 reprend le moteur de survol de `terre.html` avec sa propre identité (lumière
 dorée sur fond de nuit, titres en Cormorant Garamond). Un écran d'accueil
-précède un voyage vers dix lieux où des cultures se sont rencontrées : Tolède,
-Cordoue, l'Alhambra, Tombouctou, Alexandrie, Jérusalem, Petra, Sainte-Sophie,
-Samarcande et Angkor. Coordonnées réelles ; textes limités à des faits
-vérifiables. L'ancienne adresse `nour/` redirige vers `fatiha/`. Lien direct vers un lieu : `fatiha/index.html#samarcande`. Les
+précède un voyage vers treize lieux où des cultures se sont rencontrées : Tolède,
+Cordoue, l'Alhambra, Al Quaraouiyine à Fès, Tombouctou, la chapelle Palatine de Palerme,
+Alexandrie, Jérusalem, Petra, Sainte-Sophie, Samarcande, Nalanda et Angkor. Coordonnées réelles ; textes limités à des faits
+vérifiables. L'ancienne adresse `nour/` redirige vers `fatiha/`. Lien direct vers un lieu : `fatiha/index.html#samarcande`,
+vers sa vue de nuit ou sa plongée : `#samarcande/nuit`, `#samarcande/plongee` ; `#visite` lance la visite guidée.
+Le bouton « Partager » de la carte copie ce lien (ou ouvre le partage du téléphone). « Visite guidée » enchaîne les
+lieux avec un arrêt de 12 s (toucher le globe met en pause) ; « Trajet » trace depuis l'espace un arc entre les lieux visités. Les
 données et limites sont les mêmes que pour `terre.html`.
 
 ### Fatiha : qualité d'image
