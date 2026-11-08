@@ -1725,9 +1725,12 @@
 
   // Click a marker on the globe to fly there.
   const handler = new C.ScreenSpaceEventHandler(canvas);
+  // Layers that make things on the globe clickable register here: a handler returns true when the pick is its own.
+  const pickHandlers = [];
   handler.setInputAction((m) => {
     const picked = scene.pick(m.position);
     if (picked && picked.id && picked.id.satIndex !== undefined) { selectSat(picked.id.satIndex); return; }
+    for (const h of pickHandlers) if (h(picked, m.position)) return;
     const id = picked && picked.id && picked.id.id;
     const p = PLACES.find((x) => x.id === id);
     if (p) flyToPlace(p);
@@ -2207,7 +2210,7 @@
   }
   const googleKey = readGoogleKey();
   const TILESET_SSE = { ultra: 6, high: 8, balanced: 12, light: 20 };           // lower = sharper
-  const TILESET_CACHE_MB = { high: [512, 256], balanced: [256, 128], light: [128, 64] };
+  const TILESET_CACHE_MB = { ultra: [512, 256], high: [512, 256], balanced: [256, 128], light: [128, 64] };
   let googleTileset = null, googleOn = false, googleReady = false, googleBusy = false, googleFailures = 0;
   statusLines.google = '';
 
