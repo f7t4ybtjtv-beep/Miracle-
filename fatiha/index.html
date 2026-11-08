@@ -5,312 +5,445 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>Fatiha, maman d’Amine</title>
 <meta name="description" content="Fatiha, maman d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers dix lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
-<meta name="theme-color" content="#0B0E14" />
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwQjBFMTQiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMSIgZmlsbD0iI0UzQjA2MiIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjIwIiBmaWxsPSJub25lIiBzdHJva2U9IiNFM0IwNjIiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMiIvPjwvc3ZnPg==" />
+<meta name="theme-color" content="#04060B" />
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwNDA2MEIiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMCIgZmlsbD0iI0Y0RjZGQSIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE5IiBmaWxsPSJub25lIiBzdHJva2U9IiM5RkQzRkYiIHN0cm9rZS1vcGFjaXR5PSIuNTUiIHN0cm9rZS13aWR0aD0iMS42Ii8+PC9zdmc+" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="preconnect" href="https://server.arcgisonline.com" crossorigin>
 <link rel="preconnect" href="https://s3.amazonaws.com" crossorigin>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
 <style>
   :root {
-    /* Fatiha: warm light on a night sky. */
-    --bg-deep: #0B0E14;
-    --bg-warm: #151A24;
-    --panel: rgba(14, 18, 26, 0.72);
-    --panel-solid: #10141C;
-    --border: #262D3A;
-    --border-strong: #3A4354;
-    --accent: #E3B062;
-    --accent-2: #F1CF8E;
-    --text: #F4ECDF;
-    --text-2: #BDB5A8;
-    --muted: #7F786D;
-    --font-ui: 'Inter', Arial, sans-serif;
-    --font-serif: 'Cormorant Garamond', Georgia, serif;
-    --font-mono: 'JetBrains Mono', Consolas, monospace;
-    --gutter: 20px;
+    /* Fatiha, "space cinema": the Earth full screen, cool white type on a blue-black night, one ice-blue accent. */
+    --bg: #04060B;
+    --bg-2: #0B1220;
+    --ink: #F4F6FA;
+    --ink-2: #B7C0CD;
+    --muted: #6E7888;
+    --line: rgba(244, 246, 250, 0.14);
+    --line-2: rgba(244, 246, 250, 0.28);
+    --accent: #9FD3FF;
+    --sheet: rgba(6, 9, 15, 0.88);
+    --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    --gutter: 22px;
+    --safe-t: env(safe-area-inset-top);
+    --safe-b: env(safe-area-inset-bottom);
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; height: 100%; overflow: hidden;
-    background: var(--bg-deep); color: var(--text);
-    font-family: var(--font-ui);
+    background: var(--bg); color: var(--ink);
+    font: 400 16px/1.5 var(--font-ui);
     -webkit-font-smoothing: antialiased;
   }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
   #globe { position: fixed; inset: 0; }
   #globe .cesium-viewer-bottom, #globe .cesium-widget-credits { display: none !important; }
-  /* Cinematic vignette: purely optical, keeps the eye on the centre of frame. */
-  .vignette {
-    position: fixed; inset: 0; pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(5, 2, 1, 0.55) 100%);
-  }
+  /* Optical only: darken the frame edges and the bands where text sits, never the centre of the Earth. */
+  .vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 58%, rgba(2, 3, 8, 0.6) 100%); }
+  .shade { position: fixed; left: 0; right: 0; pointer-events: none; }
+  .shade-top { top: 0; height: 170px; background: linear-gradient(rgba(4, 6, 11, 0.72), transparent); }
+  .shade-bottom { bottom: 0; height: 48vh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
 
-  .ui { position: fixed; z-index: 5; pointer-events: none; }
-  .ui > * { pointer-events: auto; }
-  .glass {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(14px) saturate(1.1);
-    -webkit-backdrop-filter: blur(14px) saturate(1.1);
-    border-radius: 14px;
-  }
-  .kicker {
-    font-family: var(--font-mono); font-size: 11px; letter-spacing: .16em;
-    text-transform: uppercase; color: var(--muted);
-  }
+  .ui { position: fixed; z-index: 5; }
+  .kicker { font: 500 11px/1.4 var(--font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
 
-  /* Top bar */
+  /* Top: wordmark and status on the left, Orbit and Menu on the right */
   .top {
-    top: calc(var(--gutter) + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter);
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    pointer-events: none;
+    top: calc(var(--gutter) + var(--safe-t)); left: var(--gutter); right: var(--gutter);
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; pointer-events: none;
   }
-  .brand { display: flex; align-items: center; gap: 14px; padding: 10px 16px; pointer-events: auto; }
-  .brand a { color: var(--text-2); text-decoration: none; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
-  .brand a:hover { color: var(--text); }
-  .brand .sep { width: 1px; height: 16px; background: var(--border-strong); }
-  .brand h1 { margin: 0; font: 600 22px/1 var(--font-serif); letter-spacing: .02em; color: var(--accent-2); }
-  .brand .tag { font: italic 500 15px var(--font-serif); color: var(--text-2); white-space: nowrap; }
-  .tools { display: flex; gap: 8px; pointer-events: auto; }
-  .btn {
-    font: 500 12px var(--font-ui); color: var(--text-2);
-    background: var(--panel); border: 1px solid var(--border);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border-radius: 999px; padding: 9px 14px; cursor: pointer;
-    transition: color .2s, border-color .2s, background .2s;
+  .top > * { pointer-events: auto; }
+  .brand { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
+  .brand h1 { margin: 0; font: 300 15px/1 var(--font-ui); letter-spacing: .52em; text-transform: uppercase; color: var(--ink); }
+  .brand .tag { display: block; margin-top: 9px; font: 300 13px var(--font-ui); letter-spacing: .1em; color: var(--ink-2); }
+  .hud {
+    margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
+    font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
   }
-  .btn:hover { color: var(--text); border-color: var(--border-strong); }
-  .btn[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
-  .btn:focus-visible, .place:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
+  .hud .phase { color: var(--accent); }
+  .hud b { font-weight: 500; color: var(--ink); }
+  .hud .aux { color: var(--muted); }
+  #hud-radio { display: inline-flex; gap: 8px; align-items: center; max-width: 60vw; color: var(--ink); text-transform: none; letter-spacing: .02em; }
+  #hud-radio[hidden] { display: none; }
+  #hud-radio b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #hud-radio button { min-width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.5); cursor: pointer; font-size: 10px; }
+  .tools { display: flex; gap: 10px; }
+  .round {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; min-width: 44px; padding: 0 16px;
+    border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.45);
+    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: var(--ink); cursor: pointer; font: 400 13px var(--font-ui); letter-spacing: .08em; transition: border-color .2s, color .2s;
+  }
+  .round svg { width: 18px; height: 18px; flex: none; }
+  .round:hover, .round[aria-expanded="true"] { border-color: var(--accent); color: var(--accent); }
 
-  /* Places list */
+  /* Places: a snapping strip at the bottom */
   .places {
-    /* Top-right, ending above the Sources panel (about 240 px tall with the quality row) so the two never overlap. */
-    top: calc(var(--gutter) + 64px + env(safe-area-inset-top)); right: var(--gutter);
-    width: 260px; max-height: calc(100vh - var(--gutter) - 64px - 240px - env(safe-area-inset-top)); overflow: auto;
-    padding: 14px; scrollbar-width: thin;
+    left: 0; right: 0; bottom: calc(var(--safe-b) + 30px);
+    display: flex; align-items: center; gap: 8px; padding: 0 var(--gutter);
   }
-  .places .kicker {
-    position: sticky; top: -14px; z-index: 1; margin: -14px -14px 0; padding: 16px 20px 10px;
-    background: linear-gradient(var(--panel-solid) 70%, transparent);
+  .places ul {
+    flex: 1; min-width: 0; list-style: none; margin: 0; padding: 2px 0; display: flex; gap: 30px;
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
-  .places ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .places ul::-webkit-scrollbar { display: none; }
+  .places li { flex: none; scroll-snap-align: start; }
+  .places li:first-child { padding-left: 4px; }
   .place {
-    width: 100%; text-align: left; cursor: pointer;
-    background: transparent; border: 1px solid transparent; border-radius: 10px;
-    padding: 9px 10px; color: var(--text); font: 500 13.5px var(--font-ui);
-    display: grid; gap: 2px; transition: background .2s, border-color .2s;
+    display: grid; gap: 5px; min-height: 48px; padding: 6px 0; background: none; border: 0; cursor: pointer; text-align: left;
+    color: var(--ink-2); opacity: .62; transition: opacity .3s, color .3s; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
-  .place small { font: 400 11px var(--font-mono); color: var(--muted); letter-spacing: .04em; }
-  .place:hover { background: rgba(242, 227, 213, 0.05); }
-  .place[aria-current="true"] { border-color: var(--border-strong); background: rgba(217, 72, 42, 0.10); }
+  .place span { font: 300 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+  .place small { font: 400 10.5px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .place:hover { opacity: 1; }
+  .place[aria-current="true"] { opacity: 1; color: var(--ink); }
+  .place[aria-current="true"] span { border-bottom-color: var(--accent); }
+  .arrow {
+    flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(4, 6, 11, 0.4);
+    color: var(--ink-2); cursor: pointer; font-size: 18px; display: none;
+  }
+  .arrow:hover { color: var(--ink); border-color: var(--line-2); }
 
-  /* Info card */
+  /* Place title, over the Earth: no box, just type */
   .card {
-    left: var(--gutter); bottom: calc(var(--gutter) + 56px + env(safe-area-inset-bottom));
-    width: min(380px, calc(100vw - 2 * var(--gutter)));
-    padding: 18px 20px; opacity: 0; transform: translateY(8px);
-    transition: opacity .6s ease, transform .6s ease; pointer-events: none;
+    left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 104px); max-width: 600px;
+    opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; pointer-events: none;
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75);
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
-  .card h2 { margin: 4px 0 4px; font: 600 28px/1.1 var(--font-serif); letter-spacing: 0; }
-  .card .coords { font: 400 11.5px var(--font-mono); color: var(--text-2); }
-  .card p { margin: 12px 0 0; font-size: 14px; line-height: 1.55; color: var(--text-2); }
-  .card .meta { margin-top: 12px; font: 400 11px var(--font-mono); color: var(--muted); }
-  .card .links { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 12px; }
-  .card a.earth, .card button.earth { font: 500 12px var(--font-mono); color: var(--accent); text-decoration: none; border: 0; border-bottom: 1px solid var(--border-strong); background: none; padding: 0; cursor: pointer; }
-  .card a.earth:hover, .card button.earth:hover { color: var(--accent-2); border-bottom-color: var(--accent-2); }
-  .card a.earth:focus-visible, .card button.earth:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
+  .card h2 { margin: 8px 0 8px; font: 200 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
+  .card .kicker { color: var(--ink-2); }
+  .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
+  .card p { margin: 14px 0 0; max-width: 54ch; font: 300 16px/1.6 var(--font-ui); color: var(--ink-2); }
+  .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
+  .card .meta { margin-top: 10px; font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    color: var(--ink); text-decoration: none; font: 400 14px var(--font-ui); letter-spacing: .02em; cursor: pointer; text-shadow: none;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+  .chip.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .chip.primary:hover { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+  .chip[hidden] { display: none; }
 
-  /* HUD */
-  .hud {
-    left: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
-    display: flex; gap: 18px; align-items: center; padding: 10px 16px;
-    font: 400 11.5px var(--font-mono); color: var(--text-2);
+  /* Small permanent credit line, and Google's on-screen credits in Google 3D mode */
+  .credit-line {
+    right: var(--gutter); bottom: calc(var(--safe-b) + 8px); padding: 4px 0; background: none; border: 0; cursor: pointer;
+    font: 400 10px var(--font-mono); letter-spacing: .1em; color: var(--muted); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
   }
-  .hud b { color: var(--text); font-weight: 500; }
-  .hud .phase { color: var(--accent-2); }
+  .credit-line:hover { color: var(--ink-2); }
+  #cesium-credits {
+    left: var(--gutter); bottom: calc(var(--safe-b) + 6px); max-width: 60vw;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 400 10px/1.5 var(--font-mono); color: var(--ink-2);
+  }
+  #cesium-credits[hidden] { display: none; }
+  #cesium-credits a { color: var(--ink-2); }
+  #cesium-credits img { max-height: 16px; vertical-align: middle; }
 
-  .credits {
-    right: var(--gutter); bottom: calc(var(--gutter) + env(safe-area-inset-bottom));
-    max-width: 52vw; padding: 7px 12px; font: 400 10px/1.5 var(--font-mono); color: var(--muted);
-    text-align: right;
+  /* Sheets: the menu, Veille and Direct. A drawer on the right on wide screens, a bottom sheet on phones. */
+  .sheet {
+    top: calc(var(--safe-t) + 12px); right: 12px; bottom: calc(var(--safe-b) + 12px); width: min(420px, calc(100vw - 24px));
+    z-index: 8; display: none; overflow: auto; padding: 18px 18px 24px;
+    background: var(--sheet); border: 1px solid var(--line); border-radius: 22px;
+    backdrop-filter: blur(20px) saturate(1.1); -webkit-backdrop-filter: blur(20px) saturate(1.1);
+    scrollbar-width: thin; overscroll-behavior: contain;
   }
-  .credits a { color: var(--text-2); }
-  .credits summary { cursor: pointer; list-style: none; color: var(--text-2); }
-  .credits summary::-webkit-details-marker { display: none; }
-  .credits[open] summary { margin-bottom: 4px; }
+  .sheet.open { display: block; animation: sheet-in .35s ease; }
+  @keyframes sheet-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
+  .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .sheet h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); letter-spacing: .01em; }
+  .close {
+    flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: transparent;
+    color: var(--ink); cursor: pointer; font-size: 16px;
+  }
+  .close:hover { border-color: var(--accent); color: var(--accent); }
+  .group { margin-top: 22px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .opt {
+    display: grid; align-content: start; gap: 4px; min-height: 68px; padding: 12px 14px; text-align: left; cursor: pointer;
+    border-radius: 16px; border: 1px solid var(--line); background: rgba(244, 246, 250, 0.03); transition: border-color .2s, background .2s;
+  }
+  .opt b { font: 400 15px/1.25 var(--font-ui); color: var(--ink); }
+  .opt small { font: 400 11.5px/1.4 var(--font-ui); color: var(--muted); }
+  .opt:hover { border-color: var(--line-2); }
+  .opt[aria-pressed="true"] { border-color: var(--accent); background: rgba(159, 211, 255, 0.08); }
+  .opt[hidden] { display: none; }
+  .sheet details > summary { cursor: pointer; list-style: none; }
+  .sheet details > summary::-webkit-details-marker { display: none; }
+  .quality { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .quality button {
+    min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
+    color: var(--ink-2); cursor: pointer; font: 400 13px var(--font-ui);
+  }
+  .quality button[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+  .quality button:disabled { opacity: .4; cursor: not-allowed; }
+  #credits { margin-top: 14px; font: 400 11px/1.7 var(--font-mono); color: var(--muted); }
+  #credits a { color: var(--ink-2); }
 
-  /* Loader / fallback */
-  .loader {
-    position: fixed; inset: 0; z-index: 10; display: grid; place-items: center;
-    background: radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
-    transition: opacity 1.2s ease;
+  /* Generic controls inside sheets */
+  .btn {
+    min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
+    color: var(--ink-2); cursor: pointer; font: 400 13px var(--font-ui); transition: color .2s, border-color .2s;
   }
-  .loader.done { opacity: 0; pointer-events: none; }
-  .loader {
-    background:
-      radial-gradient(ellipse 60% 45% at 50% 42%, rgba(227, 176, 98, 0.14), transparent 70%),
-      radial-gradient(ellipse at center, var(--bg-warm), var(--bg-deep));
-  }
-  .loader .inner { text-align: center; max-width: 560px; padding: 0 24px; }
-  .loader h2 { margin: 10px 0 6px; font: 500 clamp(64px, 14vw, 120px)/0.95 var(--font-serif); color: var(--text); letter-spacing: .02em; }
-  .loader .tagline { margin: 0 0 22px; font: italic 500 clamp(20px, 4vw, 26px) var(--font-serif); color: var(--accent-2); }
-  .loader p { color: var(--text-2); font-size: 15px; line-height: 1.65; }
-  .loader .start {
-    margin-top: 26px; font: 500 14px var(--font-ui); letter-spacing: .02em;
-    color: var(--bg-deep); background: var(--accent); border: 0; border-radius: 999px;
-    padding: 13px 26px; cursor: pointer; transition: background .2s, opacity .3s;
-  }
-  .loader .start:hover { background: var(--accent-2); }
-  .loader .start:disabled { opacity: .45; cursor: progress; }
-  .loader .start:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 3px; }
-  .loader .bar { width: 160px; height: 2px; margin: 18px auto 0; background: var(--border); overflow: hidden; border-radius: 2px; }
-  .loader .bar i { display: block; height: 100%; width: 40%; background: var(--accent); animation: slide 1.4s ease-in-out infinite; }
-  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(260%); } }
-  .fallback-list { text-align: left; margin-top: 18px; color: var(--text-2); font-size: 13px; line-height: 1.7; }
+  .btn:hover { color: var(--ink); border-color: var(--line-2); }
+  .btn[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+  .status { margin: 10px 0; font: 400 11.5px/1.65 var(--font-mono); color: var(--ink-2); white-space: pre-line; }
+  .note { margin: 10px 0; font: 400 11.5px/1.6 var(--font-ui); color: var(--muted); }
 
-  /* Veille mondiale panel */
-  .watch {
-    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
-    width: 300px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
-    display: none; pointer-events: auto; scrollbar-width: thin;
-  }
-  .watch.open { display: block; }
-  .watch .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 12px; }
-  .watch .toggles .btn { text-align: left; border-radius: 10px; padding: 9px 11px; }
+  /* Veille */
+  .watch .toggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+  .watch .toggles .btn { min-height: 48px; text-align: left; border-radius: 14px; padding: 8px 12px; }
   .watch .toggles .wide { grid-column: 1 / -1; }
-  .watch .status { margin: 0 0 12px; font: 400 11px/1.65 var(--font-mono); color: var(--text-2); white-space: pre-line; }
-  .watch .sub { margin: 12px 0 6px; }
+  .watch .sub { margin: 16px 0 6px; }
   .watch ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
   .watch li button {
-    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px; padding: 6px 8px;
-    color: var(--text-2); font: 400 12px/1.4 var(--font-mono); cursor: pointer;
-    display: grid; grid-template-columns: 40px 1fr; gap: 8px;
+    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; padding: 8px 8px; min-height: 40px;
+    color: var(--ink-2); font: 400 12px/1.4 var(--font-mono); cursor: pointer; display: grid; grid-template-columns: 44px 1fr; gap: 8px;
   }
-  .watch li button:hover { background: rgba(244, 236, 223, 0.06); color: var(--text); }
-  .watch li button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
+  .watch li button:hover { background: rgba(244, 246, 250, 0.06); color: var(--ink); }
   .watch .mag { color: var(--accent); font-weight: 500; }
   .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
-  .watch .journal li b { color: var(--text-2); font-weight: 400; }
-  .quality { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 10px; font: 400 10px var(--font-mono); color: var(--muted); }
-  .quality button { font: 500 11px var(--font-ui); color: var(--text-2); background: transparent; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; cursor: pointer; }
-  .quality button[aria-pressed="true"] { color: var(--text); border-color: var(--accent); }
-  .quality button:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
-  #cesium-credits { margin-top: 8px; font: 400 10px/1.5 var(--font-mono); color: var(--text-2); text-align: right; display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px 10px; }
-  #cesium-credits[hidden] { display: none; }
-  #cesium-credits a { color: var(--text-2); }
-  #cesium-credits img { max-height: 18px; vertical-align: middle; }
+  .watch .journal li b { color: var(--ink-2); font-weight: 400; }
+
+  /* The Light · Stream (Direct): small squares of live TV and radio */
+  .live .row { display: flex; gap: 8px; margin: 12px 0 6px; align-items: center; }
+  .live select {
+    flex: 1; min-width: 0; min-height: 44px; color-scheme: dark; font: 400 14px var(--font-ui); color: var(--ink);
+    background: rgba(244, 246, 250, 0.04); border: 1px solid var(--line-2); border-radius: 12px; padding: 0 12px;
+  }
+  .live .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
+  .live .tabs .btn { padding: 0 4px; }
+  .live .pane { display: none; }
+  .live .pane.on { display: block; }
+  .tiles { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .tile {
+    position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; padding: 0; cursor: pointer;
+    border-radius: 12px; border: 1px solid var(--line); background: #0A0F18 center / cover no-repeat; color: var(--ink); text-align: left;
+  }
+  .tile video, .tile img.logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .tile img.logo { object-fit: contain; padding: 22%; opacity: .9; }
+  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 200 26px var(--font-ui); color: var(--ink-2); }
+  .tile .name {
+    position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 7px 6px; font: 500 10.5px/1.25 var(--font-ui);
+    background: linear-gradient(transparent, rgba(4, 6, 11, 0.85)); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  }
+  .tile .badge {
+    position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 999px; font: 500 8.5px var(--font-mono); letter-spacing: .12em;
+    text-transform: uppercase; background: rgba(4, 6, 11, 0.6); color: var(--muted);
+  }
+  .tile.on .badge { color: #FF6B6B; }
+  .tile.on .badge::before { content: '● '; }
+  .tile.off { opacity: .45; }
+  .tile.off .badge { color: var(--muted); }
+  .tile:hover { border-color: var(--line-2); }
+  .tile.playing { border-color: var(--accent); }
+  .eq { position: absolute; top: 8px; right: 8px; display: none; gap: 2px; align-items: flex-end; height: 14px; }
+  .tile.playing .eq { display: flex; }
+  .eq i { width: 3px; background: var(--accent); animation: eq 0.9s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: .2s; } .eq i:nth-child(3) { animation-delay: .4s; }
+  @keyframes eq { 0%, 100% { height: 3px; } 50% { height: 14px; } }
+  .stage { position: relative; margin: 6px 0 8px; }
+  .stage[hidden] { display: none; }
+  .stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; }
+  .stage .close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; background: rgba(4, 6, 11, 0.7); }
+  .live .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .live .list li > button, .live .list li > a {
+    display: grid; gap: 3px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px;
+    padding: 9px 8px; color: var(--ink); font: 400 13.5px/1.4 var(--font-ui); cursor: pointer; text-decoration: none;
+  }
+  .live .list li > button:hover, .live .list li > a:hover { background: rgba(244, 246, 250, 0.06); }
+  .live .list li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .live .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .live .refs a { color: var(--accent); }
+  body.live-open .card, body.live-open .places { visibility: hidden; }
+
+  #radio-audio { display: block; width: 100%; margin: 8px 0; color-scheme: dark; }
+  #radio-audio:not(.on) { display: none; }
+  .sats-box { margin: 4px 0 8px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); }
+  .sats-box[hidden] { display: none; }
+  .sats-box .sub { margin-top: 0; }
+  .check { display: flex; gap: 10px; align-items: center; min-height: 44px; font: 400 13px var(--font-ui); color: var(--ink-2); cursor: pointer; }
+  .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
+  #credits-box > summary { padding: 8px 0; min-height: 40px; display: flex; align-items: center; }
+  #credits-box[open] > summary { color: var(--ink-2); }
+
+  /* Situation room */
   .sit-only { display: none; }
   body.sitroom .sit-only { display: inline; }
   body.sitroom .places, body.sitroom .card { display: none; }
   body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
 
-  /* Direct: radios, free TV, public webcams, conflict headlines */
-  .live {
-    top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
-    width: 340px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
-    display: none; pointer-events: auto; scrollbar-width: thin;
-    background: rgba(14, 18, 26, 0.93);     /* more opaque than other panels: small grey text over a bright sky */
+  /* Opening title card */
+  .loader {
+    position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
+    background: radial-gradient(ellipse 75% 60% at 50% 42%, var(--bg-2), var(--bg) 72%);
+    transition: opacity 1.2s ease;
   }
-  .live.open { display: block; }
-  body.live-open .card { display: none; }   /* the place card would sit on top of the panel */
-  .live .row { display: flex; gap: 8px; margin: 10px 0 6px; align-items: center; }
-  .live select {
-    flex: 1; min-width: 0; color-scheme: dark; font: 500 13px var(--font-ui); color: var(--text);
-    background: var(--panel-solid); border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px 10px;
+  .loader.done { opacity: 0; pointer-events: none; }
+  .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
+  .loader h2 { margin: 18px 0 0; font: 200 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
+  .loader .tagline { margin: 18px 0 30px; font: 300 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  .loader p { margin: 0 auto; max-width: 48ch; font: 300 15px/1.7 var(--font-ui); color: var(--ink-2); }
+  .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
+  .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
+  @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+  .loader .start {
+    margin-top: 32px; height: 52px; padding: 0 32px; border-radius: 999px; border: 1px solid var(--ink); background: transparent;
+    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .26em; text-transform: uppercase; cursor: pointer; transition: background .25s, color .25s;
   }
-  .live select:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 2px; }
-  .live .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin: 10px 0; }
-  .live .tabs .btn { padding: 7px 2px; border-radius: 10px; text-align: center; font-size: 11.5px; }
-  .live .pane { display: none; }
-  .live .pane.on { display: block; }
-  .live .note { margin: 8px 0; font: 400 11px/1.6 var(--font-mono); color: var(--muted); }
-  .live .status { margin: 6px 0; font: 400 11px/1.6 var(--font-mono); color: var(--text-2); }
-  .live ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .live li > button, .live li > a {
-    display: grid; gap: 2px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 8px;
-    padding: 7px 8px; color: var(--text); font: 500 12.5px/1.4 var(--font-ui); cursor: pointer; text-decoration: none;
-  }
-  .live li > button:hover, .live li > a:hover { background: rgba(244, 236, 223, 0.06); }
-  .live li > button:focus-visible, .live li > a:focus-visible { outline: 2px solid var(--accent-2); outline-offset: 1px; }
-  .live li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
-  .live video { display: none; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 10px; margin-bottom: 6px; }
-  .live video.on { display: block; }
-  .live audio { display: none; width: 100%; margin: 6px 0; color-scheme: dark; }
-  .live audio.on { display: block; }
-  .live .chips { display: flex; gap: 6px; margin: 6px 0; }
-  .live .chips .btn { padding: 4px 10px; font-size: 11px; }
-  .live .refs a { color: var(--accent); }
-  #hud-radio { display: inline-flex; gap: 6px; align-items: center; max-width: 46vw; }
-  #hud-radio[hidden] { display: none; }
-  #hud-radio b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #hud-radio button { font: 500 10px var(--font-mono); color: var(--text-2); background: transparent; border: 1px solid var(--border-strong); border-radius: 6px; padding: 1px 6px; cursor: pointer; }
-  .quality button:disabled { opacity: .4; cursor: not-allowed; }
+  .loader .start:hover { background: var(--ink); color: var(--bg); }
+  .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
+  .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
 
-  /* Narrow screens: places become a horizontal strip, card stacks above it. */
+  /* Wide screens */
+  @media (min-width: 900px) {
+    .arrow { display: inline-block; }
+    .places { left: 50%; right: auto; transform: translateX(-50%); width: min(1100px, calc(100vw - 2 * var(--gutter))); padding: 0; }
+    .card { left: max(var(--gutter), calc(50vw - 550px)); }
+    .tiles { grid-template-columns: repeat(4, 1fr); }
+  }
+  @media (min-width: 1400px) { .sheet { width: 480px; } .tiles { grid-template-columns: repeat(5, 1fr); } }
+
+  /* Phones */
   @media (max-width: 760px) {
-    :root { --gutter: 16px; }
-    .brand .tag, .brand .sep { display: none; }
-    .brand { padding: 9px 14px; }
-    .tools .btn { padding: 8px 11px; }
-    .tools { flex-wrap: wrap; justify-content: flex-end; }
-    .top { align-items: flex-start; }
-    .watch { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 38vh; }
-    .live { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 52vh; }
-    .places {
-      top: auto; transform: none; right: var(--gutter); left: var(--gutter);
-      bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
-      width: auto; max-height: none; padding: 8px; overflow-x: auto; overflow-y: hidden;
-    }
-    .places .kicker { display: none; }
-    .places ul { grid-auto-flow: column; grid-auto-columns: max-content; }
-    .place { padding: 8px 12px; font-size: 13px; }
-    .card { bottom: calc(var(--gutter) + 124px + env(safe-area-inset-bottom)); padding: 14px 16px; }
-    .card h2 { font-size: 18px; }
-    .card p { font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-    .hud { gap: 12px; padding: 8px 12px; font-size: 10.5px; }
-    .hud .opt { display: none; }
-    .credits { left: auto; right: var(--gutter); max-width: calc(100vw - 2 * var(--gutter)); bottom: auto; top: calc(var(--gutter) + 98px + env(safe-area-inset-top)); font-size: 9.5px; padding: 5px 10px; }
+    :root { --gutter: 18px; }
+    .round span { display: none; }
+    .round { padding: 0 13px; }
+    .card { bottom: calc(var(--safe-b) + 100px); }
+    .card h2 { font-size: 34px; }
+    .card p { font-size: 15px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card.expanded p { display: block; }
+    .card .more { display: inline-block; }
+    .card .meta { display: none; }
+    .card.expanded .meta { display: block; }
+    .chip { padding: 0 14px; font-size: 13.5px; }
+    .hud .aux { display: none; }
+    .sheet { top: auto; left: 8px; right: 8px; bottom: calc(var(--safe-b) + 8px); width: auto; max-height: 80vh; border-radius: 24px; padding: 14px 14px 20px; }
+    /* Keep the top of the globe in view: touching it picks a country (Direct) or a satellite (Veille). */
+    .sheet.live { max-height: 70vh; }
+    .sheet.watch { max-height: 58vh; }
+    .sheet h3 { font-size: 22px; }
+    .shade-bottom { height: 62vh; }
+    @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
   }
   @media (prefers-reduced-motion: reduce) {
-    .card, .loader { transition: none; }
-    .loader .bar i { animation: none; width: 100%; }
+    .card, .loader, .place, .chip { transition: none; }
+    .sheet.open { animation: none; }
+    .loader .bar i, .eq i { animation: none; }
+    .loader .bar i { width: 100%; }
   }
 </style>
 </head>
 <body>
   <div id="globe" aria-label="Globe terrestre interactif"></div>
   <div class="vignette"></div>
+  <div class="shade shade-top"></div>
+  <div class="shade shade-bottom"></div>
 
-  <div class="ui top">
-    <div class="brand glass">
+  <header class="ui top">
+    <div class="brand">
       <h1>Fatiha</h1>
-      <span class="sep"></span>
       <span class="tag">maman d’Amine</span>
+      <div class="hud" aria-live="off">
+        <span class="phase" id="hud-phase">Orbite</span>
+        <span>Alt. <b id="hud-alt">—</b></span>
+        <span class="aux"><b id="hud-pos">—</b></span>
+        <span class="aux" id="hud-quality"></span>
+        <span class="sit-only"><b id="hud-utc">—</b></span>
+        <span id="hud-radio" hidden>♪ <b id="hud-radio-name"></b><button id="hud-radio-stop" type="button" aria-label="Arrêter la radio">■</button></span>
+      </div>
     </div>
     <div class="tools">
-      <button class="btn" id="btn-orbit" type="button">Orbite</button>
-      <button class="btn" id="btn-labels" type="button" aria-pressed="false">Toponymes</button>
-      <button class="btn" id="btn-google" type="button" aria-pressed="false" hidden>Google 3D</button>
-      <button class="btn" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch">Veille</button>
-      <button class="btn" id="btn-live" type="button" aria-pressed="false" aria-controls="live">Direct</button>
-      <button class="btn" id="btn-clouds" type="button" aria-pressed="true" title="Nuages décoratifs, non météorologiques">Nuages</button>
+      <button class="round" id="btn-orbit" type="button" aria-label="Retour en orbite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-24 12 12)"/></svg>
+        <span>Orbite</span>
+      </button>
+      <button class="round" id="btn-menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+        <span>Menu</span>
+      </button>
     </div>
-  </div>
+  </header>
 
-  <nav class="ui places glass" aria-label="Lieux">
-    <div class="kicker">Lieux de rencontre</div>
+  <aside class="ui sheet menu" id="menu" aria-label="Menu">
+    <div class="sheet-head">
+      <div><div class="kicker">Fatiha · menu</div><h3>Explorer la Terre</h3></div>
+      <button class="close" type="button" data-close="menu" aria-label="Fermer le menu">✕</button>
+    </div>
+    <div class="group">
+      <div class="kicker">En direct</div>
+      <div class="grid2">
+        <button class="opt" id="btn-live" type="button" aria-pressed="false" aria-controls="live"><b>The Light · Stream</b><small>télés et radios du pays, en petits carrés</small></button>
+        <button class="opt" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch"><b>Veille</b><small>séismes, station spatiale, satellites militaires, nuages</small></button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Affichage</div>
+      <div class="grid2">
+        <button class="opt" id="btn-labels" type="button" aria-pressed="false"><b>Toponymes</b><small>noms des pays et des villes</small></button>
+        <button class="opt" id="btn-clouds" type="button" aria-pressed="true"><b>Nuages</b><small>décoratifs, pas la météo</small></button>
+        <button class="opt" id="btn-google" type="button" aria-pressed="false" hidden><b>Google 3D</b><small>villes photoréalistes</small></button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Qualité d’image</div>
+      <div class="quality" role="group" aria-label="Qualité d’image">
+        <button type="button" data-quality="ultra" aria-pressed="false">Ultra · HDR 5K</button>
+        <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
+        <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
+        <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
+      </div>
+      <p class="note">Ultra · HDR 5K : lumière calculée en haute dynamique et image jusqu’à 5120 px, réduite à l’écran. Pour un ordinateur puissant ; un téléphone ralentit. Un navigateur n’affiche pas une vraie image HDR10.</p>
+      <div class="quality"><button type="button" id="btn-shot">Enregistrer une image 5K</button></div>
+    </div>
+    <details class="group" id="credits-box">
+      <summary class="kicker">Sources et crédits ›</summary>
+      <div id="credits"></div>
+    </details>
+  </aside>
+
+  <nav class="ui places" aria-label="Lieux">
+    <button class="arrow" id="places-prev" type="button" aria-label="Lieux précédents">‹</button>
     <ul id="place-list"></ul>
+    <button class="arrow" id="places-next" type="button" aria-label="Lieux suivants">›</button>
   </nav>
 
-  <aside class="ui watch glass" id="watch" aria-label="Veille mondiale">
-    <div class="kicker">Veille mondiale · données publiques</div>
+  <section class="ui card" id="card" aria-live="polite">
+    <div class="kicker" id="card-kicker"></div>
+    <h2 id="card-title"></h2>
+    <div class="coords" id="card-coords"></div>
+    <p id="card-text"></p>
+    <button class="more" id="card-more" type="button" aria-expanded="false" aria-controls="card-text">Lire la suite</button>
+    <div class="meta" id="card-meta"></div>
+    <div class="links">
+      <button class="chip primary" id="card-dive" type="button">↓ Plonger</button>
+      <button class="chip" id="card-night" type="button">☾ Nuit</button>
+      <a class="chip" id="card-earth" target="_blank" rel="noopener">Google Earth ↗</a>
+    </div>
+  </section>
+
+  <button class="ui credit-line" id="credit-line" type="button" aria-controls="menu">Esri · Maxar · NASA · CesiumJS</button>
+  <div class="ui" id="cesium-credits" hidden></div>
+
+  <aside class="ui sheet watch" id="watch" aria-label="Veille mondiale">
+    <div class="sheet-head">
+      <div><div class="kicker">Données publiques</div><h3>Veille mondiale</h3></div>
+      <button class="close" type="button" data-close="watch" aria-label="Fermer la veille">✕</button>
+    </div>
     <div class="toggles">
       <button class="btn" type="button" data-layer="quakes" aria-pressed="false">Séismes 24 h</button>
       <button class="btn" type="button" data-layer="iss" aria-pressed="false">Station spatiale</button>
+      <button class="btn wide" type="button" data-layer="sats" aria-pressed="false">Satellites militaires</button>
       <button class="btn" type="button" data-layer="clouds" aria-pressed="true">Nuages réels</button>
       <button class="btn" type="button" data-layer="lights" aria-pressed="true">Lumières de nuit</button>
       <button class="btn" type="button" data-layer="rain" aria-pressed="false">Précipitations</button>
@@ -318,40 +451,52 @@
       <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
     </div>
     <p class="status" id="watch-status" aria-live="polite"></p>
+    <div class="sats-box" id="sats-box" hidden>
+      <div class="kicker sub">Satellites militaires</div>
+      <p class="status" id="sats-status" aria-live="polite"></p>
+      <label class="check"><input type="checkbox" id="sats-orbit" /> Montrer l’orbite du satellite choisi</label>
+      <p class="note">Catalogue public seulement (groupe « military » de CelesTrak, d’après les données publiées par les forces spatiales américaines) : les satellites secrets n’y figurent pas. Positions calculées à partir des éléments d’orbite publiés, à quelques kilomètres près, pas observées. Aucune personne n’est suivie.</p>
+    </div>
     <div class="kicker sub">Séismes les plus forts</div>
     <ul id="watch-quakes"></ul>
     <div class="kicker sub">Journal</div>
     <ul id="watch-journal" class="journal"></ul>
   </aside>
 
-  <aside class="ui live glass" id="live" aria-label="Direct : radios, télés, caméras et actualité">
-    <div class="kicker">Direct · radios, télés, caméras, actualité</div>
+  <aside class="ui sheet live" id="live" aria-label="The Light · Stream : télés, radios, caméras et actualité en direct">
+    <div class="sheet-head">
+      <div><div class="kicker">Direct · le pays choisi</div><h3>The Light · Stream</h3></div>
+      <button class="close" type="button" data-close="live" aria-label="Fermer The Light · Stream">✕</button>
+    </div>
     <div class="row">
       <select id="live-country" aria-label="Pays"></select>
       <button class="btn" id="live-random" type="button">Au hasard</button>
     </div>
     <p class="note" id="live-hint"></p>
     <div class="tabs" role="group" aria-label="Rubriques">
-      <button class="btn" type="button" data-tab="radio" aria-pressed="true">Radios</button>
-      <button class="btn" type="button" data-tab="tv" aria-pressed="false">Télé</button>
+      <button class="btn" type="button" data-tab="tv" aria-pressed="true">Télé</button>
+      <button class="btn" type="button" data-tab="radio" aria-pressed="false">Radio</button>
       <button class="btn" type="button" data-tab="cam" aria-pressed="false">Caméras</button>
       <button class="btn" type="button" data-tab="war" aria-pressed="false">Conflits</button>
     </div>
-    <section class="pane on" id="pane-radio">
+    <section class="pane on" id="pane-tv">
+      <div class="stage" id="tv-stage" hidden>
+        <video id="tv-video" controls playsinline></video>
+        <button class="close" id="tv-stage-close" type="button" aria-label="Fermer la vidéo">✕</button>
+      </div>
+      <p class="status" id="tv-status" aria-live="polite"></p>
+      <ul class="tiles" id="tv-list"></ul>
+      <p class="note">Les carrés montrent le direct sans le son, en basse définition, et seulement ceux qui sont à l’écran. Touche un carré pour l’agrandir avec le son. Playlists communautaires iptv-org : chaînes gratuites en accès libre ; beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+    </section>
+    <section class="pane" id="pane-radio">
       <audio id="radio-audio" controls preload="none"></audio>
       <p class="status" id="radio-status" aria-live="polite"></p>
-      <ul id="radio-list"></ul>
-      <p class="note">Annuaire communautaire radio-browser.info. Seuls les flux sécurisés (https) sont proposés ; certains peuvent être hors ligne.</p>
-    </section>
-    <section class="pane" id="pane-tv">
-      <video id="tv-video" controls playsinline></video>
-      <p class="status" id="tv-status" aria-live="polite"></p>
-      <ul id="tv-list"></ul>
-      <p class="note">Playlists communautaires iptv-org : chaînes gratuites en accès libre. Beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+      <ul class="tiles" id="radio-list"></ul>
+      <p class="note">Touche un carré pour écouter (une radio à la fois). Annuaire communautaire radio-browser.info ; seuls les flux sécurisés (https) sont proposés, certains peuvent être hors ligne.</p>
     </section>
     <section class="pane" id="pane-cam">
       <p class="status">Webcams publiques : ouvertes dans un nouvel onglet, chez des annuaires qui les référencent avec l’accord de leurs propriétaires.</p>
-      <ul id="cam-links"></ul>
+      <ul class="list" id="cam-links"></ul>
       <p class="note">Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
     </section>
     <section class="pane" id="pane-war">
@@ -362,7 +507,7 @@
         <button class="btn" type="button" data-warlang="English" aria-pressed="false">EN</button>
         <button class="btn" type="button" id="war-refresh">Actualiser</button>
       </div>
-      <ul id="war-list"></ul>
+      <ul class="list" id="war-list"></ul>
       <p class="note">Titres repérés par mots-clés (guerre, frappes, cessez-le-feu…) dans la base d’actualité GDELT, mise à jour environ toutes les 15 minutes. Ils ne sont pas vérifiés : en temps de guerre les faits sont contestés et certains médias dépendent d’un État. Ni images de guerre ni positions de troupes ne sont affichées.</p>
       <p class="note refs">Sources de référence :
         <a href="https://news.un.org/fr/news/topic/peace-and-security" target="_blank" rel="noopener noreferrer">ONU Info</a> ·
@@ -373,45 +518,6 @@
     </section>
     <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
-
-  <section class="ui card glass" id="card" aria-live="polite">
-    <div class="kicker" id="card-kicker"></div>
-    <h2 id="card-title"></h2>
-    <div class="coords" id="card-coords"></div>
-    <p id="card-text"></p>
-    <div class="meta" id="card-meta"></div>
-    <div class="links">
-      <a class="earth" id="card-earth" target="_blank" rel="noopener">Ouvrir dans Google Earth ↗</a>
-      <button class="earth" id="card-night" type="button">Voir la nuit depuis l’orbite ↗</button>
-      <button class="earth" id="card-dive" type="button">Plonger depuis l’espace ↓</button>
-    </div>
-  </section>
-
-  <div class="ui hud glass" aria-live="off">
-    <span class="phase" id="hud-phase">Orbite</span>
-    <span>Alt. <b id="hud-alt">—</b></span>
-    <span class="opt"><b id="hud-pos">—</b></span>
-    <span class="opt" id="hud-quality"></span>
-    <span id="hud-radio" hidden>♪ <b id="hud-radio-name"></b><button id="hud-radio-stop" type="button" aria-label="Arrêter la radio">■</button></span>
-    <span class="sit-only"><b id="hud-utc">—</b></span>
-  </div>
-
-  <details class="ui credits glass" id="credits-box">
-    <summary>Sources et qualité</summary>
-    <div id="credits"></div>
-    <div class="quality" role="group" aria-label="Qualité d'image">
-      <span>Qualité</span>
-      <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
-      <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
-      <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
-      <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
-    </div>
-    <div class="quality">
-      <span>Image</span>
-      <button type="button" id="btn-shot">Enregistrer en 5K</button>
-    </div>
-    <div id="cesium-credits" hidden></div>
-  </details>
 
   <div class="loader" id="loader">
     <div class="inner">
@@ -487,7 +593,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-05.10';
+  const NOUR_BUILD = '2026-11-07.11';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -518,15 +624,27 @@
     // dpr = highest device-pixel ratio rendered. Phones are 3x: rendering at native 3x is what keeps
     // imagery crisp. msaa is the sample count used only when the effective ratio is below 2; at 2x and
     // above, pixels are small enough that multisampling and FXAA (which also softens textures) are off.
+    // Ultra (chosen, never automatic): Cesium's high-dynamic-range lighting, and a drawing buffer up to 5120 px on
+    // the long side that the browser scales down to the screen (supersampling). Cesium divides the screen-space
+    // error by the pixel ratio, so a bigger buffer alone loads the same tiles: a lower sse asks for finer ones.
+    ultra:    { label: 'Ultra · HDR 5K', sse: 0.7, dpr: 3, msaa: 1, clouds: 48, shadows: true, ultra: true },
     high:     { label: 'Haute',     sse: 1.0, dpr: 3, msaa: 4, clouds: 48, shadows: true  },
     balanced: { label: 'Équilibrée', sse: 1.4, dpr: 3, msaa: 2, clouds: 28, shadows: false },
     light:    { label: 'Légère',    sse: 3.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
   };
   const TIER_ORDER = ['high', 'balanced', 'light'];
-  const renderScale = (t) => Math.min(1, t.dpr / (window.devicePixelRatio || 1));
+  // Long side of the Ultra buffer: 5120 px, capped by the GPU, and by 4096 px on phones and tablets, whose
+  // browsers have far less graphics memory (a lost WebGL context would leave a black page).
+  function ultraScale() {
+    const gl = scene.context._gl;
+    const cap = matchMedia('(pointer: coarse)').matches ? 4096 : 5120;
+    const limit = Math.min(cap, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+    return Math.max(1, limit / (Math.max(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1)));
+  }
+  const renderScale = (t) => (t.ultra ? ultraScale() : Math.min(1, t.dpr / (window.devicePixelRatio || 1)));
   const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr);
-  const msaaFor = (t) => (effectiveDpr(t) >= 2 ? 1 : t.msaa);
-  const fxaaFor = (t) => effectiveDpr(t) < 2;
+  const msaaFor = (t) => (t.ultra || effectiveDpr(t) >= 2 ? 1 : t.msaa);
+  const fxaaFor = (t) => !t.ultra && effectiveDpr(t) < 2;
   // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
   // so a missing value must not count against the device. Only a clear low-end signal selects "light".
   function detectTier() {
@@ -538,9 +656,9 @@
     return cores >= 8 ? 'high' : 'balanced';
   }
   // Quality choice: 'auto' (detected, and lowered if the frame rate stays low) or a pinned tier.
-  // Pinned by ?qualite=haute|equilibree|legere, or by the selector in the Sources panel (saved in this browser).
+  // Pinned by ?qualite=ultra|haute|equilibree|legere, or by the selector in the menu (saved in this browser).
   const QUALITY_KEY = 'nour.quality';
-  const TIER_BY_CHOICE = { haute: 'high', equilibree: 'balanced', legere: 'light' };
+  const TIER_BY_CHOICE = { ultra: 'ultra', haute: 'high', equilibree: 'balanced', legere: 'light' };
   function readQuality() {
     let choice = new URLSearchParams(location.search).get('qualite');
     if (!TIER_BY_CHOICE[choice]) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
@@ -862,7 +980,7 @@
   // No depth fog: it darkened distant terrain tile by tile and left zig-zag edges in oblique night views.
   // The ground atmosphere still gives the aerial haze.
   scene.fog.enabled = false;
-  scene.highDynamicRange = tierName === 'high';      // HDR doubles framebuffer bandwidth: high tier only
+  scene.highDynamicRange = tierName === 'high' || tierName === 'ultra';   // HDR doubles framebuffer bandwidth
   scene.postProcessStages.fxaa.enabled = fxaaFor(tier);
   // Mild unsharp mask: restores edge contrast lost to upsampled imagery and anti-aliasing.
   scene.postProcessStages.add(new C.PostProcessStage({
@@ -1105,22 +1223,22 @@
   }
 
   // ---------- Place markers ----------
-  const markerColor = C.Color.fromCssColorString('#F4ECDF');
+  const markerColor = C.Color.fromCssColorString('#F4F6FA');
   PLACES.forEach((p) => {
     viewer.entities.add({
       id: p.id,
       position: C.Cartesian3.fromDegrees(p.lon, p.lat),
       point: {
         pixelSize: 7, color: markerColor.withAlpha(0.95),
-        outlineColor: C.Color.fromCssColorString('#E3B062'), outlineWidth: 2,
+        outlineColor: C.Color.fromCssColorString('#9FD3FF'), outlineWidth: 2,
         heightReference: C.HeightReference.CLAMP_TO_GROUND,
         disableDepthTestDistance: Number.POSITIVE_INFINITY,
         scaleByDistance: new C.NearFarScalar(2e5, 1.2, 2e7, 0.7),
         distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 5e7),
       },
       label: {
-        text: p.name, font: '600 16px "Cormorant Garamond", Georgia, serif',
-        fillColor: markerColor, outlineColor: C.Color.fromCssColorString('#0B0E14'),
+        text: p.name, font: '400 15px Inter, system-ui, sans-serif',
+        fillColor: markerColor, outlineColor: C.Color.fromCssColorString('#04060B'),
         outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE,
         pixelOffset: new C.Cartesian2(0, -16),
         heightReference: C.HeightReference.CLAMP_TO_GROUND,
@@ -1402,6 +1520,10 @@
     btn.addEventListener('click', () => flyToPlace(p));
     li.appendChild(btn); list.appendChild(li);
   });
+  // Arrows on wide screens: page the strip by most of its width.
+  [['places-prev', -1], ['places-next', 1]].forEach(([id, dir]) => $(id).addEventListener('click', () => {
+    list.scrollBy({ left: dir * list.clientWidth * 0.7, behavior: prefersReduced.matches ? 'auto' : 'smooth' });
+  }));
 
   function fmtCoord(lat, lon) {
     const ns = lat >= 0 ? 'N' : 'S', ew = lon >= 0 ? 'E' : 'O';
@@ -1420,16 +1542,25 @@
     $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
-    $('card').classList.add('show');
+    revealCard();
   }
   function hideCard() { $('card').classList.remove('show'); }
+  // Phones show two lines of the text and a "Lire la suite" button; every new card starts folded.
+  function setCardExpanded(on) {
+    $('card').classList.toggle('expanded', on);
+    $('card-more').setAttribute('aria-expanded', String(on));
+    $('card-more').textContent = on ? 'Réduire' : 'Lire la suite';
+  }
+  function revealCard() { setCardExpanded(false); $('card').classList.add('show'); }
+  $('card-more').addEventListener('click', () => setCardExpanded(!$('card').classList.contains('expanded')));
 
   // Night view: an oblique shot of the place after dark from ~600 km up, like a photograph from the Space Station.
   let nightView = false;     // the night card is showing
   let nightClock = false;    // the clock was moved to night for a night view and not brought back yet
   const NIGHT_VIEW = { pitch: -33, range: 1.05e6, solarHour: 23 };
   function setNightButton() {
-    $('card-night').textContent = nightView ? 'Revenir au lieu, de jour ↺' : 'Voir la nuit depuis l’orbite ↗';
+    $('card-night').textContent = nightView ? '↺ Retour de jour' : '☾ Nuit';
+    $('card-night').title = nightView ? 'Revenir au lieu, de jour' : 'Voir le lieu de nuit depuis l’orbite';
     // Google 3D tiles carry their own daytime lighting, so a night view over them would not be one. The way back
     // stays available if the visitor switches to Google 3D while a night view is showing.
     $('card-night').hidden = diveView || (googleOn && googleReady && !nightView);
@@ -1446,7 +1577,7 @@
     $('card-text').textContent = 'Vue oblique d’environ 600 km, comme depuis la Station spatiale (≈ 400 km). '
       + (lights ? 'Lumières : archive NASA Black Marble, pas l’éclairage d’aujourd’hui.' : 'Lumières indisponibles : la couche NASA est désactivée.');
     $('card-meta').textContent = 'Heure solaire locale ≈ 23h00' + (lights ? ' · lumières : NASA Black Marble' : '');
-    $('card').classList.add('show');
+    revealCard();
   }
   async function flyToNight(p) {
     const token = ++flightToken;
@@ -1476,7 +1607,8 @@
   let diving = false;        // a dive is under way
   const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000 };
   function setDiveButton() {
-    $('card-dive').textContent = diveView ? 'Revenir au lieu, de jour ↺' : 'Plonger depuis l’espace ↓';
+    $('card-dive').textContent = diveView ? '↺ Retour de jour' : '↓ Plonger';
+    $('card-dive').title = diveView ? 'Revenir au lieu, de jour' : 'Plonger depuis l’espace jusqu’au lieu';
     $('card-dive').hidden = nightView;
   }
   function showDiveCard(p, groundHeight) {
@@ -1486,7 +1618,7 @@
     $('card-coords').textContent = fmtCoord(p.lat, p.lon) + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
     $('card-text').textContent = 'Plongée de l’espace jusqu’à ~300 m, caméra à la verticale. Les satellites ne montrent pas les passants : la netteté dépend de l’imagerie d’ici.';
     $('card-meta').textContent = `Imagerie : Esri, Maxar, Earthstar Geographics · heure solaire ≈ ${String(Math.floor(p.solarHour)).padStart(2, '0')}h${String(Math.round((p.solarHour % 1) * 60)).padStart(2, '0')}`;
-    $('card').classList.add('show');
+    revealCard();
   }
   async function flyToDive(p) {
     const token = ++flightToken;
@@ -1595,6 +1727,7 @@
   const handler = new C.ScreenSpaceEventHandler(canvas);
   handler.setInputAction((m) => {
     const picked = scene.pick(m.position);
+    if (picked && picked.id && picked.id.satIndex !== undefined) { selectSat(picked.id.satIndex); return; }
     const id = picked && picked.id && picked.id.id;
     const p = PLACES.find((x) => x.id === id);
     if (p) flyToPlace(p);
@@ -1612,7 +1745,7 @@
     viewer.resolutionScale = renderScale(tier);
     viewer.shadows = tier.shadows;
     viewer.terrainShadows = tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED;
-    scene.highDynamicRange = name === 'high';
+    scene.highDynamicRange = name === 'high' || name === 'ultra';
     scene.postProcessStages.fxaa.enabled = fxaaFor(tier);
     hillshade.alpha = name === 'light' ? 0.6 : 0.9;
     if (googleTileset) googleTileset.maximumScreenSpaceError = TILESET_SSE[name];
@@ -1622,7 +1755,7 @@
   }
   $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   function syncQualityButtons() {
-    document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
+    document.querySelectorAll('#menu [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
   }
   function setQuality(choice) {
     quality = choice;
@@ -1632,7 +1765,9 @@
     applyTier(TIER_BY_CHOICE[choice] || detectTier());
     syncQualityButtons();
   }
-  document.querySelectorAll('#credits-box [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
+  document.querySelectorAll('#menu [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
+  // The Ultra buffer is sized from the window: follow resizes and rotations (not during a capture, which sets its own).
+  window.addEventListener('resize', () => { if (tier.ultra && !capturing) viewer.resolutionScale = renderScale(tier); });
   syncQualityButtons();
   // A hidden tab stops frames: do not count that gap as slowness.
   document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
@@ -1664,17 +1799,16 @@
     'Relief : Tilezen Terrain Tiles (SRTM, GMTED2010, ETOPO1) via AWS Open Data',
     `Version : ${NOUR_BUILD}`,
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
+    'Satellites militaires : catalogue public CelesTrak (groupe military) · positions calculées avec satellite.js (SGP4)',
     'Direct : radio-browser.info (radios) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
 
-  // Credits are open on wide screens, folded behind "Sources" on phones.
-  if (matchMedia('(min-width: 761px)').matches) $('credits-box').open = true;
 
   // ---------- Veille mondiale: open public data layers ----------
   // Everything here is public, read-only and aggregate (earthquakes, one
   // satellite, weather imagery). Nothing tracks or identifies people.
-  const veille = { quakes: false, iss: false, rain: false, live: false, sit: false, clouds: true, lights: true };
+  const veille = { quakes: false, iss: false, sats: false, rain: false, live: false, sit: false, clouds: true, lights: true };
   const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
   const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
   const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
@@ -1733,7 +1867,7 @@
           position: C.Cartesian3.fromDegrees(lon, lat),
           point: {
             pixelSize: C.Math.clamp(4 + m * 2.2, 6, 28), color: col.withAlpha(0.75),
-            outlineColor: C.Color.fromCssColorString('#F4ECDF').withAlpha(0.7), outlineWidth: 1,
+            outlineColor: C.Color.fromCssColorString('#F4F6FA').withAlpha(0.7), outlineWidth: 1,
             heightReference: C.HeightReference.CLAMP_TO_GROUND,
             disableDepthTestDistance: Number.POSITIVE_INFINITY,
           },
@@ -1776,13 +1910,13 @@
   issSource.entities.add({
     id: 'iss',
     position: new C.CallbackProperty(() => issPos, false),
-    point: { pixelSize: 10, color: C.Color.fromCssColorString('#F1CF8E'), outlineColor: C.Color.WHITE, outlineWidth: 2,
+    point: { pixelSize: 10, color: C.Color.fromCssColorString('#9FD3FF'), outlineColor: C.Color.WHITE, outlineWidth: 2,
       disableDepthTestDistance: Number.POSITIVE_INFINITY },
     label: { text: 'ISS', font: '600 14px Inter, Arial, sans-serif', fillColor: C.Color.WHITE, outlineColor: C.Color.BLACK,
       outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -18),
       disableDepthTestDistance: Number.POSITIVE_INFINITY },
     polyline: { positions: new C.CallbackProperty(() => issTrail.slice(), false), width: 2,
-      arcType: C.ArcType.NONE, material: C.Color.fromCssColorString('#F1CF8E').withAlpha(0.7) },
+      arcType: C.ArcType.NONE, material: C.Color.fromCssColorString('#9FD3FF').withAlpha(0.7) },
   });
   let issLast = null;
   async function loadISS() {
@@ -1799,6 +1933,141 @@
       statusLines.iss = 'ISS : données indisponibles (réseau ou source)';
     }
     renderStatus();
+  }
+
+  // Military satellites: the public catalogue only, CelesTrak's "military" group (built from the orbital elements
+  // the US Space Force publishes). Positions are computed with SGP4 (satellite.js) from those elements for the real
+  // current time, not observed, and are good to a few kilometres; satellites kept secret are not in the catalogue.
+  // CelesTrak updates its data about every 2 hours and asks not to download it more often: the elements are kept in
+  // this browser for 2 hours. CelesTrak could not be reached from the development sandbox, so this was tested with
+  // simulated elements, and whether CelesTrak answers requests from a web page could not be checked.
+  const SATS_URL = 'https://celestrak.org/NORAD/elements/gp.php?GROUP=military&FORMAT=tle';
+  const SATJS_URL = 'https://cdn.jsdelivr.net/npm/satellite.js@6.0.2/dist/satellite.min.js';
+  const SATS_KEY = 'nour.sats', SATS_TTL = 2 * 3600 * 1000;
+  const SAT_COLOR = C.Color.fromCssColorString('#FF9E8A');
+  const satPoints = scene.primitives.add(new C.PointPrimitiveCollection());
+  const satLabels = scene.primitives.add(new C.LabelCollection());
+  const satLabel = satLabels.add({ show: false, font: '500 13px Inter, system-ui, sans-serif', fillColor: C.Color.WHITE,
+    outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -16) });
+  satPoints.show = false; satLabels.show = false;
+  let sats = [], satTimer = 0, satPick = -1, satOrbit = [], satLoading = null, satAsOf = 0;
+  const satOrbitEntity = viewer.entities.add({
+    show: false,
+    polyline: { positions: new C.CallbackProperty(() => satOrbit, false), width: 1.5, arcType: C.ArcType.NONE, material: SAT_COLOR.withAlpha(0.65) },
+  });
+  function loadSatLib() {
+    if (window.satellite) return Promise.resolve(window.satellite);
+    if (!satLoading) {
+      satLoading = new Promise((resolve, reject) => {
+        const el = document.createElement('script'); el.src = SATJS_URL; el.async = true;
+        el.onload = () => resolve(window.satellite); el.onerror = () => { satLoading = null; reject(new Error('satellite.js indisponible')); };
+        document.head.appendChild(el);
+      });
+    }
+    return satLoading;
+  }
+  function parseTle(text) {
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean), out = [];
+    for (let i = 0; i + 1 < lines.length; i++) {
+      if (!lines[i].startsWith('1 ') || !lines[i + 1].startsWith('2 ')) continue;
+      const prev = i > 0 ? lines[i - 1] : '';
+      const norad = lines[i].slice(2, 7).trim();
+      const name = prev && !prev.startsWith('1 ') && !prev.startsWith('2 ') ? prev.replace(/^0\s+/, '') : `NORAD ${norad}`;
+      out.push({ name, norad, l1: lines[i], l2: lines[i + 1] });
+      i++;
+    }
+    return out.slice(0, 1500);
+  }
+  async function satElements() {
+    let cached = null;
+    try { cached = JSON.parse(localStorage.getItem(SATS_KEY) || 'null'); } catch (e) { /* storage blocked */ }
+    if (cached && typeof cached.text === 'string' && Date.now() - cached.t < SATS_TTL) return cached;
+    try {
+      const text = await fetchText(SATS_URL, 15000);
+      if (!parseTle(text).length) throw new Error('format');
+      const fresh = { t: Date.now(), text };
+      try { localStorage.setItem(SATS_KEY, JSON.stringify(fresh)); } catch (e) { /* storage full or blocked */ }
+      return fresh;
+    } catch (e) {
+      if (cached && typeof cached.text === 'string') return cached;       // older elements beat none
+      throw e;
+    }
+  }
+  const satStatus = (text) => { $('sats-status').textContent = text; };
+  // ECI (km, TEME) to Earth-fixed metres with the sidereal angle of `date`: what Cesium's fixed frame expects.
+  function satFixed(lib, rec, date, gmst) {
+    const pv = lib.propagate(rec, date);
+    const p = pv && pv.position;
+    if (!p || typeof p !== 'object' || !Number.isFinite(p.x)) return null;
+    const f = lib.eciToEcf(p, gmst);
+    return new C.Cartesian3(f.x * 1000, f.y * 1000, f.z * 1000);
+  }
+  function updateSats() {
+    const lib = window.satellite;
+    if (!lib || !veille.sats) return;
+    const now = new Date(), gmst = lib.gstime(now);
+    let shown = 0;
+    sats.forEach((sat) => {
+      const pos = satFixed(lib, sat.rec, now, gmst);
+      sat.point.show = !!pos;
+      if (pos) { sat.point.position = pos; sat.pos = pos; shown++; }
+    });
+    const age = Math.round((Date.now() - satAsOf) / 60000);
+    let line = `${shown} satellites du catalogue public · positions calculées pour ${fmtUTC(now)} · éléments d’orbite d’il y a ${age < 60 ? `${age} min` : `${Math.round(age / 60)} h`}`;
+    const sel = sats[satPick];
+    if (sel && sel.pos) {
+      const g = C.Cartographic.fromCartesian(sel.pos);
+      satLabel.position = sel.pos; satLabel.show = true;
+      line += `\nChoisi : ${sel.name} · NORAD ${sel.norad} · altitude ≈ ${Math.round(g.height / 1000).toLocaleString('fr-FR')} km · au-dessus de ${fmtCoord(R2D(g.latitude), R2D(g.longitude))}`;
+    } else if (satPick < 0) line += '\nTouche un point pour voir son nom et son altitude.';
+    satStatus(line);
+  }
+  // The orbit as it is now, in space: one revolution computed with the current sidereal angle (a closed ellipse).
+  function drawSatOrbit() {
+    const lib = window.satellite, sel = sats[satPick];
+    satOrbit = [];
+    const on = !!(lib && sel && $('sats-orbit').checked);
+    satOrbitEntity.show = on;
+    if (!on) return;
+    const now = Date.now(), gmst = lib.gstime(new Date(now));
+    const periodMin = (2 * Math.PI) / sel.rec.no;            // mean motion in radians per minute
+    for (let k = 0; k <= 180; k++) {
+      const pos = satFixed(lib, sel.rec, new Date(now + (k / 180) * periodMin * 60000), gmst);
+      if (pos) satOrbit.push(pos);
+    }
+  }
+  function selectSat(i) {
+    if (sats[satPick]) { sats[satPick].point.pixelSize = 5; sats[satPick].point.outlineWidth = 0; }
+    satPick = sats[i] ? i : -1;
+    satLabel.show = false;
+    if (sats[satPick]) {
+      const p = sats[satPick].point;
+      p.pixelSize = 10; p.outlineWidth = 2; satLabel.text = sats[satPick].name;
+    }
+    drawSatOrbit(); updateSats();
+  }
+  $('sats-orbit').addEventListener('change', drawSatOrbit);
+  async function startSats() {
+    satStatus('Chargement du catalogue public et du calcul d’orbite…');
+    let lib, data;
+    try { [lib, data] = await Promise.all([loadSatLib(), satElements()]); }
+    catch (e) {
+      if (veille.sats) satStatus('Satellites : données indisponibles (CelesTrak ou jsDelivr injoignable, ou requête refusée par le navigateur).');
+      return;
+    }
+    if (!veille.sats) return;
+    satPoints.removeAll(); satPick = -1;
+    sats = [];
+    parseTle(data.text).forEach((t) => {
+      let rec;
+      try { rec = lib.twoline2satrec(t.l1, t.l2); } catch (e) { return; }
+      if (!rec || rec.error) return;
+      const point = satPoints.add({ pixelSize: 5, color: SAT_COLOR, outlineColor: C.Color.WHITE, outlineWidth: 0, show: false, id: { satIndex: sats.length } });
+      sats.push({ ...t, rec, point, pos: null });
+    });
+    satAsOf = data.t;
+    updateSats();
+    clearInterval(satTimer); satTimer = setInterval(() => { if (!document.hidden) updateSats(); }, 1000);
   }
 
   function setLive(on) {
@@ -1825,6 +2094,13 @@
       clearInterval(issTimer);
       if (on) { loadISS(); issTimer = setInterval(loadISS, 5000); }
       else { statusLines.iss = ''; renderStatus(); }
+    },
+    sats(on) {
+      $('sats-box').hidden = !on;
+      satPoints.show = on; satLabels.show = on;
+      clearInterval(satTimer); satTimer = 0;
+      if (on) startSats();
+      else { selectSat(-1); satOrbitEntity.show = false; satStatus(''); }
     },
     clouds(on) { realEarth.show = on; },
     lights(on) { nightLights.show = on; },
@@ -1862,11 +2138,38 @@
   document.querySelectorAll('#watch [data-layer]').forEach((b) => {
     b.addEventListener('click', () => setLayer(b.dataset.layer, !veille[b.dataset.layer]));
   });
-  $('btn-watch').addEventListener('click', (e) => {
-    const open = !$('watch').classList.contains('open');
-    if (open) setLiveOpen(false);
+  function setWatchOpen(open) {
+    if (open) { setLiveOpen(false); setMenuOpen(false); }
     $('watch').classList.toggle('open', open);
-    e.currentTarget.setAttribute('aria-pressed', String(open));
+    $('btn-watch').setAttribute('aria-pressed', String(open));
+    syncSheets();
+    if (open) $('watch').querySelector('.close').focus();
+  }
+  $('btn-watch').addEventListener('click', () => setWatchOpen(!$('watch').classList.contains('open')));
+
+  // ---------- Menu and sheets ----------
+  // One sheet at a time: the menu, Veille or The Light · Stream. ✕ or Escape closes it and gives the focus back to
+  // the Menu button.
+  const menuEl = $('menu'), menuBtn = $('btn-menu');
+  function syncSheets() { document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet.open')); }
+  function setMenuOpen(open) {
+    if (open) { setWatchOpen(false); setLiveOpen(false); }
+    menuEl.classList.toggle('open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    syncSheets();
+    if (open) menuEl.querySelector('.close').focus();
+  }
+  menuBtn.addEventListener('click', () => setMenuOpen(!menuEl.classList.contains('open')));
+  $('credit-line').addEventListener('click', () => {
+    setMenuOpen(true); $('credits-box').open = true;
+    $('credits-box').scrollIntoView({ block: 'nearest' });
+  });
+  const closeSheet = { menu: () => setMenuOpen(false), watch: () => setWatchOpen(false), live: () => setLiveOpen(false) };
+  document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => { closeSheet[b.dataset.close](); menuBtn.focus(); }));
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const sheet = document.querySelector('.sheet.open');
+    if (sheet) { closeSheet[sheet.id](); menuBtn.focus(); }
   });
   // Stop polling when the tab is hidden; resume when it comes back.
   document.addEventListener('visibilitychange', () => {
@@ -1903,7 +2206,7 @@
     return valid(GOOGLE_MAPS_KEY) || valid(fromUrl) || valid(stored);
   }
   const googleKey = readGoogleKey();
-  const TILESET_SSE = { high: 8, balanced: 12, light: 20 };           // lower = sharper
+  const TILESET_SSE = { ultra: 6, high: 8, balanced: 12, light: 20 };           // lower = sharper
   const TILESET_CACHE_MB = { high: [512, 256], balanced: [256, 128], light: [128, 64] };
   let googleTileset = null, googleOn = false, googleReady = false, googleBusy = false, googleFailures = 0;
   statusLines.google = '';
@@ -1976,7 +2279,7 @@
   const nameEn = (cc) => { try { return (regionEn && regionEn.of(cc)) || cc; } catch (e) { return cc; } };
   const say = (id, text) => { $(id).textContent = text; };
   const liveEl = $('live'), selectEl = $('live-country'), radioEl = $('radio-audio'), tvEl = $('tv-video');
-  const live = { cc: '', lat: null, lon: null, label: '', tab: 'radio', loaded: { radio: '', tv: '', war: '' } };
+  const live = { cc: '', lat: null, lon: null, label: '', tab: 'tv', loaded: { radio: '', tv: '', war: '' } };
   let liveOpen = false, warTimer = 0, warItems = [], warLang = 'all', warLast = 0;
 
   const placeholder = document.createElement('option');
@@ -2000,13 +2303,6 @@
     ul.replaceChildren();
     rows.forEach((r) => { const li = document.createElement('li'); li.appendChild(build(r)); ul.appendChild(li); });
   }
-  function itemButton(title, sub, onClick) {
-    const b = document.createElement('button'); b.type = 'button';
-    const t = document.createElement('span'); t.textContent = title;
-    const s = document.createElement('small'); s.textContent = sub;
-    b.append(t, s); b.addEventListener('click', onClick);
-    return b;
-  }
 
   function updateHint(note) {
     $('live-hint').textContent = note || (live.cc
@@ -2018,10 +2314,17 @@
     liveEl.classList.toggle('open', open);
     document.body.classList.toggle('live-open', open);
     $('btn-live').setAttribute('aria-pressed', String(open));
+    syncSheets();
     if (open) {
-      $('watch').classList.remove('open'); $('btn-watch').setAttribute('aria-pressed', 'false');
+      setWatchOpen(false); setMenuOpen(false);
+      liveEl.querySelector('.close').focus();
       updateHint(); loadTab();
-    } else { clearInterval(warTimer); warTimer = 0; }
+    } else {
+      clearInterval(warTimer); warTimer = 0; stopPreviews();
+      // The big TV player lives in the sheet and has no control elsewhere: closing the sheet stops it. A radio keeps
+      // playing, with its stop button in the HUD.
+      if (!$('tv-stage').hidden) { stopMedia(false); say('tv-status', ''); }
+    }
   }
   $('btn-live').addEventListener('click', () => setLiveOpen(!liveOpen));
   function setTab(tab) {
@@ -2033,6 +2336,7 @@
   liveEl.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
   function loadTab() {
     clearInterval(warTimer); warTimer = 0;
+    if (live.tab !== 'tv') stopPreviews();
     if (!liveOpen) return;
     if (live.tab === 'cam') { renderCam(); return; }
     if (live.tab === 'war') {
@@ -2055,6 +2359,7 @@
     }
     selectEl.value = live.cc;
     live.loaded = { radio: '', tv: '', war: '' };
+    stopPreviews();
     fillList($('radio-list'), [], () => null); fillList($('tv-list'), [], () => null); fillList($('war-list'), [], () => null);
     say('radio-status', ''); say('tv-status', ''); say('war-status', '');
     updateHint(where && where.note);
@@ -2090,12 +2395,109 @@
     $('hud-radio').hidden = !on;
     if (on) $('hud-radio-name').textContent = nowPlaying.name;
   }
-  function stopMedia() {
+  // `resume` lets the small TV previews start again once the big player is closed.
+  function stopMedia(resume = true) {
     ++playToken; detachHls();
     [radioEl, tvEl].forEach((el) => { el.pause(); el.removeAttribute('src'); el.load(); el.classList.remove('on'); });
     nowPlaying = null; showNowPlaying();
+    $('tv-stage').hidden = true;
+    liveEl.querySelectorAll('.tile.playing').forEach((t) => t.classList.remove('playing'));
+    if (resume) pumpPreviews();
   }
   $('hud-radio-stop').addEventListener('click', () => { stopMedia(); say('radio-status', 'Radio arrêtée.'); });
+  $('tv-stage-close').addEventListener('click', () => { stopMedia(); say('tv-status', 'Vidéo fermée.'); });
+
+  // ----- Tiles: small squares with a logo (or initials), a name and a badge -----
+  const okImage = (u) => typeof u === 'string' && u.startsWith('https://');
+  const initials = (name) => name.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '·';
+  function makeTile(name, logo, badge, label) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-label', label);
+    const ini = document.createElement('span'); ini.className = 'initials'; ini.textContent = initials(name); ini.setAttribute('aria-hidden', 'true');
+    b.append(ini);
+    if (okImage(logo)) {
+      const img = document.createElement('img');
+      img.className = 'logo'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
+      img.addEventListener('load', () => ini.remove(), { once: true });
+      img.addEventListener('error', () => img.remove(), { once: true });
+      img.src = logo; b.append(img);
+    }
+    const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = badge;
+    const eq = document.createElement('span'); eq.className = 'eq'; eq.setAttribute('aria-hidden', 'true'); eq.innerHTML = '<i></i><i></i><i></i>';
+    const nm = document.createElement('span'); nm.className = 'name'; nm.textContent = name;
+    b.append(bd, eq, nm);
+    return b;
+  }
+
+  // ----- TV previews: muted, low definition, only the squares on screen, a few at a time -----
+  const PREVIEW_MAX = matchMedia('(max-width: 760px)').matches ? 4 : 6;
+  const PREVIEW_TIMEOUT = 10000;
+  const previews = new Map();          // tile -> { video, hls, timer }
+  const onScreen = new Set();          // TV tiles currently visible in the sheet
+  const previewObserver = 'IntersectionObserver' in window ? new IntersectionObserver((entries) => {
+    entries.forEach((en) => {
+      if (en.isIntersecting) onScreen.add(en.target);
+      else { onScreen.delete(en.target); stopPreview(en.target); }
+    });
+    pumpPreviews();
+  }, { root: liveEl, threshold: 0.5 }) : null;
+  function stopPreview(tile) {
+    const rec = previews.get(tile);
+    if (!rec) return;
+    previews.delete(tile);
+    clearTimeout(rec.timer);
+    if (rec.hls) rec.hls.destroy();
+    rec.video.pause(); rec.video.removeAttribute('src'); rec.video.load(); rec.video.remove();
+    tile.classList.remove('on');
+  }
+  function stopPreviews() { [...previews.keys()].forEach(stopPreview); }
+  function previewFailed(tile) {
+    stopPreview(tile);
+    tile.classList.add('off');
+    tile.querySelector('.badge').textContent = 'Hors ligne';
+    tile.setAttribute('aria-label', `${tile._channel.name} : pas de direct reçu ici (hors ligne ou géobloqué). Toucher pour essayer quand même.`);
+    const li = tile.parentElement;
+    if (li && li.parentElement) li.parentElement.appendChild(li);      // silent channels go to the end
+    pumpPreviews();
+  }
+  function pumpPreviews() {
+    if (!liveOpen || live.tab !== 'tv' || document.hidden || !$('tv-stage').hidden) return;
+    const order = [...$('tv-list').querySelectorAll('.tile')];
+    for (const tile of order) {
+      if (previews.size >= PREVIEW_MAX) break;
+      if (onScreen.has(tile) && !previews.has(tile) && !tile.classList.contains('off')) startPreview(tile);
+    }
+  }
+  async function startPreview(tile) {
+    const c = tile._channel;
+    const v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.autoplay = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+    v.disablePictureInPicture = true; v.tabIndex = -1;
+    const rec = { video: v, hls: null, timer: setTimeout(() => previewFailed(tile), PREVIEW_TIMEOUT) };
+    previews.set(tile, rec);
+    v.addEventListener('playing', () => { if (previews.get(tile) === rec) { clearTimeout(rec.timer); tile.classList.add('on'); } });
+    v.addEventListener('error', () => { if (previews.get(tile) === rec) previewFailed(tile); });
+    tile.prepend(v);
+    try {
+      if (c.hls && !v.canPlayType('application/vnd.apple.mpegurl')) {
+        const Hls = await loadHlsLib();
+        if (previews.get(tile) !== rec) return;
+        if (!Hls || !Hls.isSupported()) throw new Error('HLS non pris en charge');
+        // Lowest rendition the square needs, short buffers: a wall of previews must stay light.
+        const h = new Hls({ capLevelToPlayerSize: true, startLevel: 0, maxBufferLength: 8, maxMaxBufferLength: 12, backBufferLength: 0 });
+        rec.hls = h;
+        h.on(Hls.Events.ERROR, (ev, d) => { if (d && d.fatal && previews.get(tile) === rec) previewFailed(tile); });
+        h.loadSource(c.url); h.attachMedia(v);
+      } else v.src = c.url;
+      await v.play();
+    } catch (e) {
+      // A refused autoplay or a failed load: the timeout marks the square once the 10 s are up, unless it
+      // started anyway in the meantime.
+      if (previews.get(tile) === rec && /HLS|hls/.test(String(e && e.message))) previewFailed(tile);
+    }
+  }
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stopPreviews(); else pumpPreviews(); });
   async function attachStream(el, url, isHls, onLost) {
     detachHls();
     if (isHls && !el.canPlayType('application/vnd.apple.mpegurl')) {
@@ -2113,11 +2515,17 @@
     }
     await el.play();
   }
-  async function playMedia(kind, item, statusId) {
+  async function playMedia(kind, item, statusId, tile) {
     const token = ++playToken;
-    stopMedia(); playToken = token;
+    stopMedia(false); playToken = token;
     const el = kind === 'tv' ? tvEl : radioEl;
     el.classList.add('on');
+    if (tile) tile.classList.add('playing');
+    if (kind === 'tv') {
+      // The big player takes the bandwidth: the small previews stop while it is open.
+      stopPreviews(); $('tv-stage').hidden = false;
+      $('tv-stage').scrollIntoView({ block: 'nearest', behavior: prefersReduced.matches ? 'auto' : 'smooth' });
+    } else pumpPreviews();
     say(statusId, `Connexion à « ${item.name} »…`);
     const wait = setTimeout(() => { if (token === playToken && el.paused) say(statusId, 'Toujours en attente : le flux est peut-être hors ligne, géobloqué ou refusé par le navigateur.'); }, 15000);
     try {
@@ -2128,7 +2536,8 @@
     } catch (e) {
       if (token !== playToken) return;
       detachHls(); el.classList.remove('on');
-      say(statusId, `Lecture impossible : « ${item.name} » (flux hors ligne, géobloqué ou incompatible avec ce navigateur). Essaie une autre entrée.`);
+      if (tile) tile.classList.remove('playing');
+      say(statusId, `Lecture impossible : « ${item.name} » (flux hors ligne, géobloqué ou incompatible avec ce navigateur). Essaie un autre carré.`);
     } finally { clearTimeout(wait); }
   }
 
@@ -2168,12 +2577,19 @@
       const url = s && (s.url_resolved || s.url), name = s && typeof s.name === 'string' ? s.name.trim() : '';
       if (!name || !okStream(url) || seen.has(name.toLowerCase())) continue;
       seen.add(name.toLowerCase());
-      stations.push({ name, url, hls: s.hls === 1 || /\.m3u8(\?|$)/i.test(url), sub: [s.codec, s.bitrate ? `${s.bitrate} kb/s` : '', (s.tags || '').split(',').slice(0, 2).join(', ')].filter(Boolean).join(' · ') });
-      if (stations.length >= 15) break;
+      stations.push({ name, url, logo: s.favicon || '', hls: s.hls === 1 || /\.m3u8(\?|$)/i.test(url), sub: [s.codec, s.bitrate ? `${s.bitrate} kb/s` : '', (s.tags || '').split(',').slice(0, 2).join(', ')].filter(Boolean).join(' · ') });
+      if (stations.length >= 24) break;
     }
     live.loaded.radio = cc;
     say('radio-status', stations.length ? `${nameFr(cc)} : ${stations.length} radios, les plus écoutées d’abord.` : `${nameFr(cc)} : aucune radio sécurisée listée.`);
-    fillList($('radio-list'), stations, (st) => itemButton(st.name, st.sub || 'flux direct', () => playMedia('radio', st, 'radio-status')));
+    fillList($('radio-list'), stations, (st) => {
+      const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`);
+      tile.addEventListener('click', () => {
+        if (tile.classList.contains('playing')) { stopMedia(); say('radio-status', 'Radio arrêtée.'); }
+        else playMedia('radio', st, 'radio-status', tile);
+      });
+      return tile;
+    });
   }
 
   // ----- Free TV: iptv-org playlists (community lists of free, publicly available streams) -----
@@ -2187,7 +2603,7 @@
         line.replace(/([\w-]+)="([^"]*)"/g, (m, k, v) => { attrs[k] = v; return m; });
         let inQuote = false, comma = -1;
         for (let i = 0; i < line.length; i++) { const ch = line[i]; if (ch === '"') inQuote = !inQuote; else if (ch === ',' && !inQuote) { comma = i; break; } }
-        cur = { name: (comma >= 0 ? line.slice(comma + 1) : attrs['tvg-name'] || '').trim(), group: attrs['group-title'] || '', needsHeaders: false };
+        cur = { name: (comma >= 0 ? line.slice(comma + 1) : attrs['tvg-name'] || '').trim(), group: attrs['group-title'] || '', logo: attrs['tvg-logo'] || '', needsHeaders: false };
       } else if (line.startsWith('#EXTVLCOPT') && cur) {
         if (/http-(referrer|user-agent)/i.test(line)) cur.needsHeaders = true;   // browsers cannot send these headers
       } else if (!line.startsWith('#') && cur) { cur.url = line; out.push(cur); cur = null; }
@@ -2205,13 +2621,23 @@
     }
     if (token !== tvToken) return;
     if (text === null) { say('tv-status', `${nameFr(cc)} : aucune playlist disponible (ou service injoignable).`); return; }
+    // iptv-org names carry tags such as "(720p)", "[Geo-blocked]" or "[Not 24/7]": geo-blocked channels go last.
     const channels = parseM3u(text)
       .filter((c) => c.name && !c.needsHeaders && okStream(c.url) && !/xxx|adult|porn/i.test(`${c.group} ${c.name}`))
-      .sort((a, b) => /news|info/i.test(b.group) - /news|info/i.test(a.group))
-      .slice(0, 80);
+      .map((c) => ({ ...c, geo: /geo-?blocked/i.test(c.name), label: c.name.replace(/\s*\(\d{3,4}[pi]\)|\s*\[[^\]]*\]/gi, '').trim() || c.name, hls: !/\.(mp4|webm)(\?|$)/i.test(c.url) }))
+      .sort((a, b) => (a.geo - b.geo) || (/news|info/i.test(b.group) - /news|info/i.test(a.group)))
+      .slice(0, 60);
     live.loaded.tv = cc;
-    say('tv-status', channels.length ? `${nameFr(cc)} : ${channels.length} chaînes (infos en premier).` : `${nameFr(cc)} : aucune chaîne sécurisée listée.`);
-    fillList($('tv-list'), channels, (c) => itemButton(c.name, c.group || 'chaîne', () => playMedia('tv', { name: c.name, url: c.url, hls: !/\.(mp4|webm)(\?|$)/i.test(c.url) }, 'tv-status')));
+    say('tv-status', channels.length ? `${nameFr(cc)} : ${channels.length} chaînes (infos en premier). Les carrés qui reçoivent le direct s’animent.` : `${nameFr(cc)} : aucune chaîne sécurisée listée.`);
+    stopPreviews(); onScreen.clear();
+    if (previewObserver) previewObserver.disconnect();
+    fillList($('tv-list'), channels, (c) => {
+      const tile = makeTile(c.label, c.logo, 'Direct', `${c.label}${c.group ? ` (${c.group})` : ''} : regarder en grand avec le son`);
+      tile._channel = { name: c.label, url: c.url, hls: c.hls };
+      tile.addEventListener('click', () => playMedia('tv', tile._channel, 'tv-status', tile));
+      if (previewObserver) previewObserver.observe(tile);
+      return tile;
+    });
   }
 
   // ----- Public webcams: links only -----
@@ -2376,7 +2802,7 @@
       const line = `Fatiha, maman d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
       ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
       ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
-      ctx.fillStyle = 'rgba(244, 236, 223, 0.9)'; ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'rgba(244, 246, 250, 0.9)'; ctx.textBaseline = 'middle';
       ctx.fillText(line, px, out.height - px * 1.05, out.width - 2 * px);
       const blob = await new Promise((resolve) => out.toBlob(resolve, 'image/png'));
       if (!blob) throw new Error('export impossible');
