@@ -151,7 +151,8 @@
 
   /* Sheets: the menu, Veille and Direct. A drawer on the right on wide screens, a bottom sheet on phones. */
   .sheet {
-    top: calc(var(--safe-t) + 12px); right: 12px; bottom: calc(var(--safe-b) + 12px); width: min(420px, calc(100vw - 24px));
+    /* Below the top bar, so Orbite and Menu stay reachable while a sheet is open. */
+    top: calc(var(--safe-t) + var(--gutter) + 56px); right: 12px; bottom: calc(var(--safe-b) + 12px); width: min(420px, calc(100vw - 24px));
     z-index: 8; display: none; overflow: auto; padding: 18px 18px 24px;
     background: var(--sheet); border: 1px solid var(--line); border-radius: 22px;
     backdrop-filter: blur(20px) saturate(1.1); -webkit-backdrop-filter: blur(20px) saturate(1.1);
@@ -2546,6 +2547,7 @@
       if (token !== playToken) return;
       detachHls(); el.classList.remove('on');
       if (tile) tile.classList.remove('playing');
+      if (kind === 'tv') { $('tv-stage').hidden = true; pumpPreviews(); }     // no empty black player left open
       say(statusId, `Lecture impossible : « ${item.name} » (flux hors ligne, géobloqué ou incompatible avec ce navigateur). Essaie un autre carré.`);
     } finally { clearTimeout(wait); }
   }
