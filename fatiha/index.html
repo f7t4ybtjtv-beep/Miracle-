@@ -310,8 +310,14 @@
     .places { left: 50%; right: auto; transform: translateX(-50%); width: min(1100px, calc(100vw - 2 * var(--gutter))); padding: 0; }
     .card { left: max(var(--gutter), calc(50vw - 550px)); }
     .tiles { grid-template-columns: repeat(4, 1fr); }
+    /* A sheet open on the right: the places strip and the title make room for it. */
+    body.sheet-open .places { left: var(--gutter); transform: none; width: calc(100vw - 2 * var(--gutter) - 444px); }
+    body.sheet-open .card { max-width: min(600px, calc(100vw - 2 * var(--gutter) - 456px)); }
   }
-  @media (min-width: 1400px) { .sheet { width: 480px; } .tiles { grid-template-columns: repeat(5, 1fr); } }
+  @media (min-width: 1400px) {
+    .sheet { width: 480px; } .tiles { grid-template-columns: repeat(5, 1fr); }
+    body.sheet-open .places { width: calc(100vw - 2 * var(--gutter) - 504px); }
+  }
 
   /* Phones */
   @media (max-width: 760px) {
