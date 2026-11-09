@@ -1,0 +1,42 @@
+/* Module « Ciel » ajouté par 4I•MINE : voyage, avions, satellites, webcams, ambiance, journal. */
+.ciel { top: calc(var(--gutter) + 66px + env(safe-area-inset-top)); left: var(--gutter);
+  width: 360px; max-height: calc(100vh - 230px); overflow: auto; padding: 14px;
+  display: none; pointer-events: auto; scrollbar-width: thin; background: rgba(14,18,26,.93); }
+.ciel.open { display: block; }
+.ciel .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin: 10px 0; }
+.ciel .tabs .btn { padding: 7px 2px; border-radius: 10px; text-align: center; font-size: 11.5px; }
+.ciel .pane { display: none; } .ciel .pane.on { display: block; }
+.ciel .note { margin: 8px 0; font: 400 11px/1.6 var(--font-mono); color: var(--muted); }
+.ciel .status { margin: 6px 0; font: 400 11px/1.6 var(--font-mono); color: var(--text-2); white-space: pre-line; }
+.ciel .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; align-items: center; }
+.ciel .row .btn { padding: 6px 10px; font-size: 11.5px; }
+.ciel select, .ciel input[type=range] { accent-color: var(--accent); }
+.ciel select { background: var(--panel-solid); color: var(--text); border: 1px solid var(--border-strong); border-radius: 8px; padding: 6px 8px; font: 500 12px var(--font-ui); }
+.ciel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ciel li { font: 400 11px/1.5 var(--font-mono); color: var(--text-2); padding: 3px 6px; border-radius: 6px; }
+.ciel li b { color: var(--accent-2); font-weight: 500; }
+.ciel li button { all: unset; cursor: pointer; display: block; width: 100%; }
+.ciel li:hover { background: rgba(244,236,223,.05); }
+.ciel .legend { display: flex; flex-wrap: wrap; gap: 10px; font: 400 10.5px var(--font-mono); color: var(--text-2); }
+.ciel .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+.ciel .cta { width: 100%; padding: 12px; border-radius: 12px; font: 600 14px var(--font-ui); }
+.ciel #ciel-map { height: 260px; border-radius: 10px; margin: 8px 0; background: #0d1117; }
+.ciel #ciel-map .leaflet-popup-content { font: 12px/1.45 var(--font-ui); color: #111; }
+.ciel .warn { color: var(--accent); }
+
+/* Voyage cinématographique */
+#voyage { position: fixed; inset: 0; z-index: 60; display: none; background: #000; }
+#voyage.on { display: block; }
+#voyage canvas { width: 100%; height: 100%; display: block; }
+#voyage .vy-title { position: absolute; left: 50%; bottom: 16vh; transform: translateX(-50%); text-align: center; pointer-events: none;
+  font: 500 clamp(30px, 6vw, 64px)/1.05 var(--font-serif); color: var(--accent-2); letter-spacing: .02em; text-shadow: 0 2px 30px rgba(0,0,0,.8); transition: opacity .8s; }
+#voyage .vy-title small { display: block; margin-top: 10px; font: 400 clamp(11px,1.4vw,14px)/1.5 var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--text-2); }
+#voyage .vy-badge { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 16px; padding: 7px 12px; border-radius: 999px;
+  font: 500 11px var(--font-mono); letter-spacing: .08em; color: var(--text); background: rgba(14,18,26,.7); border: 1px solid var(--border-strong); }
+#voyage .vy-close { position: absolute; top: calc(12px + env(safe-area-inset-top)); right: 16px; }
+#voyage .vy-bar { position: absolute; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); height: 2px; background: rgba(255,255,255,.12); }
+#voyage .vy-bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+@media (max-width: 760px) {
+  .ciel { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 52vh; }
+  .ciel #ciel-map { height: 200px; }
+}
