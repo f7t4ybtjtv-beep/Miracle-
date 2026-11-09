@@ -1,0 +1,296 @@
+{
+  "project": "Fatiha, maman d’Amine",
+  "note": "Photos Wikimedia Commons pour les dix lieux. Chemins relatifs à ce dossier. Ne pas écraser le HTML original.",
+  "places": [
+    {
+      "id": "tolede",
+      "name": "Tolède",
+      "country": "Espagne",
+      "lat": 39.857,
+      "lon": -4.0237,
+      "photos": [
+        {
+          "file": "tolede.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4b/1_toledo_spain_evening_sunset_2014_DXR_edit.jpg/1920px-1_toledo_spain_evening_sunset_2014_DXR_edit.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3A1_toledo_spain_evening_sunset_2014_DXR_edit.jpg",
+          "author": "Chensiyuan",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "caption": "Vue de Tolède au crépuscule, ville historique sur le Tage.",
+          "commonsTitle": "File:1 toledo spain evening sunset 2014 DXR edit.jpg"
+        },
+        {
+          "file": "tolede-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4f/Alcazar_Toledo_Mirador_Valle.jpg/1920px-Alcazar_Toledo_Mirador_Valle.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AAlcazar_Toledo_Mirador_Valle.jpg",
+          "author": "Rafa Esteve",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "L’Alcázar et la ville historique de Tolède.",
+          "commonsTitle": "File:Alcazar Toledo Mirador Valle.jpg"
+        }
+      ]
+    },
+    {
+      "id": "cordoue",
+      "name": "Mosquée-cathédrale de Cordoue",
+      "country": "Espagne",
+      "lat": 37.8789,
+      "lon": -4.7794,
+      "photos": [
+        {
+          "file": "cordoue.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/C%C3%B3rdoba_Spain_View-of-the-Mosque-of-Cordoba-01.jpg/1920px-C%C3%B3rdoba_Spain_View-of-the-Mosque-of-Cordoba-01.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AC%C3%B3rdoba_Spain_View-of-the-Mosque-of-Cordoba-01.jpg",
+          "author": "CEphoto, Uwe Aranas",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "caption": "Vue de la mosquée-cathédrale de Cordoue.",
+          "commonsTitle": "File:Córdoba Spain View-of-the-Mosque-of-Cordoba-01.jpg"
+        },
+        {
+          "file": "cordoue-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/Mezquita-Catedral_de_C%C3%B3rdoba_-_Blending_of_Christian_and_Moorish_architecture.jpg/1920px-Mezquita-Catedral_de_C%C3%B3rdoba_-_Blending_of_Christian_and_Moorish_architecture.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AMezquita-Catedral_de_C%C3%B3rdoba_-_Blending_of_Christian_and_Moorish_architecture.jpg",
+          "author": "Martinvl",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Intérieur / arcs de la mosquée-cathédrale de Cordoue.",
+          "commonsTitle": "File:Mezquita-Catedral de Córdoba - Blending of Christian and Moorish architecture.jpg"
+        }
+      ]
+    },
+    {
+      "id": "alhambra",
+      "name": "Alhambra",
+      "country": "Espagne",
+      "lat": 37.1761,
+      "lon": -3.5881,
+      "photos": [
+        {
+          "file": "alhambra.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Alhambra_in_the_evening.jpg/1920px-Alhambra_in_the_evening.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AAlhambra_in_the_evening.jpg",
+          "author": "Jebulon",
+          "license": "Public domain",
+          "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+          "caption": "L’Alhambra de Grenade vue le soir.",
+          "commonsTitle": "File:Alhambra in the evening.jpg"
+        },
+        {
+          "file": "alhambra-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Dawn_Charles_V_Palace_Alhambra_Granada_Andalusia_Spain.jpg/1920px-Dawn_Charles_V_Palace_Alhambra_Granada_Andalusia_Spain.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ADawn_Charles_V_Palace_Alhambra_Granada_Andalusia_Spain.jpg",
+          "author": "Jebulon",
+          "license": "CC0",
+          "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/deed.en",
+          "caption": "L’Alhambra de Grenade vue le soir.",
+          "commonsTitle": "File:Dawn Charles V Palace Alhambra Granada Andalusia Spain.jpg"
+        }
+      ]
+    },
+    {
+      "id": "tombouctou",
+      "name": "Tombouctou",
+      "country": "Mali",
+      "lat": 16.7711,
+      "lon": -3.0105,
+      "photos": [
+        {
+          "file": "tombouctou.jpg",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Djinguereber_Mosque%2C_Timbuktu%2C_Mali.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ADjinguereber_Mosque%2C_Timbuktu%2C_Mali.jpg",
+          "author": "Dr. Ondřej Havelka (cestovatel)",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Mosquée Djingareyber à Tombouctou, Mali.",
+          "commonsTitle": "File:Djinguereber Mosque, Timbuktu, Mali.jpg"
+        },
+        {
+          "file": "tombouctou-2.jpg",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Djingareiber_cour.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ADjingareiber_cour.jpg",
+          "author": "KaTeznik",
+          "license": "CC BY-SA 2.0 fr",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0/fr/deed.en",
+          "caption": "Mosquée Djingareyber à Tombouctou, Mali.",
+          "commonsTitle": "File:Djingareiber cour.jpg"
+        }
+      ]
+    },
+    {
+      "id": "alexandrie",
+      "name": "Bibliotheca Alexandrina",
+      "country": "Égypte",
+      "lat": 31.2089,
+      "lon": 29.9092,
+      "photos": [
+        {
+          "file": "alexandrie.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Bibliotheca_Alexandrina_GLAM_EGY_05.jpg/1920px-Bibliotheca_Alexandrina_GLAM_EGY_05.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ABibliotheca_Alexandrina_GLAM_EGY_05.jpg",
+          "author": "Hassan Hamdy wahidy",
+          "license": "Public domain",
+          "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+          "caption": "Bibliotheca Alexandrina, front de mer d’Alexandrie.",
+          "commonsTitle": "File:Bibliotheca Alexandrina GLAM EGY 05.jpg"
+        },
+        {
+          "file": "alexandrie-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0f/Bibliotheca_Alexandrina_GLAM_EGY_03.jpg/1920px-Bibliotheca_Alexandrina_GLAM_EGY_03.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ABibliotheca_Alexandrina_GLAM_EGY_03.jpg",
+          "author": "Hassan Hamdy wahidy",
+          "license": "Public domain",
+          "licenseUrl": "https://creativecommons.org/publicdomain/mark/1.0/",
+          "caption": "Bibliotheca Alexandrina, front de mer d’Alexandrie.",
+          "commonsTitle": "File:Bibliotheca Alexandrina GLAM EGY 03.jpg"
+        }
+      ]
+    },
+    {
+      "id": "jerusalem",
+      "name": "Vieille ville de Jérusalem",
+      "country": "Proche-Orient",
+      "lat": 31.7767,
+      "lon": 35.2345,
+      "photos": [
+        {
+          "file": "jerusalem.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8b/Jerusalem-2013%282%29-Temple_Mount-Dome_of_the_Rock_%28SE_exposure%29.jpg/1920px-Jerusalem-2013%282%29-Temple_Mount-Dome_of_the_Rock_%28SE_exposure%29.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AJerusalem-2013%282%29-Temple_Mount-Dome_of_the_Rock_%28SE_exposure%29.jpg",
+          "author": "Godot13",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Dôme du Rocher, mont du Temple, Jérusalem.",
+          "commonsTitle": "File:Jerusalem-2013(2)-Temple Mount-Dome of the Rock (SE exposure).jpg"
+        },
+        {
+          "file": "jerusalem-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/16-04-04-Felsendom-Tempelberg-Jerusalem-RalfR-WAT_6385.jpg/1920px-16-04-04-Felsendom-Tempelberg-Jerusalem-RalfR-WAT_6385.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3A16-04-04-Felsendom-Tempelberg-Jerusalem-RalfR-WAT_6385.jpg",
+          "author": "Ralf Roletschek",
+          "license": "GFDL 1.2",
+          "licenseUrl": "https://www.gnu.org/licenses/old-licenses/fdl-1.2.html",
+          "caption": "Dôme du Rocher, mont du Temple, Jérusalem.",
+          "commonsTitle": "File:16-04-04-Felsendom-Tempelberg-Jerusalem-RalfR-WAT 6385.jpg"
+        }
+      ]
+    },
+    {
+      "id": "petra",
+      "name": "Petra",
+      "country": "Jordanie",
+      "lat": 30.3222,
+      "lon": 35.4515,
+      "photos": [
+        {
+          "file": "petra.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/40/Al-Khazneh_%28The_Treasury%29_2%2C_Petra%2C_Jordan.jpg/1920px-Al-Khazneh_%28The_Treasury%29_2%2C_Petra%2C_Jordan.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AAl-Khazneh_%28The_Treasury%29_2%2C_Petra%2C_Jordan.jpg",
+          "author": "Vyacheslav Argenberg",
+          "license": "CC BY 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+          "caption": "Al-Khazneh (le Trésor) à Pétra, Jordanie.",
+          "commonsTitle": "File:Al-Khazneh (The Treasury) 2, Petra, Jordan.jpg"
+        },
+        {
+          "file": "petra-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/The_Treasury%2C_Petra%2C_Jordan1.jpg/1920px-The_Treasury%2C_Petra%2C_Jordan1.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AThe_Treasury%2C_Petra%2C_Jordan1.jpg",
+          "author": "Diego Delso",
+          "license": "CC BY-SA 3.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+          "caption": "Al-Khazneh (le Trésor) à Pétra, Jordanie.",
+          "commonsTitle": "File:The Treasury, Petra, Jordan1.jpg"
+        }
+      ]
+    },
+    {
+      "id": "istanbul",
+      "name": "Sainte-Sophie",
+      "country": "Turquie",
+      "lat": 41.0086,
+      "lon": 28.9802,
+      "photos": [
+        {
+          "file": "istanbul.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cb/Hagia_Sophia_Istanbul_July_2022-2.jpg/1920px-Hagia_Sophia_Istanbul_July_2022-2.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AHagia_Sophia_Istanbul_July_2022-2.jpg",
+          "author": "Alvesgaspar",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Sainte-Sophie (Ayasofya), Istanbul.",
+          "commonsTitle": "File:Hagia Sophia Istanbul July 2022-2.jpg"
+        },
+        {
+          "file": "istanbul-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/Exterior_of_Hagia_Sophia_%281%29_-_Istanbul_%282022%29.jpg/1920px-Exterior_of_Hagia_Sophia_%281%29_-_Istanbul_%282022%29.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3AExterior_of_Hagia_Sophia_%281%29_-_Istanbul_%282022%29.jpg",
+          "author": "ImanFakhri",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Sainte-Sophie (Ayasofya), Istanbul.",
+          "commonsTitle": "File:Exterior of Hagia Sophia (1) - Istanbul (2022).jpg"
+        }
+      ]
+    },
+    {
+      "id": "samarcande",
+      "name": "Le Registan, Samarcande",
+      "country": "Ouzbékistan",
+      "lat": 39.6547,
+      "lon": 66.9758,
+      "photos": [
+        {
+          "file": "samarcande.jpg",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/8/8c/RegistanSquare_Samarkand.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ARegistanSquare_Samarkand.jpg",
+          "author": "Registan_-_Gusjer.jpg: Gustavo Jeronimo from Aranjuez, Spain derivative work: MrPanyGoff",
+          "license": "CC BY 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+          "caption": "Place du Registan à Samarcande, Ouzbékistan.",
+          "commonsTitle": "File:RegistanSquare Samarkand.jpg"
+        },
+        {
+          "file": "samarcande-2.jpg",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Registan_-_Gusjer.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3ARegistan_-_Gusjer.jpg",
+          "author": "Gustavo Jeronimo from Aranjuez, Spain",
+          "license": "CC BY 2.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+          "caption": "Place du Registan à Samarcande, Ouzbékistan.",
+          "commonsTitle": "File:Registan - Gusjer.jpg"
+        }
+      ]
+    },
+    {
+      "id": "angkor",
+      "name": "Angkor Vat",
+      "country": "Cambodge",
+      "lat": 13.4125,
+      "lon": 103.867,
+      "photos": [
+        {
+          "file": "angkor.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d4/20171126_Angkor_Wat_4712_DxO.jpg/1920px-20171126_Angkor_Wat_4712_DxO.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3A20171126_Angkor_Wat_4712_DxO.jpg",
+          "author": "Jakub Hałun",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Temple d’Angkor Vat, Cambodge.",
+          "commonsTitle": "File:20171126 Angkor Wat 4712 DxO.jpg"
+        },
+        {
+          "file": "angkor-2.jpg",
+          "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/2014-Cambodge_Angkor_Wat_%2821%29.jpg/1920px-2014-Cambodge_Angkor_Wat_%2821%29.jpg",
+          "page": "https://commons.wikimedia.org/wiki/File%3A2014-Cambodge_Angkor_Wat_%2821%29.jpg",
+          "author": "Pierre André Leclercq",
+          "license": "CC BY-SA 4.0",
+          "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+          "caption": "Temple d’Angkor Vat, Cambodge.",
+          "commonsTitle": "File:2014-Cambodge Angkor Wat (21).jpg"
+        }
+      ]
+    }
+  ]
+}
