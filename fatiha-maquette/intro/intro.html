@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Fatiha · intro</title>
+<link rel="icon" href="data:,">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
+<style>html,body{margin:0;height:100%;background:#000;color:#F4ECDF;font-family:Inter,Arial,sans-serif}
+#again{position:fixed;inset:0;display:none;place-items:center}#again button{font:600 14px Inter,sans-serif;color:#0B0E14;background:#E3B062;border:0;border-radius:999px;padding:12px 26px;cursor:pointer}</style>
+</head>
+<body>
+<div id="again"><button type="button">Revoir l’intro</button></div>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
+<script src="intro.js"></script>
+<script>
+  const capture = new URLSearchParams(location.search).has('capture');
+  const again = document.getElementById('again');
+  function run() {
+    again.style.display = 'none';
+    window.__intro = FatihaIntro.play(null, { capture, onDone: () => { again.style.display = 'grid'; } });
+  }
+  again.querySelector('button').addEventListener('click', run);
+  run();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Système solaire · Fatiha</title>
+<link rel="icon" href="data:,">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0B0E14; color: #F4ECDF; font-family: Inter, Arial, sans-serif; }
+  #globe { position: fixed; inset: 0; }
+
+  .panel { position: fixed; z-index: 5; left: 16px; top: calc(16px + env(safe-area-inset-top)); width: 290px; max-height: calc(100vh - 32px); overflow: auto;
+    padding: 14px; border-radius: 14px; background: rgba(20, 15, 11, .72); border: 1px solid rgba(227,176,98,.2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  h1 { margin: 0 0 2px; font: 600 26px 'Cormorant Garamond', Georgia, serif; color: #F1CF8E; }
+  .k { font: 400 10.5px 'JetBrains Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: #8a8174; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 12px 0; }
+  button { display: flex; align-items: center; gap: 9px; font: 500 12.5px Inter, sans-serif; color: #BDB5A8; background: rgba(14,18,26,.6);
+    border: 1px solid rgba(227,176,98,.18); border-radius: 10px; padding: 7px 10px; cursor: pointer; text-align: left; }
+  button:hover { color: #F4ECDF; border-color: rgba(227,176,98,.4); }
+  button[aria-pressed="true"] { color: #F4ECDF; border-color: #E3B062; }
+  button.wide { grid-column: 1 / -1; justify-content: center; }
+  button img, button .earth { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+  button .earth { background: radial-gradient(circle at 35% 35%, #7fb0e0, #1d4f86 60%, #0b1a2a); }
+  p { margin: 6px 0 0; font: 400 10.5px/1.6 'JetBrains Mono', monospace; color: #8a8174; }
+  p a { color: #E3B062; }
+  .hud { position: fixed; z-index: 5; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); padding: 8px 14px; border-radius: 999px;
+    font: 400 11.5px 'JetBrains Mono', monospace; color: #F1CF8E; background: rgba(20,15,11,.72); border: 1px solid rgba(227,176,98,.2); }
+  @media (max-width: 640px) { .panel { left: 10px; right: 10px; width: auto; max-height: 44vh; } }
+</style>
+<link rel="stylesheet" href="fatiha.css"><link rel="stylesheet" href="solaire.css"></head>
+<body>
+<div id="globe"></div>
+<div class="panel fatiha-panel">
+  <a class="fatiha-button return-globe" id="retour-globe" href="index.html#exploration">← Retour au globe de Fatiha</a>
+  <h1>Système solaire</h1>
+  <div class="k">Échelle artistique</div>
+  <div class="grid" id="list"></div>
+  <p>Tailles et distances ne sont pas réelles : les astres sont rapprochés pour être visibles en dézoomant depuis la Terre. Le Soleil est placé dans sa vraie direction. Caméra libre : glisser pour tourner, molette ou pincement pour zoomer, clic sur un astre pour y aller.</p>
+  <p>Textures : <a href="https://www.solarsystemscope.com/textures/" target="_blank" rel="noopener noreferrer">Solar System Scope</a>, <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a> · Terre : Natural Earth II (CesiumJS) · Rendu : CesiumJS.</p>
+<p><a href="textures/CREDITS.md">Détail des textures et licences</a> · <a href="https://cesium.com/platform/cesiumjs/">CesiumJS</a> (<a href="https://github.com/CesiumGS/cesium/blob/1.145/LICENSE.md">Apache 2.0</a>). Textures inchangées. Tailles et distances artistiques.</p></div>
+<div class="hud" id="hud">Système solaire</div>
+<script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
+<script src="solar-system.js"></script>
+<script>
+(() => {
+  'use strict';
+  const C = Cesium;
+  const viewer = new C.Viewer('globe', {
+    baseLayer: C.ImageryLayer.fromProviderAsync(C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl('Assets/Textures/NaturalEarthII'))),
+    animation: false, timeline: false, baseLayerPicker: false, geocoder: false, homeButton: false, sceneModePicker: false,
+    navigationHelpButton: false, fullscreenButton: false, infoBox: false, selectionIndicator: false,
+  });
+  const scene = viewer.scene;
+  scene.globe.enableLighting = true; scene.moon.show = false;
+  viewer.clock.shouldAnimate = false;
+  const hud = document.getElementById('hud');
+  const ss = FatihaSolarSystem.attach(viewer, { texturePath: 'textures/', onPhase: (t) => { hud.textContent = t; } });
+  const list = document.getElementById('list');
+  const mark = (id) => list.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+  const add = (id, label, icon, fn, wide) => {
+    const b = document.createElement('button'); b.type = 'button'; b.dataset.id = id; b.className = 'fatiha-button' + (wide ? ' wide' : '');
+    if (icon) b.appendChild(icon); b.appendChild(document.createTextNode(label));
+    b.addEventListener('click', () => { mark(id); fn(); }); list.appendChild(b);
+  };
+  add('ensemble', 'Vue d’ensemble', null, () => ss.overview(), true);
+  const e = document.createElement('span'); e.className = 'earth';
+  add('terre', 'Terre', e, () => ss.flyHome());
+  ss.bodies.forEach((b) => { const im = new Image(); im.src = `textures/${b.tex}`; im.alt = ''; add(b.id, b.name, im, () => ss.flyTo(b.id)); });
+  // Opening shot: far from the Earth, then the overview.
+  scene.camera.setView({ destination: C.Cartesian3.fromDegrees(10, 22, 1.1e8) });
+  setTimeout(() => { mark('ensemble'); ss.overview(); }, 1500);
+  window.__ss = ss;
+  window.solaireDiagnostic = () => ({bodies:ss.bodies.length, focus:ss.focus, flying:ss.flying, hud:hud.textContent});
+})();
+</script>
+</body>
+</html>
