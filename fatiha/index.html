@@ -282,6 +282,109 @@
   body.sitroom .places, body.sitroom .card { display: none; }
   body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
 
+  /* Spectacle: cinema tour (letterbox bars and film credits), time slider, shared-view notice, NASA EPIC viewer */
+  .cine { position: fixed; inset: 0; z-index: 30; --lb: 14vh; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .cine[hidden] { display: none; }
+  .cine-bar { position: absolute; left: 0; right: 0; height: var(--lb); background: #000; transition: transform .9s cubic-bezier(.22, .61, .36, 1); }
+  .cine-top { top: 0; transform: translateY(-100%); }
+  .cine-bottom { bottom: 0; transform: translateY(100%); }
+  .cine.in .cine-bar { transform: none; }
+  .cine-count { position: absolute; left: var(--gutter); top: calc(var(--safe-t) + 27px); font: 400 10.5px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  .cine-quit {
+    position: absolute; right: var(--gutter); top: calc(var(--safe-t) + 10px); min-height: 44px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent; color: var(--ink-2); cursor: pointer; opacity: .75;
+    font: 500 10.5px var(--font-mono); letter-spacing: .22em; text-transform: uppercase;
+  }
+  .cine-quit:hover, .cine-quit:focus-visible { opacity: 1; color: var(--ink); border-color: var(--line-2); }
+  .cine-credit {
+    position: absolute; left: max(var(--gutter), 7vw); right: var(--gutter); bottom: calc(var(--lb) + 5vh); pointer-events: none;
+    opacity: 0; transition: opacity 1.4s ease; text-shadow: 0 1px 18px rgba(0, 0, 0, 0.85);
+  }
+  .cine-credit.show { opacity: 1; }
+  .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
+  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 200 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
+  .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
+  body.cine-on .ui { visibility: hidden; }
+  /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
+  body.cine-on #credit-line, body.cine-on #cesium-credits { visibility: visible; z-index: 31; pointer-events: none; }
+
+  .timebar {
+    left: 50%; bottom: calc(var(--safe-b) + 90px); transform: translateX(-50%); width: min(640px, calc(100vw - 2 * var(--gutter)));
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 4px 4px 4px 18px;
+    border-radius: 999px; border: 1px solid var(--line); background: var(--sheet);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .timebar[hidden] { display: none; }
+  .tb-time { display: grid; gap: 2px; min-width: 0; }
+  .tb-time b { font: 400 18px/1.1 var(--font-mono); letter-spacing: .04em; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 10px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .timebar input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; cursor: pointer; }
+  /* The track reads as a day: night at both ends, local solar noon in the middle. */
+  .timebar input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
+  .timebar input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
+  .timebar input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -9px; border-radius: 50%; background: var(--ink); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--line-2); }
+  .timebar input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 3px solid var(--bg); }
+  .timebar input[type="range"]:focus-visible { outline: none; }
+  .timebar input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--accent); }
+  .timebar input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--accent); }
+  .timebar input[type="range"]:disabled { opacity: .4; cursor: progress; }
+  body.time-open .card { bottom: calc(var(--safe-b) + 160px); }
+
+  .show-toast {
+    position: fixed; z-index: 27; left: 50%; top: calc(var(--safe-t) + 130px); transform: translateX(-50%); max-width: calc(100vw - 2 * var(--gutter));
+    display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 22px;
+    border: 1px solid var(--line-2); background: var(--sheet); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    font: 400 13.5px var(--font-ui); color: var(--ink); text-align: center;
+  }
+  .show-toast[hidden], .show-toast [hidden] { display: none; }
+  .show-toast.with-field { padding: 4px 4px 4px 16px; }
+  .show-toast input {
+    min-width: 0; width: min(420px, 56vw); height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line-2);
+    background: rgba(244, 246, 250, 0.04); color: var(--ink); font: 400 12px var(--font-mono);
+  }
+
+  .epic {
+    position: fixed; inset: 0; z-index: 26; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; justify-items: center; gap: 6px;
+    padding: calc(var(--safe-t) + 16px) var(--gutter) calc(var(--safe-b) + 14px); overflow: auto;
+    background: radial-gradient(ellipse 70% 60% at 50% 45%, #070B14, #000 72%);
+  }
+  .epic[hidden] { display: none; }
+  .epic-head { width: min(760px, 100%); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .epic-head h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); }
+  .epic-photo { margin: 0; width: 100%; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
+  /* The photo is square with the disc on black: fade the corners into the backdrop. */
+  .epic-photo img {
+    display: block; width: min(88vw, 58vh, 640px); aspect-ratio: 1; object-fit: contain; transition: opacity .35s ease;
+    -webkit-mask-image: radial-gradient(circle closest-side, #000 90%, transparent 100%); mask-image: radial-gradient(circle closest-side, #000 90%, transparent 100%);
+  }
+  .epic-photo img[hidden] { display: none; }
+  .epic-photo img.loading { opacity: .35; }
+  .epic-info { width: min(640px, 100%); text-align: center; }
+  .epic-info .status { margin: 4px 0; }
+  .epic-date { margin: 0; font: 300 18px/1.4 var(--font-ui); color: var(--ink); }
+  .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
+  .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+  .epic-nav .round { width: 44px; padding: 0; font-size: 20px; }
+  .epic-nav .round:disabled { opacity: .3; cursor: default; border-color: var(--line); color: var(--ink); }
+  .epic-count { min-width: 60px; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--ink-2); }
+  .epic-credit { margin: 12px 0 0; font: 400 10.5px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
+  @media (max-width: 760px) {
+    .timebar {
+      bottom: calc(var(--safe-b) + 88px); grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "time close" "range range";
+      row-gap: 0; padding: 6px 6px 2px 16px; border-radius: 22px;
+    }
+    .tb-time { grid-area: time; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
+    .tb-time small { max-width: none; }
+    .timebar input[type="range"] { grid-area: range; height: 36px; }
+    .timebar .close { grid-area: close; }
+    body.time-open .card { visibility: hidden; }     /* the bottom of a phone screen is for the bar and the places */
+    .epic-head h3 { font-size: 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cine-bar, .cine-credit, .epic-photo img { transition: none; }
+  }
+
   /* Opening title card */
   .loader {
     position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
@@ -384,6 +487,15 @@
       <div class="grid2">
         <button class="opt" id="btn-live" type="button" aria-pressed="false" aria-controls="live"><b>The Light · Stream</b><small>télés et radios du pays, en petits carrés</small></button>
         <button class="opt" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch"><b>Veille</b><small>séismes, station spatiale, satellites militaires, nuages</small></button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Spectacle</div>
+      <div class="grid2">
+        <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les dix lieux, comme un film</small></button>
+        <button class="opt" id="btn-time" type="button" aria-pressed="false" aria-controls="timebar"><b>Curseur du temps</b><small>fais tourner le soleil sur 24 heures</small></button>
+        <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
+        <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
       </div>
     </div>
     <div class="group">
@@ -518,6 +630,55 @@
     </section>
     <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
+
+  <div class="cine" id="cine" hidden>
+    <div class="cine-bar cine-top">
+      <span class="cine-count" id="cine-count"></span>
+      <button class="cine-quit" id="cine-quit" type="button" aria-label="Quitter la visite cinéma">Quitter ✕</button>
+    </div>
+    <div class="cine-bar cine-bottom"></div>
+    <div class="cine-credit" id="cine-credit" aria-live="polite">
+      <div class="cine-country" id="cine-country"></div>
+      <div class="cine-name" id="cine-name"></div>
+      <div class="cine-coords" id="cine-coords"></div>
+    </div>
+  </div>
+
+  <div class="ui timebar" id="timebar" role="group" aria-label="Curseur du temps" hidden>
+    <div class="tb-time"><b id="tb-clock">--:--</b><small id="tb-where"></small></div>
+    <input type="range" id="tb-range" min="0" max="1435" step="5" value="720" aria-label="Heure solaire locale" />
+    <button class="close" id="tb-close" type="button" aria-label="Fermer le curseur du temps">✕</button>
+  </div>
+
+  <div class="show-toast" id="show-toast" role="status" aria-live="polite" hidden>
+    <span id="toast-text"></span>
+    <input id="toast-field" type="text" readonly aria-label="Lien de cette vue" hidden />
+    <button class="close" id="toast-close" type="button" aria-label="Fermer" hidden>✕</button>
+  </div>
+
+  <div class="epic" id="epic" role="dialog" aria-modal="true" aria-labelledby="epic-title" hidden>
+    <div class="epic-head">
+      <div><div class="kicker">NASA EPIC · DSCOVR</div><h3 id="epic-title">La Terre entière, aujourd’hui</h3></div>
+      <button class="close" id="epic-close" type="button" aria-label="Fermer les photos de la Terre entière">✕</button>
+    </div>
+    <figure class="epic-photo"><img id="epic-img" alt="" referrerpolicy="no-referrer" decoding="async" hidden /></figure>
+    <div class="epic-info">
+      <p class="status" id="epic-status" aria-live="polite"></p>
+      <button class="chip" id="epic-retry" type="button" hidden>Réessayer</button>
+      <div id="epic-meta" hidden>
+        <p class="epic-date" id="epic-date"></p>
+        <p class="epic-line"><span id="epic-age"></span>, vue depuis le point de Lagrange L1, à 1,5 million de km</p>
+        <p class="epic-line epic-mono" id="epic-detail"></p>
+        <div class="epic-nav">
+          <button class="round" id="epic-prev" type="button" aria-label="Photo précédente">‹</button>
+          <span class="epic-count" id="epic-count"></span>
+          <button class="round" id="epic-next" type="button" aria-label="Photo suivante">›</button>
+          <button class="chip primary" id="epic-fly" type="button">Voler vers ce côté</button>
+        </div>
+      </div>
+      <p class="epic-credit">Photos : NASA EPIC Team / DSCOVR</p>
+    </div>
+  </div>
 
   <div class="loader" id="loader">
     <div class="inner">
@@ -2826,6 +2987,463 @@
   shotButton.addEventListener('click', captureImage);
   syncShotButton();
 
+  // ---------- Spectacle: cinema tour, time slider, shared view, the whole Earth from NASA EPIC ----------
+  // Four showpieces from the menu; each closes the menu when it starts and moves the camera only through the flight
+  // engine. Everything lives in this closure (one name, `spectacle`, outside it): the start-up code below reads a shared
+  // view from the address with `spectacle.viewFromHash()` and flies to it with `spectacle.flyToSharedView()`.
+  const spectacle = (() => {
+    const DAY_MS = 864e5;
+    // One registry per feature: every timeout and interval goes in, and `clear()` is the one teardown path.
+    function timerSet() {
+      const ids = new Set();
+      return {
+        later(fn, ms) { const id = setTimeout(() => { ids.delete(id); fn(); }, ms); ids.add(id); return id; },
+        every(fn, ms) { const id = setInterval(fn, ms); ids.add(id); return id; },
+        stop(id) { clearTimeout(id); clearInterval(id); ids.delete(id); },
+        clear() { ids.forEach((id) => { clearTimeout(id); clearInterval(id); }); ids.clear(); },
+        get size() { return ids.size; },
+      };
+    }
+    function closeSheets() {
+      if (menuEl.classList.contains('open')) setMenuOpen(false);
+      if ($('watch').classList.contains('open')) setWatchOpen(false);
+      if (liveOpen) setLiveOpen(false);
+    }
+    // Hand the camera to a new shot, as a place button does: no place, no card, no orbit, no flight under way.
+    function takeCamera() { ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll(); }
+    const fmtLon = (lon) => `${Math.abs(lon).toFixed(1).replace('.', ',')}° ${lon >= 0 ? 'E' : 'O'}`;
+
+    // ----- Short notice ("Lien copié"), or a field holding a link to copy by hand -----
+    const toastEl = $('show-toast'), toastField = $('toast-field'), toastTimers = timerSet();
+    function hideToast() { toastTimers.clear(); toastEl.hidden = true; }
+    function toast(text, link) {
+      toastTimers.clear();
+      $('toast-text').textContent = text;
+      toastField.hidden = !link; $('toast-close').hidden = !link;
+      toastEl.classList.toggle('with-field', !!link);
+      toastEl.hidden = false;
+      if (link) {
+        toastField.value = link;
+        toastField.focus({ preventScroll: true }); toastField.select(); toastField.setSelectionRange(0, link.length);
+      } else toastTimers.later(hideToast, 2800);
+    }
+    $('toast-close').addEventListener('click', () => { hideToast(); menuBtn.focus(); });
+
+    // ----- Visite cinéma: the ten places as a film -----
+    // Letterbox bars at 2.39:1 (capped on tall screens so the Earth stays visible), every control hidden but a discreet
+    // "Quitter", a film credit over each arrival, then the next place. Any touch, click, wheel or key ends it; reduced
+    // motion keeps the tour (short flights, no orbit) without the slides and fades (see the CSS).
+    const TOUR = { dwell: 9000, title: 5500, maxLeg: 45000, finale: 4500 };    // ms after each arrival; tests shorten them
+    const cineEl = $('cine'), creditEl = $('cine-credit'), tourTimers = timerSet();
+    let tour = null;                                                            // { i, soundSet } while the tour runs
+    function layoutLetterbox() {
+      const w = window.innerWidth, h = window.innerHeight;
+      cineEl.style.setProperty('--lb', `${Math.round(Math.min(Math.max((h - w / 2.39) / 2, h * 0.05), h * 0.2))}px`);
+    }
+    // Another part of the page may provide a soundtrack: setSoundtrack(on), with its state in soundtrackOn or isSoundtrackOn().
+    function soundtrackState() {
+      try {
+        if (typeof isSoundtrackOn === 'function') return !!isSoundtrackOn();   // eslint-disable-line no-undef
+        if (typeof soundtrackOn === 'boolean') return soundtrackOn;           // eslint-disable-line no-undef
+      } catch (e) { /* not ready */ }
+      return null;
+    }
+    function setSound(on) {
+      try { if (typeof setSoundtrack === 'function') { setSoundtrack(on); return true; } } catch (e) { /* no soundtrack */ } // eslint-disable-line no-undef
+      return false;
+    }
+    function setCredit(lines) {
+      if (!lines) { creditEl.classList.remove('show'); return; }
+      $('cine-country').textContent = lines[0]; $('cine-name').textContent = lines[1]; $('cine-coords').textContent = lines[2] || '';
+      creditEl.classList.add('show');
+    }
+    function startTour() {
+      if (tour) return;
+      closeSheets(); setTimeOpen(false); setEpicOpen(false); hideToast();
+      tour = { i: -1, soundSet: false };
+      if (soundtrackState() !== true) tour.soundSet = setSound(true);           // inside the click: allowed to start audio
+      layoutLetterbox(); setCredit(null);
+      cineEl.hidden = false;
+      document.body.classList.add('cine-on');
+      void cineEl.offsetWidth;                                                  // bars start off-screen, then slide in
+      cineEl.classList.add('in');
+      $('cine-quit').focus({ preventScroll: true });
+      tourLeg();
+    }
+    function tourLeg() {
+      if (!tour) return;
+      if (document.hidden) { tourTimers.later(tourLeg, 1000); return; }       // a hidden tab draws no frames: wait for it
+      tour.i += 1;
+      if (tour.i >= PLACES.length) {
+        $('cine-count').textContent = 'Visite cinéma · fin';
+        setCredit(['Fatiha · maman d’Amine', 'La lumière du dialogue', 'dix lieux · relief et coordonnées réels']);
+        tourTimers.later(endTour, TOUR.finale);
+        return;
+      }
+      const p = PLACES[tour.i], t0 = performance.now();
+      $('cine-count').textContent = `Visite cinéma · ${String(tour.i + 1).padStart(2, '0')} / ${PLACES.length}`;
+      setCredit(null);
+      flyToPlace(p);
+      // flyToPlace shows the place card when it lands (the card is hidden during the tour): that is the cue.
+      const poll = tourTimers.every(() => {
+        const arrived = activePlace === p && !flight && $('card').classList.contains('show');
+        if (!arrived && performance.now() - t0 < TOUR.maxLeg) return;
+        tourTimers.stop(poll);
+        setCredit([p.country, p.name, fmtCoord(p.lat, p.lon)]);
+        tourTimers.later(() => setCredit(null), TOUR.title);
+        tourTimers.later(tourLeg, TOUR.dwell);
+      }, 200);
+    }
+    function endTour() {
+      if (!tour) return;
+      const t = tour; tour = null;
+      tourTimers.clear();
+      // Between two places the visitor takes over, as when touching the globe during a flight.
+      if (flight) cancelFlight();
+      else if (!orbit && !$('card').classList.contains('show')) { ++flightToken; setPhase(activePlace ? 'Survol libre' : 'Exploration libre'); }
+      const hadFocus = cineEl.contains(document.activeElement);
+      cineEl.classList.remove('in'); cineEl.hidden = true; setCredit(null);
+      document.body.classList.remove('cine-on');
+      if (t.soundSet) setSound(false);
+      if (hadFocus) menuBtn.focus({ preventScroll: true });
+    }
+    $('btn-tour').addEventListener('click', startTour);
+    cineEl.addEventListener('pointerdown', (e) => { e.preventDefault(); endTour(); });
+    cineEl.addEventListener('wheel', endTour, { passive: true });
+    $('cine-quit').addEventListener('click', endTour);
+    window.addEventListener('resize', () => { if (tour) layoutLetterbox(); });
+    window.addEventListener('hashchange', endTour);     // before the page's own handler: a place link typed during the tour
+
+    // ----- Curseur du temps: the sun over 24 h -----
+    // The slider is the local mean solar time (UTC + longitude / 15; the equation of time is ignored, ±16 min) at the
+    // active place, or else at the centre of the screen, within the clock's current day there. It follows the clock:
+    // a flight that sets its own time moves the slider, which stays locked until that flight lands instead of fighting it.
+    const timeEl = $('timebar'), timeRange = $('tb-range'), timeTimers = timerSet();
+    let timeOpen = false, timeLocked = false, timeSeen = null, lastTimeInput = 0;
+    const centrePx = new C.Cartesian2(), centreHit = new C.Cartesian3();
+    function timeReference() {
+      if (activePlace) return { lon: activePlace.lon, label: activePlace.name, at: `à ${activePlace.name}` };
+      centrePx.x = canvas.clientWidth / 2; centrePx.y = canvas.clientHeight / 2;
+      const hit = camera.pickEllipsoid(centrePx, globe.ellipsoid, centreHit);
+      if (hit) { const lon = R2D(C.Cartographic.fromCartesian(hit).longitude); return { lon, label: `centre de l’écran, ${fmtLon(lon)}`, at: `au centre de l’écran, ${fmtLon(lon)}` }; }
+      const lon = R2D(camera.positionCartographic.longitude);
+      return { lon, label: `sous la caméra, ${fmtLon(lon)}`, at: `sous la caméra, ${fmtLon(lon)}` };
+    }
+    const solarShift = (lon) => lon / 15 * 3600e3;
+    function solarMinutes(lon) {
+      const local = C.JulianDate.toDate(clock.currentTime).getTime() + solarShift(lon);
+      return (((local % DAY_MS) + DAY_MS) % DAY_MS) / 60000;
+    }
+    function timeAtSolarMinutes(lon, minutes) {
+      const shift = solarShift(lon);
+      const dayStart = Math.floor((C.JulianDate.toDate(clock.currentTime).getTime() + shift) / DAY_MS) * DAY_MS;
+      return C.JulianDate.fromDate(new Date(dayStart + minutes * 60000 - shift));
+    }
+    const hhmm = (minutes) => { const m = Math.round(minutes) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+    function renderTime(minutes, ref) {
+      $('tb-clock').textContent = hhmm(minutes);
+      $('tb-where').textContent = timeLocked ? 'le vol règle l’heure…'
+        : `heure solaire · ${ref.label} · ${C.JulianDate.toDate(clock.currentTime).toISOString().slice(11, 16)} UTC`;
+      timeRange.setAttribute('aria-valuetext', `${hhmm(minutes).replace(':', ' h ')}, heure solaire ${ref.at}`);
+    }
+    function syncTime() {
+      const changed = timeSeen && !C.JulianDate.equals(clock.currentTime, timeSeen);
+      // A flight that eases the clock owns it until it lands; the real-time clock (Jour/nuit réel) only ticks.
+      if (!flight) timeLocked = false;
+      else if (changed && !clock.shouldAnimate) timeLocked = true;
+      timeSeen = C.JulianDate.clone(clock.currentTime, timeSeen || undefined);
+      timeRange.disabled = timeLocked;
+      const ref = timeReference(), m = solarMinutes(ref.lon);
+      if (performance.now() - lastTimeInput > 600) timeRange.value = String(Math.min(1435, Math.round(m / 5) * 5));
+      renderTime(m, ref);
+    }
+    timeRange.addEventListener('input', () => {
+      if (timeLocked) return;
+      lastTimeInput = performance.now();
+      if (veille.live) setLayer('live', false);       // a running real-time clock would undo the chosen hour
+      nightClock = false;                             // the hour chosen here stays when going back to orbit
+      const ref = timeReference(), minutes = +timeRange.value;
+      clock.currentTime = timeAtSolarMinutes(ref.lon, minutes);
+      timeSeen = C.JulianDate.clone(clock.currentTime, timeSeen || undefined);
+      renderTime(minutes, ref);
+    });
+    function setTimeOpen(open) {
+      if (open === timeOpen) return;
+      timeOpen = open;
+      if (open) closeSheets();
+      timeEl.hidden = !open;
+      document.body.classList.toggle('time-open', open);
+      $('btn-time').setAttribute('aria-pressed', String(open));
+      timeTimers.clear();
+      if (open) {
+        timeSeen = null; timeLocked = false; lastTimeInput = 0;
+        syncTime();
+        timeTimers.every(() => { if (!document.hidden) syncTime(); }, 250);
+        timeRange.focus({ preventScroll: true });
+      }
+    }
+    $('btn-time').addEventListener('click', () => setTimeOpen(!timeOpen));
+    $('tb-close').addEventListener('click', () => { setTimeOpen(false); menuBtn.focus(); });
+
+    // ----- Partager cette vue -----
+    // #vue=lat,lon,height,heading,pitch,time: degrees (5 decimals, about 1 m), metres above the ellipsoid, degrees, and the
+    // clock in Unix seconds so the sun is where it was. Links without the time (5 values) are read too.
+    function viewHash() {
+      const c = camera.positionCartographic;
+      const heading = ((R2D(camera.heading) % 360) + 360) % 360;
+      const t = Math.round(C.JulianDate.toDate(clock.currentTime).getTime() / 1000);
+      return `#vue=${R2D(c.latitude).toFixed(5)},${R2D(c.longitude).toFixed(5)},${Math.round(c.height)},${heading.toFixed(1)},${R2D(camera.pitch).toFixed(1)},${t}`;
+    }
+    // Anything that is not five or six plain decimal numbers is ignored; values are then brought into range.
+    function viewFromHash(hash) {
+      let s = hash === undefined ? location.hash : hash;
+      if (typeof s !== 'string' || s.length > 200 || !s.startsWith('#vue=')) return null;
+      try { s = decodeURIComponent(s.slice(5)); } catch (e) { return null; }
+      const parts = s.split(',');
+      if (parts.length !== 5 && parts.length !== 6) return null;
+      if (!parts.every((x) => /^[+-]?\d{1,10}(\.\d{1,10})?$/.test(x))) return null;
+      const [lat, lon, h, heading, pitch, t] = parts.map(Number);
+      if (![lat, lon, h, heading, pitch].every(Number.isFinite)) return null;
+      const wrap = (x, m) => ((x % m) + m) % m;
+      return {
+        lat: C.Math.clamp(lat, -89.99, 89.99), lon: wrap(lon + 180, 360) - 180, h: C.Math.clamp(h, 100, 4e7),
+        heading: wrap(heading, 360), pitch: C.Math.clamp(pitch, -90, 90),
+        time: Number.isFinite(t) && t >= 946684800 && t <= 4102444800 ? C.JulianDate.fromDate(new Date(t * 1000)) : null,   // 2000–2100
+      };
+    }
+    // The engine ends on the geodetic point of the target's geocentric direction taken at the equatorial radius
+    // (cartoOfUnit), up to ~40 m in latitude from the target itself: aim at the latitude that lands on the shared one.
+    function engineAimLat(latDeg, lonDeg) {
+      const want = D2R(latDeg), lon = D2R(lonDeg), u = new C.Cartesian3();
+      let lat = want;
+      for (let k = 0; k < 4; k++) {
+        C.Cartesian3.normalize(C.Cartesian3.fromRadians(lon, lat, 0, ellipsoid, u), u);
+        const c = ellipsoid.cartesianToCartographic(C.Cartesian3.multiplyByScalar(u, ellipsoid.maximumRadius, u));
+        if (!c) break;
+        lat += want - c.latitude;
+      }
+      return R2D(lat);
+    }
+    function flyToSharedView(v) {
+      takeCamera();
+      if (v.time) {
+        if (veille.live) setLayer('live', false);
+        clock.currentTime = C.JulianDate.clone(v.time); nightClock = false;
+      }
+      setPhase('Vue partagée');
+      // The engine frames a target from heading, pitch and range: with the camera position itself as the target and a
+      // 1 cm range, the flight lands on that very position, heading and pitch (pitch stops at -89.5°, the engine's limit).
+      startFlight(C.Cartesian3.fromDegrees(v.lon, engineAimLat(v.lat, v.lon), v.h), { heading: v.heading, pitch: v.pitch, range: 0.01 }, {
+        onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Vue partagée'),
+        onDone: () => { setPhase('Vue partagée'); toast(`Vue partagée · ${fmtCoord(v.lat, v.lon)}`); },
+      });
+    }
+    function copyLink(link) {
+      const byHand = () => toast('Copie ce lien :', link);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(link).then(() => toast('Lien copié'), byHand); return; }
+      } catch (e) { /* no clipboard: by hand */ }
+      byHand();
+    }
+    function shareView() {
+      closeSheets();
+      const hash = viewHash();
+      try { history.replaceState(null, '', hash); } catch (e) { /* the address bar keeps its old hash */ }
+      // Only the view travels: no quality setting, no key (a Google key never stays in the address anyway).
+      const url = new URL(location.href); url.search = ''; url.hash = hash;
+      const link = url.href;
+      menuBtn.focus({ preventScroll: true });
+      if (typeof navigator.share === 'function') {
+        navigator.share({ title: document.title, text: 'Une vue de la Terre, sur Fatiha', url: link })
+          .then(() => toast('Lien partagé'))
+          .catch((e) => { if (e && e.name === 'AbortError') toast('Partage annulé'); else copyLink(link); });
+        return;
+      }
+      copyLink(link);
+    }
+    $('btn-share').addEventListener('click', shareView);
+
+    // ----- La Terre entière, aujourd'hui: NASA EPIC, the camera of DSCOVR at the Sun–Earth Lagrange point L1 -----
+    // Keyless public API: the latest day's natural-colour photos, often from one or two days ago (their real date is
+    // shown). The list is fetched (it needs CORS from epic.gsfc.nasa.gov); the photos are plain image loads.
+    const EPIC_API = 'https://epic.gsfc.nasa.gov/api/natural';
+    const EPIC_ARCHIVE = 'https://epic.gsfc.nasa.gov/archive/natural';
+    const EPIC_RANGE = 2.3e7;            // the whole disc, north up, as in the photos (they are rotated north up)
+    const epicEl = $('epic'), epicImg = $('epic-img');
+    const epic = { items: [], i: 0, at: 0, loading: null, token: 0, img: 0 };
+    let epicOpen = false;
+    const frDate = (() => { try { return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return null; } })();
+    const fmtDay = (ms) => (frDate ? frDate.format(new Date(ms)) : new Date(ms).toISOString().slice(0, 10));
+    function parseEpic(text) {
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('format');
+      const out = [];
+      data.slice(0, 60).forEach((e) => {
+        if (!e || typeof e !== 'object') return;
+        const image = typeof e.image === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(e.image) ? e.image : '';
+        const d = typeof e.date === 'string' ? /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(e.date) : null;
+        if (!image || !d) return;
+        const ms = Date.UTC(+d[1], +d[2] - 1, +d[3], +d[4], +d[5], +d[6]);
+        if (!Number.isFinite(ms)) return;
+        const cc = e.centroid_coordinates || {}, lat = Number(cc.lat), lon = Number(cc.lon);
+        const centroid = Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+        const p = e.dscovr_j2000_position;      // km, Earth-centred
+        const dist = p && [p.x, p.y, p.z].every((x) => typeof x === 'number' && Number.isFinite(x)) ? Math.hypot(p.x, p.y, p.z) : NaN;
+        out.push({ image, ms, centroid, dist: dist > 1e6 && dist < 2e6 ? dist : null,
+          url: `${EPIC_ARCHIVE}/${d[1]}/${d[2]}/${d[3]}/jpg/${image}.jpg` });
+      });
+      return out.sort((a, b) => a.ms - b.ms);
+    }
+    function loadEpic() {
+      if (epic.items.length && Date.now() - epic.at < 15 * 60000) return Promise.resolve(epic.items);
+      if (!epic.loading) {
+        epic.loading = fetchText(EPIC_API, 12000).then((text) => {
+          const items = parseEpic(text);
+          if (!items.length) throw new Error('aucune photo');
+          epic.items = items; epic.at = Date.now();
+          return items;
+        }).finally(() => { epic.loading = null; });
+      }
+      return epic.loading;
+    }
+    function epicAge(ms) {
+      const days = Math.round((Math.floor(Date.now() / DAY_MS) - Math.floor(ms / DAY_MS)));
+      return days <= 0 ? 'Photo prise aujourd’hui' : days === 1 ? 'Photo prise hier' : `Photo prise il y a ${days} jours`;
+    }
+    function epicFailed(text) {
+      say('epic-status', text);
+      $('epic-retry').hidden = false; epicImg.hidden = true; $('epic-meta').hidden = true;
+    }
+    function renderEpic() {
+      const it = epic.items[epic.i];
+      if (!it) return;
+      const token = ++epic.img, when = new Date(it.ms);
+      $('epic-retry').hidden = true; $('epic-meta').hidden = false; epicImg.hidden = false;
+      $('epic-date').textContent = `${fmtDay(it.ms)} · ${fmtUTC(when)}`;
+      $('epic-age').textContent = epicAge(it.ms);
+      $('epic-detail').textContent = [it.centroid ? `centre de la photo : ${fmtCoord(it.centroid.lat, it.centroid.lon)}` : '',
+        it.dist ? `sonde à ${Math.round(it.dist).toLocaleString('fr-FR')} km du centre de la Terre` : ''].filter(Boolean).join(' · ');
+      $('epic-count').textContent = `${epic.i + 1} / ${epic.items.length}`;
+      $('epic-prev').disabled = epic.i === 0;
+      $('epic-next').disabled = epic.i === epic.items.length - 1;
+      $('epic-fly').disabled = !it.centroid;
+      epicImg.alt = `La Terre entière photographiée par la caméra EPIC de la sonde DSCOVR le ${fmtDay(it.ms)} à ${fmtUTC(when)}`;
+      const done = (ok) => {
+        if (token !== epic.img) return;
+        epicImg.classList.remove('loading');
+        say('epic-status', ok ? '' : 'Cette photo est indisponible pour le moment (serveur de la NASA injoignable).');
+      };
+      epicImg.onload = () => done(true); epicImg.onerror = () => done(false);
+      if (epicImg.src === it.url && epicImg.complete && epicImg.naturalWidth) done(true);
+      else { epicImg.classList.add('loading'); say('epic-status', 'Chargement de la photo…'); epicImg.src = it.url; }
+      // The neighbours load ahead, so going through the day looks like the Earth turning.
+      [epic.i - 1, epic.i + 1].forEach((j) => { const n = epic.items[j]; if (n) { const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = n.url; } });
+    }
+    function setEpicOpen(open) {
+      if (open === epicOpen) return;
+      epicOpen = open;
+      epicEl.hidden = !open;
+      document.body.classList.toggle('epic-open', open);
+      if (open) { closeSheets(); hideToast(); $('epic-close').focus({ preventScroll: true }); }
+      else ++epic.token;
+    }
+    async function openEpic() {
+      setEpicOpen(true);
+      const token = ++epic.token;
+      $('epic-retry').hidden = true;
+      if (!epic.items.length) { $('epic-meta').hidden = true; epicImg.hidden = true; }
+      say('epic-status', 'Chargement des photos de la NASA…');
+      try {
+        await loadEpic();
+        if (token !== epic.token) return;
+        epic.i = epic.items.length - 1;               // the most recent photo
+        renderEpic();
+      } catch (e) {
+        if (token !== epic.token) return;
+        epicFailed('Les photos NASA EPIC sont indisponibles pour le moment (réseau ou service de la NASA). Réessaie plus tard.');
+      }
+    }
+    function epicStep(d) {
+      const j = epic.i + d;
+      if (!epicOpen || j < 0 || j >= epic.items.length) return;
+      epic.i = j; renderEpic();
+    }
+    function flyToEpic() {
+      const it = epic.items[epic.i];
+      if (!it || !it.centroid) return;
+      setEpicOpen(false);
+      takeCamera();
+      if (veille.live) setLayer('live', false);
+      nightClock = false;
+      // Same time of day as the photo, moved by whole days to within 12 h of the clock: the sun lights the same side
+      // (a day changes its declination by less than half a degree) and does not spin round during the flight.
+      const clockMs = C.JulianDate.toDate(clock.currentTime).getTime();
+      const ms = it.ms + Math.round((clockMs - it.ms) / DAY_MS) * DAY_MS;
+      setPhase('Orbite');
+      startFlight(C.Cartesian3.fromDegrees(it.centroid.lon, it.centroid.lat, 0), { heading: 0, pitch: -90, range: EPIC_RANGE }, {
+        time: C.JulianDate.fromDate(new Date(ms)),
+        onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Approche'),
+        onDone: () => { setPhase('Côté photographié'); toast(`Le côté photographié par DSCOVR · soleil de ${fmtUTC(new Date(it.ms))}`); },
+      });
+      menuBtn.focus({ preventScroll: true });
+    }
+    $('btn-epic').addEventListener('click', openEpic);
+    $('epic-retry').addEventListener('click', openEpic);
+    $('epic-close').addEventListener('click', () => { setEpicOpen(false); menuBtn.focus(); });
+    $('epic-prev').addEventListener('click', () => epicStep(-1));
+    $('epic-next').addEventListener('click', () => epicStep(1));
+    $('epic-fly').addEventListener('click', flyToEpic);
+    // A horizontal swipe on the photo goes through the day.
+    let swipeX = null;
+    epicImg.addEventListener('pointerdown', (e) => { swipeX = e.clientX; });
+    epicImg.addEventListener('pointerup', (e) => {
+      if (swipeX !== null && Math.abs(e.clientX - swipeX) > 40) epicStep(e.clientX < swipeX ? 1 : -1);
+      swipeX = null;
+    });
+    epicImg.addEventListener('dragstart', (e) => e.preventDefault());
+    function trapFocus(e) {
+      const f = [...epicEl.querySelectorAll('button')].filter((b) => !b.disabled && b.getClientRects().length);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1], at = document.activeElement;
+      if (!epicEl.contains(at) || (e.shiftKey && at === first) || (!e.shiftKey && at === last)) {
+        e.preventDefault(); (e.shiftKey ? last : first).focus();
+      }
+    }
+
+    // Keys, before the page's own Escape handler (capture on window): during the tour any key ends it; the photo viewer
+    // takes Escape, the arrows and Tab; Escape then closes the link field or the time bar when no sheet is open.
+    window.addEventListener('keydown', (e) => {
+      if (tour) {
+        if (['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'Fn'].includes(e.key)) return;
+        e.preventDefault(); e.stopPropagation(); endTour();
+        return;
+      }
+      if (epicOpen) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setEpicOpen(false); menuBtn.focus(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); epicStep(e.key === 'ArrowLeft' ? -1 : 1); }
+        else if (e.key === 'Tab') trapFocus(e);
+        return;
+      }
+      if (e.key !== 'Escape' || document.querySelector('.sheet.open')) return;
+      if (!toastEl.hidden && !toastField.hidden) { hideToast(); menuBtn.focus(); }
+      else if (timeOpen) { setTimeOpen(false); menuBtn.focus(); }
+    }, true);
+
+    // Exposed for automated tests only.
+    window.__fatiha_show = {
+      TOUR, startTour, endTour, viewHash, viewFromHash,
+      get tour() {
+        return tour ? { i: tour.i, place: PLACES[tour.i] ? PLACES[tour.i].id : null, credit: creditEl.classList.contains('show'),
+          name: $('cine-name').textContent, timers: tourTimers.size, sound: tour.soundSet } : null;
+      },
+      get timers() { return { tour: tourTimers.size, time: timeTimers.size, toast: toastTimers.size }; },
+      get time() { return { open: timeOpen, value: +timeRange.value, locked: timeLocked, clock: $('tb-clock').textContent, where: $('tb-where').textContent }; },
+      get epic() { return { open: epicOpen, i: epic.i, n: epic.items.length, src: epicImg.getAttribute('src') }; },
+      epicForget() { epic.items = []; epic.at = 0; },
+    };
+    return { viewFromHash, flyToSharedView };
+  })();
+
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.
   // Dusk over Asia: the terminator crosses the east of the first view, so the night side and its city lights show.
@@ -2837,7 +3455,7 @@
   const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
   let opened = false;
   // The intro stays up until the visitor starts the journey; a deep link
-  // (index.html#alhambra) skips it.
+  // (index.html#alhambra) or a shared view (index.html#vue=…) skips it.
   function ready() {
     if (opened) return;
     opened = true; removeTileListener();
@@ -2845,15 +3463,16 @@
     const btn = $('btn-start');
     btn.disabled = false; btn.textContent = 'Commencer le voyage';
     btn.addEventListener('click', open);
-    if (placeFromHash()) open(); else btn.focus();
+    if (placeFromHash() || spectacle.viewFromHash()) open(); else btn.focus();
   }
   function open() {
     if (loader.classList.contains('done')) return;
     loader.classList.add('done');
-    // Deep link (index.html#alhambra) or a place picked during loading
+    // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
-    const p = placeFromHash();
+    const p = placeFromHash(), v = p ? null : spectacle.viewFromHash();
     if (p && !activePlace) flyToPlace(p);
+    else if (v && !activePlace) spectacle.flyToSharedView(v);
     else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
       duration: 7500,
       onDone: () => setPhase('Orbite'),
@@ -2866,7 +3485,9 @@
   setTimeout(ready, 12000);
   window.addEventListener('hashchange', () => {
     const p = placeFromHash();
-    if (p) { open(); flyToPlace(p); }
+    if (p) { open(); flyToPlace(p); return; }
+    const v = spectacle.viewFromHash();
+    if (v) { if (loader.classList.contains('done')) spectacle.flyToSharedView(v); else open(); }
   });
 
   // Exposed for automated tests only.
