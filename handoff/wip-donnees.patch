@@ -1,0 +1,549 @@
+diff --git a/fatiha/index.html b/fatiha/index.html
+index e7efbf3..0a6c134 100644
+--- a/fatiha/index.html
++++ b/fatiha/index.html
+@@ -215,6 +215,30 @@
+   .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
+   .watch .journal li b { color: var(--ink-2); font-weight: 400; }
+ 
++  /* Veille · Terre vivante: natural events (EONET), aurora forecast, active fires; live weather on the place card */
++  .watch .data-box .note { margin-bottom: 0; }
++  .watch .events li button { grid-template-columns: 10px 1fr auto; align-items: start; font-family: var(--font-ui); font-size: 13px; }
++  .watch .events .dot { width: 10px; height: 10px; margin-top: 4px; border-radius: 50%; background: var(--c, var(--accent)); box-shadow: 0 0 0 1px rgba(4, 6, 11, 0.6); }
++  .watch .events .what { display: grid; gap: 2px; min-width: 0; }
++  .watch .events .what span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
++  .watch .events .what small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
++  .watch .events .when { font: 400 10.5px/1.6 var(--font-mono); color: var(--muted); white-space: nowrap; }
++  .watch .events li button[aria-current="true"] { background: rgba(159, 211, 255, 0.08); }
++  .watch .btn.more { width: 100%; margin-top: 6px; }
++  .watch .btn.more[hidden] { display: none; }
++  .watch #eonet-pick:empty { display: none; }
++  .watch #eonet-pick a { color: var(--accent); }
++  .watch .legend { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; font: 400 10.5px var(--font-mono); color: var(--muted); }
++  .watch .legend .ramp { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(70, 255, 150, 0.12), rgba(70, 255, 150, 1)); }
++  .card .weather { margin-top: 8px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
++  .card .weather:empty { display: none; }
++  .card .weather .w-note { color: var(--muted); }
++  /* Phones: one line (now, sky, wind) on the folded card; sunrise, sunset and the source once it is expanded. */
++  @media (max-width: 760px) {
++    .card .weather { font-size: 11px; }
++    .card:not(.expanded) .weather .w-sun { display: none; }
++  }
++
+   /* The Light · Stream (Direct): small squares of live TV and radio */
+   .live .row { display: flex; gap: 8px; margin: 12px 0 6px; align-items: center; }
+   .live select {
+@@ -432,6 +456,7 @@
+     <p id="card-text"></p>
+     <button class="more" id="card-more" type="button" aria-expanded="false" aria-controls="card-text">Lire la suite</button>
+     <div class="meta" id="card-meta"></div>
++    <div class="weather" id="card-weather"></div>
+     <div class="links">
+       <button class="chip primary" id="card-dive" type="button">↓ Plonger</button>
+       <button class="chip" id="card-night" type="button">☾ Nuit</button>
+@@ -457,6 +482,12 @@
+       <button class="btn" type="button" data-layer="live" aria-pressed="false">Jour/nuit réel</button>
+       <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
+     </div>
++    <div class="kicker sub">Terre vivante · NASA, NOAA</div>
++    <div class="toggles">
++      <button class="btn wide" type="button" data-layer="eonet" aria-pressed="false">Événements naturels</button>
++      <button class="btn" type="button" data-layer="fires" aria-pressed="false">Feux actifs (satellite)</button>
++      <button class="btn" type="button" data-layer="aurora" aria-pressed="false">Aurores (prévision 30 min)</button>
++    </div>
+     <p class="status" id="watch-status" aria-live="polite"></p>
+     <div class="sats-box" id="sats-box" hidden>
+       <div class="kicker sub">Satellites militaires</div>
+@@ -464,6 +495,22 @@
+       <label class="check"><input type="checkbox" id="sats-orbit" /> Montrer l’orbite du satellite choisi</label>
+       <p class="note">Catalogue public seulement (groupe « military » de CelesTrak, d’après les données publiées par les forces spatiales américaines) : les satellites secrets n’y figurent pas. Positions calculées à partir des éléments d’orbite publiés, à quelques kilomètres près, pas observées. Aucune personne n’est suivie.</p>
+     </div>
++    <div class="sats-box data-box" id="eonet-box" hidden>
++      <div class="kicker sub">Événements naturels en cours · NASA EONET</div>
++      <p class="status" id="eonet-pick" aria-live="polite"></p>
++      <ul class="events" id="eonet-list"></ul>
++      <button class="btn more" id="eonet-more" type="button" hidden></button>
++      <p class="note">Catalogue de la NASA (EONET) : feux, tempêtes, volcans, glaces, inondations… signalés par des agences publiques sur les 30 derniers jours. Un point = la dernière position connue ; touche-le pour y aller.</p>
++    </div>
++    <div class="sats-box data-box" id="aurora-box" hidden>
++      <div class="kicker sub">Aurores · NOAA SWPC</div>
++      <div class="legend" aria-hidden="true"><span>5 %</span><i class="ramp"></i><span>40 % et +</span></div>
++      <p class="note">Probabilité d’aurore visible prévue par le modèle OVATION pour la demi-heure qui vient, d’après le vent solaire mesuré entre le Soleil et la Terre. Visible surtout côté nuit, vers les pôles.</p>
++    </div>
++    <div class="sats-box data-box" id="fires-box" hidden>
++      <div class="kicker sub">Feux actifs · NASA FIRMS / GIBS</div>
++      <p class="note">Points chauds détectés par l’instrument VIIRS (satellite NOAA-20, 375 m) sur la journée d’hier (date UTC), de jour comme de nuit. Ce ne sont pas tous des incendies : volcans, torchères et sites industriels très chauds y figurent aussi.</p>
++    </div>
+     <div class="kicker sub">Séismes les plus forts</div>
+     <ul id="watch-quakes"></ul>
+     <div class="kicker sub">Journal</div>
+@@ -1550,6 +1597,7 @@
+     p.ground = groundHeight;
+     nightView = false; diveView = false; setNightButton(); setDiveButton();
+     revealCard();
++    showWeather(p);
+   }
+   function hideCard() { $('card').classList.remove('show'); }
+   // Phones show two lines of the text and a "Lire la suite" button; every new card starts folded.
+@@ -1818,7 +1866,8 @@
+   // ---------- Veille mondiale: open public data layers ----------
+   // Everything here is public, read-only and aggregate (earthquakes, one
+   // satellite, weather imagery). Nothing tracks or identifies people.
+-  const veille = { quakes: false, iss: false, sats: false, rain: false, live: false, sit: false, clouds: true, lights: true };
++  const veille = { quakes: false, iss: false, sats: false, rain: false, live: false, sit: false, clouds: true, lights: true,
++    eonet: false, aurora: false, fires: false };
+   const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
+   const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
+   const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
+@@ -1828,13 +1877,18 @@
+   quakeSource.show = false; issSource.show = false;
+   viewer.dataSources.add(quakeSource);
+   viewer.dataSources.add(issSource);
+-  const rain = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
+-    url: RAIN_URL, maximumLevel: 6, credit: new C.Credit('Précipitations : NASA GIBS / IMERG'),
+-  }), 4);                       // above the real-Earth imagery, under the night lights and place names
+-  rain.show = false; rain.alpha = 0.75;
++  // Precipitation goes through addGibsLayer like the other NASA layers, so it switches itself off after repeated tile
++  // errors. Kept above the real-Earth imagery and under the night lights and place names, as before.
++  function makeRainLayer() {
++    const layer = addGibsLayer(RAIN_URL, 6, 'Précipitations : NASA GIBS / IMERG', 'rain', { show: false, alpha: 0.75 });
++    const layers = viewer.imageryLayers;
++    while (layers.indexOf(layer) > layers.indexOf(nightLights) && layers.indexOf(nightLights) >= 0) layers.lower(layer);
++    return layer;
++  }
++  let rain = makeRainLayer();
+ 
+   const fmtUTC = (d) => `${d.toISOString().slice(11, 16)} UTC`;
+-  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '' };
++  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '', eonet: '', aurora: '', fires: '' };
+   function renderStatus() {
+     $('watch-status').textContent = Object.values(statusLines).filter(Boolean).join('\n');
+   }
+@@ -2080,6 +2134,383 @@
+     clearInterval(satTimer); satTimer = setInterval(() => { if (!document.hidden) updateSats(); }, 1000);
+   }
+ 
++  // ---------- Terre vivante: natural events, aurora forecast, active fires, weather at the places ----------
++  // Open, keyless public sources: NASA EONET (natural events), NOAA SWPC OVATION (aurora forecast), NASA GIBS (thermal
++  // anomalies from FIRMS) and Open-Meteo (weather on the place card). Aggregate data only; nothing about people.
++  // All four send `Access-Control-Allow-Origin: *`. EONET, OVATION and the GIBS fires were tested for real from the
++  // development machine; Open-Meteo only answered "daily limit exceeded" (429) there, so its success path was tested
++  // with a response in its documented format. A source that fails or answers something unreadable switches its layer
++  // off and says so: no stale data on screen.
++  const EONET_URL = 'https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=30';
++  const OVATION_URL = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
++  const safeHttps = (u) => { try { const x = new URL(u); return x.protocol === 'https:' ? x.href : ''; } catch (e) { return ''; } };
++  const fetchJson = async (url, ms) => JSON.parse(await fetchText(url, ms));
++  function dataUnavailable(name, message) {
++    if (!veille[name]) return;
++    veille[name] = false;
++    layerOn[name](false);
++    document.querySelector(`#watch [data-layer="${name}"]`).setAttribute('aria-pressed', 'false');
++    statusLines[name] = message;
++    renderStatus();
++    journal(message);
++  }
++  // Polled feeds: one timer each, nothing while the tab is hidden, and a switch-on within the refresh period reuses
++  // the data already loaded (it is still the latest the source has published).
++  const feeds = {
++    eonet: { every: 30 * 60000, load: () => loadEonet(), timer: 0, last: 0, busy: null },
++    aurora: { every: 10 * 60000, load: () => loadAurora(), timer: 0, last: 0, busy: null },
++  };
++  function runFeed(name) {
++    const f = feeds[name];
++    if (!f.busy) f.busy = f.load().finally(() => { f.busy = null; });
++    return f.busy;
++  }
++  function scheduleFeed(name) {
++    const f = feeds[name];
++    clearTimeout(f.timer); f.timer = 0;
++    if (!veille[name] || document.hidden) return;
++    f.timer = setTimeout(() => { f.timer = 0; runFeed(name).then(() => scheduleFeed(name)); }, Math.max(0, f.last + f.every - Date.now()));
++  }
++  const feedFresh = (name) => feeds[name].last > 0 && Date.now() - feeds[name].last < feeds[name].every;
++  document.addEventListener('visibilitychange', () => Object.keys(feeds).forEach(scheduleFeed));
++
++  // Natural events (NASA EONET v3, open events of the past 30 days). One point per event at its latest position (the
++  // centre of the area for polygons), coloured by category. Points ignore the depth test so relief never hides them,
++  // and the ones beyond the horizon are hidden each frame.
++  const EONET_CATS = {
++    wildfires: { fr: 'Feu de végétation', pl: 'feux', color: '#FF7A45', range: 3.5e5 },
++    severeStorms: { fr: 'Tempête', pl: 'tempêtes', color: '#B9A3FF', range: 1.6e6 },
++    volcanoes: { fr: 'Volcan', pl: 'volcans', color: '#FF4D5E', range: 2.5e5 },
++    seaLakeIce: { fr: 'Glace de mer ou de lac', pl: 'glaces', color: '#DDF3FF', range: 1.2e6 },
++    floods: { fr: 'Inondation', pl: 'inondations', color: '#4C9BFF', range: 6e5 },
++    dustHaze: { fr: 'Poussière et brume', pl: 'poussières', color: '#D8B48A', range: 1.2e6 },
++    snow: { fr: 'Neige', pl: 'neige', color: '#FFFFFF', range: 8e5 },
++    tempExtremes: { fr: 'Température extrême', pl: 'températures extrêmes', color: '#FFD15C', range: 1.2e6 },
++    landslides: { fr: 'Glissement de terrain', pl: 'glissements', color: '#C29770', range: 2.5e5 },
++    drought: { fr: 'Sécheresse', pl: 'sécheresses', color: '#E3A44F', range: 1.2e6 },
++    earthquakes: { fr: 'Séisme', pl: 'séismes', color: '#F1CF8E', range: 4.5e5 },
++    waterColor: { fr: 'Couleur de l’eau', pl: 'eaux colorées', color: '#4FD6C9', range: 6e5 },
++    manmade: { fr: 'D’origine humaine', pl: 'd’origine humaine', color: '#C8CDD6', range: 4e5 },
++  };
++  const OTHER_CAT = { fr: 'Autre', pl: 'autres', color: '#9FD3FF', range: 6e5 };
++  const eonet = { events: [], pick: -1, shown: 8, seen: new Set(), first: true };
++  const eonetPoints = scene.primitives.add(new C.PointPrimitiveCollection());
++  const eonetLabels = scene.primitives.add(new C.LabelCollection());
++  const eonetLabel = eonetLabels.add({ show: false, font: '500 13px Inter, system-ui, sans-serif', fillColor: C.Color.WHITE,
++    outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -16),
++    disableDepthTestDistance: Number.POSITIVE_INFINITY });
++  eonetPoints.show = false; eonetLabels.show = false;
++  const eonetOccluder = new C.EllipsoidalOccluder(globe.ellipsoid, camera.positionWC);
++  scene.preRender.addEventListener(() => {
++    if (!eonetPoints.show || !eonet.events.length) return;
++    eonetOccluder.cameraPosition = camera.positionWC;
++    for (const ev of eonet.events) if (ev.point) ev.point.show = eonetOccluder.isPointVisible(ev.probe);
++    const sel = eonet.events[eonet.pick];
++    eonetLabel.show = !!(sel && sel.point && sel.point.show);
++  });
++  // Latest position of a geometry: a Point, or the mean of a Polygon's outer ring (unwrapped across the antimeridian).
++  function eonetPoint(g) {
++    if (!g || !Array.isArray(g.coordinates)) return null;
++    let p = null;
++    if (g.type === 'Point') p = g.coordinates;
++    else if (g.type === 'Polygon' && Array.isArray(g.coordinates[0])) {
++      const ring = g.coordinates[0].filter((c) => Array.isArray(c) && Number.isFinite(c[0]) && Number.isFinite(c[1]));
++      if (ring.length > 1 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) ring.pop();
++      if (ring.length) {
++        const wrap = Math.max(...ring.map((c) => c[0])) - Math.min(...ring.map((c) => c[0])) > 180;
++        let lon = ring.reduce((s, c) => s + (wrap && c[0] < 0 ? c[0] + 360 : c[0]), 0) / ring.length;
++        if (lon > 180) lon -= 360;
++        p = [lon, ring.reduce((s, c) => s + c[1], 0) / ring.length];
++      }
++    }
++    if (!p || !Number.isFinite(p[0]) || !Number.isFinite(p[1]) || Math.abs(p[1]) > 90 || Math.abs(p[0]) > 180) return null;
++    return [p[0], p[1]];
++  }
++  function parseEonet(data) {
++    if (!data || !Array.isArray(data.events)) throw new Error('format');
++    const out = [];
++    for (const ev of data.events.slice(0, 3000)) {
++      if (!ev || typeof ev !== 'object') continue;
++      const geo = (Array.isArray(ev.geometry) ? ev.geometry : [])
++        .map((g) => ({ g, t: Date.parse(g && g.date) })).filter((x) => Number.isFinite(x.t)).sort((a, b) => b.t - a.t);
++      let pos = null, t = 0;
++      for (const x of geo) { pos = eonetPoint(x.g); if (pos) { t = x.t; break; } }
++      if (!pos) continue;
++      const cat = (Array.isArray(ev.categories) && ev.categories[0]) || {};
++      const catId = typeof cat.id === 'string' ? cat.id : '';
++      const src = (Array.isArray(ev.sources) ? ev.sources : []).find((s) => s && safeHttps(s.url));
++      out.push({
++        id: String(ev.id ?? `${pos[1]},${pos[0]}`).slice(0, 60),
++        title: (typeof ev.title === 'string' ? ev.title.replace(/\s+/g, ' ').trim() : '').slice(0, 160) || 'Sans titre',
++        cat: catId, info: EONET_CATS[catId] || OTHER_CAT,
++        lon: pos[0], lat: pos[1], t,
++        source: src ? { id: String(src.id || '').slice(0, 40), url: safeHttps(src.url) } : null,
++      });
++    }
++    return out.sort((a, b) => b.t - a.t);
++  }
++  // EONET often gives a day without an hour (00:00 UTC): show the hour only when there is one.
++  function eonetDate(t, long) {
++    const d = new Date(t), opts = { day: 'numeric', month: 'short', timeZone: 'UTC' };
++    if (!long) return d.toLocaleDateString('fr-FR', opts);
++    const day = d.toLocaleDateString('fr-FR', { ...opts, year: 'numeric' });
++    return d.getUTCHours() || d.getUTCMinutes() ? `${day}, ${d.toISOString().slice(11, 16)} UTC` : `${day} (date UTC)`;
++  }
++  async function loadEonet() {
++    let events;
++    try { events = parseEonet(await fetchJson(EONET_URL, 15000)); }
++    catch (e) {
++      eonet.events = []; feeds.eonet.last = 0; eonetPoints.removeAll();
++      dataUnavailable('eonet', 'Événements naturels : NASA EONET indisponible (réseau ou réponse illisible), couche désactivée.');
++      return;
++    }
++    const keep = eonet.events[eonet.pick] && eonet.events[eonet.pick].id;
++    if (!eonet.first) {
++      const fresh = events.filter((ev) => !eonet.seen.has(ev.id)).slice(0, 3);
++      fresh.forEach((ev) => journal(`Nouvel événement : ${ev.info.fr} · ${ev.title}`));
++    }
++    events.forEach((ev) => eonet.seen.add(ev.id));
++    eonet.first = false;
++    eonet.events = events; feeds.eonet.last = Date.now();
++    if (veille.eonet) renderEonet(keep);
++  }
++  function renderEonet(keepId) {
++    eonetPoints.removeAll(); eonet.pick = -1; eonetLabel.show = false;
++    const counts = new Map();
++    eonet.events.forEach((ev, i) => {
++      ev.point = eonetPoints.add({
++        position: C.Cartesian3.fromDegrees(ev.lon, ev.lat, 0), pixelSize: 8, color: C.Color.fromCssColorString(ev.info.color),
++        outlineColor: C.Color.fromCssColorString('#04060B').withAlpha(0.8), outlineWidth: 1.5,
++        scaleByDistance: new C.NearFarScalar(2e5, 1.3, 2e7, 0.8), disableDepthTestDistance: Number.POSITIVE_INFINITY,
++        id: { eonetIndex: i },
++      });
++      ev.probe = C.Cartesian3.fromDegrees(ev.lon, ev.lat, 3000);
++      counts.set(ev.info, (counts.get(ev.info) || 0) + 1);
++    });
++    const top = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([info, n]) => `${n} ${info.pl}`);
++    const n = eonet.events.length;
++    statusLines.eonet = `Événements naturels : ${n} en cours (30 j)${top.length ? ` · ${top.join(' · ')}` : ''} · NASA EONET, ${fmtUTC(new Date(feeds.eonet.last))}`;
++    renderStatus();
++    $('eonet-pick').replaceChildren();
++    renderEonetList();
++    const again = eonet.events.findIndex((ev) => ev.id === keepId);
++    if (again >= 0) selectEvent(again, false);
++  }
++  function renderEonetList() {
++    const ul = $('eonet-list'), more = $('eonet-more');
++    ul.replaceChildren();
++    eonet.events.slice(0, eonet.shown).forEach((ev, i) => {
++      const li = document.createElement('li'), b = document.createElement('button');
++      b.type = 'button'; b.dataset.index = String(i);
++      b.setAttribute('aria-current', String(i === eonet.pick));
++      const dot = document.createElement('span'); dot.className = 'dot'; dot.style.setProperty('--c', ev.info.color);
++      const what = document.createElement('span'); what.className = 'what';
++      const title = document.createElement('span'); title.textContent = ev.title;
++      const cat = document.createElement('small'); cat.textContent = ev.info.fr;
++      what.append(title, cat);
++      const when = document.createElement('span'); when.className = 'when'; when.textContent = eonetDate(ev.t);
++      b.append(dot, what, when);
++      b.addEventListener('click', () => selectEvent(i, true));
++      li.append(b); ul.append(li);
++    });
++    const rest = eonet.events.length - eonet.shown;
++    more.hidden = rest <= 0;
++    more.textContent = rest > 0 ? `Voir plus (${rest} autre${rest > 1 ? 's' : ''})` : '';
++    if (!eonet.events.length) {
++      const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Aucun événement en cours signalé.'; ul.append(li);
++    }
++  }
++  $('eonet-more').addEventListener('click', () => { eonet.shown += 8; renderEonetList(); });
++  function selectEvent(i, fly) {
++    const ev = eonet.events[i];
++    if (!ev) return;
++    const prev = eonet.events[eonet.pick];
++    if (prev && prev.point) { prev.point.pixelSize = 8; prev.point.outlineColor = C.Color.fromCssColorString('#04060B').withAlpha(0.8); prev.point.outlineWidth = 1.5; }
++    eonet.pick = i;
++    ev.point.pixelSize = 14; ev.point.outlineColor = C.Color.WHITE; ev.point.outlineWidth = 2;
++    const short = ev.title.length > 46 ? `${ev.title.slice(0, 45)}…` : ev.title;
++    eonetLabel.text = `${ev.info.fr} · ${short}`; eonetLabel.position = ev.point.position;
++    $('eonet-list').querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.index === String(i))));
++    const line = $('eonet-pick');
++    line.replaceChildren(document.createTextNode(`${ev.info.fr} · ${ev.title}\n${eonetDate(ev.t, true)} · ${fmtCoord(ev.lat, ev.lon)}\n`));
++    if (ev.source) {
++      const a = document.createElement('a');
++      a.href = ev.source.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
++      a.textContent = `Source : ${ev.source.id || new URL(ev.source.url).hostname} ↗`;
++      line.append(a);
++    } else line.append(document.createTextNode('Source : catalogue NASA EONET'));
++    if (fly) flyToPoint(ev.lat, ev.lon, ev.info.range);
++  }
++  pickHandlers.push((picked) => {
++    const i = picked && picked.id && picked.id.eonetIndex;
++    if (i === undefined || !veille.eonet) return false;
++    selectEvent(i, true);
++    return true;
++  });
++
++  // Aurora forecast (NOAA SWPC OVATION, about 30 minutes ahead): the probability of visible aurora on a 1° grid,
++  // painted green into a 360 × 181 image laid over the globe. Mostly drawn on the night side (dayAlpha), brightened
++  // because Cesium keeps only 30 % of the colours there. Numeric alpha only (see the GIBS layers above).
++  const aurora = { layer: null, forecast: 0, observed: 0, max: 0 };
++  function buildAurora(data) {
++    const rows = data && data.coordinates;
++    const forecast = Date.parse(data && data['Forecast Time']), observed = Date.parse(data && data['Observation Time']);
++    if (!Array.isArray(rows) || rows.length < 1000 || !Number.isFinite(forecast)) throw new Error('format');
++    const cv = document.createElement('canvas'); cv.width = 360; cv.height = 181;
++    const ctx = cv.getContext('2d'), img = ctx.createImageData(360, 181), px = img.data;
++    let max = 0, n = 0;
++    for (const r of rows) {
++      if (!Array.isArray(r)) continue;
++      const lon = Math.round(r[0]), lat = Math.round(r[1]), v = r[2];
++      if (!Number.isFinite(lon) || !Number.isFinite(lat) || !Number.isFinite(v) || lat < -90 || lat > 90) continue;
++      n++;
++      if (v > max) max = v;
++      if (v < 5) continue;
++      const x = (((lon + 180) % 360) + 360) % 360, k = ((90 - lat) * 360 + x) * 4;   // column 0 = 180° W, row 0 = 90° N
++      px[k] = 70; px[k + 1] = 255; px[k + 2] = 150; px[k + 3] = Math.round(Math.min(1, v / 40) * 255);
++    }
++    if (n < 1000) throw new Error('format');
++    ctx.putImageData(img, 0, 0);
++    return { url: cv.toDataURL('image/png'), forecast, observed, max: Math.min(100, Math.round(max)) };
++  }
++  function dropAurora() {
++    if (aurora.layer) viewer.imageryLayers.remove(aurora.layer, true);
++    aurora.layer = null;
++  }
++  function auroraStatus() {
++    statusLines.aurora = `Aurores : prévision NOAA SWPC (modèle OVATION) pour ${fmtUTC(new Date(aurora.forecast))}`
++      + ` · probabilité maximale ${aurora.max} %`
++      + (Number.isFinite(aurora.observed) ? ` · vent solaire mesuré à ${fmtUTC(new Date(aurora.observed))}` : '');
++    renderStatus();
++  }
++  async function loadAurora() {
++    let built;
++    try {
++      built = buildAurora(await fetchJson(OVATION_URL, 15000));
++      if (Date.now() - built.forecast > 2 * 3600e3) throw new Error('stale');
++    } catch (e) {
++      feeds.aurora.last = 0; dropAurora();
++      dataUnavailable('aurora', e.message === 'stale'
++        ? 'Aurores : la dernière prévision NOAA date de plus de 2 h, couche désactivée.'
++        : 'Aurores : prévision NOAA indisponible (réseau ou réponse illisible), couche désactivée.');
++      return;
++    }
++    const layers = viewer.imageryLayers;
++    const provider = new C.SingleTileImageryProvider({ url: built.url, tileWidth: 360, tileHeight: 181,
++      rectangle: C.Rectangle.fromDegrees(-180, -90, 180, 90), credit: new C.Credit('Aurores : NOAA SWPC (OVATION)') });
++    const under = layers.indexOf(labels);
++    const layer = layers.addImageryProvider(provider, under >= 0 ? under : undefined);   // under the place names
++    Object.assign(layer, { alpha: 0.9, dayAlpha: 0.15, nightAlpha: 1.0, brightness: 3.0, show: veille.aurora });
++    dropAurora();
++    Object.assign(aurora, { layer, forecast: built.forecast, observed: built.observed, max: built.max });
++    feeds.aurora.last = Date.now();
++    if (veille.aurora) auroraStatus();
++  }
++
++  // Active fires: thermal anomalies seen by VIIRS on NOAA-20 (375 m) over the previous UTC day, from NASA FIRMS through
++  // GIBS. In GIBS WMTS these layers exist only as vector tiles; the GIBS WMS renders them as transparent PNG images, so
++  // the layer asks WMS for 256 px Web Mercator tiles. Same safety as addGibsLayer: off after repeated tile errors.
++  const FIRES_LAYER = 'VIIRS_NOAA20_Thermal_Anomalies_375m_All';
++  const dayBefore = () => new Date(Date.now() - 864e5).toISOString().slice(0, 10);
++  let firesDay = dayBefore();
++  function makeFiresLayer() {
++    const provider = new C.WebMapServiceImageryProvider({
++      url: 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi',
++      layers: FIRES_LAYER,
++      parameters: { transparent: true, format: 'image/png', time: firesDay },
++      tilingScheme: new C.WebMercatorTilingScheme(), tileWidth: 256, tileHeight: 256, maximumLevel: 9,
++      enablePickFeatures: false,              // no GetFeatureInfo requests when the globe is touched
++      credit: new C.Credit('Feux actifs : NASA FIRMS / GIBS (VIIRS NOAA-20)'),
++    });
++    let errors = 0;
++    provider.errorEvent.addEventListener((e) => { e.retry = false; if (++errors === 12) gibsUnavailable('fires'); });
++    const under = viewer.imageryLayers.indexOf(labels);
++    const layer = viewer.imageryLayers.addImageryProvider(provider, under >= 0 ? under : undefined);   // under the place names
++    // Brighter: Cesium keeps only 30 % of the colours on the night side, where fires matter too.
++    Object.assign(layer, { show: false, brightness: 2.0 });
++    return layer;
++  }
++  let fires = makeFiresLayer();
++  // A NASA layer that switched itself off is built again on the next switch-on (fresh error count, fresh tiles).
++  function freshGibs(name, layer, make, force) {
++    if (!force && !gibsFailed.has(name)) return layer;
++    gibsFailed.delete(name);
++    viewer.imageryLayers.remove(layer, true);
++    return make();
++  }
++
++  // Weather on the place card (Open-Meteo, CC BY 4.0): conditions now, sunrise and sunset in local time. Cached per
++  // place for 15 minutes; a failed or outdated answer shows a short note, never older data presented as current.
++  const WMO_FR = { 0: 'ciel dégagé', 1: 'ciel peu nuageux', 2: 'partiellement nuageux', 3: 'ciel couvert', 45: 'brouillard',
++    48: 'brouillard givrant', 51: 'bruine légère', 53: 'bruine', 55: 'bruine dense', 56: 'bruine verglaçante',
++    57: 'forte bruine verglaçante', 61: 'pluie faible', 63: 'pluie', 65: 'forte pluie', 66: 'pluie verglaçante',
++    67: 'forte pluie verglaçante', 71: 'neige faible', 73: 'neige', 75: 'forte neige', 77: 'grains de neige',
++    80: 'averses faibles', 81: 'averses', 82: 'violentes averses', 85: 'averses de neige', 86: 'fortes averses de neige',
++    95: 'orage', 96: 'orage avec grêle', 99: 'orage avec forte grêle' };
++  const COMPASS_FR = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
++  const WEATHER_TTL = 15 * 60000;
++  const weatherCache = new Map();
++  let weatherToken = 0;
++  const weatherUrl = (p) => `https://api.open-meteo.com/v1/forecast?latitude=${p.lat.toFixed(4)}&longitude=${p.lon.toFixed(4)}`
++    + '&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,cloud_cover,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
++  function parseWeather(d) {
++    const c = d && d.current, u = (d && d.current_units) || {};
++    if (!c || typeof c.time !== 'string' || ![c.temperature_2m, c.wind_speed_10m, c.weather_code].every(Number.isFinite)) throw new Error('format');
++    if ((u.temperature_2m && u.temperature_2m !== '°C') || (u.wind_speed_10m && u.wind_speed_10m !== 'km/h')) throw new Error('units');
++    // `current.time` is local time at the place: back to UTC with the offset, then refuse anything not from about now.
++    const at = Date.parse(`${c.time}Z`) - (Number.isFinite(d.utc_offset_seconds) ? d.utc_offset_seconds : 0) * 1000;
++    if (!Number.isFinite(at) || Math.abs(Date.now() - at) > 3 * 3600e3) throw new Error('stale');
++    const hm = (s) => (typeof s === 'string' && /T\d\d:\d\d/.test(s) ? s.slice(s.indexOf('T') + 1, s.indexOf('T') + 6) : '');
++    const daily = d.daily || {};
++    const sky = WMO_FR[c.weather_code] || (Number.isFinite(c.cloud_cover) ? `nuages ${Math.round(c.cloud_cover)} %` : '');
++    const wind = Number.isFinite(c.wind_direction_10m) ? ` ${COMPASS_FR[Math.round(((c.wind_direction_10m % 360) + 360) % 360 / 22.5) % 16]}` : '';
++    const rise = hm(Array.isArray(daily.sunrise) && daily.sunrise[0]), set = hm(Array.isArray(daily.sunset) && daily.sunset[0]);
++    return {
++      now: `Maintenant : ${Math.round(c.temperature_2m)} °C${sky ? ` · ${sky}` : ''} · vent ${Math.round(c.wind_speed_10m)} km/h${wind}`,
++      sun: (rise && set ? ` · lever ${rise} · coucher ${set} (heure locale)` : '') + ' · Open-Meteo',
++    };
++  }
++  function paintWeather(w) {
++    const now = document.createElement('span'), sun = document.createElement('span');
++    now.textContent = w.now; sun.className = 'w-sun'; sun.textContent = w.sun;
++    $('card-weather').replaceChildren(now, sun);
++  }
++  function showWeather(p) {
++    const el = $('card-weather'), token = ++weatherToken;
++    el.replaceChildren();
++    el.title = 'Météo : Open-Meteo.com (CC BY 4.0), modèles des services météorologiques nationaux';
++    const hit = weatherCache.get(p.id);
++    if (hit && Date.now() - hit.t < WEATHER_TTL) { paintWeather(hit.w); return; }
++    weatherCache.delete(p.id);
++    fetchJson(weatherUrl(p), 9000).then(parseWeather).then((w) => {
++      weatherCache.set(p.id, { t: Date.now(), w });
++      if (token === weatherToken) paintWeather(w);
++    }).catch(() => {
++      if (token !== weatherToken) return;
++      const note = document.createElement('span'); note.className = 'w-note'; note.textContent = 'Météo du moment indisponible.';
++      el.replaceChildren(note);
++    });
++  }
++  // The weather belongs to the place card that asked for it: when the card goes away (a flight, a night or dive view),
++  // clear it, and drop an answer still on its way.
++  new MutationObserver(() => {
++    if ($('card').classList.contains('show')) return;
++    ++weatherToken; $('card-weather').replaceChildren();
++  }).observe($('card'), { attributes: true, attributeFilter: ['class'] });
++
++  // Exposed for automated tests only.
++  window.__fatiha_data = {
++    get events() { return eonet.events.map(({ id, title, cat, lat, lon, t }) => ({ id, title, cat, lat, lon, t })); },
++    get pick() { return eonet.pick; },
++    get pointsShown() { return eonet.events.filter((ev) => ev.point && ev.point.show).length; },
++    get aurora() { return { on: !!(aurora.layer && aurora.layer.show), forecast: aurora.forecast, max: aurora.max, index: aurora.layer ? viewer.imageryLayers.indexOf(aurora.layer) : -1 }; },
++    get fires() { return { show: fires.show, day: firesDay, index: viewer.imageryLayers.indexOf(fires), url: fires.imageryProvider.url, labels: viewer.imageryLayers.indexOf(labels) }; },
++    get rain() { return { show: rain.show, alpha: rain.alpha, index: viewer.imageryLayers.indexOf(rain), lights: viewer.imageryLayers.indexOf(nightLights) }; },
++    get timers() { return Object.fromEntries(Object.entries(feeds).map(([k, f]) => [k, !!f.timer])); },
++    get weatherCache() { return [...weatherCache.keys()]; },
++    feeds, selectEvent, eonetPosition: (i) => eonet.events[i] && eonet.events[i].point && eonet.events[i].point.position,
++  };
++
+   function setLive(on) {
+     if (on) {
+       clock.currentTime = C.JulianDate.now();
+@@ -2115,10 +2546,43 @@
+     clouds(on) { realEarth.show = on; },
+     lights(on) { nightLights.show = on; },
+     rain(on) {
++      if (on) rain = freshGibs('rain', rain, makeRainLayer);
+       rain.show = on;
+       statusLines.rain = on ? 'Précipitations : NASA GIBS / IMERG (dernier relevé disponible)' : '';
+       renderStatus();
+     },
++    eonet(on) {
++      $('eonet-box').hidden = !on;
++      eonetPoints.show = on; eonetLabels.show = on;
++      eonet.shown = 8;
++      if (on) {
++        if (feedFresh('eonet')) renderEonet();
++        else { statusLines.eonet = 'Événements naturels : chargement (NASA EONET)…'; renderStatus(); }
++      } else {
++        eonetPoints.removeAll(); eonet.pick = -1; eonetLabel.show = false;
++        $('eonet-list').replaceChildren(); $('eonet-pick').replaceChildren(); $('eonet-more').hidden = true;
++        statusLines.eonet = ''; renderStatus();
++      }
++      scheduleFeed('eonet');
++    },
++    aurora(on) {
++      $('aurora-box').hidden = !on;
++      if (on && feedFresh('aurora') && aurora.layer) { aurora.layer.show = true; auroraStatus(); }
++      else if (on) { statusLines.aurora = 'Aurores : chargement de la prévision (NOAA SWPC)…'; renderStatus(); }
++      else { if (aurora.layer) aurora.layer.show = false; statusLines.aurora = ''; renderStatus(); }
++      scheduleFeed('aurora');
++    },
++    fires(on) {
++      $('fires-box').hidden = !on;
++      if (on) {
++        const newDay = firesDay !== dayBefore();      // the page stayed open past midnight UTC: ask for the new day
++        firesDay = dayBefore();
++        fires = freshGibs('fires', fires, makeFiresLayer, newDay);
++      }
++      fires.show = on;
++      statusLines.fires = on ? `Feux actifs : points chauds VIIRS (NOAA-20) du ${firesDay} (UTC) · NASA FIRMS via GIBS` : '';
++      renderStatus();
++    },
+     live: setLive,
+     sit(on) {
+       document.body.classList.toggle('sitroom', on);
