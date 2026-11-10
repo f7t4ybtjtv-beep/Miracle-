@@ -215,14 +215,38 @@
   .watch .journal li { font: 400 11px/1.5 var(--font-mono); color: var(--muted); padding: 2px 8px; }
   .watch .journal li b { color: var(--ink-2); font-weight: 400; }
 
+  /* Veille · Terre vivante: natural events (EONET), aurora forecast, active fires; live weather on the place card */
+  .watch .data-box .note { margin-bottom: 0; }
+  .watch .events li button { grid-template-columns: 10px 1fr auto; align-items: start; font-family: var(--font-ui); font-size: 13px; }
+  .watch .events .dot { width: 10px; height: 10px; margin-top: 4px; border-radius: 50%; background: var(--c, var(--accent)); box-shadow: 0 0 0 1px rgba(4, 6, 11, 0.6); }
+  .watch .events .what { display: grid; gap: 2px; min-width: 0; }
+  .watch .events .what span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink); }
+  .watch .events .what small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .watch .events .when { font: 400 10.5px/1.6 var(--font-mono); color: var(--muted); white-space: nowrap; }
+  .watch .events li button[aria-current="true"] { background: rgba(159, 211, 255, 0.08); }
+  .watch .btn.more { width: 100%; margin-top: 6px; }
+  .watch .btn.more[hidden] { display: none; }
+  .watch #eonet-pick:empty { display: none; }
+  .watch #eonet-pick a { color: var(--accent); }
+  .watch .legend { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; font: 400 10.5px var(--font-mono); color: var(--muted); }
+  .watch .legend .ramp { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(70, 255, 150, 0.12), rgba(70, 255, 150, 1)); }
+  .card .weather { margin-top: 8px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
+  .card .weather:empty { display: none; }
+  .card .weather .w-note { color: var(--muted); }
+  /* Phones: one line (now, sky, wind) on the folded card; sunrise, sunset and the source once it is expanded. */
+  @media (max-width: 760px) {
+    .card .weather { font-size: 11px; }
+    .card:not(.expanded) .weather .w-sun { display: none; }
+  }
+
   /* The Light · Stream (Direct): small squares of live TV and radio */
   .live .row { display: flex; gap: 8px; margin: 12px 0 6px; align-items: center; }
   .live select {
     flex: 1; min-width: 0; min-height: 44px; color-scheme: dark; font: 400 14px var(--font-ui); color: var(--ink);
     background: rgba(244, 246, 250, 0.04); border: 1px solid var(--line-2); border-radius: 12px; padding: 0 12px;
   }
-  .live .tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
-  .live .tabs .btn { padding: 0 4px; }
+  .live .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin: 12px 0; }
+  .live .tabs .btn { padding: 0 2px; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .live .pane { display: none; }
   .live .pane.on { display: block; }
   .tiles { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -266,6 +290,30 @@
   .live .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
   .live .refs a { color: var(--accent); }
 
+  /* The Light · Stream: public webcams (Windy) and music by genre */
+  .tiles[hidden], .live .row[hidden] { display: none; }
+  .live .sub { margin: 16px 0 6px; }
+  .tile.cam img.logo { object-fit: cover; padding: 0; opacity: 1; }
+  .tile.cam .badge { max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+  .tile.cam .name { display: grid; gap: 2px; }
+  .tile.cam .name .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .tile.cam .name .p { font: 400 8.5px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.cam.open { border-color: var(--accent); }
+  .cam-stage iframe, .cam-stage img { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #000; object-fit: cover; }
+  .cam-cap { display: grid; gap: 3px; margin-top: 8px; }
+  .cam-cap b { font: 400 14px/1.35 var(--font-ui); color: var(--ink); }
+  .cam-cap small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .cam-cap .acts { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 4px; font: 400 13px var(--font-ui); }
+  .cam-cap a, .windy-credit a { color: var(--accent); }
+  #windy-box[hidden], .live .sub[hidden] { display: none; }
+  .windy-credit { margin-top: 8px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; }
+  .music-head { justify-content: space-between; }
+  .music-head .kicker { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tile.genre { background: linear-gradient(160deg, #0E1726, #070B12); }
+  .tile .glyph { position: absolute; inset: 0 0 14px; display: grid; place-items: center; color: var(--ink-2); transition: color .2s; }
+  .tile .glyph svg { width: 40%; height: 40%; }
+  .tile.genre:hover .glyph { color: var(--accent); }
+
   #radio-audio { display: block; width: 100%; margin: 8px 0; color-scheme: dark; }
   #radio-audio:not(.on) { display: none; }
   .sats-box { margin: 4px 0 8px; padding: 12px 14px; border-radius: 16px; border: 1px solid var(--line); }
@@ -281,6 +329,109 @@
   body.sitroom .sit-only { display: inline; }
   body.sitroom .places, body.sitroom .card { display: none; }
   body.sitroom .vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(5, 8, 14, 0.7) 100%); }
+
+  /* Spectacle: cinema tour (letterbox bars and film credits), time slider, shared-view notice, NASA EPIC viewer */
+  .cine { position: fixed; inset: 0; z-index: 30; --lb: 14vh; touch-action: none; -webkit-user-select: none; user-select: none; }
+  .cine[hidden] { display: none; }
+  .cine-bar { position: absolute; left: 0; right: 0; height: var(--lb); background: #000; transition: transform .9s cubic-bezier(.22, .61, .36, 1); }
+  .cine-top { top: 0; transform: translateY(-100%); }
+  .cine-bottom { bottom: 0; transform: translateY(100%); }
+  .cine.in .cine-bar { transform: none; }
+  .cine-count { position: absolute; left: var(--gutter); top: calc(var(--safe-t) + 27px); font: 400 10.5px/1 var(--font-mono); letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  .cine-quit {
+    position: absolute; right: var(--gutter); top: calc(var(--safe-t) + 10px); min-height: 44px; padding: 0 16px; border-radius: 999px;
+    border: 1px solid var(--line); background: transparent; color: var(--ink-2); cursor: pointer; opacity: .75;
+    font: 500 10.5px var(--font-mono); letter-spacing: .22em; text-transform: uppercase;
+  }
+  .cine-quit:hover, .cine-quit:focus-visible { opacity: 1; color: var(--ink); border-color: var(--line-2); }
+  .cine-credit {
+    position: absolute; left: max(var(--gutter), 7vw); right: var(--gutter); bottom: calc(var(--lb) + 5vh); pointer-events: none;
+    opacity: 0; transition: opacity 1.4s ease; text-shadow: 0 1px 18px rgba(0, 0, 0, 0.85);
+  }
+  .cine-credit.show { opacity: 1; }
+  .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
+  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 200 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
+  .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
+  body.cine-on .ui { visibility: hidden; }
+  /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
+  body.cine-on #credit-line, body.cine-on #cesium-credits { visibility: visible; z-index: 31; pointer-events: none; }
+
+  .timebar {
+    left: 50%; bottom: calc(var(--safe-b) + 90px); transform: translateX(-50%); width: min(640px, calc(100vw - 2 * var(--gutter)));
+    display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 4px 4px 4px 18px;
+    border-radius: 999px; border: 1px solid var(--line); background: var(--sheet);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  }
+  .timebar[hidden] { display: none; }
+  .tb-time { display: grid; gap: 2px; min-width: 0; }
+  .tb-time b { font: 400 18px/1.1 var(--font-mono); letter-spacing: .04em; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 10px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .timebar input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; cursor: pointer; }
+  /* The track reads as a day: night at both ends, local solar noon in the middle. */
+  .timebar input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
+  .timebar input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
+  .timebar input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; margin-top: -9px; border-radius: 50%; background: var(--ink); border: 3px solid var(--bg); box-shadow: 0 0 0 1px var(--line-2); }
+  .timebar input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: var(--ink); border: 3px solid var(--bg); }
+  .timebar input[type="range"]:focus-visible { outline: none; }
+  .timebar input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--accent); }
+  .timebar input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--accent); }
+  .timebar input[type="range"]:disabled { opacity: .4; cursor: progress; }
+  body.time-open .card { bottom: calc(var(--safe-b) + 160px); }
+
+  .show-toast {
+    position: fixed; z-index: 27; left: 50%; top: calc(var(--safe-t) + 130px); transform: translateX(-50%); max-width: calc(100vw - 2 * var(--gutter));
+    display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 20px; border-radius: 22px;
+    border: 1px solid var(--line-2); background: var(--sheet); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    font: 400 13.5px var(--font-ui); color: var(--ink); text-align: center;
+  }
+  .show-toast[hidden], .show-toast [hidden] { display: none; }
+  .show-toast.with-field { padding: 4px 4px 4px 16px; }
+  .show-toast input {
+    min-width: 0; width: min(420px, 56vw); height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--line-2);
+    background: rgba(244, 246, 250, 0.04); color: var(--ink); font: 400 12px var(--font-mono);
+  }
+
+  .epic {
+    position: fixed; inset: 0; z-index: 26; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; justify-items: center; gap: 6px;
+    padding: calc(var(--safe-t) + 16px) var(--gutter) calc(var(--safe-b) + 14px); overflow: auto;
+    background: radial-gradient(ellipse 70% 60% at 50% 45%, #070B14, #000 72%);
+  }
+  .epic[hidden] { display: none; }
+  .epic-head { width: min(760px, 100%); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .epic-head h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); }
+  .epic-photo { margin: 0; width: 100%; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
+  /* The photo is square with the disc on black: fade the corners into the backdrop. */
+  .epic-photo img {
+    display: block; width: min(88vw, 58vh, 640px); aspect-ratio: 1; object-fit: contain; transition: opacity .35s ease;
+    -webkit-mask-image: radial-gradient(circle closest-side, #000 90%, transparent 100%); mask-image: radial-gradient(circle closest-side, #000 90%, transparent 100%);
+  }
+  .epic-photo img[hidden] { display: none; }
+  .epic-photo img.loading { opacity: .35; }
+  .epic-info { width: min(640px, 100%); text-align: center; }
+  .epic-info .status { margin: 4px 0; }
+  .epic-date { margin: 0; font: 300 18px/1.4 var(--font-ui); color: var(--ink); }
+  .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
+  .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+  .epic-nav .round { width: 44px; padding: 0; font-size: 20px; }
+  .epic-nav .round:disabled { opacity: .3; cursor: default; border-color: var(--line); color: var(--ink); }
+  .epic-count { min-width: 60px; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--ink-2); }
+  .epic-credit { margin: 12px 0 0; font: 400 10.5px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
+  @media (max-width: 760px) {
+    .timebar {
+      bottom: calc(var(--safe-b) + 88px); grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "time close" "range range";
+      row-gap: 0; padding: 6px 6px 2px 16px; border-radius: 22px;
+    }
+    .tb-time { grid-area: time; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
+    .tb-time small { max-width: none; }
+    .timebar input[type="range"] { grid-area: range; height: 36px; }
+    .timebar .close { grid-area: close; }
+    body.time-open .card { visibility: hidden; }     /* the bottom of a phone screen is for the bar and the places */
+    .epic-head h3 { font-size: 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cine-bar, .cine-credit, .epic-photo img { transition: none; }
+  }
 
   /* Opening title card */
   .loader {
@@ -394,11 +545,21 @@
       </div>
     </div>
     <div class="group">
+      <div class="kicker">Spectacle</div>
+      <div class="grid2">
+        <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les dix lieux, comme un film</small></button>
+        <button class="opt" id="btn-time" type="button" aria-pressed="false" aria-controls="timebar"><b>Curseur du temps</b><small>fais tourner le soleil sur 24 heures</small></button>
+        <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
+        <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
+      </div>
+    </div>
+    <div class="group">
       <div class="kicker">Affichage</div>
       <div class="grid2">
         <button class="opt" id="btn-labels" type="button" aria-pressed="false"><b>Toponymes</b><small>noms des pays et des villes</small></button>
         <button class="opt" id="btn-clouds" type="button" aria-pressed="true"><b>Nuages</b><small>décoratifs, pas la météo</small></button>
         <button class="opt" id="btn-google" type="button" aria-pressed="false" hidden><b>Google 3D</b><small>villes photoréalistes</small></button>
+        <button class="opt" id="btn-soundtrack" type="button" aria-pressed="false"><b>Bande-son</b><small>musique générée, suit l’altitude</small></button>
       </div>
     </div>
     <div class="group">
@@ -432,6 +593,7 @@
     <p id="card-text"></p>
     <button class="more" id="card-more" type="button" aria-expanded="false" aria-controls="card-text">Lire la suite</button>
     <div class="meta" id="card-meta"></div>
+    <div class="weather" id="card-weather"></div>
     <div class="links">
       <button class="chip primary" id="card-dive" type="button">↓ Plonger</button>
       <button class="chip" id="card-night" type="button">☾ Nuit</button>
@@ -457,12 +619,34 @@
       <button class="btn" type="button" data-layer="live" aria-pressed="false">Jour/nuit réel</button>
       <button class="btn wide" type="button" data-layer="sit" aria-pressed="false">Salle de situation</button>
     </div>
+    <div class="kicker sub">Terre vivante · NASA, NOAA</div>
+    <div class="toggles">
+      <button class="btn wide" type="button" data-layer="eonet" aria-pressed="false">Événements naturels</button>
+      <button class="btn" type="button" data-layer="fires" aria-pressed="false">Feux actifs (satellite)</button>
+      <button class="btn" type="button" data-layer="aurora" aria-pressed="false">Aurores (prévision 30 min)</button>
+    </div>
     <p class="status" id="watch-status" aria-live="polite"></p>
     <div class="sats-box" id="sats-box" hidden>
       <div class="kicker sub">Satellites militaires</div>
       <p class="status" id="sats-status" aria-live="polite"></p>
       <label class="check"><input type="checkbox" id="sats-orbit" /> Montrer l’orbite du satellite choisi</label>
       <p class="note">Catalogue public seulement (groupe « military » de CelesTrak, d’après les données publiées par les forces spatiales américaines) : les satellites secrets n’y figurent pas. Positions calculées à partir des éléments d’orbite publiés, à quelques kilomètres près, pas observées. Aucune personne n’est suivie.</p>
+    </div>
+    <div class="sats-box data-box" id="eonet-box" hidden>
+      <div class="kicker sub">Événements naturels en cours · NASA EONET</div>
+      <p class="status" id="eonet-pick" aria-live="polite"></p>
+      <ul class="events" id="eonet-list"></ul>
+      <button class="btn more" id="eonet-more" type="button" hidden></button>
+      <p class="note">Catalogue de la NASA (EONET) : feux, tempêtes, volcans, glaces, inondations… signalés par des agences publiques sur les 30 derniers jours. Un point = la dernière position connue ; touche-le pour y aller.</p>
+    </div>
+    <div class="sats-box data-box" id="aurora-box" hidden>
+      <div class="kicker sub">Aurores · NOAA SWPC</div>
+      <div class="legend" aria-hidden="true"><span>5 %</span><i class="ramp"></i><span>40 % et +</span></div>
+      <p class="note">Probabilité d’aurore visible prévue par le modèle OVATION pour la demi-heure qui vient, d’après le vent solaire mesuré entre le Soleil et la Terre. Visible surtout côté nuit, vers les pôles.</p>
+    </div>
+    <div class="sats-box data-box" id="fires-box" hidden>
+      <div class="kicker sub">Feux actifs · NASA FIRMS / GIBS</div>
+      <p class="note">Points chauds détectés par l’instrument VIIRS (satellite NOAA-20, 375 m) sur la journée d’hier (date UTC), de jour comme de nuit. Ce ne sont pas tous des incendies : volcans, torchères et sites industriels très chauds y figurent aussi.</p>
     </div>
     <div class="kicker sub">Séismes les plus forts</div>
     <ul id="watch-quakes"></ul>
@@ -483,6 +667,7 @@
     <div class="tabs" role="group" aria-label="Rubriques">
       <button class="btn" type="button" data-tab="tv" aria-pressed="true">Télé</button>
       <button class="btn" type="button" data-tab="radio" aria-pressed="false">Radio</button>
+      <button class="btn" type="button" data-tab="music" aria-pressed="false">Musique</button>
       <button class="btn" type="button" data-tab="cam" aria-pressed="false">Caméras</button>
       <button class="btn" type="button" data-tab="war" aria-pressed="false">Conflits</button>
     </div>
@@ -501,10 +686,44 @@
       <ul class="tiles" id="radio-list"></ul>
       <p class="note">Touche un carré pour écouter (une radio à la fois). Annuaire communautaire radio-browser.info ; seuls les flux sécurisés (https) sont proposés, certains peuvent être hors ligne.</p>
     </section>
+    <section class="pane" id="pane-music">
+      <div class="row music-head" id="music-head" hidden>
+        <button class="btn" id="music-back" type="button">‹ Genres</button>
+        <span class="kicker" id="music-title"></span>
+      </div>
+      <p class="status" id="music-status" aria-live="polite"></p>
+      <ul class="tiles" id="music-genres" aria-label="Genres"></ul>
+      <ul class="tiles" id="music-list" hidden></ul>
+      <p class="note">Ce sont des radios internet d’un annuaire communautaire (radio-browser.info), rangées par les étiquettes que leurs auditeurs leur donnent : pas un service de musique à la demande. Une radio à la fois, flux sécurisés seulement ; certaines peuvent être hors ligne ou parler entre deux morceaux.</p>
+    </section>
     <section class="pane" id="pane-cam">
-      <p class="status">Webcams publiques : ouvertes dans un nouvel onglet, chez des annuaires qui les référencent avec l’accord de leurs propriétaires.</p>
+      <div class="stage cam-stage" id="cam-stage" hidden>
+        <div id="cam-frame"></div>
+        <button class="close" id="cam-stage-close" type="button" aria-label="Fermer la caméra">✕</button>
+        <div class="cam-cap">
+          <b id="cam-title"></b>
+          <small id="cam-where"></small>
+          <small id="cam-by"></small>
+          <div class="acts">
+            <a id="cam-detail" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Page de la caméra ↗</a>
+            <button class="btn" id="cam-locate" type="button">Situer sur le globe</button>
+          </div>
+        </div>
+      </div>
+      <p class="status" id="cam-status" aria-live="polite"></p>
+      <div class="kicker sub" id="cam-here-title" hidden></div>
+      <ul class="tiles" id="cam-here" hidden></ul>
+      <div class="kicker sub" id="cam-world-title">Dans le monde</div>
+      <ul class="tiles" id="cam-world"></ul>
+      <div id="windy-box" hidden>
+        <div class="kicker sub">Windy · autour de ce point</div>
+        <p class="status" id="windy-status" aria-live="polite"></p>
+        <ul class="tiles" id="cam-list"></ul>
+        <p class="note windy-credit">Webcams provided by <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">windy.com</a></p>
+      </div>
+      <div class="kicker sub">Plus de webcams</div>
       <ul class="list" id="cam-links"></ul>
-      <p class="note">Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
+      <p class="note">Caméras de lieux publics (places, ports, plages, monuments), publiées par leurs propriétaires : offices de tourisme, villes, chaînes, réseaux de webcams. Elles peuvent être hors ligne, en pause la nuit ou remplacées par une rediffusion. Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
     </section>
     <section class="pane" id="pane-war">
       <p class="status" id="war-status" aria-live="polite"></p>
@@ -523,8 +742,57 @@
         <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer">UCDP</a> ·
         <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a></p>
     </section>
-    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
+    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, YouTube et les sites des caméras que tu ouvres, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
+
+  <div class="cine" id="cine" hidden>
+    <div class="cine-bar cine-top">
+      <span class="cine-count" id="cine-count"></span>
+      <button class="cine-quit" id="cine-quit" type="button" aria-label="Quitter la visite cinéma">Quitter ✕</button>
+    </div>
+    <div class="cine-bar cine-bottom"></div>
+    <div class="cine-credit" id="cine-credit" aria-live="polite">
+      <div class="cine-country" id="cine-country"></div>
+      <div class="cine-name" id="cine-name"></div>
+      <div class="cine-coords" id="cine-coords"></div>
+    </div>
+  </div>
+
+  <div class="ui timebar" id="timebar" role="group" aria-label="Curseur du temps" hidden>
+    <div class="tb-time"><b id="tb-clock">--:--</b><small id="tb-where"></small></div>
+    <input type="range" id="tb-range" min="0" max="1435" step="5" value="720" aria-label="Heure solaire locale" />
+    <button class="close" id="tb-close" type="button" aria-label="Fermer le curseur du temps">✕</button>
+  </div>
+
+  <div class="show-toast" id="show-toast" role="status" aria-live="polite" hidden>
+    <span id="toast-text"></span>
+    <input id="toast-field" type="text" readonly aria-label="Lien de cette vue" hidden />
+    <button class="close" id="toast-close" type="button" aria-label="Fermer" hidden>✕</button>
+  </div>
+
+  <div class="epic" id="epic" role="dialog" aria-modal="true" aria-labelledby="epic-title" hidden>
+    <div class="epic-head">
+      <div><div class="kicker">NASA EPIC · DSCOVR</div><h3 id="epic-title">La Terre entière, aujourd’hui</h3></div>
+      <button class="close" id="epic-close" type="button" aria-label="Fermer les photos de la Terre entière">✕</button>
+    </div>
+    <figure class="epic-photo"><img id="epic-img" alt="" referrerpolicy="no-referrer" decoding="async" hidden /></figure>
+    <div class="epic-info">
+      <p class="status" id="epic-status" aria-live="polite"></p>
+      <button class="chip" id="epic-retry" type="button" hidden>Réessayer</button>
+      <div id="epic-meta" hidden>
+        <p class="epic-date" id="epic-date"></p>
+        <p class="epic-line"><span id="epic-age"></span>, vue depuis le point de Lagrange L1, à 1,5 million de km</p>
+        <p class="epic-line epic-mono" id="epic-detail"></p>
+        <div class="epic-nav">
+          <button class="round" id="epic-prev" type="button" aria-label="Photo précédente">‹</button>
+          <span class="epic-count" id="epic-count"></span>
+          <button class="round" id="epic-next" type="button" aria-label="Photo suivante">›</button>
+          <button class="chip primary" id="epic-fly" type="button">Voler vers ce côté</button>
+        </div>
+      </div>
+      <p class="epic-credit">Photos : NASA EPIC Team / DSCOVR</p>
+    </div>
+  </div>
 
   <div class="loader" id="loader">
     <div class="inner">
@@ -940,7 +1208,7 @@
   const dayLayers = [[naturalEarth, 1.0], [satellite, satellite.brightness], [realEarth, 1.0]];
   const lookPoint = new C.Cartesian3(), screenCentre = new C.Cartesian2();
   let nightLook = 0, starGain = 1;
-  let rush = 0, haze = 0, prevH = 0, prevT = 0;     // dive blur and haze, see the "nour_rush" stage
+  let rush = 0, haze = 0, cloudZoom = 1, prevA = 0, prevT = 0;     // dive blur and haze, see the "nour_rush" stage
   scene.preRender.addEventListener(() => {
     const h = camera.positionCartographic.height;
     screenCentre.x = canvas.clientWidth / 2; screenCentre.y = canvas.clientHeight / 2;
@@ -951,17 +1219,23 @@
     const k = 1 - 0.45 * nightLook;
     for (const [layer, base] of dayLayers) layer.brightness = base * k;
     glowFx.enabled = nightLook > 0.02 && tierName !== 'light';   // no halo passes by day or on the light tier
-    // Dive: blur from how fast the altitude changes (e-folds per second), only once below a few hundred km, and a
-    // grey haze around 6 km up where the cloud layer is. Off outside a dive, and with reduced motion.
+    // Dive: a light speed blur from how fast the height above the ground changes (e-folds per second), only between a
+    // few thousand km and ~20 km above the ground, and a short pass through the cloud layer around 3 km above the
+    // ground. Both are 0 in the last kilometre, outside a dive and with reduced motion, so the final frames stay sharp.
     const nowMs = performance.now();
     if (diving && !prefersReduced.matches) {
-      if (prevH > 0) {
-        const rate = Math.abs(Math.log(h / prevH)) / Math.max((nowMs - prevT) / 1000, 1e-3);
-        rush += (Math.min(1, rate / 2.0) * (1 - ramp(h, 4e5, 4e6)) - rush) * 0.25;
+      const agl = Math.max(h - diveGround, 1);
+      const dt = Math.max((nowMs - prevT) / 1000, 1e-3);
+      if (prevA > 0) {
+        const rate = Math.abs(Math.log(agl / prevA)) / dt;
+        const goal = Math.min(0.35, rate / 4) * (1 - ramp(h, 4e5, 4e6)) * ramp(agl, 2e4, 6e4);
+        rush += (goal - rush) * (1 - Math.exp(-dt / 0.12));      // smoothing that does not depend on the frame rate
       }
-      prevH = h; prevT = nowMs;
-      haze = cloudsOn ? Math.exp(-0.5 * Math.pow(Math.log(Math.max(h, 1) / 6000) / 0.55, 2)) : 0;
-    } else { rush = 0; haze = 0; prevH = 0; }
+      prevA = agl; prevT = nowMs;
+      const x = Math.log(agl / 3000) / 0.33;
+      haze = cloudsOn ? 0.5 * Math.exp(-0.5 * x * x) * ramp(agl, 900, 1500) : 0;
+      cloudZoom = Math.min(4, Math.max(0.25, Math.pow(agl / 3000, 1.2)));   // the haze pattern opens up as it is crossed
+    } else { rush = 0; haze = 0; prevA = 0; }
     rushFx.enabled = rush > 0.02 || haze > 0.02;
   });
 
@@ -1129,13 +1403,16 @@
   glowFx.enabled = false;
   scene.postProcessStages.add(glowFx);
   // Dive finish (last stage): radial blur towards the screen centre, strength `rush`, and a cloud haze of strength `haze`.
+  // Linear sampling and taps whose weight falls off along the line, so a short blur never shows separate copies.
   const rushFx = new C.PostProcessStage({
     name: 'nour_rush',
-    uniforms: { rush: () => rush, haze: () => haze, seed: () => (performance.now() % 100000) / 1000 },
+    sampleMode: C.PostProcessStageSampleMode.LINEAR,
+    uniforms: { rush: () => rush, haze: () => haze, cloudZoom: () => cloudZoom, seed: () => (performance.now() % 100000) / 1000 },
     fragmentShader: `
       uniform sampler2D colorTexture;
       uniform float rush;
       uniform float haze;
+      uniform float cloudZoom;
       uniform float seed;
       in vec2 v_textureCoordinates;
       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -1147,11 +1424,20 @@
       void main() {
         vec2 uv = v_textureCoordinates;
         vec2 toCentre = uv - 0.5;
-        vec3 sum = vec3(0.0);
-        for (int i = 0; i < 12; i++) sum += texture(colorTexture, uv - toCentre * (rush * 0.10 * float(i) / 11.0)).rgb;
-        vec3 color = sum / 12.0;
+        vec3 color = texture(colorTexture, uv).rgb;
+        if (rush > 0.0) {
+          vec3 sum = color;
+          float wsum = 1.0;
+          for (int i = 1; i < 10; i++) {
+            float f = float(i) / 9.0;
+            float w = 1.0 - 0.7 * f;
+            sum += texture(colorTexture, uv - toCentre * (rush * 0.10 * f)).rgb * w;
+            wsum += w;
+          }
+          color = sum / wsum;
+        }
         if (haze > 0.0) {
-          vec2 q = uv * vec2(2.2, 3.4) + toCentre * 1.5 + seed * 0.25;
+          vec2 q = toCentre * vec2(czm_viewport.z / czm_viewport.w, 1.0) * 6.0 * cloudZoom + vec2(3.1, 1.7) + seed * 0.05;
           float n = 0.55 * noise(q) + 0.3 * noise(q * 2.1 + 7.0) + 0.15 * noise(q * 4.3 + 3.0);
           vec3 fog = vec3(0.60, 0.64, 0.70) * (0.55 + 0.6 * n);
           color = mix(color, fog, clamp(haze * (0.55 + 0.4 * n), 0.0, 0.92));
@@ -1336,6 +1622,17 @@
     return slerpUnit(p1, p2, q, out);
   }
   const lerpAngle = (a, b, t) => a + C.Math.negativePiToPi(b - a) * t;
+  // Dive descent law F(t), 0 → 1, applied to the logarithm of the height above the ground: the rate (e-folds per
+  // second) ramps up over the first 12 % of the time, holds (about 1.2 e-folds/s, 1.7 imagery levels/s for 13 s),
+  // then slows from 52 % on and is nearly zero in the last second, so tile levels change slowly near the ground and
+  // the last frames are still. Tabulated once.
+  const DIVE_F = (() => {
+    const N = 512, f = new Float64Array(N + 1), F = new Float64Array(N + 1);
+    for (let i = 0; i <= N; i++) f[i] = smooth(0, 0.12, i / N) * Math.pow(1 - smooth(0.52, 1, i / N), 0.8);
+    for (let i = 1; i <= N; i++) F[i] = F[i - 1] + (f[i] + f[i - 1]) / 2;
+    for (let i = 0; i <= N; i++) F[i] /= F[N];
+    return (t) => { const x = C.Math.clamp(t, 0, 1) * N, i = Math.min(N - 1, Math.floor(x)); return F[i] + (F[i + 1] - F[i]) * (x - i); };
+  })();
   const ellipsoid = C.Ellipsoid.WGS84;
   function unitOf(carto) { return C.Cartesian3.normalize(C.Cartesian3.fromRadians(carto.longitude, carto.latitude, 0), new C.Cartesian3()); }
   function cartoOfUnit(u, height) {
@@ -1350,7 +1647,9 @@
   function releaseLookAt() { camera.lookAtTransform(C.Matrix4.IDENTITY); }
 
   function cancelFlight() {
-    if (!flight) return;
+    const f = flight;
+    endDive(false);            // a touch or another flight ends a dive: no blur, haze or prefetch left behind
+    if (!f) return;
     flight = null;
     ctl.enableInputs = true;
     setPhase(activePlace ? 'Survol libre' : 'Exploration libre');
@@ -1363,7 +1662,8 @@
    */
   function startFlight(target, view, opts) {
     stopOrbit(); releaseLookAt(); flight = null;
-    diving = !!(opts && opts.dive);     // the dive drives its own speed blur and cloud haze
+    const dive = !!(opts && opts.dive), apex = !!(opts && opts.apex);
+    diving = dive;                      // the dive drives its own speed blur and cloud haze
     const startCarto = camera.positionCartographic.clone();
     const startHeading = camera.heading, startPitch = camera.pitch, startRoll = C.Math.negativePiToPi(camera.roll);
 
@@ -1389,9 +1689,13 @@
     const hEnd = Math.max(endCarto.height, 50);
     const hPeak = Math.max(h0, hEnd, C.Math.clamp(arcMeters * 0.6, 0, 9.0e6));
     const L0 = Math.log(h0), Lf = Math.log(hEnd), Lp = Math.log(hPeak);
-    // A dive (straight down from space) descends the whole time instead of holding at the top first.
-    const altitudeAt = diving
-      ? (s) => Math.exp(L0 + (Lf - L0) * Math.pow(s, 1.35))
+    // A dive (straight down from space) follows DIVE_F in the log of the height above the target's ground, so the
+    // apparent speed is the same over a mountain town as over the sea. A climb to an apex (`apex`, the first leg of
+    // the dive) rises the whole time and slows into the top instead of holding there.
+    const ground = ellipsoid.cartesianToCartographic(target).height || 0;
+    const A0 = Math.log(Math.max(h0 - ground, 50)), Af = Math.log(Math.max(hEnd - ground, 50));
+    const altitudeAt = dive ? (s) => ground + Math.exp(A0 + (Af - A0) * DIVE_F(s))
+      : apex ? (s) => Math.exp(L0 + (Lf - L0) * s)
       : (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
 
     // Pitch: tilt down towards nadir during the climb, then open up to the
@@ -1399,7 +1703,7 @@
     // bound the tilt rate whatever the altitude change.
     const NADIR = D2R(-89.5);
     const climbing = hPeak > h0 * 1.5;
-    const pitchAt = diving ? (s) => C.Math.lerp(startPitch, NADIR, smooth(0, 0.12, s)) : (s) => {
+    const pitchAt = dive ? (s) => C.Math.lerp(startPitch, NADIR, smooth(0, 0.12, s)) : (s) => {
       const up = climbing ? C.Math.lerp(startPitch, NADIR, smooth(0, 0.45, s)) : startPitch;
       const down = C.Math.lerp(NADIR, P, smooth(0.5, 1.0, s));
       return C.Math.lerp(up, down, smooth(0.3, 0.5, s));
@@ -1450,7 +1754,7 @@
       t0, duration, onDone: opts && opts.onDone,
       step(now) {
         const t = C.Math.clamp((now - t0) / duration, 0, 1);
-        const s = reduced ? t : easeInOutSine(t);
+        const s = reduced || dive ? t : easeInOutSine(t);     // DIVE_F has its own ease in and out
 
         const q = qForDistance(lookup(progress, s) * trackLen[N]);
         const g = bezierUnit(uStart, uCtrl, uEnd, q, tmp.b);
@@ -1463,7 +1767,8 @@
         // Heading: on long flights settle to north while in orbit, then turn
         // to the arrival heading over the whole descent.
         const toNorth = longHaul ? smooth(0, 0.4, s) : 0;
-        hpr.heading = diving ? lerpAngle(startHeading, H, smooth(0, 1, s))   // a slow turn all the way down
+        // The dive turns with the zoom (same share of the turn per e-fold), so the turn eases out with the descent.
+        hpr.heading = dive ? lerpAngle(startHeading, H, DIVE_F(s))
           : lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
         hpr.pitch = pitchAt(s);
         hpr.roll = startRoll * (1 - smooth(0, 0.2, s));
@@ -1472,6 +1777,23 @@
         if (dt !== 0) clock.currentTime = C.JulianDate.addSeconds(time0, dt * smooth(0, 1, t), new C.JulianDate());
         if (opts && opts.onProgress) opts.onProgress(s, carto.height);
         return t >= 1;
+      },
+    };
+    ctl.enableInputs = false;
+  }
+
+  // End of a dive: the camera holds still until every visible tile is loaded (6 calm frames in a row), for at most
+  // `maxMs`, so the card comes up over a sharp picture. A touch ends the wait early (`onCancel`).
+  function startSettle(maxMs, onDone) {
+    stopOrbit(); flight = null;
+    const t0 = performance.now();
+    let calm = 0;
+    flight = {
+      onDone, onCancel: onDone,
+      step(now) {
+        const loaded = googleOn && googleReady && googleTileset ? googleTileset.tilesLoaded : globe.tilesLoaded;
+        calm = loaded ? calm + 1 : 0;
+        return calm >= 6 || now - t0 >= maxMs;
       },
     };
     ctl.enableInputs = false;
@@ -1492,7 +1814,7 @@
   // Cancel automated motion as soon as the visitor takes the controls.
   ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
     canvas.addEventListener(ev, () => {
-      if (flight) { cancelFlight(); }
+      if (flight) { const f = flight; cancelFlight(); if (f.onCancel) f.onCancel(); }
       if (orbit) { stopOrbit(); }
     }, { passive: true });
   });
@@ -1550,6 +1872,7 @@
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
     revealCard();
+    showWeather(p);
   }
   function hideCard() { $('card').classList.remove('show'); }
   // Phones show two lines of the text and a "Lire la suite" button; every new card starts folded.
@@ -1607,12 +1930,18 @@
     if (p) (nightView ? flyToPlace(p) : flyToNight(p));
   });
 
-  // Dive: the whole way down from space with the camera straight down, through the clouds, ending around 300 m up,
-  // with the speed blur of a free fall (see the "nour_rush" stage). Satellite imagery cannot show passers-by, so the
-  // card says what the last frame can and cannot show.
+  // Dive: a climb to a straight-down view from space, then the whole way down with the camera straight down, through
+  // the clouds, ending around 300 m up, with a light speed blur in the fast part (see the "nour_rush" stage) and a
+  // short settle while the last tiles come in. Satellite imagery cannot show passers-by, so the card says what the
+  // last frame can and cannot show.
   let diveView = false;      // the dive card is showing
-  let diving = false;        // a dive is under way
-  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000 };
+  let diving = false;        // the descent is under way (blur and haze)
+  let diveSeq = false;       // a dive is under way, from the click to the card (no quality step-down meanwhile)
+  let diveStage = null;      // 'ascent' | 'descent' | 'settle' | 'done' (for tests)
+  let diveGround = 0;        // ground height under the dive target, m
+  // duration: the descent (tests shorten it); climb: the first leg; turn: heading at the end, degrees; settle: the
+  // longest wait for tiles at the end; prefetch: the most Esri tiles requested ahead.
+  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 2500, prefetch: 120 };
   function setDiveButton() {
     $('card-dive').textContent = diveView ? '↺ Retour de jour' : '↓ Plonger';
     $('card-dive').title = diveView ? 'Revenir au lieu, de jour' : 'Plonger depuis l’espace jusqu’au lieu';
@@ -1627,6 +1956,126 @@
     $('card-meta').textContent = `Imagerie : Esri, Maxar, Earthstar Geographics · heure solaire ≈ ${String(Math.floor(p.solarHour)).padStart(2, '0')}h${String(Math.round((p.solarHour % 1) * 60)).padStart(2, '0')}`;
     revealCard();
   }
+  // ---------- Dive prefetch ----------
+  // While the camera climbs, the Esri tiles the descent will need under the target (level 8 down to the level of the
+  // final view, nearest the target first, at most DIVE.prefetch tiles, 6 at a time) are requested and kept decoded in
+  // a Map. Cesium's own request for the same x/y/level is then answered from that Map through a wrapper of the
+  // provider's requestImage, so the tile is never fetched twice. What is left is dropped when the dive ends; a
+  // cancelled dive also cancels the requests in flight. Tiles Cesium still holds are not asked for again.
+  const satProvider = satellite.imageryProvider;
+  const satRequestImage = satProvider.requestImage.bind(satProvider);
+  const prefetched = new Map();          // "level/x/y" → Promise<image>
+  const prefetchStats = { planned: 0, requested: 0, loaded: 0, failed: 0, served: 0 };
+  let prefetchJob = null;
+  satProvider.requestImage = (x, y, level, request) => {
+    const key = `${level}/${x}/${y}`;
+    const hit = prefetched.get(key);
+    if (!hit) return satRequestImage(x, y, level, request);
+    prefetched.delete(key); prefetchStats.served++;
+    // Should that prefetch fail or be cancelled after all, the tile is fetched the usual way.
+    return hit.catch(() => satRequestImage(x, y, level, request) || Promise.reject(new Error('tile')));
+  };
+  // Imagery Cesium already has for this tile (states 2-4: received, texture loaded, ready). Private cache of the pinned
+  // version; if it changes, everything is simply prefetched.
+  function satHas(x, y, level) {
+    try { const im = satellite._imageryCache[JSON.stringify([x, y, level])]; return !!im && im.state >= 2 && im.state <= 4; }
+    catch (e) { return false; }
+  }
+  // Which tiles: for heights from 2 500 km down to the end of the dive, the terrain level Cesium refines to under the
+  // camera (it splits a tile while geometricError · screen height in CSS px / (distance · 2·tan(fovy/2)) exceeds
+  // maximumScreenSpaceError), the imagery level it drapes on it (texel ≈ the terrain tile's error), and the imagery
+  // tiles covering the terrain tiles under the screen footprint, turned as the dive turns.
+  function planDivePrefetch(p, cap) {
+    const ts = satProvider.tilingScheme, tt = globe.terrainProvider.tilingScheme;
+    const target = C.Cartographic.fromDegrees(p.lon, p.lat);
+    const w = canvas.clientWidth || 400, hgt = canvas.clientHeight || 800, aspect = w / hgt;
+    const fov = camera.frustum.fov || D2R(60);
+    const tanY = aspect <= 1 ? Math.tan(fov / 2) : Math.tan(fov / 2) / aspect, tanX = tanY * aspect;
+    const K = hgt / (2 * tanY), sse = globe.maximumScreenSpaceError;
+    const e0 = globe.terrainProvider.getLevelMaximumGeometricError(0);
+    const R = ellipsoid.maximumRadius, cosLat = Math.cos(target.latitude);
+    const texel0 = R * ts.rectangle.width * cosLat / (satProvider.tileWidth * ts.getNumberOfXTilesAtLevel(0));
+    const top = Math.log(DIVE.startRange), end = Math.log(DIVE.endRange);
+    const cand = new Map();
+    const corner = new C.Cartographic();
+    for (let la = Math.log(2.5e6); ; la -= 0.07) {
+      const a = Math.exp(Math.max(la, end));
+      const L = Math.max(0, Math.ceil(Math.log2(e0 * K / (a * sse))));
+      const level = Math.min(satProvider.maximumLevel, Math.round(Math.log2(texel0 * 2 ** L / e0)));
+      if (level >= 8) {
+        const turn = D2R(DIVE.turn) * C.Math.clamp((top - Math.log(a)) / (top - end), 0, 1);
+        const hx = a * tanX, hy = a * tanY;
+        const ex = (Math.abs(hx * Math.cos(turn)) + Math.abs(hy * Math.sin(turn))) / (R * cosLat);
+        const ey = (Math.abs(hx * Math.sin(turn)) + Math.abs(hy * Math.cos(turn))) / R;
+        const nw = tt.positionToTileXY(C.Cartographic.fromRadians(target.longitude - ex, target.latitude + ey, 0, corner), L);
+        const se = tt.positionToTileXY(C.Cartographic.fromRadians(target.longitude + ex, target.latitude - ey, 0, corner), L);
+        if (nw && se) {
+          const r0 = tt.tileXYToRectangle(nw.x, nw.y, L), r1 = tt.tileXYToRectangle(se.x, se.y, L), eps = 1e-9;
+          const i0 = ts.positionToTileXY(C.Cartographic.fromRadians(r0.west + eps, r0.north - eps, 0, corner), level);
+          const i1 = ts.positionToTileXY(C.Cartographic.fromRadians(r1.east - eps, r1.south + eps, 0, corner), level);
+          if (i0 && i1) {
+            for (let x = i0.x; x <= i1.x; x++) for (let y = i0.y; y <= i1.y; y++) {
+              const key = `${level}/${x}/${y}`;
+              if (cand.has(key)) continue;
+              const r = ts.tileXYToRectangle(x, y, level);
+              const d = Math.hypot(((r.west + r.east) / 2 - target.longitude) / r.width, ((r.north + r.south) / 2 - target.latitude) / r.height);
+              cand.set(key, { key, x, y, level, d });
+            }
+          }
+        }
+      }
+      if (la <= end) break;
+    }
+    const all = [...cand.values()].filter((c) => !satHas(c.x, c.y, c.level)).sort((a, b) => a.d - b.d);
+    const deepest = all.reduce((m, c) => Math.max(m, c.level), 0);
+    const pick = new Map();
+    const take = (c) => { if (pick.size < cap) pick.set(c.key, c); };
+    all.filter((c) => c.d <= 0.75).forEach(take);               // every level: the tiles at the target
+    all.filter((c) => c.level >= deepest - 1).forEach(take);    // the final view and the level before it
+    all.forEach(take);                                          // then outwards, all levels
+    prefetchStats.planned = pick.size;
+    return [...pick.values()].sort((a, b) => a.level - b.level || a.d - b.d);   // in the order the descent needs them
+  }
+  function prefetchStart(list) {
+    prefetchStop(true);
+    Object.assign(prefetchStats, { requested: 0, loaded: 0, failed: 0, served: 0 });
+    const job = prefetchJob = { list, i: 0, active: new Set(), stopped: false };
+    const pump = () => {
+      while (!job.stopped && job.active.size < 6 && job.i < job.list.length) {
+        const { key, x, y, level } = job.list[job.i++];
+        if (prefetched.has(key)) continue;
+        const request = new C.Request({ throttle: false, throttleByServer: false, type: C.RequestType.IMAGERY });
+        const loading = satRequestImage(x, y, level, request);
+        if (!loading) continue;
+        prefetchStats.requested++;
+        job.active.add(request);
+        const done = loading.then((img) => { prefetchStats.loaded++; return img; });
+        prefetched.set(key, done);
+        done.catch(() => { prefetchStats.failed++; if (prefetched.get(key) === done) prefetched.delete(key); })
+          .finally(() => { job.active.delete(request); pump(); });
+      }
+    };
+    pump();
+  }
+  // cancelActive: also cancel the requests in flight (the dive was abandoned). Otherwise they finish (Cesium may be
+  // waiting for some of them) and only the unused tiles are dropped.
+  function prefetchStop(cancelActive) {
+    if (prefetchJob) {
+      prefetchJob.stopped = true;
+      if (cancelActive) prefetchJob.active.forEach((r) => r.cancel());
+      prefetchJob = null;
+    }
+    for (const pending of prefetched.values()) pending.then((img) => { if (img && img.close) img.close(); }, () => {});
+    prefetched.clear();
+  }
+  // Ends a dive, finished (card shown) or not (touch, another flight): no blur or haze, no prefetch left, and the
+  // frame-rate watch resumes after a warm-up.
+  function endDive(finished) {
+    if (diveSeq) { slowWindows = 0; warmUntil = performance.now() + 5000; }
+    diving = false; diveSeq = false; diveStage = finished ? 'done' : null;
+    prefetchStop(!finished);
+  }
+
   async function flyToDive(p) {
     const token = ++flightToken;
     hideCard(); stopOrbit(); cancelFlight();
@@ -1636,17 +2085,29 @@
     const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
     placeClouds(p, groundHeight);
     nightClock = false;
+    diveSeq = true; diveStage = 'ascent'; diveGround = groundHeight;
+    if (satellite.show && !(googleOn && googleReady)) prefetchStart(planDivePrefetch(p, DIVE.prefetch));
     const time = veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour);
-    // Leg 1: up to a straight-down view over the place where the Earth fills the frame. Leg 2: the dive.
+    const phaseAt = (agl) => (agl > 1.2e5 ? 'Orbite' : agl > 1500 && agl < 7000 && cloudsOn ? 'Traversée des nuages' : 'Plongée');
+    // Leg 1: a climb that slows into a straight-down view over the place where the Earth fills the frame. Leg 2 starts
+    // at once from that apex: the descent, then the settle while the last tiles come in, then the card.
     startFlight(target, { heading: 0, pitch: -90, range: DIVE.startRange }, {
-      duration: camera.positionCartographic.height > 5e6 ? 3500 : 6500, time,
+      apex: true, duration: camera.positionCartographic.height > 5e6 ? 3000 : DIVE.climb, time,
       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
       onDone: () => {
         if (token !== flightToken) return;
-        startFlight(target, { heading: 110, pitch: -90, range: DIVE.endRange }, {
+        diveStage = 'descent';
+        startFlight(target, { heading: DIVE.turn, pitch: -90, range: DIVE.endRange }, {
           dive: true, duration: DIVE.duration,
-          onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : h > 1.5e4 ? 'Traversée des nuages' : 'Plongée'),
-          onDone: () => { diving = false; setPhase('Vue du dessus'); showDiveCard(p, groundHeight); },
+          onProgress: (s, h) => setPhase(phaseAt(h - groundHeight)),
+          onDone: () => {
+            diving = false; diveStage = 'settle';
+            setPhase('Mise au point');
+            startSettle(prefersReduced.matches ? 1200 : DIVE.settle, () => {
+              if (token !== flightToken) return;
+              endDive(true); setPhase('Vue du dessus'); showDiveCard(p, groundHeight);
+            });
+          },
         });
       },
     });
@@ -1713,7 +2174,8 @@
     });
   }
 
-  function setPhase(t) { $('hud-phase').textContent = t; }
+  let phaseText = null;      // written only when it changes: flights call this on every frame
+  function setPhase(t) { if (t !== phaseText) { phaseText = t; $('hud-phase').textContent = t; } }
 
   $('btn-orbit').addEventListener('click', returnToOrbit);
   $('btn-labels').addEventListener('click', (e) => {
@@ -1788,7 +2250,8 @@
       const fps = frames * 1000 / (now - fpsT);
       frames = 0; fpsT = now;
       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
-      slowWindows = (now > warmUntil && fps < 24 && !capturing) ? slowWindows + 1 : 0;
+      // Nor a dive: it loads tiles at every level on purpose (endDive gives a warm-up afterwards).
+      slowWindows = (now > warmUntil && fps < 24 && !capturing && !diveSeq) ? slowWindows + 1 : 0;
       const i = TIER_ORDER.indexOf(tierName);
       if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
     }
@@ -1818,7 +2281,8 @@
   // ---------- Veille mondiale: open public data layers ----------
   // Everything here is public, read-only and aggregate (earthquakes, one
   // satellite, weather imagery). Nothing tracks or identifies people.
-  const veille = { quakes: false, iss: false, sats: false, rain: false, live: false, sit: false, clouds: true, lights: true };
+  const veille = { quakes: false, iss: false, sats: false, rain: false, live: false, sit: false, clouds: true, lights: true,
+    eonet: false, aurora: false, fires: false };
   const QUAKE_URL = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
   const ISS_URL = 'https://api.wheretheiss.at/v1/satellites/25544';
   const RAIN_URL = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png';
@@ -1828,13 +2292,18 @@
   quakeSource.show = false; issSource.show = false;
   viewer.dataSources.add(quakeSource);
   viewer.dataSources.add(issSource);
-  const rain = viewer.imageryLayers.addImageryProvider(new C.UrlTemplateImageryProvider({
-    url: RAIN_URL, maximumLevel: 6, credit: new C.Credit('Précipitations : NASA GIBS / IMERG'),
-  }), 4);                       // above the real-Earth imagery, under the night lights and place names
-  rain.show = false; rain.alpha = 0.75;
+  // Precipitation goes through addGibsLayer like the other NASA layers, so it switches itself off after repeated tile
+  // errors. Kept above the real-Earth imagery and under the night lights and place names, as before.
+  function makeRainLayer() {
+    const layer = addGibsLayer(RAIN_URL, 6, 'Précipitations : NASA GIBS / IMERG', 'rain', { show: false, alpha: 0.75 });
+    const layers = viewer.imageryLayers;
+    while (layers.indexOf(layer) > layers.indexOf(nightLights) && layers.indexOf(nightLights) >= 0) layers.lower(layer);
+    return layer;
+  }
+  let rain = makeRainLayer();
 
   const fmtUTC = (d) => `${d.toISOString().slice(11, 16)} UTC`;
-  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '' };
+  const statusLines = { quakes: '', iss: '', rain: '', live: '', clouds: '', lights: '', eonet: '', aurora: '', fires: '' };
   function renderStatus() {
     $('watch-status').textContent = Object.values(statusLines).filter(Boolean).join('\n');
   }
@@ -2080,6 +2549,383 @@
     clearInterval(satTimer); satTimer = setInterval(() => { if (!document.hidden) updateSats(); }, 1000);
   }
 
+  // ---------- Terre vivante: natural events, aurora forecast, active fires, weather at the places ----------
+  // Open, keyless public sources: NASA EONET (natural events), NOAA SWPC OVATION (aurora forecast), NASA GIBS (thermal
+  // anomalies from FIRMS) and Open-Meteo (weather on the place card). Aggregate data only; nothing about people.
+  // All four send `Access-Control-Allow-Origin: *`. EONET, OVATION and the GIBS fires were tested for real from the
+  // development machine; Open-Meteo only answered "daily limit exceeded" (429) there, so its success path was tested
+  // with a response in its documented format. A source that fails or answers something unreadable switches its layer
+  // off and says so: no stale data on screen.
+  const EONET_URL = 'https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=30';
+  const OVATION_URL = 'https://services.swpc.noaa.gov/json/ovation_aurora_latest.json';
+  const safeHttps = (u) => { try { const x = new URL(u); return x.protocol === 'https:' ? x.href : ''; } catch (e) { return ''; } };
+  const fetchJson = async (url, ms) => JSON.parse(await fetchText(url, ms));
+  function dataUnavailable(name, message) {
+    if (!veille[name]) return;
+    veille[name] = false;
+    layerOn[name](false);
+    document.querySelector(`#watch [data-layer="${name}"]`).setAttribute('aria-pressed', 'false');
+    statusLines[name] = message;
+    renderStatus();
+    journal(message);
+  }
+  // Polled feeds: one timer each, nothing while the tab is hidden, and a switch-on within the refresh period reuses
+  // the data already loaded (it is still the latest the source has published).
+  const feeds = {
+    eonet: { every: 30 * 60000, load: () => loadEonet(), timer: 0, last: 0, busy: null },
+    aurora: { every: 10 * 60000, load: () => loadAurora(), timer: 0, last: 0, busy: null },
+  };
+  function runFeed(name) {
+    const f = feeds[name];
+    if (!f.busy) f.busy = f.load().finally(() => { f.busy = null; });
+    return f.busy;
+  }
+  function scheduleFeed(name) {
+    const f = feeds[name];
+    clearTimeout(f.timer); f.timer = 0;
+    if (!veille[name] || document.hidden) return;
+    f.timer = setTimeout(() => { f.timer = 0; runFeed(name).then(() => scheduleFeed(name)); }, Math.max(0, f.last + f.every - Date.now()));
+  }
+  const feedFresh = (name) => feeds[name].last > 0 && Date.now() - feeds[name].last < feeds[name].every;
+  document.addEventListener('visibilitychange', () => Object.keys(feeds).forEach(scheduleFeed));
+
+  // Natural events (NASA EONET v3, open events of the past 30 days). One point per event at its latest position (the
+  // centre of the area for polygons), coloured by category. Points ignore the depth test so relief never hides them,
+  // and the ones beyond the horizon are hidden each frame.
+  const EONET_CATS = {
+    wildfires: { fr: 'Feu de végétation', pl: 'feux', color: '#FF7A45', range: 3.5e5 },
+    severeStorms: { fr: 'Tempête', pl: 'tempêtes', color: '#B9A3FF', range: 1.6e6 },
+    volcanoes: { fr: 'Volcan', pl: 'volcans', color: '#FF4D5E', range: 2.5e5 },
+    seaLakeIce: { fr: 'Glace de mer ou de lac', pl: 'glaces', color: '#DDF3FF', range: 1.2e6 },
+    floods: { fr: 'Inondation', pl: 'inondations', color: '#4C9BFF', range: 6e5 },
+    dustHaze: { fr: 'Poussière et brume', pl: 'poussières', color: '#D8B48A', range: 1.2e6 },
+    snow: { fr: 'Neige', pl: 'neige', color: '#FFFFFF', range: 8e5 },
+    tempExtremes: { fr: 'Température extrême', pl: 'températures extrêmes', color: '#FFD15C', range: 1.2e6 },
+    landslides: { fr: 'Glissement de terrain', pl: 'glissements', color: '#C29770', range: 2.5e5 },
+    drought: { fr: 'Sécheresse', pl: 'sécheresses', color: '#E3A44F', range: 1.2e6 },
+    earthquakes: { fr: 'Séisme', pl: 'séismes', color: '#F1CF8E', range: 4.5e5 },
+    waterColor: { fr: 'Couleur de l’eau', pl: 'eaux colorées', color: '#4FD6C9', range: 6e5 },
+    manmade: { fr: 'D’origine humaine', pl: 'd’origine humaine', color: '#C8CDD6', range: 4e5 },
+  };
+  const OTHER_CAT = { fr: 'Autre', pl: 'autres', color: '#9FD3FF', range: 6e5 };
+  const eonet = { events: [], pick: -1, shown: 8, seen: new Set(), first: true };
+  const eonetPoints = scene.primitives.add(new C.PointPrimitiveCollection());
+  const eonetLabels = scene.primitives.add(new C.LabelCollection());
+  const eonetLabel = eonetLabels.add({ show: false, font: '500 13px Inter, system-ui, sans-serif', fillColor: C.Color.WHITE,
+    outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -16),
+    disableDepthTestDistance: Number.POSITIVE_INFINITY });
+  eonetPoints.show = false; eonetLabels.show = false;
+  const eonetOccluder = new C.EllipsoidalOccluder(globe.ellipsoid, camera.positionWC);
+  scene.preRender.addEventListener(() => {
+    if (!eonetPoints.show || !eonet.events.length) return;
+    eonetOccluder.cameraPosition = camera.positionWC;
+    for (const ev of eonet.events) if (ev.point) ev.point.show = eonetOccluder.isPointVisible(ev.probe);
+    const sel = eonet.events[eonet.pick];
+    eonetLabel.show = !!(sel && sel.point && sel.point.show);
+  });
+  // Latest position of a geometry: a Point, or the mean of a Polygon's outer ring (unwrapped across the antimeridian).
+  function eonetPoint(g) {
+    if (!g || !Array.isArray(g.coordinates)) return null;
+    let p = null;
+    if (g.type === 'Point') p = g.coordinates;
+    else if (g.type === 'Polygon' && Array.isArray(g.coordinates[0])) {
+      const ring = g.coordinates[0].filter((c) => Array.isArray(c) && Number.isFinite(c[0]) && Number.isFinite(c[1]));
+      if (ring.length > 1 && ring[0][0] === ring[ring.length - 1][0] && ring[0][1] === ring[ring.length - 1][1]) ring.pop();
+      if (ring.length) {
+        const wrap = Math.max(...ring.map((c) => c[0])) - Math.min(...ring.map((c) => c[0])) > 180;
+        let lon = ring.reduce((s, c) => s + (wrap && c[0] < 0 ? c[0] + 360 : c[0]), 0) / ring.length;
+        if (lon > 180) lon -= 360;
+        p = [lon, ring.reduce((s, c) => s + c[1], 0) / ring.length];
+      }
+    }
+    if (!p || !Number.isFinite(p[0]) || !Number.isFinite(p[1]) || Math.abs(p[1]) > 90 || Math.abs(p[0]) > 180) return null;
+    return [p[0], p[1]];
+  }
+  function parseEonet(data) {
+    if (!data || !Array.isArray(data.events)) throw new Error('format');
+    const out = [];
+    for (const ev of data.events.slice(0, 3000)) {
+      if (!ev || typeof ev !== 'object') continue;
+      const geo = (Array.isArray(ev.geometry) ? ev.geometry : [])
+        .map((g) => ({ g, t: Date.parse(g && g.date) })).filter((x) => Number.isFinite(x.t)).sort((a, b) => b.t - a.t);
+      let pos = null, t = 0;
+      for (const x of geo) { pos = eonetPoint(x.g); if (pos) { t = x.t; break; } }
+      if (!pos) continue;
+      const cat = (Array.isArray(ev.categories) && ev.categories[0]) || {};
+      const catId = typeof cat.id === 'string' ? cat.id : '';
+      const src = (Array.isArray(ev.sources) ? ev.sources : []).find((s) => s && safeHttps(s.url));
+      out.push({
+        id: String(ev.id ?? `${pos[1]},${pos[0]}`).slice(0, 60),
+        title: (typeof ev.title === 'string' ? ev.title.replace(/\s+/g, ' ').trim() : '').slice(0, 160) || 'Sans titre',
+        cat: catId, info: EONET_CATS[catId] || OTHER_CAT,
+        lon: pos[0], lat: pos[1], t,
+        source: src ? { id: String(src.id || '').slice(0, 40), url: safeHttps(src.url) } : null,
+      });
+    }
+    return out.sort((a, b) => b.t - a.t);
+  }
+  // EONET often gives a day without an hour (00:00 UTC): show the hour only when there is one.
+  function eonetDate(t, long) {
+    const d = new Date(t), opts = { day: 'numeric', month: 'short', timeZone: 'UTC' };
+    if (!long) return d.toLocaleDateString('fr-FR', opts);
+    const day = d.toLocaleDateString('fr-FR', { ...opts, year: 'numeric' });
+    return d.getUTCHours() || d.getUTCMinutes() ? `${day}, ${d.toISOString().slice(11, 16)} UTC` : `${day} (date UTC)`;
+  }
+  async function loadEonet() {
+    let events;
+    try { events = parseEonet(await fetchJson(EONET_URL, 15000)); }
+    catch (e) {
+      eonet.events = []; feeds.eonet.last = 0; eonetPoints.removeAll();
+      dataUnavailable('eonet', 'Événements naturels : NASA EONET indisponible (réseau ou réponse illisible), couche désactivée.');
+      return;
+    }
+    const keep = eonet.events[eonet.pick] && eonet.events[eonet.pick].id;
+    if (!eonet.first) {
+      const fresh = events.filter((ev) => !eonet.seen.has(ev.id)).slice(0, 3);
+      fresh.forEach((ev) => journal(`Nouvel événement : ${ev.info.fr} · ${ev.title}`));
+    }
+    events.forEach((ev) => eonet.seen.add(ev.id));
+    eonet.first = false;
+    eonet.events = events; feeds.eonet.last = Date.now();
+    if (veille.eonet) renderEonet(keep);
+  }
+  function renderEonet(keepId) {
+    eonetPoints.removeAll(); eonet.pick = -1; eonetLabel.show = false;
+    const counts = new Map();
+    eonet.events.forEach((ev, i) => {
+      ev.point = eonetPoints.add({
+        position: C.Cartesian3.fromDegrees(ev.lon, ev.lat, 0), pixelSize: 8, color: C.Color.fromCssColorString(ev.info.color),
+        outlineColor: C.Color.fromCssColorString('#04060B').withAlpha(0.8), outlineWidth: 1.5,
+        scaleByDistance: new C.NearFarScalar(2e5, 1.3, 2e7, 0.8), disableDepthTestDistance: Number.POSITIVE_INFINITY,
+        id: { eonetIndex: i },
+      });
+      ev.probe = C.Cartesian3.fromDegrees(ev.lon, ev.lat, 3000);
+      counts.set(ev.info, (counts.get(ev.info) || 0) + 1);
+    });
+    const top = [...counts].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([info, n]) => `${n} ${info.pl}`);
+    const n = eonet.events.length;
+    statusLines.eonet = `Événements naturels : ${n} en cours (30 j)${top.length ? ` · ${top.join(' · ')}` : ''} · NASA EONET, ${fmtUTC(new Date(feeds.eonet.last))}`;
+    renderStatus();
+    $('eonet-pick').replaceChildren();
+    renderEonetList();
+    const again = eonet.events.findIndex((ev) => ev.id === keepId);
+    if (again >= 0) selectEvent(again, false);
+  }
+  function renderEonetList() {
+    const ul = $('eonet-list'), more = $('eonet-more');
+    ul.replaceChildren();
+    eonet.events.slice(0, eonet.shown).forEach((ev, i) => {
+      const li = document.createElement('li'), b = document.createElement('button');
+      b.type = 'button'; b.dataset.index = String(i);
+      b.setAttribute('aria-current', String(i === eonet.pick));
+      const dot = document.createElement('span'); dot.className = 'dot'; dot.style.setProperty('--c', ev.info.color);
+      const what = document.createElement('span'); what.className = 'what';
+      const title = document.createElement('span'); title.textContent = ev.title;
+      const cat = document.createElement('small'); cat.textContent = ev.info.fr;
+      what.append(title, cat);
+      const when = document.createElement('span'); when.className = 'when'; when.textContent = eonetDate(ev.t);
+      b.append(dot, what, when);
+      b.addEventListener('click', () => selectEvent(i, true));
+      li.append(b); ul.append(li);
+    });
+    const rest = eonet.events.length - eonet.shown;
+    more.hidden = rest <= 0;
+    more.textContent = rest > 0 ? `Voir plus (${rest} autre${rest > 1 ? 's' : ''})` : '';
+    if (!eonet.events.length) {
+      const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Aucun événement en cours signalé.'; ul.append(li);
+    }
+  }
+  $('eonet-more').addEventListener('click', () => { eonet.shown += 8; renderEonetList(); });
+  function selectEvent(i, fly) {
+    const ev = eonet.events[i];
+    if (!ev) return;
+    const prev = eonet.events[eonet.pick];
+    if (prev && prev.point) { prev.point.pixelSize = 8; prev.point.outlineColor = C.Color.fromCssColorString('#04060B').withAlpha(0.8); prev.point.outlineWidth = 1.5; }
+    eonet.pick = i;
+    ev.point.pixelSize = 14; ev.point.outlineColor = C.Color.WHITE; ev.point.outlineWidth = 2;
+    const short = ev.title.length > 46 ? `${ev.title.slice(0, 45)}…` : ev.title;
+    eonetLabel.text = `${ev.info.fr} · ${short}`; eonetLabel.position = ev.point.position;
+    $('eonet-list').querySelectorAll('button').forEach((b) => b.setAttribute('aria-current', String(b.dataset.index === String(i))));
+    const line = $('eonet-pick');
+    line.replaceChildren(document.createTextNode(`${ev.info.fr} · ${ev.title}\n${eonetDate(ev.t, true)} · ${fmtCoord(ev.lat, ev.lon)}\n`));
+    if (ev.source) {
+      const a = document.createElement('a');
+      a.href = ev.source.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.textContent = `Source : ${ev.source.id || new URL(ev.source.url).hostname} ↗`;
+      line.append(a);
+    } else line.append(document.createTextNode('Source : catalogue NASA EONET'));
+    if (fly) flyToPoint(ev.lat, ev.lon, ev.info.range);
+  }
+  pickHandlers.push((picked) => {
+    const i = picked && picked.id && picked.id.eonetIndex;
+    if (i === undefined || !veille.eonet) return false;
+    selectEvent(i, true);
+    return true;
+  });
+
+  // Aurora forecast (NOAA SWPC OVATION, about 30 minutes ahead): the probability of visible aurora on a 1° grid,
+  // painted green into a 360 × 181 image laid over the globe. Mostly drawn on the night side (dayAlpha), brightened
+  // because Cesium keeps only 30 % of the colours there. Numeric alpha only (see the GIBS layers above).
+  const aurora = { layer: null, forecast: 0, observed: 0, max: 0 };
+  function buildAurora(data) {
+    const rows = data && data.coordinates;
+    const forecast = Date.parse(data && data['Forecast Time']), observed = Date.parse(data && data['Observation Time']);
+    if (!Array.isArray(rows) || rows.length < 1000 || !Number.isFinite(forecast)) throw new Error('format');
+    const cv = document.createElement('canvas'); cv.width = 360; cv.height = 181;
+    const ctx = cv.getContext('2d'), img = ctx.createImageData(360, 181), px = img.data;
+    let max = 0, n = 0;
+    for (const r of rows) {
+      if (!Array.isArray(r)) continue;
+      const lon = Math.round(r[0]), lat = Math.round(r[1]), v = r[2];
+      if (!Number.isFinite(lon) || !Number.isFinite(lat) || !Number.isFinite(v) || lat < -90 || lat > 90) continue;
+      n++;
+      if (v > max) max = v;
+      if (v < 5) continue;
+      const x = (((lon + 180) % 360) + 360) % 360, k = ((90 - lat) * 360 + x) * 4;   // column 0 = 180° W, row 0 = 90° N
+      px[k] = 70; px[k + 1] = 255; px[k + 2] = 150; px[k + 3] = Math.round(Math.min(1, v / 40) * 255);
+    }
+    if (n < 1000) throw new Error('format');
+    ctx.putImageData(img, 0, 0);
+    return { url: cv.toDataURL('image/png'), forecast, observed, max: Math.min(100, Math.round(max)) };
+  }
+  function dropAurora() {
+    if (aurora.layer) viewer.imageryLayers.remove(aurora.layer, true);
+    aurora.layer = null;
+  }
+  function auroraStatus() {
+    statusLines.aurora = `Aurores : prévision NOAA SWPC (modèle OVATION) pour ${fmtUTC(new Date(aurora.forecast))}`
+      + ` · probabilité maximale ${aurora.max} %`
+      + (Number.isFinite(aurora.observed) ? ` · vent solaire mesuré à ${fmtUTC(new Date(aurora.observed))}` : '');
+    renderStatus();
+  }
+  async function loadAurora() {
+    let built;
+    try {
+      built = buildAurora(await fetchJson(OVATION_URL, 15000));
+      if (Date.now() - built.forecast > 2 * 3600e3) throw new Error('stale');
+    } catch (e) {
+      feeds.aurora.last = 0; dropAurora();
+      dataUnavailable('aurora', e.message === 'stale'
+        ? 'Aurores : la dernière prévision NOAA date de plus de 2 h, couche désactivée.'
+        : 'Aurores : prévision NOAA indisponible (réseau ou réponse illisible), couche désactivée.');
+      return;
+    }
+    const layers = viewer.imageryLayers;
+    const provider = new C.SingleTileImageryProvider({ url: built.url, tileWidth: 360, tileHeight: 181,
+      rectangle: C.Rectangle.fromDegrees(-180, -90, 180, 90), credit: new C.Credit('Aurores : NOAA SWPC (OVATION)') });
+    const under = layers.indexOf(labels);
+    const layer = layers.addImageryProvider(provider, under >= 0 ? under : undefined);   // under the place names
+    Object.assign(layer, { alpha: 0.9, dayAlpha: 0.15, nightAlpha: 1.0, brightness: 3.0, show: veille.aurora });
+    dropAurora();
+    Object.assign(aurora, { layer, forecast: built.forecast, observed: built.observed, max: built.max });
+    feeds.aurora.last = Date.now();
+    if (veille.aurora) auroraStatus();
+  }
+
+  // Active fires: thermal anomalies seen by VIIRS on NOAA-20 (375 m) over the previous UTC day, from NASA FIRMS through
+  // GIBS. In GIBS WMTS these layers exist only as vector tiles; the GIBS WMS renders them as transparent PNG images, so
+  // the layer asks WMS for 256 px Web Mercator tiles. Same safety as addGibsLayer: off after repeated tile errors.
+  const FIRES_LAYER = 'VIIRS_NOAA20_Thermal_Anomalies_375m_All';
+  const dayBefore = () => new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+  let firesDay = dayBefore();
+  function makeFiresLayer() {
+    const provider = new C.WebMapServiceImageryProvider({
+      url: 'https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi',
+      layers: FIRES_LAYER,
+      parameters: { transparent: true, format: 'image/png', time: firesDay },
+      tilingScheme: new C.WebMercatorTilingScheme(), tileWidth: 256, tileHeight: 256, maximumLevel: 9,
+      enablePickFeatures: false,              // no GetFeatureInfo requests when the globe is touched
+      credit: new C.Credit('Feux actifs : NASA FIRMS / GIBS (VIIRS NOAA-20)'),
+    });
+    let errors = 0;
+    provider.errorEvent.addEventListener((e) => { e.retry = false; if (++errors === 12) gibsUnavailable('fires'); });
+    const under = viewer.imageryLayers.indexOf(labels);
+    const layer = viewer.imageryLayers.addImageryProvider(provider, under >= 0 ? under : undefined);   // under the place names
+    // Brighter: Cesium keeps only 30 % of the colours on the night side, where fires matter too.
+    Object.assign(layer, { show: false, brightness: 2.0 });
+    return layer;
+  }
+  let fires = makeFiresLayer();
+  // A NASA layer that switched itself off is built again on the next switch-on (fresh error count, fresh tiles).
+  function freshGibs(name, layer, make, force) {
+    if (!force && !gibsFailed.has(name)) return layer;
+    gibsFailed.delete(name);
+    viewer.imageryLayers.remove(layer, true);
+    return make();
+  }
+
+  // Weather on the place card (Open-Meteo, CC BY 4.0): conditions now, sunrise and sunset in local time. Cached per
+  // place for 15 minutes; a failed or outdated answer shows a short note, never older data presented as current.
+  const WMO_FR = { 0: 'ciel dégagé', 1: 'ciel peu nuageux', 2: 'partiellement nuageux', 3: 'ciel couvert', 45: 'brouillard',
+    48: 'brouillard givrant', 51: 'bruine légère', 53: 'bruine', 55: 'bruine dense', 56: 'bruine verglaçante',
+    57: 'forte bruine verglaçante', 61: 'pluie faible', 63: 'pluie', 65: 'forte pluie', 66: 'pluie verglaçante',
+    67: 'forte pluie verglaçante', 71: 'neige faible', 73: 'neige', 75: 'forte neige', 77: 'grains de neige',
+    80: 'averses faibles', 81: 'averses', 82: 'violentes averses', 85: 'averses de neige', 86: 'fortes averses de neige',
+    95: 'orage', 96: 'orage avec grêle', 99: 'orage avec forte grêle' };
+  const COMPASS_FR = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSO', 'SO', 'OSO', 'O', 'ONO', 'NO', 'NNO'];
+  const WEATHER_TTL = 15 * 60000;
+  const weatherCache = new Map();
+  let weatherToken = 0;
+  const weatherUrl = (p) => `https://api.open-meteo.com/v1/forecast?latitude=${p.lat.toFixed(4)}&longitude=${p.lon.toFixed(4)}`
+    + '&current=temperature_2m,wind_speed_10m,wind_direction_10m,weather_code,cloud_cover,is_day&daily=sunrise,sunset&timezone=auto&forecast_days=1';
+  function parseWeather(d) {
+    const c = d && d.current, u = (d && d.current_units) || {};
+    if (!c || typeof c.time !== 'string' || ![c.temperature_2m, c.wind_speed_10m, c.weather_code].every(Number.isFinite)) throw new Error('format');
+    if ((u.temperature_2m && u.temperature_2m !== '°C') || (u.wind_speed_10m && u.wind_speed_10m !== 'km/h')) throw new Error('units');
+    // `current.time` is local time at the place: back to UTC with the offset, then refuse anything not from about now.
+    const at = Date.parse(`${c.time}Z`) - (Number.isFinite(d.utc_offset_seconds) ? d.utc_offset_seconds : 0) * 1000;
+    if (!Number.isFinite(at) || Math.abs(Date.now() - at) > 3 * 3600e3) throw new Error('stale');
+    const hm = (s) => (typeof s === 'string' && /T\d\d:\d\d/.test(s) ? s.slice(s.indexOf('T') + 1, s.indexOf('T') + 6) : '');
+    const daily = d.daily || {};
+    const sky = WMO_FR[c.weather_code] || (Number.isFinite(c.cloud_cover) ? `nuages ${Math.round(c.cloud_cover)} %` : '');
+    const wind = Number.isFinite(c.wind_direction_10m) ? ` ${COMPASS_FR[Math.round(((c.wind_direction_10m % 360) + 360) % 360 / 22.5) % 16]}` : '';
+    const rise = hm(Array.isArray(daily.sunrise) && daily.sunrise[0]), set = hm(Array.isArray(daily.sunset) && daily.sunset[0]);
+    return {
+      now: `Maintenant : ${Math.round(c.temperature_2m)} °C${sky ? ` · ${sky}` : ''} · vent ${Math.round(c.wind_speed_10m)} km/h${wind}`,
+      sun: (rise && set ? ` · lever ${rise} · coucher ${set} (heure locale)` : '') + ' · Open-Meteo',
+    };
+  }
+  function paintWeather(w) {
+    const now = document.createElement('span'), sun = document.createElement('span');
+    now.textContent = w.now; sun.className = 'w-sun'; sun.textContent = w.sun;
+    $('card-weather').replaceChildren(now, sun);
+  }
+  function showWeather(p) {
+    const el = $('card-weather'), token = ++weatherToken;
+    el.replaceChildren();
+    el.title = 'Météo : Open-Meteo.com (CC BY 4.0), modèles des services météorologiques nationaux';
+    const hit = weatherCache.get(p.id);
+    if (hit && Date.now() - hit.t < WEATHER_TTL) { paintWeather(hit.w); return; }
+    weatherCache.delete(p.id);
+    fetchJson(weatherUrl(p), 9000).then(parseWeather).then((w) => {
+      weatherCache.set(p.id, { t: Date.now(), w });
+      if (token === weatherToken) paintWeather(w);
+    }).catch(() => {
+      if (token !== weatherToken) return;
+      const note = document.createElement('span'); note.className = 'w-note'; note.textContent = 'Météo du moment indisponible.';
+      el.replaceChildren(note);
+    });
+  }
+  // The weather belongs to the place card that asked for it: when the card goes away (a flight, a night or dive view),
+  // clear it, and drop an answer still on its way.
+  new MutationObserver(() => {
+    if ($('card').classList.contains('show')) return;
+    ++weatherToken; $('card-weather').replaceChildren();
+  }).observe($('card'), { attributes: true, attributeFilter: ['class'] });
+
+  // Exposed for automated tests only.
+  window.__fatiha_data = {
+    get events() { return eonet.events.map(({ id, title, cat, lat, lon, t }) => ({ id, title, cat, lat, lon, t })); },
+    get pick() { return eonet.pick; },
+    get pointsShown() { return eonet.events.filter((ev) => ev.point && ev.point.show).length; },
+    get aurora() { return { on: !!(aurora.layer && aurora.layer.show), forecast: aurora.forecast, max: aurora.max, index: aurora.layer ? viewer.imageryLayers.indexOf(aurora.layer) : -1 }; },
+    get fires() { return { show: fires.show, day: firesDay, index: viewer.imageryLayers.indexOf(fires), url: fires.imageryProvider.url, labels: viewer.imageryLayers.indexOf(labels) }; },
+    get rain() { return { show: rain.show, alpha: rain.alpha, index: viewer.imageryLayers.indexOf(rain), lights: viewer.imageryLayers.indexOf(nightLights) }; },
+    get timers() { return Object.fromEntries(Object.entries(feeds).map(([k, f]) => [k, !!f.timer])); },
+    get weatherCache() { return [...weatherCache.keys()]; },
+    feeds, selectEvent, eonetPosition: (i) => eonet.events[i] && eonet.events[i].point && eonet.events[i].point.position,
+  };
+
   function setLive(on) {
     if (on) {
       clock.currentTime = C.JulianDate.now();
@@ -2115,8 +2961,41 @@
     clouds(on) { realEarth.show = on; },
     lights(on) { nightLights.show = on; },
     rain(on) {
+      if (on) rain = freshGibs('rain', rain, makeRainLayer);
       rain.show = on;
       statusLines.rain = on ? 'Précipitations : NASA GIBS / IMERG (dernier relevé disponible)' : '';
+      renderStatus();
+    },
+    eonet(on) {
+      $('eonet-box').hidden = !on;
+      eonetPoints.show = on; eonetLabels.show = on;
+      eonet.shown = 8;
+      if (on) {
+        if (feedFresh('eonet')) renderEonet();
+        else { statusLines.eonet = 'Événements naturels : chargement (NASA EONET)…'; renderStatus(); }
+      } else {
+        eonetPoints.removeAll(); eonet.pick = -1; eonetLabel.show = false;
+        $('eonet-list').replaceChildren(); $('eonet-pick').replaceChildren(); $('eonet-more').hidden = true;
+        statusLines.eonet = ''; renderStatus();
+      }
+      scheduleFeed('eonet');
+    },
+    aurora(on) {
+      $('aurora-box').hidden = !on;
+      if (on && feedFresh('aurora') && aurora.layer) { aurora.layer.show = true; auroraStatus(); }
+      else if (on) { statusLines.aurora = 'Aurores : chargement de la prévision (NOAA SWPC)…'; renderStatus(); }
+      else { if (aurora.layer) aurora.layer.show = false; statusLines.aurora = ''; renderStatus(); }
+      scheduleFeed('aurora');
+    },
+    fires(on) {
+      $('fires-box').hidden = !on;
+      if (on) {
+        const newDay = firesDay !== dayBefore();      // the page stayed open past midnight UTC: ask for the new day
+        firesDay = dayBefore();
+        fires = freshGibs('fires', fires, makeFiresLayer, newDay);
+      }
+      fires.show = on;
+      statusLines.fires = on ? `Feux actifs : points chauds VIIRS (NOAA-20) du ${firesDay} (UTC) · NASA FIRMS via GIBS` : '';
       renderStatus();
     },
     live: setLive,
@@ -2332,23 +3211,27 @@
     } else {
       clearInterval(warTimer); warTimer = 0; stopPreviews();
       // The big TV player lives in the sheet and has no control elsewhere: closing the sheet stops it. A radio keeps
-      // playing, with its stop button in the HUD.
+      // playing, with its stop button in the HUD. The camera player and the camera points go with the sheet too.
       if (!$('tv-stage').hidden) { stopMedia(false); say('tv-status', ''); }
+      closeCamStage(); syncCamPoints();
     }
   }
   $('btn-live').addEventListener('click', () => setLiveOpen(!liveOpen));
   function setTab(tab) {
     live.tab = tab;
     liveEl.querySelectorAll('[data-tab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.tab === tab)));
-    ['radio', 'tv', 'cam', 'war'].forEach((t) => $(`pane-${t}`).classList.toggle('on', t === tab));
+    ['radio', 'tv', 'music', 'cam', 'war'].forEach((t) => $(`pane-${t}`).classList.toggle('on', t === tab));
+    if (tab !== 'cam') closeCamStage();
     loadTab();
   }
   liveEl.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
   function loadTab() {
     clearInterval(warTimer); warTimer = 0;
     if (live.tab !== 'tv') stopPreviews();
+    syncCamPoints();
     if (!liveOpen) return;
     if (live.tab === 'cam') { renderCam(); return; }
+    if (live.tab === 'music') { renderMusic(); return; }
     if (live.tab === 'war') {
       if (live.loaded.war !== (live.cc || '*')) loadWar();
       warTimer = setInterval(() => { if (!document.hidden) loadWar(); }, 300000);
@@ -2372,6 +3255,7 @@
     stopPreviews();
     fillList($('radio-list'), [], () => null); fillList($('tv-list'), [], () => null); fillList($('war-list'), [], () => null);
     say('radio-status', ''); say('tv-status', ''); say('war-status', '');
+    resetCams(); musicCountryChanged();
     updateHint(where && where.note);
     if (liveOpen) loadTab();
   }
@@ -2583,24 +3467,30 @@
       return;
     }
     if (token !== radioToken) return;
+    const stations = toStations(rows, 24);
+    live.loaded.radio = cc;
+    say('radio-status', stations.length ? `${nameFr(cc)} : ${stations.length} radios, les plus écoutées d’abord.` : `${nameFr(cc)} : aucune radio sécurisée listée.`);
+    fillList($('radio-list'), stations, (st) => stationTile(st, 'radio-status'));
+  }
+  // Directory rows -> playable stations (secure streams, one per name), in the order given.
+  function toStations(rows, max) {
     const seen = new Set(), stations = [];
     for (const s of Array.isArray(rows) ? rows : []) {
       const url = s && (s.url_resolved || s.url), name = s && typeof s.name === 'string' ? s.name.trim() : '';
       if (!name || !okStream(url) || seen.has(name.toLowerCase())) continue;
       seen.add(name.toLowerCase());
       stations.push({ name, url, logo: s.favicon || '', hls: s.hls === 1 || /\.m3u8(\?|$)/i.test(url), sub: [s.codec, s.bitrate ? `${s.bitrate} kb/s` : '', (s.tags || '').split(',').slice(0, 2).join(', ')].filter(Boolean).join(' · ') });
-      if (stations.length >= 24) break;
+      if (stations.length >= max) break;
     }
-    live.loaded.radio = cc;
-    say('radio-status', stations.length ? `${nameFr(cc)} : ${stations.length} radios, les plus écoutées d’abord.` : `${nameFr(cc)} : aucune radio sécurisée listée.`);
-    fillList($('radio-list'), stations, (st) => {
-      const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`);
-      tile.addEventListener('click', () => {
-        if (tile.classList.contains('playing')) { stopMedia(); say('radio-status', 'Radio arrêtée.'); }
-        else playMedia('radio', st, 'radio-status', tile);
-      });
-      return tile;
+    return stations;
+  }
+  function stationTile(st, statusId) {
+    const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`);
+    tile.addEventListener('click', () => {
+      if (tile.classList.contains('playing')) { stopMedia(); say(statusId, 'Radio arrêtée.'); }
+      else playMedia('radio', st, statusId, tile);
     });
+    return tile;
   }
 
   // ----- Free TV: iptv-org playlists (community lists of free, publicly available streams) -----
@@ -2651,8 +3541,99 @@
     });
   }
 
-  // ----- Public webcams: links only -----
-  function renderCam() {
+  // ----- Public webcams: city cameras published by their owners (no key), Windy (optional key), links -----
+  // CITY_CAMS: public cameras of public places, put online by their owners (tourism offices, cities, broadcasters,
+  // webcam networks, official YouTube live channels), shown in their own embedded players. Checked by hand when
+  // added: see `source` for each one. A camera can go offline or be replaced by a replay; nothing is scraped.
+  // Format: { id, city, cc, lat, lon, title, provider, kind: 'youtube'|'iframe', embed (https iframe URL), source, thumb? }
+  const CITY_CAMS = [
+    /*CITY_CAMS_START*/
+    { id: 'demo-paris', city: 'Paris', cc: 'FR', lat: 48.8584, lon: 2.2945, title: 'EXEMPLE Tour Eiffel', provider: 'EXEMPLE', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/live_stream?channel=UCdemo000000000000000001&autoplay=1&playsinline=1', source: 'https://www.youtube.com/', thumb: 'https://i.ytimg.com/vi/demo/hqdefault.jpg' },
+    { id: 'demo-marseille', city: 'Marseille', cc: 'FR', lat: 43.2951, lon: 5.3745, title: 'EXEMPLE Vieux-Port', provider: 'EXEMPLE', kind: 'iframe', embed: 'https://www.skylinewebcams.com/demo-embed.html', source: 'https://www.skylinewebcams.com/' },
+    { id: 'demo-lisboa', city: 'Lisbonne', cc: 'PT', lat: 38.7078, lon: -9.1366, title: 'EXEMPLE Praça do Comércio', provider: 'EXEMPLE', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/demo00000ab?autoplay=1&playsinline=1', source: 'https://www.youtube.com/' },
+    /*CITY_CAMS_END*/
+  ];
+  const isHttps = (u) => { try { return new URL(u).protocol === 'https:'; } catch (e) { return false; } };
+  const onHost = (u, hosts) => { try { const x = new URL(u); return x.protocol === 'https:' && hosts.some((h) => x.hostname === h || x.hostname.endsWith(`.${h}`)); } catch (e) { return false; } };
+  const YT_HOSTS = ['youtube-nocookie.com', 'youtube.com'];
+  // Keep only well-formed entries: https everywhere, YouTube players from YouTube's own embed hosts.
+  const cityCams = CITY_CAMS.filter((c) => c && typeof c.id === 'string' && typeof c.title === 'string' && typeof c.city === 'string'
+    && Number.isFinite(c.lat) && Number.isFinite(c.lon) && Math.abs(c.lat) <= 90 && Math.abs(c.lon) <= 180
+    && (c.kind === 'youtube' ? onHost(c.embed, YT_HOSTS) : c.kind === 'iframe' && isHttps(c.embed)) && isHttps(c.source))
+    .map((c) => ({ ...c, cc: /^[A-Z]{2}$/.test(c.cc || '') ? c.cc : '', thumb: okImage(c.thumb) ? c.thumb : '', provider: c.provider || '', detail: c.source, player: c.embed }));
+
+  // Windy Webcams API v3: dormant unless a visitor brings a key. None is in the code: ?wkey=… in the address is
+  // validated, kept in this browser only and removed from the address bar; ?wkey=off forgets it (as for the Google
+  // key). The key goes in a header to api.windy.com only. Free-plan image addresses expire after a few minutes, so
+  // the list is fetched again when the tab is reopened after 8 minutes. No key was available during development:
+  // tested against simulated answers in the documented v3 format only.
+  const WINDY_KEY = '';
+  const WINDY_API = 'https://api.windy.com/webcams/api/v3/webcams';
+  const CAM_TTL = 8 * 60 * 1000, CAM_RADIUS_KM = 120, CAM_MAX = 60;
+  function readWindyKey() {
+    const valid = (k) => (/^[A-Za-z0-9_-]{16,80}$/.test(k || '') ? k : '');
+    let fromUrl = '', stored = '';
+    try {
+      const params = new URLSearchParams(location.search);
+      if (params.has('wkey')) {
+        fromUrl = params.get('wkey');
+        params.delete('wkey');
+        const qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+      }
+    } catch (e) { /* no history API: the key just stays in the address */ }
+    try {
+      if (fromUrl === 'off') localStorage.removeItem('nour.wkey');
+      else if (valid(fromUrl)) localStorage.setItem('nour.wkey', fromUrl);
+      stored = localStorage.getItem('nour.wkey') || '';
+    } catch (e) { /* storage blocked: a key from the address is used for this visit only */ }
+    return valid(WINDY_KEY) || (fromUrl === 'off' ? '' : valid(fromUrl) || valid(stored));
+  }
+  const windyKey = readWindyKey();
+  const cam = { list: [], key: '', at: 0, token: 0, open: null };
+  // Points on the globe while the Cameras tab is open: every city camera, plus Windy's when a key is set.
+  const cityPoints = scene.primitives.add(new C.PointPrimitiveCollection());
+  const windyPoints = scene.primitives.add(new C.PointPrimitiveCollection());
+  const camOccluder = new C.EllipsoidalOccluder(C.Ellipsoid.WGS84, camera.positionWC);
+  const CAM_COLOR = C.Color.fromCssColorString('#9FD3FF'), CAM_OUTLINE = C.Color.fromCssColorString('#04060B');
+  const camPointStyle = { pixelSize: 8, color: CAM_COLOR, outlineColor: CAM_OUTLINE, outlineWidth: 2,
+    disableDepthTestDistance: Number.POSITIVE_INFINITY, scaleByDistance: new C.NearFarScalar(5e4, 1.3, 2e7, 0.7) };
+  cityPoints.show = false; windyPoints.show = false;
+  cityCams.forEach((c, i) => { c.point = cityPoints.add({ ...camPointStyle, position: C.Cartesian3.fromDegrees(c.lon, c.lat, 30), id: { cityCam: i } }); });
+  // windy.com or one of its subdomains, https only (the player in the frame, the camera's page).
+  const onWindy = (u) => onHost(u, ['windy.com']);
+  // v3 gives the player addresses as strings; older answers wrapped them as { embed, link }.
+  const playerUrl = (v) => (typeof v === 'string' ? v : v && typeof v === 'object' ? (v.embed || v.link || '') : '');
+  const str = (v) => (typeof v === 'string' ? v.trim() : '');
+  async function windyFetch(query, ms = 12000) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(`${WINDY_API}?${query}&limit=50&include=images,location,player,urls`, {
+        signal: ctl.signal, credentials: 'omit', referrerPolicy: 'no-referrer', headers: { 'x-windy-api-key': windyKey } });
+      if (!r.ok) { const e = new Error(`HTTP ${r.status}`); e.status = r.status; throw e; }
+      return await r.json();
+    } finally { clearTimeout(t); }
+  }
+  function parseCams(data) {
+    const out = [];
+    for (const w of data && Array.isArray(data.webcams) ? data.webcams : []) {
+      if (!w || (w.status && w.status !== 'active')) continue;
+      const id = String(w.webcamId != null ? w.webcamId : '');
+      if (!/^\d{1,15}$/.test(id)) continue;
+      const loc = w.location || {}, img = w.images || {}, cur = img.current || {}, day = img.daylight || {}, pl = w.player || {};
+      const lat = Number(loc.latitude), lon = Number(loc.longitude);
+      const live = playerUrl(pl.live), player = [live, playerUrl(pl.day)].find(onWindy) || '';
+      out.push({
+        id, kind: 'windy', title: str(w.title) || 'Webcam', city: str(loc.city), region: str(loc.region), provider: 'windy.com',
+        lat: Number.isFinite(lat) && Math.abs(lat) <= 90 ? lat : null, lon: Number.isFinite(lon) && Math.abs(lon) <= 180 ? lon : null,
+        thumb: [cur.preview, cur.thumbnail, day.preview, day.thumbnail].find(okImage) || '',
+        player, live: !!player && player === live,
+        detail: w.urls && onWindy(w.urls.detail) ? w.urls.detail : `https://www.windy.com/webcams/${id}`,
+      });
+    }
+    return out;
+  }
+  function renderCamLinks() {
     const name = live.label || (live.cc ? nameFr(live.cc) : '');
     const links = [];
     if (live.lat != null) links.push(['Carte Windy des webcams autour de ce point', 'fond cartographique avec les webcams publiques', `https://www.windy.com/-Webcams-webcams?${live.lat.toFixed(3)},${live.lon.toFixed(3)},9`]);
@@ -2666,6 +3647,253 @@
       a.append(t, s); li.appendChild(a); ul.appendChild(li);
     });
   }
+  function camTile(c) {
+    const tile = makeTile(c.title, c.thumb, c.city || 'Webcam', `${c.title}${c.city ? `, ${c.city}` : ''}${c.provider ? ` (${c.provider})` : ''} : voir la caméra ici`);
+    tile.classList.add('cam'); tile._cam = c;
+    const nm = tile.querySelector('.name'), t = document.createElement('span'), p = document.createElement('span');
+    t.className = 't'; t.textContent = c.title; p.className = 'p'; p.textContent = c.provider;
+    nm.replaceChildren(t, p);
+    tile.addEventListener('click', () => openCam(c, true));
+    return tile;
+  }
+  // The chosen country first, then the rest of the world, nearest first when a point is known.
+  function renderCityCams() {
+    const here = live.cc ? cityCams.filter((c) => c.cc === live.cc) : [];
+    let world = cityCams.filter((c) => !here.includes(c));
+    if (live.lat != null) {
+      const p = C.Cartesian3.fromDegrees(live.lon, live.lat), d = (c) => C.Cartesian3.distanceSquared(p, c.point.position);
+      world = world.slice().sort((a, b) => d(a) - d(b));
+    } else world = world.slice().sort((a, b) => a.city.localeCompare(b.city, 'fr'));
+    $('cam-here-title').hidden = !live.cc; $('cam-here').hidden = !here.length;
+    $('cam-here-title').textContent = live.cc ? `${nameFr(live.cc)} · ${here.length || 'aucune'} caméra${here.length > 1 ? 's' : ''}` : '';
+    fillList($('cam-here'), here, camTile);
+    $('cam-world-title').hidden = !world.length; fillList($('cam-world'), world, camTile);
+    const where = live.cc ? nameFr(live.cc) : live.label;
+    say('cam-status', !cityCams.length ? 'Aucune caméra de ville dans la sélection pour le moment.'
+      : live.cc && !here.length ? `${where} : pas encore de caméra dans cette sélection. En voici ailleurs, les plus proches d’abord. Touche un carré pour la voir ici, ou un point bleu sur le globe.`
+      : `${here.length ? `${where} : ${here.length} caméra${here.length > 1 ? 's' : ''} de ville, puis le reste du monde. ` : ''}Touche un carré pour la voir ici, ou un point bleu sur le globe.`);
+    if (cam.open) markOpenCam(cam.open);
+  }
+  function renderCam() {
+    renderCamLinks();
+    renderCityCams();
+    // Points on the ground: the relief may have loaded since the page opened.
+    cityCams.forEach((c) => { const g = globe.getHeight(C.Cartographic.fromDegrees(c.lon, c.lat)); if (Number.isFinite(g)) c.point.position = C.Cartesian3.fromDegrees(c.lon, c.lat, g + 30); });
+    $('windy-box').hidden = !windyKey;
+    if (windyKey) loadCams();
+    syncCamPoints();
+  }
+  const camKey = () => `${live.cc}|${live.lat != null ? `${live.lat.toFixed(3)},${live.lon.toFixed(3)}` : ''}`;
+  async function loadCams() {
+    const key = camKey();
+    if (cam.key === key && Date.now() - cam.at < CAM_TTL) return;
+    if (!live.cc && live.lat == null) { say('windy-status', 'Choisis un pays (liste ci-dessus ou globe) ou un lieu.'); return; }
+    const token = ++cam.token;
+    const keepOpen = cam.open && cam.open.kind === 'windy' && cam.key === key ? cam.open.id : '';
+    say('windy-status', 'Recherche des webcams…');
+    // Around the place or the touched point first, then the rest of the country.
+    const near = live.lat != null ? `nearby=${live.lat.toFixed(4)},${live.lon.toFixed(4)},${CAM_RADIUS_KM}` : '';
+    let list = [], failure = null;
+    try { if (near) list = parseCams(await windyFetch(near)); } catch (e) { failure = e; }
+    if (live.cc && list.length < 12 && !(failure && (failure.status === 401 || failure.status === 403))) {
+      try {
+        const seen = new Set(list.map((c) => c.id));
+        parseCams(await windyFetch(`countries=${encodeURIComponent(live.cc)}`)).forEach((c) => { if (!seen.has(c.id)) { seen.add(c.id); list.push(c); } });
+        failure = null;
+      } catch (e) { failure = failure || e; }
+    }
+    if (token !== cam.token) return;            // the visitor moved on while we waited
+    const where = live.label || nameFr(live.cc);
+    if (failure && !list.length) {
+      const st = failure.status;
+      say('windy-status', st === 401 || st === 403 ? 'Clé Windy refusée : vérifie-la sur api.windy.com/keys, ou ?wkey=off pour l’oublier.'
+        : st === 429 ? 'Windy : quota de la clé atteint pour le moment. Réessaie plus tard.'
+        : 'Webcams Windy indisponibles pour le moment (service injoignable ou bloqué).');
+      cam.list = []; showWindyTiles(); return;
+    }
+    cam.list = list.slice(0, CAM_MAX); cam.key = key; cam.at = Date.now();
+    say('windy-status', cam.list.length ? `${where} : ${cam.list.length} webcams publiques${near ? ' autour de ce point' : ''}${near && live.cc ? ' et dans le pays' : ''}.` : `${where} : aucune webcam publique trouvée chez Windy.`);
+    showWindyTiles();
+    if (keepOpen) { const c = cam.list.find((x) => x.id === keepOpen); if (c) openCam(c, false); else closeCamStage(); }
+  }
+  function showWindyTiles() {
+    fillList($('cam-list'), cam.list, camTile);
+    windyPoints.removeAll();
+    cam.list.forEach((c, i) => {
+      if (c.lat == null) return;
+      const ground = globe.getHeight(C.Cartographic.fromDegrees(c.lon, c.lat));
+      c.point = windyPoints.add({ ...camPointStyle, position: C.Cartesian3.fromDegrees(c.lon, c.lat, (Number.isFinite(ground) ? ground : 0) + 30), id: { windyCam: i } });
+    });
+    syncCamPoints();
+  }
+  // The points show while the Cameras tab is open. They are drawn over the relief, so the far side of the Earth hides
+  // them here instead of the depth test.
+  function syncCamPoints() {
+    const on = liveOpen && live.tab === 'cam';
+    cityPoints.show = on && cityPoints.length > 0; windyPoints.show = on && windyPoints.length > 0;
+  }
+  scene.preRender.addEventListener(() => {
+    if (!cityPoints.show && !windyPoints.show) return;
+    camOccluder.cameraPosition = camera.positionWC;
+    for (const coll of [cityPoints, windyPoints]) for (let i = 0; i < coll.length; i++) { const p = coll.get(i); p.show = camOccluder.isPointVisible(p.position); }
+  });
+  function markOpenCam(c) {
+    $('pane-cam').querySelectorAll('.tile.cam').forEach((t) => t.classList.toggle('open', !!c && t._cam === c));
+    cityCams.concat(cam.list).forEach((x) => { if (x.point) { x.point.pixelSize = x === c ? 13 : 8; x.point.color = x === c ? C.Color.WHITE : CAM_COLOR; } });
+  }
+  function openCam(c, scroll) {
+    cam.open = c;
+    const frame = $('cam-frame'); frame.replaceChildren();
+    if (c.player) {
+      // The owner's own player in a sandboxed frame. YouTube refuses to play embeds that send no referrer at all
+      // (its "error 153"), so YouTube frames get the page's origin only; other players get no referrer.
+      const f = document.createElement('iframe');
+      f.title = `Caméra : ${c.title}`;
+      f.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation');
+      f.setAttribute('allow', c.kind === 'windy' ? 'fullscreen' : 'autoplay; fullscreen; encrypted-media; picture-in-picture');
+      f.setAttribute('allowfullscreen', '');
+      f.setAttribute('referrerpolicy', c.kind === 'youtube' ? 'strict-origin' : 'no-referrer');
+      f.src = c.player; frame.appendChild(f);
+    } else if (c.thumb) {
+      const img = document.createElement('img'); img.alt = `Caméra : ${c.title}`; img.referrerPolicy = 'no-referrer'; img.src = c.thumb; frame.appendChild(img);
+    }
+    $('cam-title').textContent = c.title;
+    $('cam-where').textContent = [c.city, c.region, c.cc ? nameFr(c.cc) : ''].filter(Boolean)
+      .concat(c.kind === 'windy' ? (c.player ? (c.live ? 'direct' : 'images de la journée, en accéléré') : 'image récente (pas de lecteur)') : 'direct, quand la caméra émet')
+      .join(' · ');
+    const by = $('cam-by'); by.replaceChildren();
+    if (c.kind === 'windy') {
+      const a = document.createElement('a'); a.href = 'https://www.windy.com/'; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'windy.com';
+      by.append('Webcams provided by ', a);
+    } else by.textContent = c.provider ? `Caméra publiée par ${c.provider}` : '';
+    $('cam-detail').href = c.detail;
+    $('cam-detail').textContent = c.kind === 'windy' ? 'Page de la caméra sur windy.com ↗' : 'Page de la caméra ↗';
+    $('cam-locate').hidden = c.lat == null;
+    $('cam-stage').hidden = false;
+    markOpenCam(c);
+    if (scroll) $('cam-stage').scrollIntoView({ block: 'nearest', behavior: prefersReduced.matches ? 'auto' : 'smooth' });
+  }
+  function closeCamStage() {
+    cam.open = null;
+    $('cam-frame').replaceChildren();        // removing the frame stops the player
+    $('cam-stage').hidden = true;
+    markOpenCam(null);
+  }
+  // A new country or point: Windy's list is fetched again; the city cameras are only re-ordered.
+  function resetCams() {
+    ++cam.token; cam.key = ''; cam.at = 0;
+    if (cam.open && cam.open.kind === 'windy') closeCamStage();
+    cam.list = []; fillList($('cam-list'), [], () => null); windyPoints.removeAll(); say('windy-status', '');
+    syncCamPoints();
+  }
+  $('cam-stage-close').addEventListener('click', () => { closeCamStage(); say('cam-status', 'Caméra fermée.'); });
+  $('cam-locate').addEventListener('click', () => {
+    const c = cam.open;
+    if (!c || c.lat == null) return;
+    ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll();
+    startFlight(C.Cartesian3.fromDegrees(c.lon, c.lat, 0), { heading: 0, pitch: -50, range: 9000 }, {
+      onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Caméra'),
+      onDone: () => setPhase('Caméra'),
+    });
+  });
+  pickHandlers.push((picked) => {
+    const id = picked && picked.id;
+    if (!id || (id.cityCam === undefined && id.windyCam === undefined)) return false;
+    const c = id.cityCam !== undefined ? cityCams[id.cityCam] : cam.list[id.windyCam];
+    if (c) openCam(c, true);
+    return true;
+  });
+
+  // ----- Music: internet radios by genre (radio-browser.info tags) -----
+  // Genre squares, then the most listened stations carrying that tag, played like the radios (one at a time).
+  // Tags are given by the directory's users: results are what the community labelled, not a curated catalogue.
+  const GLYPH = {
+    space: '<circle cx="12" cy="12" r="4.2"/><ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-24 12 12)"/><path d="M19 4.5h.01M4.5 18.5h.01"/>',
+    note: '<ellipse cx="9" cy="17" rx="3.2" ry="2.3" transform="rotate(-20 9 17)"/><path d="M12 16.4V3.8l6 2.2"/>',
+    notes: '<ellipse cx="7" cy="17.5" rx="2.6" ry="1.9" transform="rotate(-20 7 17.5)"/><ellipse cx="16.4" cy="15.5" rx="2.6" ry="1.9" transform="rotate(-20 16.4 15.5)"/><path d="M9.4 17V6.6l9.4-2.2V15M9.4 9.4l9.4-2.2"/>',
+    tape: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="8.5" cy="11.5" r="2"/><circle cx="15.5" cy="11.5" r="2"/><path d="M10.5 11.5h3M7.5 18l1.3-2.6h6.4l1.3 2.6"/>',
+    star: '<rect x="6.3" y="6.3" width="11.4" height="11.4"/><rect x="6.3" y="6.3" width="11.4" height="11.4" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="2.2"/>',
+    keys: '<rect x="3" y="6" width="18" height="12" rx="1.5"/><path d="M7.5 6v12M12 6v12M16.5 6v12"/><path d="M6 6v6.5h3V6M10.5 6v6.5h3V6M15 6v6.5h3V6" fill="currentColor" stroke="none"/>',
+    drum: '<ellipse cx="12" cy="7" rx="7" ry="2.6"/><path d="M5 7v9.5c0 1.5 3.1 2.7 7 2.7s7-1.2 7-2.7V7M5 12.5c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6"/>',
+    guitar: '<circle cx="9" cy="15.4" r="4.6"/><circle cx="9" cy="15.4" r="1.4"/><path d="M12.3 12.1 19.6 4.8M17.8 3.2l3 3"/>',
+    drop: '<path d="M12 21c-3.6 0-6-2.3-6-5.6S8.6 10 12 10s6 2 6 5.4S15.6 21 12 21z"/><path d="M12 10V3.2M10 3.2h4"/><circle cx="12" cy="15.6" r="1.5"/>',
+    globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/>',
+  };
+  // Exact tags (tagExact): a substring search returned "cloud rap" for "oud". Checked against the live directory in
+  // November 2026; "oud", "gnawa", "andalusian" and "malouf" had no station at all, so they are not offered.
+  const GENRES = [
+    { id: 'ambient', name: 'Espace & ambient', tags: ['space', 'space music', 'ambient'], glyph: 'space' },
+    { id: 'classique', name: 'Classique', tags: ['classical'], glyph: 'note' },
+    { id: 'jazz', name: 'Jazz', tags: ['jazz'], glyph: 'notes' },
+    { id: 'piano', name: 'Piano', tags: ['piano'], glyph: 'keys' },
+    { id: 'lofi', name: 'Lo-fi', tags: ['lofi', 'lo-fi'], glyph: 'tape' },
+    { id: 'arabe', name: 'Musique arabe · tarab', tags: ['tarab', 'arabic music', 'arabic'], glyph: 'star' },
+    { id: 'monde', name: 'Musiques du monde', tags: ['world music'], glyph: 'drum' },
+    { id: 'flamenco', name: 'Flamenco', tags: ['flamenco'], glyph: 'guitar' },
+    { id: 'fado', name: 'Fado', tags: ['fado'], glyph: 'drop' },
+    { id: 'pays', name: 'Musique du pays', country: true, glyph: 'globe' },
+  ];
+  // "Music of the country": its stations whose tags say music (local and traditional styles first), not news or talk.
+  const LOCAL_MUSIC = /folk|tradi|ethni|world ?music|chaabi|\brai\b|gnawa|andalou|andalusian|amazigh|berb|kabyl|fado|flamenco|copla|rumba|tango|samba|forr[oó]|cumbia|ranchera|mariachi|bollywood|desi|k-?pop|j-?pop|enka|chanson|schlager|volks|rebetiko|laiko|halk|t[uü]rk|arab|khaleeji|tarab|mizrahi|klezmer|celtic|irish|bhangra|qawwali|afrobeat|highlife|bongo|kizomba|zouk|kompa|soca|reggae|calypso|salsa|bachata|merengue|vallenato|sertanejo|mpb|bossa/i;
+  const ANY_MUSIC = /music|musique|m[uú]sica|musik|muzi[kc]|muzyka|hits|pop|rock|classic|jazz|oldies|dance|blues|soul/i;
+  const NOT_MUSIC = /news|talk|sport|noticias|nachrichten|actualit|informa|politi|podcast|quran|coran|sermon|bible|predica|preaching/i;
+  const music = { genre: null, key: '', token: 0 };
+  const genreKey = (g) => (g.country ? `pays:${live.cc}` : g.id);
+  const genreName = (g) => (g.country && live.cc ? `Musique · ${nameFr(live.cc)}` : g.name);
+  fillList($('music-genres'), GENRES, (g) => {
+    const tile = makeTile(g.name, '', 'Genre', `${g.name} : radios de ce genre`);
+    tile.classList.add('genre'); tile.dataset.genre = g.id;
+    const glyph = document.createElement('span'); glyph.className = 'glyph'; glyph.setAttribute('aria-hidden', 'true');
+    glyph.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">${GLYPH[g.glyph]}</svg>`;
+    tile.querySelector('.initials').replaceWith(glyph);
+    tile.addEventListener('click', () => { music.genre = g; renderMusic(); });
+    return tile;
+  });
+  function musicCountryChanged() {
+    const g = GENRES.find((x) => x.country), tile = $('music-genres').querySelector('[data-genre="pays"]');
+    tile.querySelector('.name').textContent = genreName(g);
+    tile.setAttribute('aria-label', `${genreName(g)} : radios musicales du pays`);
+    if (music.genre && music.genre.country) {
+      ++music.token; music.key = ''; fillList($('music-list'), [], () => null);
+      if (liveOpen && live.tab === 'music') renderMusic();
+    }
+  }
+  function renderMusic() {
+    const g = music.genre;
+    $('music-genres').hidden = !!g; $('music-list').hidden = !g; $('music-head').hidden = !g;
+    if (!g) { ++music.token; say('music-status', 'Choisis un genre. Les radios se jouent une à la fois, comme dans l’onglet Radio.'); return; }
+    $('music-title').textContent = genreName(g);
+    if (g.country && !live.cc) { ++music.token; fillList($('music-list'), [], () => null); say('music-status', 'Choisis d’abord un pays (liste ci-dessus ou globe).'); return; }
+    if (music.key !== genreKey(g)) loadMusic(g);
+  }
+  async function loadMusic(g) {
+    const token = ++music.token, key = genreKey(g), cc = live.cc;
+    say('music-status', `${genreName(g)} : recherche des radios…`); fillList($('music-list'), [], () => null);
+    const secure = location.protocol === 'https:' ? '&is_https=true' : '';
+    let rows = [];
+    try {
+      if (g.country) {
+        const all = JSON.parse(await radioFetch(`/json/stations/search?countrycode=${encodeURIComponent(cc)}&hidebroken=true&order=clickcount&reverse=true&limit=150${secure}`));
+        const score = (s) => { const t = `${s.tags || ''} ${s.name || ''}`; return LOCAL_MUSIC.test(t) ? 2 : ANY_MUSIC.test(t) ? 1 : 0; };
+        rows = (Array.isArray(all) ? all : []).filter((s) => s && !NOT_MUSIC.test(`${s.tags || ''} ${s.name || ''}`) && score(s) > 0)
+          .map((s, i) => ({ s, i, k: score(s) })).sort((a, b) => (b.k - a.k) || (a.i - b.i)).map((x) => x.s);
+      } else {
+        const lists = await Promise.allSettled(g.tags.map((tag) => radioFetch(`/json/stations/search?tag=${encodeURIComponent(tag)}&tagExact=true&hidebroken=true&order=clickcount&reverse=true&limit=40${secure}`).then(JSON.parse)));
+        if (!lists.some((r) => r.status === 'fulfilled')) throw new Error('annuaire injoignable');
+        rows = lists.flatMap((r) => (r.status === 'fulfilled' && Array.isArray(r.value) ? r.value : []))
+          .sort((a, b) => ((b && +b.clickcount) || 0) - ((a && +a.clickcount) || 0));
+      }
+    } catch (e) {
+      if (token === music.token) say('music-status', 'Annuaire des radios indisponible pour le moment (service injoignable ou bloqué).');
+      return;
+    }
+    if (token !== music.token) return;
+    const stations = toStations(rows, 24);
+    music.key = key;
+    say('music-status', stations.length ? `${genreName(g)} : ${stations.length} radios, les plus écoutées d’abord. Touche un carré pour écouter.` : `${genreName(g)} : aucune radio sécurisée trouvée pour ce genre.`);
+    fillList($('music-list'), stations, (st) => stationTile(st, 'music-status'));
+  }
+  $('music-back').addEventListener('click', () => { music.genre = null; renderMusic(); $('music-genres').querySelector('.tile').focus(); });
 
   // ----- Conflict headlines: GDELT DOC API (news index, no key) -----
   const WAR_TERMS = '(war OR airstrike OR shelling OR "missile strike" OR ceasefire OR offensive OR "armed conflict" OR invasion)';
@@ -2775,6 +4003,245 @@
     else setCountry(cc, { lat, lon });
   }
 
+  // ---------- Soundtrack: a calm score generated in the browser (WebAudio, nothing downloaded) ----------
+  // A slow pad (two detuned oscillators per note through a low-pass filter that a slow LFO opens and closes) moves
+  // between a few voicings of D Dorian, with sparse high notes and a reverb from a generated impulse response. A
+  // filtered noise "wind" follows the camera, read 5 times a second: silent in orbit (the pad is darker and the low
+  // drone stronger there), more air in the atmosphere, louder and brighter while the altitude changes fast (the dive).
+  // Off by default. The audio context is created on the visitor's click (browsers block sound before a gesture); the
+  // choice is remembered in this browser, but the score starts again only after the next touch or key. It fades out
+  // and pauses while a radio, a TV or a city camera plays, and when the tab is hidden. Master level -18 dB.
+  // `setSoundtrack(on)` and `soundtrackOn` are what other parts of the page (a guided tour) may use.
+  let soundtrackOn = false;
+  const SOUNDTRACK_KEY = 'nour.soundtrack';
+  const ST_MASTER = Math.pow(10, -18 / 20);
+  // Voicings (MIDI notes), one per chord; voice i glides to voice i of the next chord.
+  const ST_CHORDS = [[38, 45, 53, 64, 69], [41, 48, 57, 64, 67], [43, 50, 57, 60, 62], [45, 52, 55, 60, 64], [36, 43, 52, 62, 67]];
+  const ST_VOICE = 0.034;
+  const midiHz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const st = { ctx: null, nodes: 0, armed: false, ducked: false, timers: new Set(), suspendTimer: 0, chord: 0, prevLn: 0, prevT: 0, rate: 0, level: null };
+  const stLater = (fn, ms) => { const id = setTimeout(() => { st.timers.delete(id); fn(); }, ms); st.timers.add(id); };
+  // Something the visitor chose to listen to is playing (a muted TV preview does not count), or a city camera's player
+  // is open: many have their street sound (Windy's time-lapses have none).
+  const mediaAudible = () => (!!nowPlaying && !(radioEl.paused && tvEl.paused)) || (!!cam.open && cam.open.kind !== 'windy' && !!cam.open.player);
+
+  // Reverb tail: decaying noise that also gets darker as it decays, like a large hall.
+  function stImpulse(ctx, seconds) {
+    const rate = ctx.sampleRate, len = Math.floor(rate * seconds), buf = ctx.createBuffer(2, len, rate);
+    for (let ch = 0; ch < 2; ch++) {
+      const d = buf.getChannelData(ch); let y = 0;
+      for (let i = 0; i < len; i++) {
+        const t = i / len;
+        y += (0.85 - 0.75 * t) * ((Math.random() * 2 - 1) - y);
+        d[i] = y * Math.pow(1 - t, 2.6) * Math.min(1, i / (rate * 0.012));
+      }
+    }
+    return buf;
+  }
+  // Pink-ish noise (Paul Kellet's economy filter), looped for the wind.
+  function stNoise(ctx, seconds) {
+    const len = Math.floor(ctx.sampleRate * seconds), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < len; i++) {
+      const w = Math.random() * 2 - 1;
+      b0 = 0.99765 * b0 + w * 0.0990460; b1 = 0.96300 * b1 + w * 0.2965164; b2 = 0.57000 * b2 + w * 1.0526913;
+      d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.16;
+    }
+    return buf;
+  }
+  function buildScore() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    let ctx;
+    try { ctx = new AC(); } catch (e) { return false; }
+    st.ctx = ctx;
+    const node = (x) => { st.nodes++; return x; };
+    const gain = (v) => { const g = node(ctx.createGain()); g.gain.value = v; return g; };
+    const lfo = (hz, depth, target) => { const o = node(ctx.createOscillator()), g = gain(depth); o.frequency.value = hz; o.connect(g); g.connect(target); o.start(); return o; };
+    // Output: master -18 dB, then a limiter so nothing can come out loud.
+    const limiter = node(ctx.createDynamicsCompressor());
+    limiter.threshold.value = -10; limiter.knee.value = 0; limiter.ratio.value = 20; limiter.attack.value = 0.003; limiter.release.value = 0.25;
+    limiter.connect(ctx.destination);
+    const master = gain(ST_MASTER); master.connect(limiter);
+    st.fade = gain(0); st.fade.connect(master);                      // fade in/out, and the ducking
+    const dry = gain(0.7), verb = node(ctx.createConvolver()), wet = gain(0.6);
+    verb.buffer = stImpulse(ctx, 3.4); dry.connect(st.fade); verb.connect(wet); wet.connect(st.fade);
+    const send = (src, d, w) => { const a = gain(d), b = gain(w); src.connect(a); a.connect(dry); src.connect(b); b.connect(verb); };
+    // Pad.
+    st.padLp = node(ctx.createBiquadFilter()); st.padLp.type = 'lowpass'; st.padLp.frequency.value = 380; st.padLp.Q.value = 0.7;
+    const padOut = gain(0.85); st.padLp.connect(padOut); send(padOut, 0.65, 0.75);
+    lfo(0.043, 170, st.padLp.frequency);                             // the filter breathes over ~23 s
+    lfo(0.071, 0.16, padOut.gain);
+    const n = ST_CHORDS[0].length;
+    st.voices = ST_CHORDS[0].map((m, i) => {
+      const g = gain(ST_VOICE);
+      if (ctx.createStereoPanner) { const p = node(ctx.createStereoPanner()); p.pan.value = (i / (n - 1) - 0.5) * 1.1; g.connect(p); p.connect(st.padLp); }
+      else g.connect(st.padLp);
+      const oscs = [['sawtooth', -7], ['triangle', 6]].map(([type, cents]) => {
+        const o = node(ctx.createOscillator()); o.type = type; o.frequency.value = midiHz(m); o.detune.value = cents; o.connect(g); o.start(); return o;
+      });
+      return { g, oscs };
+    });
+    // Low drone on the chord root: the depth of the orbit.
+    st.sub = node(ctx.createOscillator()); st.sub.type = 'sine'; st.sub.frequency.value = midiHz(ST_CHORDS[0][0]);
+    st.subGain = gain(0.1); st.sub.connect(st.subGain); st.subGain.connect(dry); st.sub.start();
+    // Sparse high notes go mostly to the reverb.
+    st.bellIn = gain(1); send(st.bellIn, 0.25, 0.9);
+    // Wind: pink noise through a band-pass, with slow gusts.
+    const noise = node(ctx.createBufferSource()); noise.buffer = stNoise(ctx, 4); noise.loop = true;
+    st.windBp = node(ctx.createBiquadFilter()); st.windBp.type = 'bandpass'; st.windBp.frequency.value = 240; st.windBp.Q.value = 0.55;
+    const gust = gain(1);
+    st.windGain = gain(0);
+    noise.connect(st.windBp); st.windBp.connect(gust); gust.connect(st.windGain); send(st.windGain, 0.85, 0.3);
+    lfo(0.13, 0.35, gust.gain); lfo(0.087, 110, st.windBp.frequency);
+    noise.start();
+    return true;
+  }
+  function stChord() {
+    const ctx = st.ctx, t = ctx.currentTime;
+    let i; do i = Math.floor(Math.random() * ST_CHORDS.length); while (i === st.chord);
+    st.chord = i;
+    // A soft dip while the voices glide to the new chord, so the change breathes rather than slides.
+    ST_CHORDS[i].forEach((m, v) => {
+      const voice = st.voices[v];
+      voice.g.gain.setTargetAtTime(ST_VOICE * 0.35, t, 0.6);
+      voice.oscs.forEach((o) => o.frequency.setTargetAtTime(midiHz(m), t + 0.9, 0.45));
+      voice.g.gain.setTargetAtTime(ST_VOICE, t + 1.9, 1.2);
+    });
+    st.sub.frequency.setTargetAtTime(midiHz(ST_CHORDS[i][0]), t + 0.9, 0.6);
+  }
+  function stBell() {
+    const ctx = st.ctx;
+    if (!soundtrackOn || st.ducked || document.hidden || ctx.state !== 'running') return;
+    const t = ctx.currentTime + 0.05, chord = ST_CHORDS[st.chord];
+    const m = chord[2 + Math.floor(Math.random() * 3)] + (Math.random() < 0.5 ? 12 : 24);
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = 'sine'; o.frequency.value = midiHz(m); g.gain.value = 0;
+    const loud = 0.05 * (1 - 0.6 * (st.level ? st.level.air : 0));    // stars: brighter up in orbit
+    g.gain.setTargetAtTime(loud, t, 0.35); g.gain.setTargetAtTime(0, t + 1.2, 1.6);
+    if (ctx.createStereoPanner) { const p = ctx.createStereoPanner(); p.pan.value = Math.random() * 1.4 - 0.7; o.connect(g); g.connect(p); p.connect(st.bellIn); }
+    else { o.connect(g); g.connect(st.bellIn); }
+    o.start(t); o.stop(t + 9);
+    o.onended = () => { o.disconnect(); g.disconnect(); };
+  }
+  function stChordLoop() { stChord(); stLater(stChordLoop, 20000 + Math.random() * 8000); }
+  function stBellLoop() { stBell(); stLater(stBellLoop, 3500 + Math.random() * 6000); }
+  // Five times a second: follow the camera, and step aside for a radio or a TV.
+  function stTick() {
+    const ctx = st.ctx;
+    const busy = mediaAudible();
+    if (busy !== st.ducked) stDuck(busy);
+    if (document.hidden) return;
+    const h = Math.max(1, camera.positionCartographic.height), lnh = Math.log(h), now = performance.now();
+    if (st.prevT) {
+      const dt = Math.max((now - st.prevT) / 1000, 0.05);
+      st.rate += ((st.prevLn - lnh) / dt - st.rate) * 0.4;           // e-folds per second, > 0 while descending
+    }
+    st.prevLn = lnh; st.prevT = now;
+    const air = clamp01((Math.log(3e5) - lnh) / Math.log(100));       // 0 above 300 km, 1 below 3 km
+    const atmo = clamp01((Math.log(1.2e6) - lnh) / Math.log(120));    // 0 above 1,200 km, 1 below 10 km
+    const fall = clamp01(Math.abs(st.rate) / 1.6) * (diving ? 1 : 0.55) * atmo;
+    const t = ctx.currentTime;
+    st.windGain.gain.setTargetAtTime(0.004 + 0.14 * air + 0.34 * fall, t, 0.5);
+    st.windBp.frequency.setTargetAtTime(240 + 700 * air + 2400 * fall, t, 0.5);
+    st.padLp.frequency.setTargetAtTime(380 + 560 * air + 300 * fall, t, 1.2);
+    st.subGain.gain.setTargetAtTime(0.03 + 0.09 * (1 - air), t, 1.5);
+    st.level = { h: Math.round(h), air: +air.toFixed(3), fall: +fall.toFixed(3), rate: +st.rate.toFixed(3) };
+  }
+  // Fade out then pause the context (no work while silent); back with a slow fade in.
+  function stSilence(tc) {
+    const ctx = st.ctx;
+    clearTimeout(st.suspendTimer);
+    st.fade.gain.cancelScheduledValues(ctx.currentTime);
+    st.fade.gain.setTargetAtTime(0, ctx.currentTime, tc);
+    st.suspendTimer = setTimeout(() => {
+      if ((!soundtrackOn || st.ducked || document.hidden) && ctx.state === 'running') ctx.suspend().catch(() => {});
+    }, tc * 6000);
+  }
+  function stWake() {
+    const ctx = st.ctx;
+    if (!ctx || !soundtrackOn || st.ducked || document.hidden) return;
+    clearTimeout(st.suspendTimer);
+    const up = () => { st.fade.gain.cancelScheduledValues(ctx.currentTime); st.fade.gain.setTargetAtTime(1, ctx.currentTime, 1.5); };
+    if (ctx.state !== 'running') ctx.resume().then(up, () => {}); else up();
+  }
+  function stDuck(on) {
+    st.ducked = on;
+    if (on) stSilence(0.3); else stWake();
+    syncSoundtrackButton();
+  }
+  function startScore() {
+    if (!st.ctx && !buildScore()) return false;
+    // iPhone: play like the radios do, even with the ring/silent switch on.
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* older Safari */ }
+    st.prevT = 0; st.rate = 0; st.ducked = false;
+    st.timers.add(setInterval(stTick, 200));
+    stTick();
+    stLater(stChordLoop, 14000); stLater(stBellLoop, 2500);
+    stWake();
+    return true;
+  }
+  function stopScore() {
+    st.timers.forEach((id) => { clearTimeout(id); clearInterval(id); }); st.timers.clear();
+    st.ducked = false;
+    if (st.ctx) stSilence(0.25);
+  }
+  function syncSoundtrackButton() {
+    const b = $('btn-soundtrack');
+    b.setAttribute('aria-pressed', String(soundtrackOn || st.armed));
+    b.querySelector('small').textContent = st.armed ? 'reprendra au premier geste'
+      : soundtrackOn && st.ducked ? 'en pause : une radio, une télé ou une caméra joue' : 'musique générée, suit l’altitude';
+  }
+  function setSoundtrack(on) {
+    on = !!on; st.armed = false;
+    try { if (on) localStorage.setItem(SOUNDTRACK_KEY, '1'); else localStorage.removeItem(SOUNDTRACK_KEY); }
+    catch (e) { /* storage blocked: the choice applies to this visit only */ }
+    if (on !== soundtrackOn) {
+      soundtrackOn = on;
+      if (on && !startScore()) { soundtrackOn = false; $('btn-soundtrack').querySelector('small').textContent = 'son indisponible dans ce navigateur'; return false; }
+      if (!on) stopScore();
+    } else if (on) stWake();
+    syncSoundtrackButton();
+    return soundtrackOn;
+  }
+  $('btn-soundtrack').addEventListener('click', () => setSoundtrack(!(soundtrackOn || st.armed)));
+  // Remembered as on: start at the first touch or key (not before: no sound without a gesture). A gesture also
+  // resumes a context the browser kept suspended. The button's own click decides by itself.
+  function stGesture(e) {
+    if (st.armed) { if (!(e.target && e.target.closest && e.target.closest('#btn-soundtrack'))) setSoundtrack(true); }
+    else if (soundtrackOn && st.ctx && st.ctx.state !== 'running') stWake();
+  }
+  ['pointerup', 'touchend', 'keydown', 'click'].forEach((type) => window.addEventListener(type, stGesture, { capture: true, passive: true }));
+  document.addEventListener('visibilitychange', () => {
+    if (!st.ctx || !soundtrackOn) return;
+    if (document.hidden) { clearTimeout(st.suspendTimer); st.fade.gain.cancelScheduledValues(st.ctx.currentTime); st.fade.gain.setValueAtTime(0, st.ctx.currentTime); st.ctx.suspend().catch(() => {}); }
+    else stWake();
+  });
+  try { st.armed = localStorage.getItem(SOUNDTRACK_KEY) === '1'; } catch (e) { /* storage blocked */ }
+  syncSoundtrackButton();
+
+  // Test hooks (media: cameras, music, soundtrack).
+  window.__fatiha_media = {
+    get windyKey() { return !!windyKey; },
+    get cityCams() { return cityCams.map((c) => ({ id: c.id, city: c.city, cc: c.cc, kind: c.kind, title: c.title })); },
+    get cams() { return cam.list.map((c) => ({ id: c.id, title: c.title, city: c.city, player: c.player, live: c.live, hasPoint: !!c.point })); },
+    get camPoints() {
+      const vis = (coll) => Array.from({ length: coll.length }, (_, i) => coll.get(i).show).filter(Boolean).length;
+      return { city: { show: cityPoints.show, length: cityPoints.length, visible: vis(cityPoints) }, windy: { show: windyPoints.show, length: windyPoints.length, visible: vis(windyPoints) } };
+    },
+    camScreen(kind, i) { const coll = kind === 'windy' ? windyPoints : cityPoints, p = coll.get(i), w = p && C.SceneTransforms.worldToWindowCoordinates(scene, p.position); return w ? { x: w.x, y: w.y, show: p.show } : null; },
+    get openCam() { return cam.open && { id: cam.open.id, kind: cam.open.kind, title: cam.open.title }; },
+    get music() { return { genre: music.genre && music.genre.id, key: music.key }; },
+    get soundtrack() {
+      return { on: soundtrackOn, armed: st.armed, ducked: st.ducked, state: st.ctx ? st.ctx.state : null, nodes: st.nodes,
+        fade: st.fade ? +st.fade.gain.value.toFixed(3) : null, wind: st.windGain ? +st.windGain.gain.value.toFixed(4) : null,
+        windHz: st.windBp ? Math.round(st.windBp.frequency.value) : null, padHz: st.padLp ? Math.round(st.padLp.frequency.value) : null,
+        chord: st.chord, timers: st.timers.size, level: st.level };
+    },
+    setSoundtrack,
+  };
+
   // ---------- Image up to 5120 px on the long side ----------
   // Renders the current view into a bigger drawing buffer, adds the credits and downloads a PNG. Not offered
   // over Google 3D tiles: Google's terms do not allow exporting its imagery.
@@ -2834,6 +4301,463 @@
   shotButton.addEventListener('click', captureImage);
   syncShotButton();
 
+  // ---------- Spectacle: cinema tour, time slider, shared view, the whole Earth from NASA EPIC ----------
+  // Four showpieces from the menu; each closes the menu when it starts and moves the camera only through the flight
+  // engine. Everything lives in this closure (one name, `spectacle`, outside it): the start-up code below reads a shared
+  // view from the address with `spectacle.viewFromHash()` and flies to it with `spectacle.flyToSharedView()`.
+  const spectacle = (() => {
+    const DAY_MS = 864e5;
+    // One registry per feature: every timeout and interval goes in, and `clear()` is the one teardown path.
+    function timerSet() {
+      const ids = new Set();
+      return {
+        later(fn, ms) { const id = setTimeout(() => { ids.delete(id); fn(); }, ms); ids.add(id); return id; },
+        every(fn, ms) { const id = setInterval(fn, ms); ids.add(id); return id; },
+        stop(id) { clearTimeout(id); clearInterval(id); ids.delete(id); },
+        clear() { ids.forEach((id) => { clearTimeout(id); clearInterval(id); }); ids.clear(); },
+        get size() { return ids.size; },
+      };
+    }
+    function closeSheets() {
+      if (menuEl.classList.contains('open')) setMenuOpen(false);
+      if ($('watch').classList.contains('open')) setWatchOpen(false);
+      if (liveOpen) setLiveOpen(false);
+    }
+    // Hand the camera to a new shot, as a place button does: no place, no card, no orbit, no flight under way.
+    function takeCamera() { ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll(); }
+    const fmtLon = (lon) => `${Math.abs(lon).toFixed(1).replace('.', ',')}° ${lon >= 0 ? 'E' : 'O'}`;
+
+    // ----- Short notice ("Lien copié"), or a field holding a link to copy by hand -----
+    const toastEl = $('show-toast'), toastField = $('toast-field'), toastTimers = timerSet();
+    function hideToast() { toastTimers.clear(); toastEl.hidden = true; }
+    function toast(text, link) {
+      toastTimers.clear();
+      $('toast-text').textContent = text;
+      toastField.hidden = !link; $('toast-close').hidden = !link;
+      toastEl.classList.toggle('with-field', !!link);
+      toastEl.hidden = false;
+      if (link) {
+        toastField.value = link;
+        toastField.focus({ preventScroll: true }); toastField.select(); toastField.setSelectionRange(0, link.length);
+      } else toastTimers.later(hideToast, 2800);
+    }
+    $('toast-close').addEventListener('click', () => { hideToast(); menuBtn.focus(); });
+
+    // ----- Visite cinéma: the ten places as a film -----
+    // Letterbox bars at 2.39:1 (capped on tall screens so the Earth stays visible), every control hidden but a discreet
+    // "Quitter", a film credit over each arrival, then the next place. Any touch, click, wheel or key ends it; reduced
+    // motion keeps the tour (short flights, no orbit) without the slides and fades (see the CSS).
+    const TOUR = { dwell: 9000, title: 5500, maxLeg: 45000, finale: 4500 };    // ms after each arrival; tests shorten them
+    const cineEl = $('cine'), creditEl = $('cine-credit'), tourTimers = timerSet();
+    let tour = null;                                                            // { i, soundSet } while the tour runs
+    function layoutLetterbox() {
+      const w = window.innerWidth, h = window.innerHeight;
+      cineEl.style.setProperty('--lb', `${Math.round(Math.min(Math.max((h - w / 2.39) / 2, h * 0.05), h * 0.2))}px`);
+    }
+    // Another part of the page may provide a soundtrack: setSoundtrack(on), with its state in soundtrackOn or isSoundtrackOn().
+    function soundtrackState() {
+      try {
+        if (typeof isSoundtrackOn === 'function') return !!isSoundtrackOn();   // eslint-disable-line no-undef
+        if (typeof soundtrackOn === 'boolean') return soundtrackOn;           // eslint-disable-line no-undef
+      } catch (e) { /* not ready */ }
+      return null;
+    }
+    function setSound(on) {
+      try { if (typeof setSoundtrack === 'function') { setSoundtrack(on); return true; } } catch (e) { /* no soundtrack */ } // eslint-disable-line no-undef
+      return false;
+    }
+    function setCredit(lines) {
+      if (!lines) { creditEl.classList.remove('show'); return; }
+      $('cine-country').textContent = lines[0]; $('cine-name').textContent = lines[1]; $('cine-coords').textContent = lines[2] || '';
+      creditEl.classList.add('show');
+    }
+    function startTour() {
+      if (tour) return;
+      closeSheets(); setTimeOpen(false); setEpicOpen(false); hideToast();
+      tour = { i: -1, soundSet: false };
+      if (soundtrackState() !== true) tour.soundSet = setSound(true);           // inside the click: allowed to start audio
+      layoutLetterbox(); setCredit(null);
+      cineEl.hidden = false;
+      document.body.classList.add('cine-on');
+      void cineEl.offsetWidth;                                                  // bars start off-screen, then slide in
+      cineEl.classList.add('in');
+      $('cine-quit').focus({ preventScroll: true });
+      tourLeg();
+    }
+    function tourLeg() {
+      if (!tour) return;
+      if (document.hidden) { tourTimers.later(tourLeg, 1000); return; }       // a hidden tab draws no frames: wait for it
+      tour.i += 1;
+      if (tour.i >= PLACES.length) {
+        $('cine-count').textContent = 'Visite cinéma · fin';
+        setCredit(['Fatiha · maman d’Amine', 'La lumière du dialogue', 'dix lieux · relief et coordonnées réels']);
+        tourTimers.later(endTour, TOUR.finale);
+        return;
+      }
+      const p = PLACES[tour.i], t0 = performance.now();
+      $('cine-count').textContent = `Visite cinéma · ${String(tour.i + 1).padStart(2, '0')} / ${PLACES.length}`;
+      setCredit(null);
+      flyToPlace(p);
+      // flyToPlace shows the place card when it lands (the card is hidden during the tour): that is the cue.
+      const poll = tourTimers.every(() => {
+        const arrived = activePlace === p && !flight && $('card').classList.contains('show');
+        if (!arrived && performance.now() - t0 < TOUR.maxLeg) return;
+        tourTimers.stop(poll);
+        setCredit([p.country, p.name, fmtCoord(p.lat, p.lon)]);
+        tourTimers.later(() => setCredit(null), TOUR.title);
+        tourTimers.later(tourLeg, TOUR.dwell);
+      }, 200);
+    }
+    function endTour() {
+      if (!tour) return;
+      const t = tour; tour = null;
+      tourTimers.clear();
+      // Between two places the visitor takes over, as when touching the globe during a flight.
+      if (flight) cancelFlight();
+      else if (!orbit && !$('card').classList.contains('show')) { ++flightToken; setPhase(activePlace ? 'Survol libre' : 'Exploration libre'); }
+      const hadFocus = cineEl.contains(document.activeElement);
+      cineEl.classList.remove('in'); cineEl.hidden = true; setCredit(null);
+      document.body.classList.remove('cine-on');
+      if (t.soundSet) setSound(false);
+      if (hadFocus) menuBtn.focus({ preventScroll: true });
+    }
+    $('btn-tour').addEventListener('click', startTour);
+    cineEl.addEventListener('pointerdown', (e) => { e.preventDefault(); endTour(); });
+    cineEl.addEventListener('wheel', endTour, { passive: true });
+    $('cine-quit').addEventListener('click', endTour);
+    window.addEventListener('resize', () => { if (tour) layoutLetterbox(); });
+    window.addEventListener('hashchange', endTour);     // before the page's own handler: a place link typed during the tour
+
+    // ----- Curseur du temps: the sun over 24 h -----
+    // The slider is the local mean solar time (UTC + longitude / 15; the equation of time is ignored, ±16 min) at the
+    // active place, or else at the centre of the screen, within the clock's current day there. It follows the clock:
+    // a flight that sets its own time moves the slider, which stays locked until that flight lands instead of fighting it.
+    const timeEl = $('timebar'), timeRange = $('tb-range'), timeTimers = timerSet();
+    let timeOpen = false, timeLocked = false, timeSeen = null, lastTimeInput = 0;
+    const centrePx = new C.Cartesian2(), centreHit = new C.Cartesian3();
+    function timeReference() {
+      if (activePlace) return { lon: activePlace.lon, label: activePlace.name, at: `à ${activePlace.name}` };
+      centrePx.x = canvas.clientWidth / 2; centrePx.y = canvas.clientHeight / 2;
+      const hit = camera.pickEllipsoid(centrePx, globe.ellipsoid, centreHit);
+      if (hit) { const lon = R2D(C.Cartographic.fromCartesian(hit).longitude); return { lon, label: `centre de l’écran, ${fmtLon(lon)}`, at: `au centre de l’écran, ${fmtLon(lon)}` }; }
+      const lon = R2D(camera.positionCartographic.longitude);
+      return { lon, label: `sous la caméra, ${fmtLon(lon)}`, at: `sous la caméra, ${fmtLon(lon)}` };
+    }
+    const solarShift = (lon) => lon / 15 * 3600e3;
+    function solarMinutes(lon) {
+      const local = C.JulianDate.toDate(clock.currentTime).getTime() + solarShift(lon);
+      return (((local % DAY_MS) + DAY_MS) % DAY_MS) / 60000;
+    }
+    function timeAtSolarMinutes(lon, minutes) {
+      const shift = solarShift(lon);
+      const dayStart = Math.floor((C.JulianDate.toDate(clock.currentTime).getTime() + shift) / DAY_MS) * DAY_MS;
+      return C.JulianDate.fromDate(new Date(dayStart + minutes * 60000 - shift));
+    }
+    const hhmm = (minutes) => { const m = Math.round(minutes) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+    function renderTime(minutes, ref) {
+      $('tb-clock').textContent = hhmm(minutes);
+      $('tb-where').textContent = timeLocked ? 'le vol règle l’heure…'
+        : `heure solaire · ${ref.label} · ${C.JulianDate.toDate(clock.currentTime).toISOString().slice(11, 16)} UTC`;
+      timeRange.setAttribute('aria-valuetext', `${hhmm(minutes).replace(':', ' h ')}, heure solaire ${ref.at}`);
+    }
+    function syncTime() {
+      const changed = timeSeen && !C.JulianDate.equals(clock.currentTime, timeSeen);
+      // A flight that eases the clock owns it until it lands; the real-time clock (Jour/nuit réel) only ticks.
+      if (!flight) timeLocked = false;
+      else if (changed && !clock.shouldAnimate) timeLocked = true;
+      timeSeen = C.JulianDate.clone(clock.currentTime, timeSeen || undefined);
+      timeRange.disabled = timeLocked;
+      const ref = timeReference(), m = solarMinutes(ref.lon);
+      if (performance.now() - lastTimeInput > 600) timeRange.value = String(Math.min(1435, Math.round(m / 5) * 5));
+      renderTime(m, ref);
+    }
+    timeRange.addEventListener('input', () => {
+      if (timeLocked) return;
+      lastTimeInput = performance.now();
+      if (veille.live) setLayer('live', false);       // a running real-time clock would undo the chosen hour
+      nightClock = false;                             // the hour chosen here stays when going back to orbit
+      const ref = timeReference(), minutes = +timeRange.value;
+      clock.currentTime = timeAtSolarMinutes(ref.lon, minutes);
+      timeSeen = C.JulianDate.clone(clock.currentTime, timeSeen || undefined);
+      renderTime(minutes, ref);
+    });
+    function setTimeOpen(open) {
+      if (open === timeOpen) return;
+      timeOpen = open;
+      if (open) closeSheets();
+      timeEl.hidden = !open;
+      document.body.classList.toggle('time-open', open);
+      $('btn-time').setAttribute('aria-pressed', String(open));
+      timeTimers.clear();
+      if (open) {
+        timeSeen = null; timeLocked = false; lastTimeInput = 0;
+        syncTime();
+        timeTimers.every(() => { if (!document.hidden) syncTime(); }, 250);
+        timeRange.focus({ preventScroll: true });
+      }
+    }
+    $('btn-time').addEventListener('click', () => setTimeOpen(!timeOpen));
+    $('tb-close').addEventListener('click', () => { setTimeOpen(false); menuBtn.focus(); });
+
+    // ----- Partager cette vue -----
+    // #vue=lat,lon,height,heading,pitch,time: degrees (5 decimals, about 1 m), metres above the ellipsoid, degrees, and the
+    // clock in Unix seconds so the sun is where it was. Links without the time (5 values) are read too.
+    function viewHash() {
+      const c = camera.positionCartographic;
+      const heading = ((R2D(camera.heading) % 360) + 360) % 360;
+      const t = Math.round(C.JulianDate.toDate(clock.currentTime).getTime() / 1000);
+      return `#vue=${R2D(c.latitude).toFixed(5)},${R2D(c.longitude).toFixed(5)},${Math.round(c.height)},${heading.toFixed(1)},${R2D(camera.pitch).toFixed(1)},${t}`;
+    }
+    // Anything that is not five or six plain decimal numbers is ignored; values are then brought into range.
+    function viewFromHash(hash) {
+      let s = hash === undefined ? location.hash : hash;
+      if (typeof s !== 'string' || s.length > 200 || !s.startsWith('#vue=')) return null;
+      try { s = decodeURIComponent(s.slice(5)); } catch (e) { return null; }
+      const parts = s.split(',');
+      if (parts.length !== 5 && parts.length !== 6) return null;
+      if (!parts.every((x) => /^[+-]?\d{1,10}(\.\d{1,10})?$/.test(x))) return null;
+      const [lat, lon, h, heading, pitch, t] = parts.map(Number);
+      if (![lat, lon, h, heading, pitch].every(Number.isFinite)) return null;
+      const wrap = (x, m) => ((x % m) + m) % m;
+      return {
+        lat: C.Math.clamp(lat, -89.99, 89.99), lon: wrap(lon + 180, 360) - 180, h: C.Math.clamp(h, 100, 4e7),
+        heading: wrap(heading, 360), pitch: C.Math.clamp(pitch, -90, 90),
+        time: Number.isFinite(t) && t >= 946684800 && t <= 4102444800 ? C.JulianDate.fromDate(new Date(t * 1000)) : null,   // 2000–2100
+      };
+    }
+    // The engine ends on the geodetic point of the target's geocentric direction taken at the equatorial radius
+    // (cartoOfUnit), up to ~40 m in latitude from the target itself: aim at the latitude that lands on the shared one.
+    function engineAimLat(latDeg, lonDeg) {
+      const want = D2R(latDeg), lon = D2R(lonDeg), u = new C.Cartesian3();
+      let lat = want;
+      for (let k = 0; k < 4; k++) {
+        C.Cartesian3.normalize(C.Cartesian3.fromRadians(lon, lat, 0, ellipsoid, u), u);
+        const c = ellipsoid.cartesianToCartographic(C.Cartesian3.multiplyByScalar(u, ellipsoid.maximumRadius, u));
+        if (!c) break;
+        lat += want - c.latitude;
+      }
+      return R2D(lat);
+    }
+    function flyToSharedView(v) {
+      takeCamera();
+      if (v.time) {
+        if (veille.live) setLayer('live', false);
+        clock.currentTime = C.JulianDate.clone(v.time); nightClock = false;
+      }
+      setPhase('Vue partagée');
+      // The engine frames a target from heading, pitch and range: with the camera position itself as the target and a
+      // 1 cm range, the flight lands on that very position, heading and pitch (pitch stops at -89.5°, the engine's limit).
+      startFlight(C.Cartesian3.fromDegrees(v.lon, engineAimLat(v.lat, v.lon), v.h), { heading: v.heading, pitch: v.pitch, range: 0.01 }, {
+        onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Vue partagée'),
+        onDone: () => { setPhase('Vue partagée'); toast(`Vue partagée · ${fmtCoord(v.lat, v.lon)}`); },
+      });
+    }
+    function copyLink(link) {
+      const byHand = () => toast('Copie ce lien :', link);
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(link).then(() => toast('Lien copié'), byHand); return; }
+      } catch (e) { /* no clipboard: by hand */ }
+      byHand();
+    }
+    function shareView() {
+      closeSheets();
+      const hash = viewHash();
+      try { history.replaceState(null, '', hash); } catch (e) { /* the address bar keeps its old hash */ }
+      // Only the view travels: no quality setting, no key (a Google key never stays in the address anyway).
+      const url = new URL(location.href); url.search = ''; url.hash = hash;
+      const link = url.href;
+      menuBtn.focus({ preventScroll: true });
+      if (typeof navigator.share === 'function') {
+        navigator.share({ title: document.title, text: 'Une vue de la Terre, sur Fatiha', url: link })
+          .then(() => toast('Lien partagé'))
+          .catch((e) => { if (e && e.name === 'AbortError') toast('Partage annulé'); else copyLink(link); });
+        return;
+      }
+      copyLink(link);
+    }
+    $('btn-share').addEventListener('click', shareView);
+
+    // ----- La Terre entière, aujourd'hui: NASA EPIC, the camera of DSCOVR at the Sun–Earth Lagrange point L1 -----
+    // Keyless public API: the latest day's natural-colour photos, often from one or two days ago (their real date is
+    // shown). The list is fetched (it needs CORS from epic.gsfc.nasa.gov); the photos are plain image loads.
+    const EPIC_API = 'https://epic.gsfc.nasa.gov/api/natural';
+    const EPIC_ARCHIVE = 'https://epic.gsfc.nasa.gov/archive/natural';
+    const EPIC_RANGE = 2.3e7;            // the whole disc, north up, as in the photos (they are rotated north up)
+    const epicEl = $('epic'), epicImg = $('epic-img');
+    const epic = { items: [], i: 0, at: 0, loading: null, token: 0, img: 0 };
+    let epicOpen = false;
+    const frDate = (() => { try { return new Intl.DateTimeFormat('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }); } catch (e) { return null; } })();
+    const fmtDay = (ms) => (frDate ? frDate.format(new Date(ms)) : new Date(ms).toISOString().slice(0, 10));
+    function parseEpic(text) {
+      const data = JSON.parse(text);
+      if (!Array.isArray(data)) throw new Error('format');
+      const out = [];
+      data.slice(0, 60).forEach((e) => {
+        if (!e || typeof e !== 'object') return;
+        const image = typeof e.image === 'string' && /^[A-Za-z0-9_-]{1,80}$/.test(e.image) ? e.image : '';
+        const d = typeof e.date === 'string' ? /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$/.exec(e.date) : null;
+        if (!image || !d) return;
+        const ms = Date.UTC(+d[1], +d[2] - 1, +d[3], +d[4], +d[5], +d[6]);
+        if (!Number.isFinite(ms)) return;
+        const cc = e.centroid_coordinates || {}, lat = Number(cc.lat), lon = Number(cc.lon);
+        const centroid = Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+        const p = e.dscovr_j2000_position;      // km, Earth-centred
+        const dist = p && [p.x, p.y, p.z].every((x) => typeof x === 'number' && Number.isFinite(x)) ? Math.hypot(p.x, p.y, p.z) : NaN;
+        out.push({ image, ms, centroid, dist: dist > 1e6 && dist < 2e6 ? dist : null,
+          url: `${EPIC_ARCHIVE}/${d[1]}/${d[2]}/${d[3]}/jpg/${image}.jpg` });
+      });
+      return out.sort((a, b) => a.ms - b.ms);
+    }
+    function loadEpic() {
+      if (epic.items.length && Date.now() - epic.at < 15 * 60000) return Promise.resolve(epic.items);
+      if (!epic.loading) {
+        epic.loading = fetchText(EPIC_API, 12000).then((text) => {
+          const items = parseEpic(text);
+          if (!items.length) throw new Error('aucune photo');
+          epic.items = items; epic.at = Date.now();
+          return items;
+        }).finally(() => { epic.loading = null; });
+      }
+      return epic.loading;
+    }
+    function epicAge(ms) {
+      const days = Math.round((Math.floor(Date.now() / DAY_MS) - Math.floor(ms / DAY_MS)));
+      return days <= 0 ? 'Photo prise aujourd’hui' : days === 1 ? 'Photo prise hier' : `Photo prise il y a ${days} jours`;
+    }
+    function epicFailed(text) {
+      say('epic-status', text);
+      $('epic-retry').hidden = false; epicImg.hidden = true; $('epic-meta').hidden = true;
+    }
+    function renderEpic() {
+      const it = epic.items[epic.i];
+      if (!it) return;
+      const token = ++epic.img, when = new Date(it.ms);
+      $('epic-retry').hidden = true; $('epic-meta').hidden = false; epicImg.hidden = false;
+      $('epic-date').textContent = `${fmtDay(it.ms)} · ${fmtUTC(when)}`;
+      $('epic-age').textContent = epicAge(it.ms);
+      $('epic-detail').textContent = [it.centroid ? `centre de la photo : ${fmtCoord(it.centroid.lat, it.centroid.lon)}` : '',
+        it.dist ? `sonde à ${Math.round(it.dist).toLocaleString('fr-FR')} km du centre de la Terre` : ''].filter(Boolean).join(' · ');
+      $('epic-count').textContent = `${epic.i + 1} / ${epic.items.length}`;
+      $('epic-prev').disabled = epic.i === 0;
+      $('epic-next').disabled = epic.i === epic.items.length - 1;
+      $('epic-fly').disabled = !it.centroid;
+      epicImg.alt = `La Terre entière photographiée par la caméra EPIC de la sonde DSCOVR le ${fmtDay(it.ms)} à ${fmtUTC(when)}`;
+      const done = (ok) => {
+        if (token !== epic.img) return;
+        epicImg.classList.remove('loading');
+        say('epic-status', ok ? '' : 'Cette photo est indisponible pour le moment (serveur de la NASA injoignable).');
+      };
+      epicImg.onload = () => done(true); epicImg.onerror = () => done(false);
+      if (epicImg.src === it.url && epicImg.complete && epicImg.naturalWidth) done(true);
+      else { epicImg.classList.add('loading'); say('epic-status', 'Chargement de la photo…'); epicImg.src = it.url; }
+      // The neighbours load ahead, so going through the day looks like the Earth turning.
+      [epic.i - 1, epic.i + 1].forEach((j) => { const n = epic.items[j]; if (n) { const im = new Image(); im.referrerPolicy = 'no-referrer'; im.src = n.url; } });
+    }
+    function setEpicOpen(open) {
+      if (open === epicOpen) return;
+      epicOpen = open;
+      epicEl.hidden = !open;
+      document.body.classList.toggle('epic-open', open);
+      if (open) { closeSheets(); hideToast(); $('epic-close').focus({ preventScroll: true }); }
+      else ++epic.token;
+    }
+    async function openEpic() {
+      setEpicOpen(true);
+      const token = ++epic.token;
+      $('epic-retry').hidden = true;
+      if (!epic.items.length) { $('epic-meta').hidden = true; epicImg.hidden = true; }
+      say('epic-status', 'Chargement des photos de la NASA…');
+      try {
+        await loadEpic();
+        if (token !== epic.token) return;
+        epic.i = epic.items.length - 1;               // the most recent photo
+        renderEpic();
+      } catch (e) {
+        if (token !== epic.token) return;
+        epicFailed('Les photos NASA EPIC sont indisponibles pour le moment (réseau ou service de la NASA). Réessaie plus tard.');
+      }
+    }
+    function epicStep(d) {
+      const j = epic.i + d;
+      if (!epicOpen || j < 0 || j >= epic.items.length) return;
+      epic.i = j; renderEpic();
+    }
+    function flyToEpic() {
+      const it = epic.items[epic.i];
+      if (!it || !it.centroid) return;
+      setEpicOpen(false);
+      takeCamera();
+      if (veille.live) setLayer('live', false);
+      nightClock = false;
+      // Same time of day as the photo, moved by whole days to within 12 h of the clock: the sun lights the same side
+      // (a day changes its declination by less than half a degree) and does not spin round during the flight.
+      const clockMs = C.JulianDate.toDate(clock.currentTime).getTime();
+      const ms = it.ms + Math.round((clockMs - it.ms) / DAY_MS) * DAY_MS;
+      setPhase('Orbite');
+      startFlight(C.Cartesian3.fromDegrees(it.centroid.lon, it.centroid.lat, 0), { heading: 0, pitch: -90, range: EPIC_RANGE }, {
+        time: C.JulianDate.fromDate(new Date(ms)),
+        onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Approche'),
+        onDone: () => { setPhase('Côté photographié'); toast(`Le côté photographié par DSCOVR · soleil de ${fmtUTC(new Date(it.ms))}`); },
+      });
+      menuBtn.focus({ preventScroll: true });
+    }
+    $('btn-epic').addEventListener('click', openEpic);
+    $('epic-retry').addEventListener('click', openEpic);
+    $('epic-close').addEventListener('click', () => { setEpicOpen(false); menuBtn.focus(); });
+    $('epic-prev').addEventListener('click', () => epicStep(-1));
+    $('epic-next').addEventListener('click', () => epicStep(1));
+    $('epic-fly').addEventListener('click', flyToEpic);
+    // A horizontal swipe on the photo goes through the day.
+    let swipeX = null;
+    epicImg.addEventListener('pointerdown', (e) => { swipeX = e.clientX; });
+    epicImg.addEventListener('pointerup', (e) => {
+      if (swipeX !== null && Math.abs(e.clientX - swipeX) > 40) epicStep(e.clientX < swipeX ? 1 : -1);
+      swipeX = null;
+    });
+    epicImg.addEventListener('dragstart', (e) => e.preventDefault());
+    function trapFocus(e) {
+      const f = [...epicEl.querySelectorAll('button')].filter((b) => !b.disabled && b.getClientRects().length);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1], at = document.activeElement;
+      if (!epicEl.contains(at) || (e.shiftKey && at === first) || (!e.shiftKey && at === last)) {
+        e.preventDefault(); (e.shiftKey ? last : first).focus();
+      }
+    }
+
+    // Keys, before the page's own Escape handler (capture on window): during the tour any key ends it; the photo viewer
+    // takes Escape, the arrows and Tab; Escape then closes the link field or the time bar when no sheet is open.
+    window.addEventListener('keydown', (e) => {
+      if (tour) {
+        if (['Shift', 'Control', 'Alt', 'AltGraph', 'Meta', 'CapsLock', 'Fn'].includes(e.key)) return;
+        e.preventDefault(); e.stopPropagation(); endTour();
+        return;
+      }
+      if (epicOpen) {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); setEpicOpen(false); menuBtn.focus(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); epicStep(e.key === 'ArrowLeft' ? -1 : 1); }
+        else if (e.key === 'Tab') trapFocus(e);
+        return;
+      }
+      if (e.key !== 'Escape' || document.querySelector('.sheet.open')) return;
+      if (!toastEl.hidden && !toastField.hidden) { hideToast(); menuBtn.focus(); }
+      else if (timeOpen) { setTimeOpen(false); menuBtn.focus(); }
+    }, true);
+
+    // Exposed for automated tests only.
+    window.__fatiha_show = {
+      TOUR, startTour, endTour, viewHash, viewFromHash,
+      get tour() {
+        return tour ? { i: tour.i, place: PLACES[tour.i] ? PLACES[tour.i].id : null, credit: creditEl.classList.contains('show'),
+          name: $('cine-name').textContent, timers: tourTimers.size, sound: tour.soundSet } : null;
+      },
+      get timers() { return { tour: tourTimers.size, time: timeTimers.size, toast: toastTimers.size }; },
+      get time() { return { open: timeOpen, value: +timeRange.value, locked: timeLocked, clock: $('tb-clock').textContent, where: $('tb-where').textContent }; },
+      get epic() { return { open: epicOpen, i: epic.i, n: epic.items.length, src: epicImg.getAttribute('src') }; },
+      epicForget() { epic.items = []; epic.at = 0; },
+    };
+    return { viewFromHash, flyToSharedView };
+  })();
+
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.
   // Dusk over Asia: the terminator crosses the east of the first view, so the night side and its city lights show.
@@ -2845,7 +4769,7 @@
   const placeFromHash = () => PLACES.find((x) => x.id === location.hash.slice(1));
   let opened = false;
   // The intro stays up until the visitor starts the journey; a deep link
-  // (index.html#alhambra) skips it.
+  // (index.html#alhambra) or a shared view (index.html#vue=…) skips it.
   function ready() {
     if (opened) return;
     opened = true; removeTileListener();
@@ -2853,15 +4777,16 @@
     const btn = $('btn-start');
     btn.disabled = false; btn.textContent = 'Commencer le voyage';
     btn.addEventListener('click', open);
-    if (placeFromHash()) open(); else btn.focus();
+    if (placeFromHash() || spectacle.viewFromHash()) open(); else btn.focus();
   }
   function open() {
     if (loader.classList.contains('done')) return;
     loader.classList.add('done');
-    // Deep link (index.html#alhambra) or a place picked during loading
+    // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
-    const p = placeFromHash();
+    const p = placeFromHash(), v = p ? null : spectacle.viewFromHash();
     if (p && !activePlace) flyToPlace(p);
+    else if (v && !activePlace) spectacle.flyToSharedView(v);
     else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
       duration: 7500,
       onDone: () => setPhase('Orbite'),
@@ -2874,11 +4799,13 @@
   setTimeout(ready, 12000);
   window.addEventListener('hashchange', () => {
     const p = placeFromHash();
-    if (p) { open(); flyToPlace(p); }
+    if (p) { open(); flyToPlace(p); return; }
+    const v = spectacle.viewFromHash();
+    if (v) { if (loader.classList.contains('done')) spectacle.flyToSharedView(v); else open(); }
   });
 
   // Exposed for automated tests only.
-  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
 })();
 </script>
 </body>
