@@ -248,6 +248,21 @@
   .live .chips { display: flex; gap: 6px; margin: 6px 0; }
   .live .chips .btn { padding: 4px 10px; font-size: 11px; }
   .live .refs a { color: var(--accent); }
+  .live #cam-embed { display: grid; gap: 10px; margin: 8px 0; }
+  .live .cam-box { margin: 0; display: grid; gap: 4px; min-width: 0; }
+  .live .cam-box figcaption {
+    font: 500 10px/1.4 var(--font-mono); letter-spacing: .08em;
+    text-transform: uppercase; color: var(--accent-2);
+  }
+  .live .cam-scroll {
+    max-width: 100%; overflow-x: auto; overflow-y: hidden; border-radius: 10px;
+    background: #050d1b; -webkit-overflow-scrolling: touch; scrollbar-width: thin;
+  }
+  .live .cam-box iframe { display: block; border: 0; background: #050d1b; }
+  /* Nearby previews sit side by side inside Windy's widget. The frame is widened
+     only when several exist; pointer-events stay off so a finger can slide the strip. */
+  .live .cam-nearby { width: 100%; height: 250px; pointer-events: none; }
+  .live .cam-map { width: 100%; height: 230px; border-radius: 10px; }
   #hud-radio { display: inline-flex; gap: 6px; align-items: center; max-width: 46vw; }
   #hud-radio[hidden] { display: none; }
   #hud-radio b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -263,7 +278,12 @@
     .tools { flex-wrap: wrap; justify-content: flex-end; }
     .top { align-items: flex-start; }
     .watch { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 38vh; }
-    .live { top: calc(var(--gutter) + 150px + env(safe-area-inset-top)); left: var(--gutter); right: var(--gutter); width: auto; max-height: 52vh; }
+    /* End above the place strip. A vh max-height ran under the orbit badge and hid the bottom of the panel. */
+    .live {
+      top: calc(var(--gutter) + 150px + env(safe-area-inset-top));
+      left: var(--gutter); right: var(--gutter); width: auto; max-height: none;
+      bottom: calc(var(--gutter) + 128px + env(safe-area-inset-bottom));
+    }
     .places {
       top: auto; transform: none; right: var(--gutter); left: var(--gutter);
       bottom: calc(var(--gutter) + 48px + env(safe-area-inset-bottom));
@@ -361,8 +381,9 @@
       <p class="note">Playlists communautaires iptv-org : chaînes gratuites en accès libre. Beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
     </section>
     <section class="pane" id="pane-cam">
-      <p class="status">Webcams publiques : ouvertes dans un nouvel onglet, chez des annuaires qui les référencent avec l’accord de leurs propriétaires.</p>
-      <ul id="cam-links"></ul>
+      <p class="status" id="cam-status" aria-live="polite"></p>
+      <div id="cam-embed"></div>
+      <p class="note">Webcams publiques et carte : widgets officiels de Windy.com, affichés ici. Les images viennent des caméras que leurs propriétaires ont confiées à Windy. S’il n’y en a aucune près du point, le widget le dit.</p>
       <p class="note">Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
     </section>
     <section class="pane" id="pane-war">
@@ -382,7 +403,7 @@
         <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer">UCDP</a> ·
         <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a></p>
     </section>
-    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
+    <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, Windy.com, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
 
   <section class="ui card glass" id="card" aria-live="polite">
@@ -2171,9 +2192,10 @@
   // ---------- Direct: radios, free TV, public webcams, conflict headlines ----------
   // Nothing loads until the visitor opens the panel and picks a country. Each tab then calls a public service
   // that sees the visitor's address: radio-browser.info (radio directory), the iptv-org playlists on GitHub
-  // Pages (free TV), GDELT (news headlines), and jsDelivr (hls.js, country outlines). Cameras are only links
-  // to public webcam directories. None of these services could be reached from the development sandbox, so
-  // this code was tested against simulated responses in the documented formats, not against the real services.
+  // Pages (free TV), GDELT (news headlines), jsDelivr (hls.js, country outlines), and — only while the
+  // Cameras tab is open on a known point — Windy.com's official public-webcam and map embeds.
+  // Radios, TV and headlines were tested against simulated responses: those hosts are not reachable from
+  // the development sandbox. The camera embeds use Windy's public pages, which answer without an API key.
   const COUNTRY_CODES = 'AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK XK YE YT ZA ZM ZW'.split(' ');
   const NUMERIC_TO_A2 = {"100":"BG","104":"MM","108":"BI","112":"BY","116":"KH","120":"CM","124":"CA","140":"CF","144":"LK","148":"TD","152":"CL","156":"CN","158":"TW","170":"CO","178":"CG","180":"CD","188":"CR","191":"HR","192":"CU","196":"CY","203":"CZ","204":"BJ","208":"DK","214":"DO","218":"EC","222":"SV","226":"GQ","231":"ET","232":"ER","233":"EE","238":"FK","242":"FJ","246":"FI","250":"FR","260":"TF","262":"DJ","266":"GA","268":"GE","270":"GM","275":"PS","276":"DE","288":"GH","300":"GR","304":"GL","320":"GT","324":"GN","328":"GY","332":"HT","340":"HN","348":"HU","352":"IS","356":"IN","360":"ID","364":"IR","368":"IQ","372":"IE","376":"IL","380":"IT","384":"CI","388":"JM","392":"JP","398":"KZ","400":"JO","404":"KE","408":"KP","410":"KR","414":"KW","417":"KG","418":"LA","422":"LB","426":"LS","428":"LV","430":"LR","434":"LY","440":"LT","442":"LU","450":"MG","454":"MW","458":"MY","466":"ML","478":"MR","484":"MX","496":"MN","498":"MD","499":"ME","504":"MA","508":"MZ","512":"OM","516":"NA","524":"NP","528":"NL","540":"NC","548":"VU","554":"NZ","558":"NI","562":"NE","566":"NG","578":"NO","586":"PK","591":"PA","598":"PG","600":"PY","604":"PE","608":"PH","616":"PL","620":"PT","624":"GW","626":"TL","630":"PR","634":"QA","642":"RO","643":"RU","646":"RW","682":"SA","686":"SN","688":"RS","694":"SL","703":"SK","704":"VN","705":"SI","706":"SO","710":"ZA","716":"ZW","724":"ES","728":"SS","729":"SD","732":"EH","740":"SR","748":"SZ","752":"SE","756":"CH","760":"SY","762":"TJ","764":"TH","768":"TG","780":"TT","784":"AE","788":"TN","792":"TR","795":"TM","800":"UG","804":"UA","807":"MK","818":"EG","826":"GB","834":"TZ","840":"US","854":"BF","858":"UY","860":"UZ","862":"VE","887":"YE","894":"ZM","032":"AR","044":"BS","076":"BR","068":"BO","084":"BZ","072":"BW","024":"AO","012":"DZ","050":"BD","064":"BT","004":"AF","051":"AM","040":"AT","008":"AL","056":"BE","090":"SB","036":"AU","031":"AZ","096":"BN","010":"AQ","070":"BA"};
   const COUNTRIES_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json';
@@ -2230,7 +2252,7 @@
     if (open) {
       $('watch').classList.remove('open'); $('btn-watch').setAttribute('aria-pressed', 'false');
       updateHint(); loadTab();
-    } else { clearInterval(warTimer); warTimer = 0; }
+    } else { clearInterval(warTimer); warTimer = 0; unloadCam(); }
   }
   $('btn-live').addEventListener('click', () => setLiveOpen(!liveOpen));
   function setTab(tab) {
@@ -2244,6 +2266,7 @@
     clearInterval(warTimer); warTimer = 0;
     if (!liveOpen) return;
     if (live.tab === 'cam') { renderCam(); return; }
+    unloadCam();
     if (live.tab === 'war') {
       if (live.loaded.war !== (live.cc || '*')) loadWar();
       warTimer = setInterval(() => { if (!document.hidden) loadWar(); }, 300000);
@@ -2423,19 +2446,365 @@
     fillList($('tv-list'), channels, (c) => itemButton(c.name, c.group || 'chaîne', () => playMedia('tv', { name: c.name, url: c.url, hls: !/\.(mp4|webm)(\?|$)/i.test(c.url) }, 'tv-status')));
   }
 
-  // ----- Public webcams: links only -----
+  // ----- Public webcams: official Windy.com widgets, inside the panel -----
+  // Nearby: the iframe Windy's "Nearby webcams" embed builds
+  //   (webcams.windy.com/webcams/public/embed/nearby). It lays cameras out in a row,
+  //   one per 340 px, and says "No webcam found" when it has none.
+  // Map: Windy's official map widget (embed.windy.com/embed.html).
+  // Both are created only while this tab is open on a known point. The sandbox keeps
+  // their scripts but no popups and no top navigation. No private or unsecured cameras.
+  // Do not iframe www.windy.com (frame-ancestors 'self' *.windy.com, so the frame stays blank)
+  // and do not call api.windy.com (403 without a key; this page has none).
+  const CAM_SANDBOX = 'allow-scripts allow-same-origin';
+  const CAM_SLOT_PX = 340;
+  const CAM_ASK = 4;
+  // Representative point when the visitor only picked a country: capital, or the
+  // country's centre when it has no capital. Third value 1 = capital. Public data
+  // (Wikidata capitals; country centres from the same public country list). Not a request.
+  const COUNTRY_POINTS = {
+    AD: [42.51, 1.52, 1],
+    AE: [24.45, 54.40, 1],
+    AF: [34.53, 69.17, 1],
+    AG: [17.12, -61.84, 1],
+    AI: [18.22, -63.05, 1],
+    AL: [41.33, 19.82, 1],
+    AM: [40.18, 44.51, 1],
+    AO: [-8.84, 13.23, 1],
+    AQ: [-90.00, 0.00, 0],
+    AR: [-34.60, -58.38, 1],
+    AS: [-14.28, -170.70, 1],
+    AT: [48.21, 16.37, 1],
+    AU: [-35.29, 149.13, 1],
+    AW: [12.52, -70.04, 1],
+    AX: [60.10, 19.94, 1],
+    AZ: [40.37, 49.84, 1],
+    BA: [43.86, 18.41, 1],
+    BB: [13.10, -59.62, 1],
+    BD: [23.73, 90.39, 1],
+    BE: [50.85, 4.35, 1],
+    BF: [12.37, -1.53, 1],
+    BG: [42.70, 23.32, 1],
+    BH: [26.22, 50.58, 1],
+    BI: [-3.43, 29.93, 1],
+    BJ: [6.48, 2.62, 1],
+    BL: [17.90, -62.85, 1],
+    BM: [32.30, -64.78, 1],
+    BN: [4.92, 114.92, 1],
+    BO: [-16.50, -68.13, 1],
+    BQ: [12.18, -68.25, 0],
+    BR: [-15.79, -47.88, 1],
+    BS: [25.08, -77.34, 1],
+    BT: [27.47, 89.63, 1],
+    BV: [-54.43, 3.40, 0],
+    BW: [-24.66, 25.91, 1],
+    BY: [53.90, 27.56, 1],
+    BZ: [17.25, -88.77, 1],
+    CA: [45.42, -75.69, 1],
+    CC: [-12.19, 96.83, 1],
+    CD: [-4.32, 15.31, 1],
+    CF: [4.37, 18.56, 1],
+    CG: [-4.27, 15.27, 1],
+    CH: [46.95, 7.45, 1],
+    CI: [6.82, -5.27, 1],
+    CK: [-21.21, -159.77, 1],
+    CL: [-33.44, -70.65, 1],
+    CM: [3.86, 11.52, 1],
+    CN: [39.90, 116.41, 1],
+    CO: [4.61, -74.08, 1],
+    CR: [9.93, -84.08, 1],
+    CU: [23.14, -82.36, 1],
+    CV: [14.92, -23.51, 1],
+    CW: [12.11, -68.94, 1],
+    CX: [-10.42, 105.68, 1],
+    CY: [35.17, 33.37, 1],
+    CZ: [50.09, 14.42, 1],
+    DE: [52.52, 13.38, 1],
+    DJ: [11.60, 43.15, 1],
+    DK: [55.68, 12.57, 1],
+    DM: [15.30, -61.38, 1],
+    DO: [18.46, -69.94, 1],
+    DZ: [36.78, 3.06, 1],
+    EC: [-0.22, -78.51, 1],
+    EE: [59.44, 24.75, 1],
+    EG: [30.04, 31.24, 1],
+    EH: [24.50, -13.00, 0],
+    ER: [15.33, 38.92, 1],
+    ES: [40.42, -3.70, 1],
+    ET: [9.04, 38.75, 1],
+    FI: [60.17, 24.94, 1],
+    FJ: [-18.13, 178.43, 1],
+    FK: [-51.69, -57.85, 1],
+    FM: [6.92, 158.19, 1],
+    FO: [62.01, -6.77, 1],
+    FR: [48.86, 2.35, 1],
+    GA: [0.41, 9.44, 1],
+    GB: [51.51, -0.13, 1],
+    GD: [12.05, -61.75, 1],
+    GE: [41.72, 44.79, 1],
+    GF: [4.94, -52.34, 1],
+    GG: [49.46, -2.55, 1],
+    GH: [5.56, -0.20, 1],
+    GI: [36.14, -5.35, 1],
+    GL: [64.17, -51.73, 1],
+    GM: [13.45, -16.58, 1],
+    GN: [9.51, -13.71, 1],
+    GP: [16.00, -61.73, 1],
+    GQ: [1.59, 10.82, 1],
+    GR: [37.98, 23.73, 1],
+    GS: [-54.28, -36.49, 1],
+    GT: [14.64, -90.51, 1],
+    GU: [13.48, 144.75, 1],
+    GW: [11.86, -15.58, 1],
+    GY: [6.81, -58.15, 1],
+    HK: [22.27, 114.19, 0],
+    HM: [-53.10, 72.52, 0],
+    HN: [14.11, -87.20, 1],
+    HR: [45.81, 15.98, 1],
+    HT: [18.55, -72.34, 1],
+    HU: [47.50, 19.04, 1],
+    ID: [-6.18, 106.83, 1],
+    IE: [53.35, -6.26, 1],
+    IL: [31.78, 35.23, 1],
+    IM: [54.15, -4.48, 1],
+    IN: [28.61, 77.21, 1],
+    IO: [-7.31, 72.41, 1],
+    IQ: [33.32, 44.37, 1],
+    IR: [35.69, 51.39, 1],
+    IS: [64.15, -21.93, 1],
+    IT: [41.89, 12.48, 1],
+    JE: [49.19, -2.11, 1],
+    JM: [17.97, -76.79, 1],
+    JO: [31.95, 35.93, 1],
+    JP: [35.69, 139.69, 1],
+    KE: [-1.29, 36.82, 1],
+    KG: [42.87, 74.57, 1],
+    KH: [11.57, 104.92, 1],
+    KI: [1.33, 172.97, 1],
+    KM: [-11.70, 43.25, 1],
+    KN: [17.30, -62.73, 1],
+    KP: [39.02, 125.75, 1],
+    KR: [37.56, 126.99, 1],
+    KW: [29.38, 47.98, 1],
+    KY: [19.30, -81.38, 1],
+    KZ: [51.13, 71.43, 1],
+    LA: [17.98, 102.63, 1],
+    LB: [33.89, 35.51, 1],
+    LC: [14.01, -60.99, 1],
+    LI: [47.14, 9.52, 1],
+    LK: [6.93, 79.86, 1],
+    LR: [6.31, -10.80, 1],
+    LS: [-29.32, 27.48, 1],
+    LT: [54.69, 25.28, 1],
+    LU: [49.61, 6.13, 1],
+    LV: [56.95, 24.11, 1],
+    LY: [32.89, 13.19, 1],
+    MA: [34.02, -6.84, 1],
+    MC: [43.73, 7.42, 1],
+    MD: [47.02, 28.84, 1],
+    ME: [42.44, 19.26, 1],
+    MF: [18.07, -63.08, 1],
+    MG: [-18.91, 47.52, 1],
+    MH: [7.09, 171.38, 1],
+    MK: [42.00, 21.43, 1],
+    ML: [12.65, -7.99, 1],
+    MM: [19.75, 96.11, 1],
+    MN: [47.92, 106.91, 1],
+    MO: [22.17, 113.55, 0],
+    MP: [15.21, 145.75, 1],
+    MQ: [14.60, -61.07, 1],
+    MR: [18.09, -15.98, 1],
+    MS: [16.71, -62.22, 1],
+    MT: [35.90, 14.51, 1],
+    MU: [-20.16, 57.50, 1],
+    MV: [4.17, 73.51, 1],
+    MW: [-13.99, 33.77, 1],
+    MX: [19.35, -99.14, 1],
+    MY: [3.15, 101.70, 1],
+    MZ: [-25.97, 32.57, 1],
+    NA: [-22.57, 17.08, 1],
+    NC: [-22.27, 166.45, 1],
+    NE: [13.52, 2.12, 1],
+    NF: [-29.05, 167.97, 1],
+    NG: [9.06, 7.49, 1],
+    NI: [12.15, -86.27, 1],
+    NL: [52.37, 4.88, 1],
+    NO: [59.91, 10.74, 1],
+    NP: [27.71, 85.32, 1],
+    NR: [-0.55, 166.92, 1],
+    NU: [-19.06, -169.92, 1],
+    NZ: [-41.29, 174.78, 1],
+    OM: [23.61, 58.59, 1],
+    PA: [8.97, -79.53, 1],
+    PE: [-12.06, -77.04, 1],
+    PF: [-17.54, -149.57, 1],
+    PG: [-9.48, 147.15, 1],
+    PH: [14.60, 120.98, 1],
+    PK: [33.70, 73.04, 1],
+    PL: [52.23, 21.01, 1],
+    PM: [46.82, -56.34, 1],
+    PN: [-25.07, -130.10, 1],
+    PR: [18.47, -66.12, 1],
+    PS: [31.78, 35.23, 1],
+    PT: [38.71, -9.14, 1],
+    PW: [7.50, 134.62, 1],
+    PY: [-25.28, -57.63, 1],
+    QA: [25.29, 51.53, 1],
+    RE: [-20.88, 55.45, 1],
+    RO: [44.41, 26.10, 1],
+    RS: [44.82, 20.46, 1],
+    RU: [55.75, 37.62, 1],
+    RW: [-1.95, 30.11, 1],
+    SA: [24.64, 46.72, 1],
+    SB: [-9.43, 159.95, 1],
+    SC: [-4.62, 55.45, 1],
+    SD: [15.60, 32.53, 1],
+    SE: [59.33, 18.07, 1],
+    SG: [1.30, 103.80, 1],
+    SH: [-15.93, -5.72, 1],
+    SI: [46.05, 14.51, 1],
+    SJ: [78.00, 20.00, 0],
+    SK: [48.15, 17.11, 1],
+    SL: [8.49, -13.24, 1],
+    SM: [43.93, 12.45, 1],
+    SN: [14.67, -17.43, 1],
+    SO: [2.04, 45.34, 1],
+    SR: [5.87, -55.17, 1],
+    SS: [4.85, 31.58, 1],
+    ST: [0.34, 6.73, 1],
+    SV: [13.70, -89.19, 1],
+    SX: [18.02, -63.04, 1],
+    SY: [33.51, 36.29, 1],
+    SZ: [-26.32, 31.13, 1],
+    TC: [21.46, -71.14, 1],
+    TD: [12.11, 15.05, 1],
+    TF: [-49.35, 70.22, 1],
+    TG: [6.13, 1.22, 1],
+    TH: [13.75, 100.52, 1],
+    TJ: [38.57, 68.79, 1],
+    TK: [-9.00, -172.00, 0],
+    TL: [-8.55, 125.58, 1],
+    TM: [37.95, 58.38, 1],
+    TN: [36.80, 10.18, 1],
+    TO: [-21.13, -175.20, 1],
+    TR: [39.94, 32.84, 1],
+    TT: [10.67, -61.52, 1],
+    TV: [-8.50, 179.12, 1],
+    TW: [25.04, 121.56, 1],
+    TZ: [-6.18, 35.75, 1],
+    UA: [50.45, 30.52, 1],
+    UG: [0.31, 32.58, 1],
+    UM: [19.30, 166.63, 0],
+    US: [38.90, -77.04, 1],
+    UY: [-34.91, -56.19, 1],
+    UZ: [41.31, 69.28, 1],
+    VA: [41.90, 12.45, 1],
+    VC: [13.16, -61.23, 1],
+    VE: [10.51, -66.91, 1],
+    VG: [18.43, -64.62, 1],
+    VI: [18.35, -64.95, 1],
+    VN: [21.02, 105.84, 1],
+    VU: [-17.73, 168.32, 1],
+    WF: [-13.28, -176.17, 1],
+    WS: [-13.83, -171.83, 1],
+    XK: [42.67, 21.17, 1],
+    YE: [12.80, 45.03, 1],
+    YT: [-12.79, 45.27, 1],
+    ZA: [-25.75, 28.19, 1],
+    ZM: [-15.42, 28.28, 1],
+    ZW: [-17.83, 31.05, 1],
+  };
+  const windyNearbyUrl = (lat, lon) => 'https://webcams.windy.com/webcams/public/embed/nearby?' + new URLSearchParams({
+    lat: lat.toFixed(4), lon: lon.toFixed(4), numberOfWebcams: String(CAM_ASK),
+    referrer: encodeURIComponent(location.origin + location.pathname),
+    sr: `${(screen && screen.width) || 0}x${(screen && screen.height) || 0}`,
+  }).toString();
+  const windyMapUrl = (lat, lon) => 'https://embed.windy.com/embed.html?' + new URLSearchParams({
+    type: 'map', location: 'coordinates', metricRain: 'default', metricTemp: 'default', metricWind: 'default',
+    zoom: '9', overlay: 'wind', product: 'ecmwf', level: 'surface',
+    lat: lat.toFixed(3), lon: lon.toFixed(3), detailLat: lat.toFixed(3), detailLon: lon.toFixed(3),
+    marker: 'true', message: 'true',
+  }).toString();
+  let camKey = '', camToken = 0;
+  function unloadCam() {
+    camKey = ''; camToken++;
+    const host = $('cam-embed'); if (host) host.replaceChildren();
+  }
+  function camFocus() {
+    if (live.lat != null && live.lon != null) {
+      return { lat: live.lat, lon: live.lon, kind: 'point', name: live.label || (live.cc ? nameFr(live.cc) : '') };
+    }
+    const row = live.cc && COUNTRY_POINTS[live.cc];
+    if (!row) return null;
+    return { lat: row[0], lon: row[1], kind: row[2] ? 'capital' : 'centre', name: nameFr(live.cc) };
+  }
+  function camStatus(focus) {
+    if (focus.kind === 'point') {
+      const name = focus.name || 'Ce point';
+      return `${name} (${focus.lat.toFixed(3)}, ${focus.lon.toFixed(3)}) : webcams publiques les plus proches et carte, affichées ici.`;
+    }
+    const where = focus.kind === 'capital' ? 'la capitale' : 'le centre du pays';
+    return `${focus.name} : webcams publiques autour de ${where}. Touche le globe ou choisis un lieu du parcours pour recentrer.`;
+  }
+  function camFrame(src, title, cls) {
+    const f = document.createElement('iframe');
+    f.src = src; f.title = title; f.className = cls;
+    f.setAttribute('sandbox', CAM_SANDBOX);
+    f.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    f.setAttribute('scrolling', 'no'); f.setAttribute('frameborder', '0');
+    return f;
+  }
+  function camBlock(heading, frame, hint) {
+    const box = document.createElement('figure'); box.className = 'cam-box';
+    const cap = document.createElement('figcaption'); cap.textContent = heading;
+    box.appendChild(cap);
+    if (hint) { const p = document.createElement('p'); p.className = 'note'; p.textContent = hint; box.appendChild(p); }
+    if (frame.classList.contains('cam-nearby')) {
+      const scroller = document.createElement('div'); scroller.className = 'cam-scroll';
+      scroller.appendChild(frame); box.appendChild(scroller);
+    } else box.appendChild(frame);
+    return box;
+  }
+  // The embed page reports how many previews it built. Widen only then, so a single
+  // camera is not covered by Windy's last-tile "Explore more", and "No webcam found" stays in view.
+  async function nearbySlots(url) {
+    try {
+      const text = await fetchText(url, 8000);
+      const m = /numberOfNearbyWebcams\s*=\s*(\d+)/.exec(text);
+      return m ? +m[1] : null;
+    } catch (e) { return null; }
+  }
   function renderCam() {
-    const name = live.label || (live.cc ? nameFr(live.cc) : '');
-    const links = [];
-    if (live.lat != null) links.push(['Carte Windy des webcams autour de ce point', 'fond cartographique avec les webcams publiques', `https://www.windy.com/-Webcams-webcams?${live.lat.toFixed(3)},${live.lon.toFixed(3)},9`]);
-    if (name) links.push([`Webcams en direct sur YouTube : ${name}`, 'recherche filtrée sur les directs', `https://www.youtube.com/results?search_query=${encodeURIComponent(`webcam live ${name}`)}&sp=EgJAAQ%253D%253D`]);
-    const ul = $('cam-links'); ul.replaceChildren();
-    if (!links.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Choisis un pays ou un lieu pour voir les liens.'; ul.appendChild(li); return; }
-    links.forEach(([title, sub, href]) => {
-      const li = document.createElement('li'), a = document.createElement('a');
-      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      const t = document.createElement('span'); t.textContent = title; const s = document.createElement('small'); s.textContent = `${sub} ↗`;
-      a.append(t, s); li.appendChild(a); ul.appendChild(li);
+    const focus = camFocus();
+    const host = $('cam-embed');
+    if (!focus) {
+      unloadCam();
+      say('cam-status', live.cc
+        ? `${nameFr(live.cc)} : pas de point pour ce pays. Touche le globe ou choisis un lieu du parcours.`
+        : 'Choisis un pays, un lieu du parcours, ou touche le globe pour afficher les webcams publiques ici.');
+      return;
+    }
+    const key = `${focus.kind}:${focus.lat.toFixed(4)},${focus.lon.toFixed(4)}`;
+    say('cam-status', camStatus(focus));
+    if (key === camKey && host.querySelector('iframe')) return;
+    camKey = key;
+    const token = ++camToken;
+    const nearby = windyNearbyUrl(focus.lat, focus.lon);
+    const map = windyMapUrl(focus.lat, focus.lon);
+    host.replaceChildren();
+    const wait = document.createElement('p'); wait.className = 'note'; wait.textContent = 'Chargement des webcams publiques…';
+    host.appendChild(wait);
+    nearbySlots(nearby).then((slots) => {
+      if (token !== camToken || key !== camKey) return;
+      const count = slots == null ? 1 : slots;
+      const shown = Math.min(Math.max(count, 0), 5);
+      const near = camFrame(nearby, `Webcams publiques les plus proches de ${focus.name || 'ce point'} (widget Windy.com)`, 'cam-nearby');
+      if (shown > 1) near.style.width = `${shown * CAM_SLOT_PX}px`;
+      const hint = shown > 1 ? 'Fais glisser de côté pour voir les autres caméras.' : '';
+      const mapFrame = camFrame(map, `Carte Windy.com centrée sur ${focus.name || 'ce point'}`, 'cam-map');
+      host.replaceChildren(
+        camBlock('Webcams publiques les plus proches · Windy.com', near, hint),
+        camBlock('Carte autour du lieu · Windy.com', mapFrame, ''),
+      );
     });
   }
 
