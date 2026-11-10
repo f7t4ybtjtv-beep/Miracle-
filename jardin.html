@@ -359,6 +359,17 @@
     });
   }
 
+  // the typewriter must be stopped before any other text is written to the
+  // panel, or its pending ticks overwrite that text (the ending, the intro)
+  function stopTyping(){
+    if (typeTimer) { clearInterval(typeTimer); typeTimer = null; }
+  }
+  function clearSilence(){
+    pLira.classList.remove('silence');
+    pNox.classList.remove('silence');
+    panel.classList.remove('silence');
+  }
+
   function showBeat(i){
     const beat = script[i];
     pLira.classList.toggle('active', beat.speaker === 'lira');
@@ -383,7 +394,7 @@
       panelLine.textContent = full;
       return;
     }
-    if (typeTimer) clearInterval(typeTimer);
+    stopTyping();
     let j = 0;
     panelLine.textContent = '';
     typeTimer = setInterval(() => {
@@ -395,6 +406,8 @@
   function advance(){
     step++;
     if (step >= script.length) {
+      stopTyping();
+      clearSilence();
       nextBtn.style.display = 'none';
       replayBtn.style.display = 'inline-block';
       pLira.classList.remove('active');
@@ -411,6 +424,7 @@
 
   function replay(){
     step = -1;
+    stopTyping();
     if (window.speechSynthesis) speechSynthesis.cancel();
     noxParticles.querySelectorAll('circle').forEach(c => c.removeAttribute('style'));
     const original = [
@@ -421,8 +435,7 @@
       c.setAttribute('cx', original[i][0]);
       c.setAttribute('cy', original[i][1]);
     });
-    pLira.classList.remove('silence');
-    pNox.classList.remove('silence');
+    clearSilence();
     nextBtn.style.display = 'inline-block';
     replayBtn.style.display = 'none';
     panelLine.className = 'line';

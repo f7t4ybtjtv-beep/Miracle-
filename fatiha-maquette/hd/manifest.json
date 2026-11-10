@@ -1,0 +1,100 @@
+[
+  {
+    "file": "iss-italie-1280.webp",
+    "width": 1280,
+    "height": 852,
+    "quality": 90,
+    "bytes": 234596
+  },
+  {
+    "file": "iss-italie-1280.jpg",
+    "width": 1280,
+    "height": 852,
+    "quality": 92,
+    "bytes": 364436
+  },
+  {
+    "file": "iss-italie-2560.webp",
+    "width": 2560,
+    "height": 1704,
+    "quality": 90,
+    "bytes": 1154968
+  },
+  {
+    "file": "iss-italie-2560.jpg",
+    "width": 2560,
+    "height": 1704,
+    "quality": 92,
+    "bytes": 1554668
+  },
+  {
+    "file": "iss-italie-3840.webp",
+    "width": 3840,
+    "height": 2556,
+    "quality": 90,
+    "bytes": 2843536
+  },
+  {
+    "file": "iss-italie-3840.jpg",
+    "width": 3840,
+    "height": 2556,
+    "quality": 92,
+    "bytes": 3625713
+  },
+  {
+    "file": "iss-italie-4928.webp",
+    "width": 4928,
+    "height": 3280,
+    "quality": 90,
+    "bytes": 4434850
+  },
+  {
+    "file": "iss-italie-4928.jpg",
+    "width": 4928,
+    "height": 3280,
+    "quality": 92,
+    "bytes": 4272256
+  },
+  {
+    "file": "black-marble-europe-1280.webp",
+    "width": 1280,
+    "height": 1024,
+    "quality": 90,
+    "bytes": 235926
+  },
+  {
+    "file": "black-marble-europe-1280.jpg",
+    "width": 1280,
+    "height": 1024,
+    "quality": 92,
+    "bytes": 421506
+  },
+  {
+    "file": "black-marble-europe-2560.webp",
+    "width": 2560,
+    "height": 2048,
+    "quality": 90,
+    "bytes": 745338
+  },
+  {
+    "file": "black-marble-europe-2560.jpg",
+    "width": 2560,
+    "height": 2048,
+    "quality": 92,
+    "bytes": 1465362
+  },
+  {
+    "file": "black-marble-europe-3840.webp",
+    "width": 3840,
+    "height": 3072,
+    "quality": 90,
+    "bytes": 1407942
+  },
+  {
+    "file": "black-marble-europe-3840.jpg",
+    "width": 3840,
+    "height": 3072,
+    "quality": 92,
+    "bytes": 2915516
+  }
+]

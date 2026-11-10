@@ -1,0 +1,253 @@
+/* FATIHA — finition visuelle autonome, sans dépendance JavaScript.
+   Charger les Google Fonts depuis le <head> (exemple dans apercu.html).
+   Tous les sélecteurs sont préfixés « fatiha- » ; aucune règle Cesium interne.
+   .fatiha-app accueille le canvas plein écran et les overlays frères.
+*/
+:root{
+ --fatiha-night:#121313;--fatiha-sand:#f5e9d7;--fatiha-muted:#b9a58e;
+ --fatiha-gold:#e4ba7b;--fatiha-copper:#b66d4b;--fatiha-line:#d9b47a3d;
+ --fatiha-panel:#251e18e8;--fatiha-serif:'Cormorant Garamond',Georgia,serif;
+ --fatiha-sans:'Inter',Arial,sans-serif;--fatiha-radius:22px;
+ --fatiha-space:clamp(16px,2.1vw,36px);color-scheme:dark;
+}
+.fatiha-app,.fatiha-app *,.fatiha-intro,.fatiha-intro *{box-sizing:border-box}
+.fatiha-app{position:relative;isolation:isolate;width:100%;height:100dvh;min-height:460px;overflow:hidden;background:var(--fatiha-night);color:var(--fatiha-sand);font:400 14px/1.6 var(--fatiha-sans);-webkit-font-smoothing:antialiased}
+/* Canvas Cesium : ajouter cette classe au conteneur du viewer. */
+.fatiha-canvas{position:absolute;inset:0;z-index:0;width:100%;height:100%}
+.fatiha-vignette{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,#0808086b,transparent 25%,transparent 60%,#08080877),radial-gradient(ellipse at center,transparent 40%,#09070655)}
+/* La couche est transparente aux interactions ; les panneaux restent cliquables. */
+.fatiha-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
+.fatiha-overlay>*,.fatiha-overlay button,.fatiha-overlay a{pointer-events:auto}
+.fatiha-panel{border:1px solid var(--fatiha-line);border-radius:var(--fatiha-radius);background:var(--fatiha-panel);box-shadow:0 18px 65px #0004;backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+.fatiha-eyebrow{margin:0;color:var(--fatiha-gold);font:500 10px/1.5 var(--fatiha-sans);text-transform:uppercase;letter-spacing:.2em}
+/* Bandeau d'hommage : le nom et le lien personnel restent du texte HTML. */
+.fatiha-header{position:absolute;inset:var(--fatiha-space) var(--fatiha-space) auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.fatiha-brand{display:flex;align-items:center;gap:20px;padding:14px 22px;text-decoration:none;color:inherit}
+.fatiha-brand__name{margin:0;color:var(--fatiha-sand);font:500 38px/.95 var(--fatiha-serif);letter-spacing:-.02em}
+.fatiha-brand__dedication{font:italic 500 19px/1.1 var(--fatiha-serif);color:var(--fatiha-gold);border-left:1px solid var(--fatiha-line);padding-left:20px}
+.fatiha-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.fatiha-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:11px 17px;border:1px solid var(--fatiha-line);border-radius:100px;background:#211b15cf;color:var(--fatiha-sand);font:500 11px/1.3 var(--fatiha-sans);text-decoration:none;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.fatiha-button:hover{border-color:var(--fatiha-gold);background:#493724}
+.fatiha-button:active{transform:translateY(1px)}
+.fatiha-button--primary{padding:16px 25px;border-color:#f1d3a4;background:var(--fatiha-gold);color:#21170e;box-shadow:0 8px 35px #be8c4a26}
+.fatiha-button--primary:hover{background:#f0d2a2;color:#21170e}
+.fatiha-button:disabled{opacity:.4;cursor:wait;transform:none}
+.fatiha-app :focus-visible,.fatiha-intro :focus-visible{outline:2px solid var(--fatiha-gold);outline-offset:4px}
+/* Carte photo : grand visuel, crédit immédiatement visible, texte jamais tronqué. */
+.fatiha-card{position:absolute;left:var(--fatiha-space);bottom:100px;width:min(435px,calc(100% - 2 * var(--fatiha-space)));max-height:calc(100dvh - 230px);overflow:auto;scrollbar-width:thin;scrollbar-color:#d5b17366 transparent;transition:opacity .45s,transform .45s}
+.fatiha-card[hidden]{display:none}
+.fatiha-card.is-entering{animation:fatiha-reveal .55s both}
+.fatiha-photo{margin:0;position:relative;overflow:hidden;border-radius:calc(var(--fatiha-radius) - 1px) calc(var(--fatiha-radius) - 1px) 0 0;background:#30291f}
+.fatiha-photo__image{display:block;width:100%;height:230px;object-fit:cover;object-position:center;transition:opacity .45s,transform 1s}
+.fatiha-photo__caption{position:absolute;left:24px;right:24px;bottom:48px;z-index:1;margin:0;color:#fff2dc;text-shadow:0 2px 14px #000a;font:italic 500 27px/1.1 var(--fatiha-serif);pointer-events:none}
+.fatiha-photo:after{content:'';position:absolute;inset:50% 0 27px;background:linear-gradient(transparent,#13100d88);pointer-events:none}
+.fatiha-photo__credit{position:relative;z-index:2;display:block;margin:0;padding:8px 13px;background:#1a1714;color:#c5b49e;font:400 9px/1.4 var(--fatiha-sans)}
+.fatiha-photo__credit a{color:inherit;text-underline-offset:2px}
+.fatiha-card__body{padding:23px 25px 0}
+.fatiha-card__title{margin:7px 0 9px;color:var(--fatiha-sand);font:500 38px/1.04 var(--fatiha-serif);letter-spacing:-.015em}
+.fatiha-card__coords{margin:0;color:var(--fatiha-muted);font:400 10px/1.6 var(--fatiha-sans);font-variant-numeric:tabular-nums;letter-spacing:.03em}
+.fatiha-card__text{margin:17px 0;color:#dfd0bd;font:400 13px/1.8 var(--fatiha-sans)}
+.fatiha-card__meta{margin:0 0 17px;color:var(--fatiha-muted);font:400 10px/1.6 var(--fatiha-sans)}
+.fatiha-card__links{display:flex;gap:16px;flex-wrap:wrap;padding-bottom:20px}
+.fatiha-link{color:var(--fatiha-gold);font:500 10px/1.5 var(--fatiha-sans);text-decoration:none;border-bottom:1px solid #c5a16b55}
+.fatiha-link:hover{color:#ffe0ac;border-color:currentColor}
+/* Précédent/suivant : vraies balises <button>, les flèches sont décoratives. */
+.fatiha-navigation{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 25px;padding:15px 0 18px;border-top:1px solid var(--fatiha-line)}
+.fatiha-navigation__button{appearance:none;border:0;background:none;padding:6px 0;color:var(--fatiha-gold);font:500 11px/1.4 var(--fatiha-sans);cursor:pointer;white-space:nowrap}
+.fatiha-navigation__button:hover{color:#ffe5ba}
+.fatiha-navigation__button:disabled{opacity:.3;cursor:default}
+.fatiha-navigation__count{color:var(--fatiha-muted);font:400 10px/1 var(--fatiha-sans);letter-spacing:.1em;font-variant-numeric:tabular-nums}
+/* Index des dix lieux : aucune logique de caméra, aria-current est fourni par l'app. */
+.fatiha-index{position:absolute;right:var(--fatiha-space);top:132px;width:250px;max-height:calc(100dvh - 270px);overflow:auto;padding:18px 12px;scrollbar-width:thin}
+.fatiha-index__title{padding:0 10px 12px}
+.fatiha-index__list{list-style:none;padding:0;margin:0;display:grid;gap:4px}
+.fatiha-place{appearance:none;display:grid;grid-template-columns:26px 1fr;column-gap:8px;width:100%;padding:11px 10px;border:1px solid transparent;border-radius:12px;color:var(--fatiha-sand);background:none;text-align:left;font:500 12px/1.35 var(--fatiha-sans);cursor:pointer;transition:background .2s,border-color .2s}
+.fatiha-place__number{grid-row:1/3;color:#ac8c62;font:italic 500 18px/1 var(--fatiha-serif)}
+.fatiha-place__country{display:block;grid-column:2;color:var(--fatiha-muted);font:400 9px/1.5 var(--fatiha-sans);margin-top:3px}
+.fatiha-place:hover{background:#b38c4e12}
+.fatiha-place[aria-current=true]{background:#bc8d4e1c;border-color:#d2ac715a}
+/* Statut et sources : une seule ligne, loin des contrôles Cesium. */
+.fatiha-footer{position:absolute;inset:auto var(--fatiha-space) 25px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.fatiha-status{margin:0;padding:10px 15px;font:400 10px/1.5 var(--fatiha-sans);color:var(--fatiha-muted)}
+.fatiha-status strong{font-weight:500;color:var(--fatiha-gold)}
+.fatiha-sources{max-width:280px;padding:10px 14px;font:400 10px/1.6 var(--fatiha-sans);color:var(--fatiha-muted)}
+.fatiha-sources summary{cursor:pointer;color:var(--fatiha-sand)}
+/* Écran d'intro : option photo véritable OU dégradé neutre. Retirer hidden pour afficher. */
+.fatiha-intro{position:absolute;inset:0;z-index:10;display:flex;align-items:center;overflow:auto;background:#16120f;color:var(--fatiha-sand);font-family:var(--fatiha-sans);isolation:isolate;transition:opacity .8s,visibility .8s}
+.fatiha-intro[hidden]{display:none}
+.fatiha-intro.is-leaving{opacity:0;visibility:hidden;pointer-events:none}
+.fatiha-intro__backdrop{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2;opacity:.7;background:radial-gradient(ellipse at 20% 30%,#72563e,#33281d 50%,#171412)}
+.fatiha-intro:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#0b090a33,#100c0ac9),linear-gradient(0deg,#100d0fe0,transparent 70%);pointer-events:none}
+.fatiha-intro__content{width:100%;max-width:1450px;margin:auto;padding:70px 9%}
+.fatiha-intro__eyebrow{display:inline-block;padding-top:18px;border-top:1px solid #e4ba7b77}
+.fatiha-intro__title{margin:25px 0 8px;font:500 clamp(100px,15vw,190px)/.9 var(--fatiha-serif);letter-spacing:-.045em;color:#fff0d9}
+.fatiha-intro__dedication{margin:0 0 32px;color:#eed0a3;font:italic 500 clamp(28px,4vw,44px)/1.1 var(--fatiha-serif)}
+.fatiha-intro__text{max-width:440px;margin:0 0 32px;color:#dccbb6;font:400 14px/1.9 var(--fatiha-sans)}
+.fatiha-intro__note{margin-top:18px;color:var(--fatiha-muted);font:400 10px/1.6 var(--fatiha-sans)}
+.fatiha-intro__credit{position:absolute;bottom:25px;left:9%;right:9%;color:var(--fatiha-muted);font:400 9px/1.6 var(--fatiha-sans)}
+@keyframes fatiha-reveal{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* Mobile : texte intégral défilant et index horizontal, canvas toujours accessible. */
+@media(max-width:900px){.fatiha-card{width:360px}.fatiha-photo__image{height:190px}.fatiha-card__title{font-size:32px}.fatiha-index{width:220px}.fatiha-brand__name{font-size:33px}.fatiha-brand__dedication{font-size:17px}.fatiha-header{gap:12px}.fatiha-tools{gap:5px}.fatiha-button{font-size:10px;padding:10px 13px}}
+@media(max-width:650px){
+ .fatiha-app{min-height:500px}.fatiha-header{align-items:flex-start;inset:calc(12px + env(safe-area-inset-top)) 12px auto}
+ .fatiha-brand{display:block;padding:11px 14px}.fatiha-brand__name{font-size:29px}.fatiha-brand__dedication{display:block;border:0;padding:4px 0 0;font-size:14px}
+ .fatiha-tools{max-width:190px}.fatiha-button{padding:9px 11px;font-size:9px}
+ .fatiha-card{left:12px;bottom:calc(150px + env(safe-area-inset-bottom));width:calc(100% - 24px);max-height:calc(100dvh - 310px);border-radius:18px}
+ .fatiha-photo__image{height:160px}.fatiha-photo__caption{left:19px;right:19px;font-size:24px}.fatiha-photo__credit{font-size:8px}
+ .fatiha-card__body{padding:18px 19px 0}.fatiha-card__title{font-size:31px}.fatiha-card__text{font-size:12px;line-height:1.75;margin:15px 0}.fatiha-card__meta{font-size:9px}
+ .fatiha-navigation{margin:0 19px;padding:11px 0 14px}.fatiha-navigation__button{font-size:10px}
+ .fatiha-index{left:12px;right:12px;top:auto;bottom:calc(68px + env(safe-area-inset-bottom));width:auto;max-height:70px;padding:7px;border-radius:14px;overflow:auto}
+ .fatiha-index__title{display:none}.fatiha-index__list{display:flex;gap:5px}.fatiha-place{min-width:175px;padding:8px;font-size:11px}.fatiha-place__number{font-size:17px}
+ .fatiha-footer{left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom));gap:8px}.fatiha-status{font-size:9px;padding:9px 11px}.fatiha-sources{font-size:9px;padding:9px 11px;max-width:135px}
+ .fatiha-intro__content{padding:60px 8%}.fatiha-intro__title{font-size:112px}.fatiha-intro__text{max-width:310px;font-size:13px}.fatiha-intro__credit{left:8%;right:8%;bottom:20px}
+}
+@media(max-height:650px) and (min-width:651px){.fatiha-card{bottom:80px;max-height:calc(100dvh - 190px)}.fatiha-photo__image{height:145px}.fatiha-index{top:110px;max-height:calc(100dvh - 210px)}.fatiha-intro__content{padding:35px 9%}.fatiha-intro__title{font-size:105px}}
+/* Respect de l'accessibilité : aucune animation nécessaire à la compréhension. */
+@media(prefers-reduced-motion:reduce){.fatiha-app *,.fatiha-intro *{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* ── Direction spatiale : lumières d'ambre, atmosphère bleu-vert ──────────
+   Inspiration des références fournies, sans réutiliser leurs pixels.
+   Les classes précédentes et le contrat de branchement sont inchangés.
+*/
+:root{
+ --fatiha-night:#020711;--fatiha-sand:#fff0d8;--fatiha-muted:#a6b3c3;
+ --fatiha-gold:#ffcb79;--fatiha-copper:#f79a45;--fatiha-line:#7dbedb36;
+ --fatiha-panel:#071321d9;--fatiha-blue:#338cff;--fatiha-teal:#53cfbe;
+ --fatiha-halo:#338cff24;--fatiha-amber:#ffad4f;
+}
+.fatiha-app{background:var(--fatiha-night)}
+.fatiha-vignette{background:linear-gradient(180deg,#00040d80,transparent 30%,transparent 60%,#00040d88),radial-gradient(ellipse at center,transparent 45%,#00030b7a)}
+.fatiha-panel{background:linear-gradient(135deg,#0d2030d9,#050d1be8);border-color:var(--fatiha-line);box-shadow:0 18px 65px #0006,0 0 30px #338cff0b,inset 0 1px 0 #88dae513;backdrop-filter:blur(24px) saturate(1.15);-webkit-backdrop-filter:blur(24px) saturate(1.15)}
+.fatiha-brand{border-color:#84bccc38;box-shadow:0 0 30px #338cff0e,inset 0 1px 0 #a6dfff12}
+.fatiha-brand__name{text-shadow:0 0 26px #ffd29e20}
+.fatiha-brand__dedication{color:var(--fatiha-gold)}
+.fatiha-eyebrow{color:var(--fatiha-gold);text-shadow:0 0 16px #ffb95517}
+.fatiha-button{background:#091524ce;border-color:#78a8c342;color:#e7f0f4;box-shadow:inset 0 1px 0 #a5d8ef0a}
+.fatiha-button:hover{background:#102b3e;border-color:#64bcce99;box-shadow:0 0 20px #338cff1c}
+.fatiha-button--primary{background:linear-gradient(135deg,#ffdc9b,#eda44f);border-color:#ffe7bd;color:#1b120a;box-shadow:0 0 32px #ffaf4f29,0 8px 35px #0004}
+.fatiha-button--primary:hover{background:linear-gradient(135deg,#ffe6bd,#ffc16f);color:#1b120a;box-shadow:0 0 40px #ffb44f38}
+.fatiha-card{border-color:#79d4d54d;box-shadow:0 18px 65px #0008,0 0 26px #338cff17,inset 0 1px 0 #74dfdf20;scrollbar-color:#5a9eb773 transparent}
+.fatiha-photo{background:#081522}
+.fatiha-photo:after{background:linear-gradient(transparent,#020712bb)}
+.fatiha-photo__caption{color:#fff1d7;text-shadow:0 2px 14px #000b,0 0 22px #ffbd6422}
+.fatiha-photo__credit{background:#030c16;color:#aebac7;border-top:1px solid #54b7cb22}
+.fatiha-card__title{color:#fff1dc;text-shadow:0 0 24px #ffbd6110}
+.fatiha-card__text{color:#d2dee5}.fatiha-card__coords,.fatiha-card__meta{color:#9baebf}
+.fatiha-navigation{border-color:#84bad12b}.fatiha-navigation__button,.fatiha-link{color:var(--fatiha-gold);text-shadow:0 0 15px #ffc16c15}.fatiha-link{border-bottom-color:#ffc16b44}
+.fatiha-place__number{color:var(--fatiha-amber)}
+.fatiha-place:hover{background:#48adcf12}
+.fatiha-place[aria-current=true]{background:linear-gradient(100deg,#f5b95117,#3e9dba0e);border-color:#ffcc7966;box-shadow:inset 2px 0 0 #ffc36a99,0 0 15px #f5ac3e08}
+.fatiha-status strong{color:var(--fatiha-gold)}
+/* Champ d'étoiles purement décoratif, sans requête, animation ni géographie.
+   Optionnel : placer derrière le mockup, jamais devant la surface de la Terre.
+   Dans Cesium réel, utiliser son SkyBox ; ne pas superposer ces étoiles au globe.
+*/
+.fatiha-starfield{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;background-image:radial-gradient(1px 1px at 13px 27px,#d8ecffb3 80%,transparent),radial-gradient(1px 1px at 97px 119px,#a9d4ff80 80%,transparent),radial-gradient(1.4px 1.4px at 211px 49px,#fff2d99c 70%,transparent),radial-gradient(.8px .8px at 73px 91px,#70b4e67a 80%,transparent),radial-gradient(.7px .7px at 143px 159px,#daecff66 80%,transparent);background-size:293px 211px,379px 293px,601px 467px,173px 233px,251px 317px;opacity:.7}
+.fatiha-starfield:after{content:'';position:absolute;inset:-40%;transform:rotate(-28deg);background:radial-gradient(ellipse 58% 5% at center,#a7c6e90b,transparent 75%),radial-gradient(ellipse 45% 11% at center,#5097da0e,transparent 75%);filter:blur(15px)}
+.fatiha-intro{background:var(--fatiha-night)}
+.fatiha-intro:after{background:linear-gradient(90deg,#02071122,#0207118c 80%),linear-gradient(0deg,#020711e8,transparent 70%)}
+.fatiha-intro__backdrop{opacity:1;overflow:hidden;background:radial-gradient(ellipse at 83% 74%,#d78a3817,transparent 25%),radial-gradient(ellipse at 55% 90%,#13627b35,transparent 50%),#020711}
+.fatiha-intro__backdrop:after{content:'';position:absolute;width:170%;height:100%;left:-25%;top:77%;border-radius:50%;transform:rotate(-13deg);background:radial-gradient(ellipse at 65% 0,#102d4d,#040b15 48%);border-top:1px solid #70d7e9aa;box-shadow:0 -4px 10px #47cad34d,0 -14px 55px #237dff42,0 -26px 85px #338cff17}
+.fatiha-intro__title{color:#fff2dc;text-shadow:0 0 60px #ffb95a16}
+.fatiha-intro__dedication{color:#ffd69b;text-shadow:0 0 28px #ffb95a18}
+.fatiha-intro__text{color:#d3dfe8}.fatiha-intro__note,.fatiha-intro__credit{color:#a7bacb}
+
+/* ── Relief / profondeur : volumes CSS, sans images géographiques fictives ── */
+.fatiha-app{perspective:1800px}
+.fatiha-vignette{background:radial-gradient(ellipse at 53% 42%,transparent 30%,#00030b66 73%,#000208dd 100%);box-shadow:inset 0 0 140px #0008}
+.fatiha-panel{border-top-color:#b6eff381;border-left-color:#90d8e05c;border-right-color:#2b5d7e77;border-bottom-color:#02050da6;box-shadow:0 2px 1px #000b,0 12px 25px #0007,0 35px 75px #0008,0 0 45px #267dcc12,inset 0 1px 0 #cffaff36,inset 1px 0 0 #b0e5ff16,inset 0 -2px 0 #0008}
+.fatiha-card{transform:perspective(1500px) rotateY(var(--fatiha-tilt-y,-4deg)) rotateX(var(--fatiha-tilt-x,2deg));transform-origin:center;transition:transform .25s ease-out,box-shadow .3s,border-color .3s;isolation:isolate}
+.fatiha-card:before{content:'';position:absolute;inset:0;z-index:4;border-radius:inherit;pointer-events:none;background:radial-gradient(ellipse at var(--fatiha-shine-x,12%) var(--fatiha-shine-y,0%),#a9eaff21,transparent 50%),linear-gradient(125deg,#e5faff0d,transparent 24%,transparent 74%,#72bfff08);box-shadow:inset 0 1px 0 #d2fcff66}
+.fatiha-card:hover{border-color:#8ee4ef99;box-shadow:0 3px 3px #000b,0 20px 35px #0007,0 45px 100px #000a,0 0 40px #238cff25,inset 0 1px 0 #e6ffff66}
+.fatiha-card.is-entering{animation:fatiha-depth-in .7s cubic-bezier(.2,.8,.2,1) both}
+.fatiha-index{transform:perspective(1400px) rotateY(3deg);box-shadow:-12px 20px 60px #0007,0 0 25px #318cff12,inset 0 1px 0 #d9fbff2b}
+.fatiha-brand__name,.fatiha-intro__title{text-shadow:0 1px 0 #b98b53,0 2px 0 #8a6239,0 3px 0 #543a21,0 5px 3px #0009,0 12px 22px #000a,0 0 45px #ffb85d25}
+.fatiha-intro__title{letter-spacing:-.035em;text-shadow:0 1px 0 #d9b375,0 2px 0 #b68a50,0 3px 0 #8f6336,0 4px 0 #614422,0 6px 0 #332111,0 12px 12px #0008,0 28px 40px #000c,0 0 70px #ffbf5d30}
+/* Les trois plans d'étoiles sont décalés par le script de démonstration.
+   Les valeurs restent nulles sans JS et sur les appareils à mouvement réduit. */
+.fatiha-stars-layer{position:absolute;inset:-60px;pointer-events:none;will-change:transform;transform:translate3d(var(--fatiha-parallax-x,0px),var(--fatiha-parallax-y,0px),0);background-repeat:repeat}
+.fatiha-stars-layer--far{opacity:.4;background-image:radial-gradient(.7px .7px at 27px 51px,#aacbff 90%,transparent),radial-gradient(.6px .6px at 169px 113px,#bce0ff 90%,transparent);background-size:179px 223px,251px 187px}
+.fatiha-stars-layer--middle{opacity:.65;background-image:radial-gradient(1px 1px at 81px 31px,#d7ecff 80%,transparent),radial-gradient(1px 1px at 207px 173px,#9ddcff 80%,transparent);background-size:331px 281px,457px 359px}
+.fatiha-stars-layer--near{opacity:.8;background-image:radial-gradient(1.6px 1.6px at 191px 63px,#fff0ce 65%,#8edfff50 90%,transparent),radial-gradient(1.3px 1.3px at 61px 219px,#e3f7ff 60%,transparent);background-size:607px 443px,823px 593px;filter:drop-shadow(0 0 3px #a6dbff77)}
+.fatiha-grain{position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.045;background-image:repeating-radial-gradient(circle at 17% 32%,#9ac9e9 0 .5px,transparent .8px 3px);background-size:7px 9px;mix-blend-mode:screen}
+/* Planète sculptée par lumière, ombre, strates et faux réseaux lumineux.
+   Composition abstraite : aucune forme ne prétend représenter un continent. */
+.demo-orb.fatiha-planet,.fatiha-planet{position:absolute;border-radius:50%;overflow:visible;background:radial-gradient(ellipse at 29% 24%,#c7dece6b,transparent 30%),radial-gradient(ellipse at 42% 33%,#307e9b,#123957 43%,#030b1a 69%,#01030a 87%);box-shadow:inset 5px 3px 12px #c5ffff66,inset 13px 10px 33px #81dff94d,inset -75px -35px 90px #000d,0 0 0 1px #a2f9ffcc,0 0 6px #7eeaf7aa,0 0 20px #2d9fff80,0 0 65px #1c76e74d,20px 35px 80px #000c;isolation:isolate}
+.fatiha-planet:before{content:'';position:absolute;inset:0;border-radius:50%;z-index:1;background:radial-gradient(ellipse at 29% 22%,#e1f8f33d,transparent 25%),repeating-radial-gradient(ellipse at 23% 20%,transparent 0 12px,#abcac225 13px,#030c163d 15px,transparent 21px),radial-gradient(ellipse at 40% 35%,#799382aa,transparent 19%),radial-gradient(ellipse at 68% 57%,#526e6f90,transparent 26%);box-shadow:inset -80px -20px 75px #000c,inset 18px 8px 40px #b0f5ff33;opacity:.9}
+.fatiha-planet:after{content:'';position:absolute;inset:0;border-radius:50%;z-index:2;background:radial-gradient(1.4px 1.4px at 41% 47%,#fff6b8,transparent),radial-gradient(2px 2px at 52% 58%,#ffe999,transparent),radial-gradient(1.5px 1.5px at 62% 31%,#ffd37a,transparent),radial-gradient(1px 1px at 33% 38%,#ffd585,transparent),radial-gradient(ellipse at 46% 49%,#ffcb6222,transparent 16%),linear-gradient(110deg,transparent 20%,#0005 49%,#000b 68%,#000e 87%);background-size:39px 41px,63px 57px,91px 83px,29px 37px,100% 100%,100% 100%;box-shadow:inset -32px 0 55px #000d;mix-blend-mode:screen;opacity:.8}
+.fatiha-sun{position:absolute;width:22px;height:22px;border-radius:50%;background:#fff9de;z-index:2;box-shadow:0 0 5px 2px #fff6d3,0 0 16px 6px #ffe6a9,0 0 32px 14px #ffc267b3,0 0 70px 35px #f8a04c55,0 0 130px 60px #f6943822;pointer-events:none}
+.fatiha-sun:before{content:'';position:absolute;left:-140px;right:-140px;top:9px;height:3px;background:linear-gradient(90deg,transparent,#ffd48e44,#fff7cb,#ffd48e44,transparent);filter:blur(1px)}
+.fatiha-sun:after{content:'';position:absolute;top:-70px;bottom:-70px;left:9px;width:3px;background:linear-gradient(transparent,#ffe5aa77,#fff9df,#ffe5aa77,transparent);transform:rotate(22deg);filter:blur(1px)}
+.fatiha-sun--scene{left:67%;top:17%}
+.fatiha-planet--intro{width:min(75vw,1050px);aspect-ratio:1;right:-19%;top:27%;transform:rotate(-16deg);z-index:0}
+.fatiha-sun--intro{left:76%;top:30%;z-index:1}
+.fatiha-intro__backdrop:after{display:none}
+.fatiha-intro:after{background:linear-gradient(90deg,#01050b55,transparent 60%),linear-gradient(0deg,#01050b88,transparent 60%)}
+.fatiha-intro__content{position:relative;z-index:3;pointer-events:none}.fatiha-intro__content button{pointer-events:auto}.fatiha-intro__credit{z-index:3}
+/* Vignettes de relief abstrait : terrasses éclairées + ombres + points dorés. */
+.fatiha-photo .fatiha-relief{overflow:hidden;background:radial-gradient(ellipse at 15% 5%,#96c0bc44,transparent 55%),radial-gradient(ellipse at 82% 82%,#010610cc,transparent 65%),repeating-radial-gradient(ellipse at 34% 36%,#546b68 0 7px,#788776 8px 9px,#203943 12px 15px,#0b1a2b 18px 25px);box-shadow:inset 0 1px 0 #ecfff955,inset -20px -25px 45px #0009}
+.fatiha-relief:before{inset:-10%;border:0;border-radius:0;transform:rotate(-18deg) scale(1.05);background:repeating-radial-gradient(ellipse at 23% 50%,transparent 0 18px,#b3ba8e55 20px,#080f19aa 24px,transparent 32px),radial-gradient(ellipse at 65% 50%,#1a345e88,transparent 50%);filter:drop-shadow(8px 12px 3px #0007);opacity:.85}
+.fatiha-relief:after{content:'';position:absolute;inset:0;background:radial-gradient(1px 1px at 15% 42%,#fff3bb,transparent),radial-gradient(2px 2px at 48% 54%,#ffe38f,transparent),radial-gradient(1.2px 1.2px at 74% 67%,#ffb742,transparent);background-size:37px 43px,79px 67px,53px 61px;filter:drop-shadow(0 0 3px #f9b04c);box-shadow:inset 0 0 70px #0008;opacity:.85}
+.fatiha-relief>span{padding:6px 10px;background:#020711a6;border:1px solid #94c4d333;border-radius:5px;letter-spacing:.13em;font-size:9px;text-shadow:0 1px 8px #000;color:#d5e4ed}
+@keyframes fatiha-depth-in{from{opacity:0;transform:perspective(1500px) translateZ(-180px) scale(.94) rotateY(-10deg)}to{opacity:1;transform:perspective(1500px) translateZ(0) scale(1) rotateY(var(--fatiha-tilt-y,-4deg)) rotateX(var(--fatiha-tilt-x,2deg))}}
+@media(max-width:650px){.fatiha-card{transform:none}.fatiha-index{transform:none}.fatiha-planet--intro{width:125vw;right:-65%;top:42%}.fatiha-sun--intro{left:84%;top:43%}.fatiha-sun--scene{left:86%;top:14%}.fatiha-card.is-entering{animation:fatiha-mobile-depth .5s both}.fatiha-relief>span{font-size:8px}.fatiha-grain{opacity:.025}}
+@keyframes fatiha-mobile-depth{from{opacity:0;transform:scale(.96) translateY(14px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.fatiha-card,.fatiha-index{transform:none!important}.fatiha-stars-layer{transform:none!important;will-change:auto}.fatiha-card.is-entering{animation:none!important}}
+
+/* Déformation procédurale locale des strates : évite les anneaux concentriques.
+   Le filtre SVG facultatif est défini dans apercu.html, sans fichier externe. */
+.demo-orb.fatiha-planet,.fatiha-planet{overflow:hidden}
+.fatiha-planet:before{inset:-15%;border-radius:50%;background:radial-gradient(ellipse at 29% 22%,#d8f8f34d,transparent 28%),repeating-radial-gradient(ellipse at 30% 35%,transparent 0 22px,#a0c1ba30 24px,#030b1644 28px,transparent 38px),radial-gradient(ellipse at 40% 35%,#789e87c9,transparent 19%),radial-gradient(ellipse at 68% 57%,#446c6f90,transparent 26%);filter:url(#fatiha-terrain-warp);opacity:.8}
+.fatiha-relief:before{filter:url(#fatiha-terrain-warp) drop-shadow(8px 12px 3px #0007)}
+.fatiha-planet:after{background-size:47px 59px,81px 73px,131px 107px,67px 43px,100% 100%,100% 100%;opacity:.65}
+
+/* Photographie orbitale HD : vraies données NASA, jamais agrandies au-delà
+   de leur résolution native dans les variantes livrées. */
+.fatiha-orbit-photo{position:absolute;inset:0;display:block;z-index:0;background:#020711}
+.fatiha-orbit-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 42%;image-rendering:auto}
+.fatiha-canvas--hd .demo-orb,.fatiha-canvas--hd .fatiha-sun,.fatiha-intro__backdrop--hd>.fatiha-planet,.fatiha-intro__backdrop--hd>.fatiha-sun{display:none}
+.fatiha-canvas--hd>.fatiha-starfield,.fatiha-intro__backdrop--hd>.fatiha-starfield{height:15%;inset:0 0 auto;z-index:1;opacity:.55}
+.fatiha-canvas--hd .demo-watermark{z-index:2;background:#020711ad;padding:9px 14px;border-radius:8px;color:#d9e2eb;top:auto;bottom:95px;width:330px;max-width:35vw}
+.fatiha-intro:has(.fatiha-intro__backdrop--hd):after{background:linear-gradient(90deg,#020711c7, #02071166 45%,#0207110a 80%),linear-gradient(0deg,#020711bb,transparent 65%)}
+.fatiha-intro__credit a{color:inherit;text-underline-offset:2px}
+.fatiha-source-map{display:block;margin-top:10px}.fatiha-source-map img{display:block;width:100%;height:auto;border-radius:7px;border:1px solid #79d4d54d}
+.fatiha-sources[open]{max-height:65dvh;overflow:auto;max-width:320px;position:relative;z-index:7}
+/* CSS/SVG vectoriels : étoiles et textes restent nets en DPR 1, 2 et 4K.
+   Aucun flou de bitmap, aucune transformation scale() permanente sur le texte. */
+@media(min-width:2000px){.fatiha-card{width:480px}.fatiha-photo__image{height:260px}.fatiha-index{width:280px}.fatiha-card__text{font-size:14px}}
+@media(max-width:650px){.fatiha-orbit-photo img{object-position:52% 35%}.fatiha-sources[open]{max-width:calc(100vw - 24px);position:absolute;right:0;bottom:0}.fatiha-canvas--hd .demo-watermark{display:none}}
+
+/* Réglages publics : échelles unitaires, pilotées par FatihaSettings. */
+:root{--fatiha-city-glow:1;--fatiha-star-density:.55;--fatiha-star-spacing:1;--fatiha-drift-duration:180s;--fatiha-drift-state:paused;--fatiha-parallax-strength:1;--fatiha-atmosphere:.7}
+.fatiha-orbit-photo{transition:opacity 1s ease;animation:fatiha-view-drift var(--fatiha-drift-duration) ease-in-out infinite alternate;animation-play-state:var(--fatiha-drift-state);transform-origin:55% 55%;will-change:auto}
+.fatiha-orbit-photo--night{opacity:1;filter:brightness(calc(.65 + var(--fatiha-city-glow) * .35)) contrast(1.03)}
+.fatiha-orbit-photo--day{opacity:0;pointer-events:none;background:#020711}
+.fatiha-orbit-photo--day img{object-fit:contain;object-position:60% 50%}
+.fatiha-app.is-day .fatiha-orbit-photo--day{opacity:1}.fatiha-app.is-day .fatiha-orbit-photo--night{opacity:0}
+.fatiha-app.is-day .fatiha-panel{background:linear-gradient(135deg,#071320f2,#050d1bf0)}
+.fatiha-canvas--hd:after,.fatiha-intro__backdrop--hd:before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 50% 25%,transparent 40%,#299aff19 65%,transparent 83%);box-shadow:inset 0 0 90px #248bff22;opacity:var(--fatiha-atmosphere)}
+.fatiha-stars-layer{transform:translate3d(calc(var(--fatiha-parallax-x,0px) * var(--fatiha-parallax-strength)),calc(var(--fatiha-parallax-y,0px) * var(--fatiha-parallax-strength)),0)}
+.fatiha-starfield{opacity:var(--fatiha-star-density)!important;animation:fatiha-star-drift var(--fatiha-drift-duration) linear infinite alternate;animation-play-state:var(--fatiha-drift-state)}
+.fatiha-stars-layer--far{background-size:calc(179px * var(--fatiha-star-spacing)) calc(223px * var(--fatiha-star-spacing)),calc(251px * var(--fatiha-star-spacing)) calc(187px * var(--fatiha-star-spacing))}
+.fatiha-stars-layer--middle{background-size:calc(331px * var(--fatiha-star-spacing)) calc(281px * var(--fatiha-star-spacing)),calc(457px * var(--fatiha-star-spacing)) calc(359px * var(--fatiha-star-spacing))}
+.fatiha-stars-layer--near{background-size:calc(607px * var(--fatiha-star-spacing)) calc(443px * var(--fatiha-star-spacing)),calc(823px * var(--fatiha-star-spacing)) calc(593px * var(--fatiha-star-spacing))}
+.fatiha-settings{position:absolute;right:var(--fatiha-space);top:108px;width:290px;z-index:8;max-height:calc(100dvh - 185px);overflow:auto;scrollbar-width:thin;pointer-events:auto}
+.fatiha-settings>summary{cursor:pointer;list-style:none;padding:13px 17px;color:var(--fatiha-gold);font:500 11px/1.5 var(--fatiha-sans);letter-spacing:.03em;user-select:none}
+.fatiha-settings>summary:after{content:'＋';float:right;color:#a8ccd8}.fatiha-settings[open]>summary:after{content:'−'}.fatiha-settings>summary::-webkit-details-marker{display:none}
+.fatiha-settings__body{padding:7px 20px 20px;border-top:1px solid var(--fatiha-line)}
+.fatiha-settings__body>.fatiha-eyebrow{margin-top:13px;font-size:8px}
+.fatiha-settings__title{margin:6px 0 8px;font:500 28px/1.1 var(--fatiha-serif);color:#fff1dc}
+.fatiha-settings__intro,.fatiha-settings__hint{font:400 10px/1.65 var(--fatiha-sans);color:#aebdca;margin:0 0 16px}
+.fatiha-setting{margin:17px 0}.fatiha-setting__label{display:flex;justify-content:space-between;gap:8px;align-items:center;font:500 11px/1.5 var(--fatiha-sans);color:#e3eaf0}.fatiha-setting output{color:var(--fatiha-gold);font-size:10px;font-variant-numeric:tabular-nums}
+.fatiha-setting input[type=range]{display:block;width:100%;margin:9px 0 0;accent-color:#efc17b;height:22px;cursor:pointer}
+.fatiha-settings__switch{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:14px 0;margin:4px 0 14px;border-top:1px solid var(--fatiha-line);border-bottom:1px solid var(--fatiha-line);font:500 11px/1.5 var(--fatiha-sans);cursor:pointer}
+.fatiha-settings__switch small{display:block;font-size:9px;color:#9eafbd;font-weight:400}.fatiha-settings__switch input{width:18px;height:18px;accent-color:#efc17b;cursor:pointer}.fatiha-settings__switch>span:last-child{color:var(--fatiha-gold);font-size:10px;min-width:24px}
+.fatiha-settings__motion{font:400 10px/1.6 var(--fatiha-sans);color:#ffcf8b;border-left:2px solid #f4bf74;padding-left:9px}
+.fatiha-settings~.fatiha-index{top:170px;max-height:calc(100dvh - 300px)}
+.fatiha-app:has(.fatiha-settings[open]) .fatiha-index{visibility:hidden;pointer-events:none}
+@keyframes fatiha-view-drift{from{transform:scale(1.01) translate3d(-.3%,0,0) rotate(-.15deg)}to{transform:scale(1.045) translate3d(.5%,.3%,0) rotate(.25deg)}}
+@keyframes fatiha-star-drift{from{transform:translate3d(-3px,0,0)}to{transform:translate3d(20px,5px,0)}}
+@media(max-width:650px){.fatiha-settings{right:12px;top:calc(100px + env(safe-area-inset-top));width:235px;max-height:calc(100dvh - 195px);border-radius:15px}.fatiha-settings>summary{padding:10px 13px;font-size:10px}.fatiha-settings__body{padding:6px 15px 15px}.fatiha-settings~.fatiha-index{top:auto;max-height:70px}.fatiha-settings__title{font-size:26px}.fatiha-orbit-photo--day img{object-position:52% 18%}}
+@media(prefers-reduced-motion:reduce){.fatiha-orbit-photo,.fatiha-starfield{animation:none!important;transition:none!important}.fatiha-stars-layer{transform:none!important}}
+/* Toute la plage 0–150 % du halo reste graduelle, sans saturation à 100 %. */
+.fatiha-canvas--hd:after,.fatiha-intro__backdrop--hd:before{opacity:calc(var(--fatiha-atmosphere) / 1.5)}
