@@ -1238,6 +1238,11 @@
         colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.05,
       });
     realEarth.show = veille.clouds;
+    // Added late, it lands just under the place names, above every overlay created at start-up (night lights, rain,
+    // fires, aurora): bring it down to where it was meant to be, just above the relief shading.
+    const layers = viewer.imageryLayers;
+    const floor = layers.indexOf(layers.contains(hillshade) ? hillshade : satellite);
+    while (floor >= 0 && layers.indexOf(realEarth) > floor + 1) layers.lower(realEarth);
     dayLayers[2] = [realEarth, 1.0];
   });
   // Night lights (VIIRS Black Marble, 2016): drawn only on the night side. Cesium dims the night side to 30 %,
@@ -1929,7 +1934,7 @@
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
     revealCard();
-    showWeather(p);
+    if (!document.body.classList.contains('cine-on')) showWeather(p);   // the tour hides the card: no request for nothing
   }
   function hideCard() { $('card').classList.remove('show'); }
   // Phones show two lines of the text and a "Lire la suite" button; every new card starts folded.
@@ -2447,6 +2452,7 @@
 
   // Fly the camera to a point on the ground using the same engine as the places.
   function flyToPoint(lat, lon, range) {
+    endTourHook();
     ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight();
     clouds.removeAll(); setPhase('Veille');
     startFlight(C.Cartesian3.fromDegrees(lon, lat, 0), { heading: 0, pitch: -55, range }, {
@@ -3516,7 +3522,10 @@
     } catch (e) {
       // A refused autoplay or a failed load: the timeout marks the square once the 10 s are up, unless it
       // started anyway in the meantime.
-      if (previews.get(tile) === rec && /HLS|hls/.test(String(e && e.message))) previewFailed(tile);
+      if (previews.get(tile) !== rec) return;
+      // Autoplay refused (Low Power Mode, data saver): the channel is not offline, the square just stays still.
+      if (e && e.name === 'NotAllowedError') clearTimeout(rec.timer);
+      else if (/HLS|hls/.test(String(e && e.message))) previewFailed(tile);
     }
   }
   document.addEventListener('visibilitychange', () => { if (document.hidden) stopPreviews(); else pumpPreviews(); });
@@ -3934,6 +3943,7 @@
   $('cam-locate').addEventListener('click', () => {
     const c = cam.open;
     if (!c || c.lat == null) return;
+    endTourHook();
     ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll();
     startFlight(C.Cartesian3.fromDegrees(c.lon, c.lat, 0), { heading: 0, pitch: -50, range: 9000 }, {
       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Caméra'),
@@ -4179,7 +4189,7 @@
   const stLater = (fn, ms) => { const id = setTimeout(() => { st.timers.delete(id); fn(); }, ms); st.timers.add(id); };
   // Something the visitor chose to listen to is playing (a muted TV preview does not count), or a city camera's player
   // is open: many have their street sound (Windy's time-lapses have none).
-  const mediaAudible = () => (!!nowPlaying && !(radioEl.paused && tvEl.paused)) || (!!cam.open && cam.open.kind !== 'windy' && !!cam.open.player);
+  const mediaAudible = () => (!!nowPlaying && !(radioEl.paused && tvEl.paused)) || (!!cam.open && cam.open.kind === 'iframe' && !!cam.open.player);   // YouTube cams start muted (mute=1)
 
   // Reverb tail: decaying noise that also gets darker as it decays, like a large hall.
   function stImpulse(ctx, seconds) {
@@ -4479,7 +4489,7 @@
       if (liveOpen) setLiveOpen(false);
     }
     // Hand the camera to a new shot, as a place button does: no place, no card, no orbit, no flight under way.
-    function takeCamera() { ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll(); }
+    function takeCamera() { endTourHook(); ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll(); }
     const fmtLon = (lon) => `${Math.abs(lon).toFixed(1).replace('.', ',')}° ${lon >= 0 ? 'E' : 'O'}`;
 
     // ----- Short notice ("Lien copié"), or a field holding a link to copy by hand -----
@@ -4581,7 +4591,8 @@
       if (!tour || tour.paused) return;
       tour.paused = true;
       tourTimers.clear();
-      if (flight) { ++flightToken; cancelFlight(); }                            // stop where it is, mid-flight
+      ++flightToken;                                    // also a leg still waiting for the ground height (no flight yet)
+      if (flight) cancelFlight();                                               // stop where it is, mid-flight
       if (orbit) stopOrbit();
       setCredit(null);
       cineEl.classList.add('paused');
@@ -4760,7 +4771,7 @@
       const url = new URL(location.href); url.search = ''; url.hash = hash;
       const link = url.href;
       (back || menuBtn).focus({ preventScroll: true });
-      if (typeof navigator.share === 'function') {
+      if (typeof navigator.share === 'function' && matchMedia('(pointer: coarse)').matches) {   // desktop: copy the link
         navigator.share({ title: document.title, text, url: link })
           .then(() => toast('Lien partagé'))
           .catch((e) => { if (e && e.name === 'AbortError') toast('Partage annulé'); else copyLink(link); });
