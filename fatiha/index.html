@@ -804,13 +804,47 @@
     Object.assign(layer, options);
     return layer;
   }
-  // Daily true-colour mosaic (real clouds), two days back: the newest day that is always complete.
+  // Daily true-colour mosaic (real clouds). SNPP at J-2 is not always complete
+  // (404 on 10 nov. 2026 for J-1, J-2, J-4, J-120). Probe a test tile first and
+  // prefer NOAA-20, then NOAA-21, then SNPP, starting from the most recent day.
   // Black = no data, made transparent so the map shows through. Faded out with altitude (see below).
-  const twoDaysAgo = new Date(Date.now() - 2 * 864e5).toISOString().slice(0, 10);
-  const realEarth = addGibsLayer(gibsUrl('VIIRS_SNPP_CorrectedReflectance_TrueColor', 'GoogleMapsCompatible_Level9', 'jpg', twoDaysAgo),
-    9, 'Images : NASA GIBS / VIIRS', 'clouds', {
-      colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.05,
+  const GIBS_TRUECOLOR = [
+    'VIIRS_NOAA20_CorrectedReflectance_TrueColor',
+    'VIIRS_NOAA21_CorrectedReflectance_TrueColor',
+    'VIIRS_SNPP_CorrectedReflectance_TrueColor',
+  ];
+  const gibsDay = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+  function probeGibsTile(url, ms = 8000) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      const t = setTimeout(() => { img.onload = img.onerror = null; resolve(false); }, ms);
+      img.onload = () => { clearTimeout(t); resolve(true); };
+      img.onerror = () => { clearTimeout(t); resolve(false); };
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
     });
+  }
+  async function pickTruecolor() {
+    for (const n of [1, 2, 8, 15, 30]) {
+      const time = gibsDay(n);
+      for (const layer of GIBS_TRUECOLOR) {
+        const probe = gibsUrl(layer, 'GoogleMapsCompatible_Level9', 'jpg', time)
+          .replace('{z}', '2').replace('{y}', '1').replace('{x}', '1');
+        if (await probeGibsTile(probe)) return { layer, time, daysAgo: n };
+      }
+    }
+    return null;
+  }
+  let realEarth = null;
+  pickTruecolor().then((picked) => {
+    if (!picked) { gibsUnavailable('clouds'); return; }
+    realEarth = addGibsLayer(gibsUrl(picked.layer, 'GoogleMapsCompatible_Level9', 'jpg', picked.time),
+      9, 'Images : NASA GIBS / VIIRS', 'clouds', {
+        colorToAlpha: C.Color.BLACK, colorToAlphaThreshold: 0.05,
+      });
+    realEarth.show = veille.clouds;
+    dayLayers[2] = [realEarth, 1.0];
+  });
   // Night lights (VIIRS Black Marble, 2016): drawn only on the night side. Cesium dims the night side to 30 %,
   // so the layer is brightened to compensate.
   const nightLights = addGibsLayer(gibsUrl('VIIRS_Black_Marble', 'GoogleMapsCompatible_Level8', 'png', '2016-01-01'),
@@ -824,7 +858,7 @@
   const ramp = (h, lo, hi) => Math.min(1, Math.max(0, (h - lo) / (hi - lo)));
   scene.preRender.addEventListener(() => {
     const h = camera.positionCartographic.height;
-    realEarth.alpha = ramp(h, 1.5e5, 8e5);
+    if (realEarth) realEarth.alpha = ramp(h, 1.5e5, 8e5);
     nightLights.alpha = ramp(h, 3e4, 8e4);
   });
   // Night look. Cesium keeps 30 % of the daytime colours on the night side, which reads as dusk, not night.
@@ -845,7 +879,7 @@
     nightLook = ramp(-sunElevationSin, 0.05, 0.35) * (1 - ramp(h, 1.5e6, 4e6));
     starGain = 1 - 0.93 * ramp(sunElevationSin, -0.1, 0.2) * ramp(h, 2e5, 1.5e6);
     const k = 1 - 0.45 * nightLook;
-    for (const [layer, base] of dayLayers) layer.brightness = base * k;
+    for (const [layer, base] of dayLayers) if (layer) layer.brightness = base * k;
     glowFx.enabled = nightLook > 0.02 && tierName !== 'light';   // no halo passes by day or on the light tier
     // Dive: blur from how fast the altitude changes (e-folds per second), only once below a few hundred km, and a
     // grey haze around 6 km up where the cloud layer is. Off outside a dive, and with reduced motion.
@@ -2001,7 +2035,7 @@
       if (on) { loadISS(); issTimer = setInterval(loadISS, 5000); }
       else { statusLines.iss = ''; renderStatus(); }
     },
-    clouds(on) { realEarth.show = on; },
+    clouds(on) { if (realEarth) realEarth.show = on; },
     lights(on) { nightLights.show = on; },
     rain(on) {
       rain.show = on;
@@ -2432,7 +2466,18 @@
     const key = live.cc || '*', where = live.cc ? nameFr(live.cc) : 'Monde';
     say('war-status', `${where} : recherche des titres…`);
     try {
-      const text = await fetchText(gdeltUrl('json'), 15000);
+      let text;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          text = await fetchText(gdeltUrl('json'), 15000);
+          break;
+        } catch (err) {
+          if (!String(err && err.message).includes('429') || attempt === 3) throw err;
+          say('war-status', `${where} : source temporairement saturée, nouvel essai…`);
+          await new Promise((r) => setTimeout(r, 8000));
+          warLast = Date.now();
+        }
+      }
       let data; try { data = JSON.parse(text); } catch (e) { throw new Error(text.slice(0, 120)); }
       if (key !== (live.cc || '*')) return;           // the visitor moved on while we waited
       const seen = new Set(); warItems = [];
