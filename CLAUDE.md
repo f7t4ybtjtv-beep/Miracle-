@@ -10,8 +10,8 @@ fictional immersive social network exclusively for AIs, where humans are
 spectators, never actors. There is no backend, no build step, and no package
 manager: every page is a single self-contained `.html` file with inline
 `<style>` and `<script>`. The one external dependency is CesiumJS, loaded
-from jsDelivr by `terre.html` and `fatiha/index.html` (pinned to `cesium@1.145.0`); `fatiha/` also loads hls.js and
-world-atlas lazily from jsDelivr when the "Direct" panel needs them.
+from jsDelivr by `terre.html` and `fatiha/index.html` (pinned to `cesium@1.145.0`); `fatiha/` also loads hls.js,
+satellite.js and world-atlas lazily from jsDelivr when a panel needs them.
 
 ## Running the site
 
@@ -86,24 +86,39 @@ python3 -m satlab bench --campaign standard --out results/standard
   JPEG noise, so a lower black point makes streaky speckle instead of stars.
   GLSL ES 3.00 pitfalls hit here: `cast` is a reserved word (a variable with that name stopped the whole render loop), and
   `textureSize()` is the safe way to get a stage's texel size when it uses `textureScale`.
-  The "Direct" panel (radios from radio-browser.info, free TV from the iptv-org playlists, public-webcam links,
-  GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
-  is one block of the script. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
+  Design: "cinéma spatial" (`#04060B`, ink `#F4F6FA`, one accent `#9FD3FF`, Inter 200–600 and JetBrains Mono) — this
+  page does not use the Synthora palette. Panels are `.sheet`s: right drawer on desktop, bottom sheet on phones.
+  The "The Light · Stream" panel (radios from radio-browser.info, free TV from the iptv-org playlists, music by genre,
+  city cameras, GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
+  is one block of the script. `CITY_CAMS` holds only cameras whose owner publishes them (checked by hand: embeddable,
+  live, plays embedded); YouTube players must keep `referrerpolicy="strict-origin"` (with `no-referrer` YouTube shows
+  error 153), and SkylineWebcams forbids embedding. Windy stays dormant unless a visitor brings `?wkey=`. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
   from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
   whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
-  The "Plonger depuis l'espace" card button chains two `startFlight` legs (straight-down orbit view, then `dive: true`, which
-  descends the whole time and sets the module flag `diving`); `startFlight` resets `diving` on every start. While `diving`,
-  the `preRender` hook derives `rush` from the altitude rate (e-folds per second) and `haze` from altitude (cloud layer ~6 km)
-  for the last stage `nour_rush`; tests can shorten the dive with `window.__terre.DIVE.duration` and read `diveState`.
+  The "Plonger" card button chains two `startFlight` legs (climb to a straight-down view with `apex: true`, then at once
+  `dive: true`, whose height above the ground follows the tabulated law `DIVE_F` in log space), then `startSettle`, which
+  waits for `globe.tilesLoaded` (2.5 s at most) before the card. `startFlight` resets `diving` on every start; `diveSeq`
+  covers the whole sequence and keeps the FPS monitor from stepping quality down; `cancelFlight()` calls `endDive(false)`.
+  While `diving`, the `preRender` hook derives `rush` from the rate of the height above the ground (0 below ~20 km) and
+  `haze` around 3 km above the ground, for the last stage `nour_rush`. During the climb, `planDivePrefetch` lists the Esri
+  tiles the descent needs and a wrapper of the satellite provider's `requestImage` serves them from a Map. Tests can
+  shorten the dive with `window.__terre.DIVE.duration` and read `diveState` (stage, rush, haze, prefetch counters).
   Cesium's `PostProcessStage.uniforms` is not a plain object of your functions: read your own variables in tests instead.
   Safari on iPhone has no float blending, so Cesium has no order-independent translucency there and sorts translucent draws
   by `boundingVolume`; Cesium 1.145's `CloudCollection` sets none, which stopped the render loop on iPhones only. The page wraps
   `clouds.update` to give those draws a sphere (and skip empty updates). To reproduce in Playwright, set
   `scene.view.oit._translucentMRTSupport` and `_translucentMultipassSupport` to false before starting.
-  Guided tour (`tour`): one `setTimeout` in `tour.timer`, cleared only by `stopTour()`/`pauseTour()`; it reuses
-  `flyToPlace(p, { tour: true })`, and any other flight (place, night, dive, Orbite) ends it. Touching the globe or
-  hiding the tab pauses it. The hash names the view (`#id`, `#id/nuit`, `#id/plongee`, `#visite`) and is written with
-  `replaceState` on arrival so it never re-triggers a flight. The route arcs (`routeSource`) only show above 80 km.
+  Spectacle (menu) is one closure, `spectacle`, with one `timerSet()` registry per feature (`clear()` is the only
+  teardown). The cinema tour (`#cine`, letterbox and credits) reuses `flyToPlace(p, { tour: true })`; every other flight
+  calls `endTourHook()` (set to the tour's `endTour`) first. A touch or wheel on the picture or a hidden tab pauses it
+  (`pauseTour`, the overlay then lets touches through to the globe), Escape ends it. The hash names the view (`#id`,
+  `#id/nuit`, `#id/plongee`, `#visite`, or `#vue=lat,lon,h,heading,pitch,unixtime` for "Partager cette vue") and is
+  written with `replaceState` so it never re-triggers a flight; `parseHash`/`goToHash` read it at start and on
+  `hashchange`. The route arcs (`routeSource`) only show above 80 km. Also there: the time slider and NASA EPIC.
+  Veille also has NASA EONET events, OVATION aurora and VIIRS fires. GIBS thermal anomalies exist only as vector tiles in
+  the WMTS: use the WMS (`WebMapServiceImageryProvider`, PNG). The true-colour layer `realEarth` is null until
+  `pickTruecolor()` finds a day that answers; guard every use. Open-Meteo, CelesTrak and GDELT rate-limit or refuse the
+  cloud's shared address (429 / TLS reset), not a visitor's: keep their error messages.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 

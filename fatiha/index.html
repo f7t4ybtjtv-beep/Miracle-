@@ -346,6 +346,8 @@
     font: 500 10.5px var(--font-mono); letter-spacing: .22em; text-transform: uppercase;
   }
   .cine-quit:hover, .cine-quit:focus-visible { opacity: 1; color: var(--ink); border-color: var(--line-2); }
+  /* Narrow screens: the count goes under the two buttons instead of running into them. */
+  @media (max-width: 560px) { .cine-count { top: calc(var(--safe-t) + 66px); right: var(--gutter); text-align: right; } }
   .cine-credit {
     position: absolute; left: max(var(--gutter), 7vw); right: var(--gutter); bottom: calc(var(--lb) + 5vh); pointer-events: none;
     opacity: 0; transition: opacity 1.4s ease; text-shadow: 0 1px 18px rgba(0, 0, 0, 0.85);
@@ -888,7 +890,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-07.11';
+  const NOUR_BUILD = '2026-11-10.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -2396,7 +2398,10 @@
     `Version : ${NOUR_BUILD}`,
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
     'Satellites militaires : catalogue public CelesTrak (groupe military) · positions calculées avec satellite.js (SGP4)',
-    'Direct : radio-browser.info (radios) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
+    'Veille (suite) : NASA EONET (événements naturels) · NASA FIRMS / GIBS (feux actifs VIIRS) · NOAA SWPC (aurores, modèle OVATION)',
+    'Météo des lieux : Open-Meteo · La Terre entière : NASA EPIC Team / DSCOVR',
+    'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
+    'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, Western Wall Heritage Foundation, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · bande-son générée dans le navigateur',
     'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
 

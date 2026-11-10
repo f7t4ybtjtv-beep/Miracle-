@@ -8,7 +8,7 @@ vérifié, et surtout ce qui n'est **pas** fini.
   `fatiha/index.html` (HTML, puis `<style>`, puis `<script>`).
   - Moteur 3D : **CesiumJS 1.145.0**, chargé depuis jsDelivr.
   - Bibliothèques chargées seulement quand on en a besoin : hls.js 1.5.13, satellite.js 6.0.2, world-atlas 2.0.2.
-- **Ce que fait le site** : survol de la Terre en 3D vers dix lieux de rencontre des cultures, avec :
+- **Ce que fait le site** : survol de la Terre en 3D vers treize lieux de rencontre des cultures, avec :
   - une vue de nuit depuis l'orbite ;
   - une plongée depuis l'espace ;
   - une « Veille » de données publiques ;
@@ -24,28 +24,19 @@ vérifié, et surtout ce qui n'est **pas** fini.
   numérique seulement, mot réservé GLSL `cast`, plan lointain infini, plantage iPhone sans OIT, etc.
 - **Lancer le site en local** : `python3 -m http.server 8000`, puis ouvrir http://localhost:8000/fatiha/
 
-## 2. Branches
-| Branche | Contenu | État |
-|---|---|---|
-| `main` | Version publiée en ligne, avant la refonte | en ligne |
-| `claude/fatiha-cinema` (PR #30, brouillon) | **Version complète et testée** : refonte « cinéma spatial », The Light · Stream, satellites militaires, Ultra · HDR 5K et corrections, plus ce dossier `handoff/` | **à jour, fonctionne** |
-| `claude/wip-plongee` | Plongée nette et fluide | **NON TERMINÉ, NON TESTÉ** |
-| `claude/wip-donnees` | Événements naturels, aurores, météo, feux | **NON TERMINÉ, NON TESTÉ** |
-| `claude/wip-cameras-musique` | Caméras de ville, musique, bande-son | **NON TERMINÉ, NON TESTÉ** |
-| `claude/wip-spectacle` | Visite cinéma, curseur du temps, partage, photo EPIC | **NON TERMINÉ, NON TESTÉ** |
+## 2. État au 10 nov. 2026
+- **Branche `claude/zen-mendel-hk8sly`** : `claude/fatiha-cinema` + les quatre patchs `wip-*` appliqués et repris
+  + fusion de `main` (Fès, Palerme, Nalanda : **13 lieux** ; repli GIBS NOAA-20 → NOAA-21 → SNPP ; arcs de trajet ;
+  liens `#lieu`, `#lieu/nuit`, `#lieu/plongee`, `#visite`).
+- Les fichiers `wip-*.patch` de ce dossier sont **appliqués** ; ils ne servent plus que d'archive. Les branches
+  `claude/wip-*` sont dépassées.
+- Choix faits avec la propriétaire :
+  - **une seule visite** : celle de `main` (pause au toucher, reprise, trajet) habillée en « Visite cinéma » (bandes
+    noires, génériques) ;
+  - **deux formats de lien** : `#lieu[/nuit|/plongee]` (bouton « Partager » de la fiche) et `#vue=…` (« Partager cette
+    vue », point de vue exact).
 
-- **Les quatre branches `wip-*`** partent d'un commit un peu plus ancien (`0cd1d9e`).
-- **Les mêmes travaux existent en patchs** dans ce dossier (`wip-*.patch`), refaits pour s'appliquer sur
-  `claude/fatiha-cinema` :
-  ```bash
-  git checkout claude/fatiha-cinema
-  git apply --3way handoff/wip-plongee.patch   # etc., un par un, puis tester
-  ```
-- **Vérifié** : les quatre patchs s'appliquent ensemble sans conflit, et le JavaScript obtenu est valide
-  (`node --check`).
-- **Pas vérifié** : aucun n'a été testé dans un navigateur après la fin de son écriture.
-
-## 3. Ce qui marche (branche `claude/fatiha-cinema`)
+## 3. Ce qui marche (refonte `claude/fatiha-cinema`, reprise ici)
 - **Design « cinéma spatial »** :
   - couleurs : noir bleuté `#04060B`, texte `#F4F6FA`, un seul accent bleu glacier `#9FD3FF` ;
   - polices : Inter fine et JetBrains Mono.
@@ -74,68 +65,20 @@ vérifié, et surtout ce qui n'est **pas** fini.
   - Les vraies images Esri et NASA s'affichent bien depuis l'orbite.
   - Aucune erreur de page.
 
-## 4. Travaux inachevés : ce qui est écrit, ce qui manque
-Pour tous les quatre, il manque au minimum : les tests dans un navigateur, la relecture, les crédits
-(`$('credits').innerHTML = [...]`), la version (`NOUR_BUILD`), le README et `CLAUDE.md`.
+## 4. Travaux repris le 10 nov. : ce qui est fait et testé
+Tests : Playwright avec SwiftShader, 1440×900 et 393×852 (tactile), **toutes les sources externes simulées** (le
+navigateur de test n'atteint ni Esri, ni NASA, ni les API) : Cesium et les bibliothèques en copie npm, tuiles unies,
+réponses au format vérifié §5. Aucune erreur de page dans aucun scénario.
 
-### A. Plongée nette et fluide (`wip-plongee`)
-**Problème signalé par la propriétaire** : la plongée est « floue, pas nette, pas assez fluide ». Causes trouvées dans le
-code d'origine :
-- le flou de vitesse `nour_rush` est trop fort jusqu'à la fin ;
-- le voile gris des nuages dure trop longtemps ;
-- rien ne précharge les tuiles et rien ne les attend ;
-- il y a une pause morte de 4 s en haut ;
-- la qualité peut baisser d'elle-même en pleine plongée ;
-- `diving` reste vrai après une plongée interrompue.
+| Partie | Testé (réponses simulées) | Pas vérifié |
+|---|---|---|
+| A. Plongée | montée → descente sans pause → palier → fiche ; flou nul sous ~20 km, voile seulement vers 3–4 km au-dessus du sol ; 120 tuiles préchargées, 0 échec ; pas de baisse de qualité ; un toucher en pleine descente arrête tout proprement | netteté et fluidité **avec la vraie imagerie Esri, sur un vrai téléphone** |
+| B. Données | EONET (liste, points, vol), aurores, feux (WMS), précipitations, météo sur la fiche ; panne simulée → message + couche coupée | rendu des vraies données |
+| C. Caméras, musique | 17 caméras dans `CITY_CAMS` (§6 sauf Rome), lecteur avec `strict-origin`, fermeture ; musique par genre ; bande-son marche/arrêt | lecture réelle des directs YouTube (toujours oEmbed 200 le 10 nov., état « en direct » non revérifié : la page YouTube renvoie un captcha au cloud) |
+| D. Spectacle | visite (départ, pause au toucher, reprise, Échap, fin, téléphone), curseur du temps, deux partages, EPIC (liste, photo, vol), liens au démarrage `#vue=`, `#fes/nuit`, `#nalanda/plongee`, `#visite` | photo EPIC réelle |
 
-**Ce qui est écrit** :
-- une loi de descente tabulée (`DIVE_F`) sur la hauteur au-dessus du sol, qui ralentit fortement à la fin ;
-- une montée sans pause ;
-- un virage réduit (40°) ;
-- un flou léger, nul dans le dernier kilomètre, avec un échantillonnage linéaire ;
-- un voile bref vers 3 km au-dessus du sol ;
-- un « palier » de fin (`startSettle`) qui attend que les tuiles soient chargées, 2,5 s au plus ;
-- un **préchargement** des tuiles Esri sous le lieu, gardées dans une `Map` et servies par une enveloppe de
-  `requestImage` (au plus 120 tuiles) ;
-- pas de baisse de qualité pendant la plongée (`diveSeq`).
-
-**Ce qui manque** : les mesures avant et après avec la vraie imagerie Esri, et une vérification à l'œil sur téléphone.
-
-### B. Données publiques (`wip-donnees`)
-**Ce qui est écrit** :
-- **Événements naturels** NASA EONET : points sur le globe, liste, toucher un point fait voler la caméra
-  (`#eonet-box`, `#eonet-list`).
-- **Aurores** NOAA OVATION : un voile vert dessiné à partir de la grille de 65 160 points (`#aurora-box`).
-- **Feux actifs** (`#fires-box`), déjà branchés sur le WMS de GIBS (`WebMapServiceImageryProvider`,
-  `VIIRS_NOAA20_Thermal_Anomalies_375m_All`), comme il le faut (voir §5).
-- **Météo du lieu** sur la fiche, Open-Meteo (`#card-weather`).
-- **Précipitations** : la couche passe par le mécanisme d'arrêt automatique.
-
-**Ce qui manque** : les tests. La météo ne peut pas être testée en vrai depuis le cloud (limite d'Open-Meteo, voir §5).
-
-### C. Caméras, musique, bande-son (`wip-cameras-musique`)
-**Ce qui est écrit** :
-- un onglet Caméras (`#cam-*`) avec les caméras de ville, un grand lecteur et des points sur le globe. Les lecteurs
-  YouTube utilisent déjà `referrerpolicy="strict-origin"`, ce qui est correct (voir §5) ;
-- Windy en option, seulement avec `?wkey=` : aucune clé dans le code ;
-- un onglet Musique par genre, avec des radios radio-browser (`#music-*`) ;
-- une bande-son générée par WebAudio (`#btn-soundtrack`, fonction `setSoundtrack(on)`) qui suit l'altitude et la
-  plongée.
-
-**Ce qui manque** :
-- mettre dans `CITY_CAMS` la liste vérifiée de `handoff/citycams.json` et les 9 caméras du §6 ;
-- les tests.
-
-### D. Spectacle (`wip-spectacle`)
-**Ce qui est écrit**, dans le nouveau groupe de menu « Spectacle » :
-- **Visite cinéma** (`#btn-tour`, `#cine-*`) : les dix lieux enchaînés, bandes noires au format cinéma, titres comme un
-  générique ; un toucher arrête la visite.
-- **Curseur du temps** (`#btn-time`) : jour et nuit sur 24 h.
-- **Partager cette vue** (`#btn-share`) : un lien `#vue=lat,lon,h,cap,inclinaison`.
-- **Photo EPIC de la Terre entière** (`#btn-epic`, `#epic-*`).
-
-**Ce qui manque** : les tests, en particulier la remise en place de la vue partagée au démarrage et la photo EPIC
-réelle.
+- La caméra de Rome (`89d3tEaqImM`) est écartée : son oEmbed ne donne plus ni titre ni chaîne le 10 nov.
+- Crédits, `NOUR_BUILD` (`2026-11-10.1`), README et `CLAUDE.md` sont à jour.
 
 ## 5. Faits vérifiés EN VRAI (9 nov. 2026, depuis le cloud)
 - **Ces services répondent, et acceptent les appels depuis une page web** (`Access-Control-Allow-Origin: *`) :
@@ -246,10 +189,7 @@ caméra ne joue plus.
 - **Honnêteté** : ne jamais annoncer comme vérifié ce qui n'a pas été vu marcher. Une source en panne affiche un message
   et se coupe.
 
-## 8. Ordre conseillé pour finir
-1. Appliquer `wip-plongee` et tester la plongée sur un vrai téléphone et un vrai ordinateur (vraie imagerie).
-2. Appliquer `wip-donnees` ; vérifier les feux (WMS), puis EONET, les aurores et la météo.
-3. Appliquer `wip-cameras-musique` ; remplir `CITY_CAMS` (§6) et garder `strict-origin` sur les lecteurs YouTube.
-4. Appliquer `wip-spectacle` ; tester la visite, le curseur du temps, le partage et EPIC.
-5. Ajouter les crédits et la version, et mettre à jour le README et `CLAUDE.md`.
-6. Fusionner la PR #30 dans `main` : le site en ligne se met à jour tout seul (GitHub Pages).
+## 8. Reste à faire
+1. Regarder la plongée et la visite sur un vrai téléphone et un vrai ordinateur, avec la vraie imagerie.
+2. Fusionner la PR dans `main` : le site en ligne se met à jour tout seul (GitHub Pages).
+3. Revérifier de temps en temps les directs de `CITY_CAMS` (§6) et marquer ceux qui ne jouent plus.
