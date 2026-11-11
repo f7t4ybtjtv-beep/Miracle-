@@ -87,7 +87,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   GLSL ES 3.00 pitfalls hit here: `cast` is a reserved word (a variable with that name stopped the whole render loop), and
   `textureSize()` is the safe way to get a stage's texel size when it uses `textureScale`.
   Design: "cinéma spatial" (`#04060B`, ink `#F4F6FA`, one accent `#9FD3FF`, Inter 200–600 and JetBrains Mono) — this
-  page does not use the Synthora palette. Panels are `.sheet`s: right drawer on desktop, bottom sheet on phones.
+  page does not use the Synthora palette. Panels are `.sheet`s: right drawer on desktop, bottom sheet on phones; they are
+  non-modal `role="dialog"` (the globe above stays touchable) and on phones Tab loops inside the open one. Place markers
+  ignore the depth test, so a `preRender` hook hides those beyond the horizon (`placeOccluder`). Every control is at
+  least 44 px; `@media (max-height: 560px / 420px)` keeps the place card under the status line on short screens.
+  Check changes with axe-core (0 WCAG 2.1 AA violations at the last audit).
   The "The Light · Stream" panel (radios from radio-browser.info, free TV from the iptv-org playlists, music by genre,
   city cameras, GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
   is one block of the script. `CITY_CAMS` holds only cameras whose owner publishes them (checked by hand: embeddable,

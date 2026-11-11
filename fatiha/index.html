@@ -106,7 +106,7 @@
   .place[aria-current="true"] span { border-bottom-color: var(--accent); }
   .place[data-visited] small::after { content: ' · vu'; color: var(--accent); }
   .arrow {
-    flex: none; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: rgba(4, 6, 11, 0.4);
+    flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: rgba(4, 6, 11, 0.4);
     color: var(--ink-2); cursor: pointer; font-size: 18px; display: none;
   }
   .arrow:hover { color: var(--ink); border-color: var(--line-2); }
@@ -115,7 +115,7 @@
   .card {
     left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 104px); max-width: 600px;
     opacity: 0; transform: translateY(10px); transition: opacity .6s ease, transform .6s ease; pointer-events: none;
-    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75);
+    text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75), 0 0 3px rgba(0, 0, 0, 0.85);   /* the second one holds small text over bright ground */
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
   .card h2 { margin: 8px 0 8px; font: 200 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
@@ -123,7 +123,7 @@
   .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
   .card p { margin: 14px 0 0; max-width: 54ch; font: 300 16px/1.6 var(--font-ui); color: var(--ink-2); }
   .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
-  .card .meta { margin-top: 10px; font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .card .meta { margin-top: 10px; font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
   .chip {
     display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px;
@@ -138,7 +138,7 @@
 
   /* Small permanent credit line, and Google's on-screen credits in Google 3D mode */
   .credit-line {
-    right: var(--gutter); bottom: calc(var(--safe-b) + 8px); padding: 4px 0; background: none; border: 0; cursor: pointer;
+    right: var(--gutter); bottom: var(--safe-b); min-height: 44px; padding: 8px 0 12px 12px; background: none; border: 0; cursor: pointer;
     font: 400 10px var(--font-mono); letter-spacing: .1em; color: var(--muted); text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
   }
   .credit-line:hover { color: var(--ink-2); }
@@ -183,7 +183,7 @@
   .sheet details > summary::-webkit-details-marker { display: none; }
   .quality { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
   .quality button {
-    min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
+    min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
     color: var(--ink-2); cursor: pointer; font: 400 13px var(--font-ui);
   }
   .quality button[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
@@ -193,7 +193,7 @@
 
   /* Generic controls inside sheets */
   .btn {
-    min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
+    min-height: 44px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent;
     color: var(--ink-2); cursor: pointer; font: 400 13px var(--font-ui); transition: color .2s, border-color .2s;
   }
   .btn:hover { color: var(--ink); border-color: var(--line-2); }
@@ -208,7 +208,7 @@
   .watch .sub { margin: 16px 0 6px; }
   .watch ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
   .watch li button {
-    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; padding: 8px 8px; min-height: 40px;
+    width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px; padding: 8px 8px; min-height: 44px;
     color: var(--ink-2); font: 400 12px/1.4 var(--font-mono); cursor: pointer; display: grid; grid-template-columns: 44px 1fr; gap: 8px;
   }
   .watch li button:hover { background: rgba(244, 246, 250, 0.06); color: var(--ink); }
@@ -280,7 +280,7 @@
   .stage { position: relative; margin: 6px 0 8px; }
   .stage[hidden] { display: none; }
   .stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; }
-  .stage .close { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; background: rgba(4, 6, 11, 0.7); }
+  .stage .close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; background: rgba(4, 6, 11, 0.7); }
   .live .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
   .live .list li > button, .live .list li > a {
     display: grid; gap: 3px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px;
@@ -322,7 +322,7 @@
   .sats-box .sub { margin-top: 0; }
   .check { display: flex; gap: 10px; align-items: center; min-height: 44px; font: 400 13px var(--font-ui); color: var(--ink-2); cursor: pointer; }
   .check input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent); }
-  #credits-box > summary { padding: 8px 0; min-height: 40px; display: flex; align-items: center; }
+  #credits-box > summary { padding: 8px 0; min-height: 44px; display: flex; align-items: center; }
   #credits-box[open] > summary { color: var(--ink-2); }
 
   /* Situation room */
@@ -490,7 +490,11 @@
     .card .more { display: inline-block; }
     .card .meta { display: none; }
     .card.expanded .meta { display: block; }
-    .chip { padding: 0 14px; font-size: 13.5px; }
+    .chip { padding: 0 12px; font-size: 13.5px; gap: 6px; }
+    .card .links { gap: 8px; }
+    /* Four pills on one line: shorter labels; "Partager" keeps its name for screen readers (aria-label). */
+    .chip .wide { display: none; }
+    #card-share { min-width: 44px; justify-content: center; }
     .hud .aux { display: none; }
     .sheet { top: auto; left: 8px; right: 8px; bottom: calc(var(--safe-b) + 8px); width: auto; max-height: 80vh; border-radius: 24px; padding: 14px 14px 20px; }
     /* Keep the top of the globe in view: touching it picks a country (Direct) or a satellite (Veille). */
@@ -507,10 +511,25 @@
     .loader .bar i, .eq i { animation: none; }
     .loader .bar i { width: 100%; }
   }
+  /* Short screens (a phone held sideways, a window zoomed to 200 %): the place title shrinks and its text waits for
+     "Lire la suite", so the card stays under the status line. */
+  @media (max-height: 560px) {
+    .card { bottom: calc(var(--safe-b) + 96px); }
+    .card h2 { font-size: 28px; margin: 4px 0; }
+    .card p { margin-top: 8px; font-size: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .card.expanded p { display: block; }
+    .card .more { display: inline-block; }
+    .card .meta, .card .weather { display: none; }
+    .card.expanded .meta, .card.expanded .weather { display: block; }
+    .card .links { margin-top: 10px; }
+    .places { bottom: calc(var(--safe-b) + 18px); }
+  }
+  /* Very short (a phone on its side): the country and the coordinates are already in the places strip and the status line. */
+  @media (max-height: 420px) { .card .kicker, .card .coords { display: none; } }
 </style>
 </head>
 <body>
-  <div id="globe" aria-label="Globe terrestre interactif"></div>
+  <div id="globe" role="region" aria-label="Globe terrestre interactif"></div>
   <div class="vignette"></div>
   <div class="shade shade-top"></div>
   <div class="shade shade-bottom"></div>
@@ -540,7 +559,7 @@
     </div>
   </header>
 
-  <aside class="ui sheet menu" id="menu" aria-label="Menu">
+  <aside class="ui sheet menu" id="menu" role="dialog" aria-modal="false" aria-label="Menu">
     <div class="sheet-head">
       <div><div class="kicker">Fatiha · menu</div><h3>Explorer la Terre</h3></div>
       <button class="close" type="button" data-close="menu" aria-label="Fermer le menu">✕</button>
@@ -606,15 +625,15 @@
     <div class="links">
       <button class="chip primary" id="card-dive" type="button">↓ Plonger</button>
       <button class="chip" id="card-night" type="button">☾ Nuit</button>
-      <a class="chip" id="card-earth" target="_blank" rel="noopener">Google Earth ↗</a>
-      <button class="chip" id="card-share" type="button" title="Copier un lien vers ce lieu">⧉ Partager</button>
+      <a class="chip" id="card-earth" target="_blank" rel="noopener" title="Ouvrir dans Google Earth"><span class="wide">Google</span>Earth ↗</a>
+      <button class="chip" id="card-share" type="button" title="Copier un lien vers ce lieu" aria-label="Partager ce lieu"><span aria-hidden="true">⧉</span><span class="wide">Partager</span></button>
     </div>
   </section>
 
   <button class="ui credit-line" id="credit-line" type="button" aria-controls="menu">Esri · Maxar · NASA · CesiumJS</button>
   <div class="ui" id="cesium-credits" hidden></div>
 
-  <aside class="ui sheet watch" id="watch" aria-label="Veille mondiale">
+  <aside class="ui sheet watch" id="watch" role="dialog" aria-modal="false" aria-label="Veille mondiale">
     <div class="sheet-head">
       <div><div class="kicker">Données publiques</div><h3>Veille mondiale</h3></div>
       <button class="close" type="button" data-close="watch" aria-label="Fermer la veille">✕</button>
@@ -664,7 +683,7 @@
     <ul id="watch-journal" class="journal"></ul>
   </aside>
 
-  <aside class="ui sheet live" id="live" aria-label="The Light · Stream : télés, radios, caméras et actualité en direct">
+  <aside class="ui sheet live" id="live" role="dialog" aria-modal="false" aria-label="The Light · Stream : télés, radios, caméras et actualité en direct">
     <div class="sheet-head">
       <div><div class="kicker">Direct · le pays choisi</div><h3>The Light · Stream</h3></div>
       <button class="close" type="button" data-close="live" aria-label="Fermer The Light · Stream">✕</button>
@@ -890,7 +909,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-10.1';
+  const NOUR_BUILD = '2026-11-11.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1601,6 +1620,19 @@
         distanceDisplayCondition: new C.DistanceDisplayCondition(4000, 4.5e6),
       },
     });
+  });
+
+  // The markers ignore the depth test so relief never hides a place nearby, which also drew far places through the
+  // Earth (Tombouctou over Jérusalem from 1 km up). Hide each one beyond the horizon, as for the EONET points: the
+  // probe sits 3 km up so a place on the horizon itself stays visible.
+  const placeOccluder = new C.EllipsoidalOccluder(C.Ellipsoid.WGS84, camera.positionWC);
+  const placeMarks = PLACES.map((p) => ({ e: viewer.entities.getById(p.id), probe: C.Cartesian3.fromDegrees(p.lon, p.lat, 3000) }));
+  scene.preRender.addEventListener(() => {
+    placeOccluder.cameraPosition = camera.positionWC;
+    for (const m of placeMarks) {
+      const seen = placeOccluder.isPointVisible(m.probe);
+      if (m.e.show !== seen) m.e.show = seen;
+    }
   });
 
   // ---------- Decorative clouds (not weather data) ----------
@@ -3189,6 +3221,22 @@
   });
   const closeSheet = { menu: () => setMenuOpen(false), watch: () => setWatchOpen(false), live: () => setLiveOpen(false) };
   document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => { closeSheet[b.dataset.close](); menuBtn.focus(); }));
+  // Phones: the open sheet covers most of the screen, so Tab and Shift+Tab loop inside it (keyboard only: touching the
+  // globe above it still picks a country or a satellite).
+  const phoneSheets = matchMedia('(max-width: 760px)');
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Tab' || !phoneSheets.matches) return;
+    const sheet = document.querySelector('.sheet.open');
+    if (!sheet) return;
+    const f = [...sheet.querySelectorAll('button, a[href], select, input, summary, [tabindex]:not([tabindex="-1"])')]
+      .filter((x) => !x.disabled && x.getClientRects().length && getComputedStyle(x).visibility !== 'hidden'
+        && !(x.tagName !== 'SUMMARY' && x.closest('details:not([open])')));   // a closed <details> keeps its content out of Tab
+    if (!f.length) return;
+    const first = f[0], last = f[f.length - 1], at = document.activeElement;
+    if (!sheet.contains(at) || (e.shiftKey && at === first) || (!e.shiftKey && at === last)) {
+      e.preventDefault(); (e.shiftKey ? last : first).focus();
+    }
+  });
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
     const sheet = document.querySelector('.sheet.open');
@@ -5011,6 +5059,7 @@
   function open() {
     if (loader.classList.contains('done')) return;
     loader.classList.add('done');
+    loader.inert = true; loader.setAttribute('aria-hidden', 'true');   // faded out: no longer reachable by Tab
     // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
     const h = parseHash();
