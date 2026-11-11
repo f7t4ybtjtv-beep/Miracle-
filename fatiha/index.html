@@ -1061,7 +1061,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-11.2';
+  const NOUR_BUILD = '2026-11-12.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -2590,6 +2590,7 @@
     'Veille : USGS (séismes) · wheretheiss.at (ISS) · NASA GIBS (images VIIRS, lumières Black Marble, précipitations IMERG)',
     'Satellites militaires : catalogue public CelesTrak (groupe military) · positions calculées avec satellite.js (SGP4)',
     'Veille (suite) : NASA EONET (événements naturels) · NASA FIRMS / GIBS (feux actifs VIIRS) · NOAA SWPC (aurores, modèle OVATION)',
+    'Enquête : images datées NASA GIBS (VIIRS, MODIS, Landsat et Sentinel-2 HLS, VIIRS Day/Night, inondations) · relief AWS Terrain Tiles · calculs WGS84 dans la page',
     'Météo des lieux : Open-Meteo · La Terre entière : NASA EPIC Team / DSCOVR',
     'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
     'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, Western Wall Heritage Foundation, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · bande-son générée dans le navigateur',

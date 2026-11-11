@@ -190,6 +190,14 @@ caméra ne joue plus.
 - **Honnêteté** : ne jamais annoncer comme vérifié ce qui n'a pas été vu marcher. Une source en panne affiche un message
   et se coupe.
 
+## 7 bis. Panneau Enquête (12 nov.)
+- Outils : Point (coordonnées, MGRS, aller à), Mesure (distance, surface, profil, ligne de vue), Soleil
+  (chronolocalisation), Images datées NASA GIBS avec rideau, Journal (GeoJSON/KML).
+- Vérifié contre pyproj, geographiclib, mgrs et pvlib (SPA) ; les 8 couches d'images contre le vrai GIBS ; test de bout
+  en bout dans le navigateur, axe 0 violation, cibles ≥ 44 px, aucun lien sortant.
+- Écartés volontairement (non vérifiables depuis le cloud) : recherche par nom de lieu, avions en direct. Jamais de
+  recherche de personnes.
+
 ## 8. Reste à faire
 1. Regarder la plongée et la visite sur un vrai téléphone et un vrai ordinateur, avec la vraie imagerie.
 2. Fusionner la PR dans `main` : le site en ligne se met à jour tout seul (GitHub Pages).

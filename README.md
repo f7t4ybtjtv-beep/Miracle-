@@ -115,6 +115,29 @@ Limite : la netteté de la dernière image est celle de l'imagerie satellite (Es
 au drone. Testé avec une imagerie unie simulée (trajectoire, flou, brume et
 retour vérifiés) ; l'aspect avec la vraie imagerie n'est pas vérifié.
 
+### Fatiha : Enquête (menu) — outils de sources ouvertes
+
+Un panneau d'outils pour enquêter sur des **lieux et des données publiques** (jamais sur des personnes), sans lien vers
+un autre site :
+
+- **Point** : toucher le globe donne les coordonnées en décimal, DMS, UTM et MGRS, l'altitude du relief et l'heure
+  solaire ; copier, épingler. « Aller à » accepte des coordonnées en décimal, DMS (N/S/E/O) ou MGRS ; pas de
+  recherche par nom, faute de pouvoir la vérifier.
+- **Mesure** : distance géodésique avec caps, surface d'un polygone, profil du relief entre deux points avec ligne de
+  vue (courbure de la Terre et réfraction, coefficient 0,13).
+- **Soleil** : azimut et hauteur du soleil, direction et longueur des ombres, lever, coucher, heure dorée ; les heures
+  où une ombre prend une direction donnée (dater une photo) ; régler le globe sur cette heure.
+- **Images** : deux dates côte à côte avec un rideau (NASA GIBS : VIIRS et MODIS ~250 m, Landsat et Sentinel-2 HLS
+  30 m, lumières de la nuit du jour, inondations) ; la dernière date disponible est cherchée automatiquement.
+- **Journal** : épingles gardées dans le navigateur, export GeoJSON et KML, import GeoJSON.
+
+Vérification : les calculs (UTM, MGRS, géodésiques, surfaces, soleil, ligne de vue) sont comparés à des bibliothèques
+indépendantes sur des centaines de cas — UTM à 10⁻⁵ mm de pyproj, MGRS identique au paquet `mgrs`, géodésiques à
+0,08 mm de geographiclib, surfaces à 3·10⁻⁹ près, soleil à 0,05° de l'algorithme SPA du NREL, lever et coucher à 5 s.
+Les huit couches d'images ont été vérifiées sur le vrai service de la NASA. Le relief réel (AWS) n'est pas joignable
+depuis l'environnement de test : profil et ligne de vue y sont testés sur un relief simulé dont la réponse est connue.
+Bâtiments et arbres ne sont pas dans le modèle de relief.
+
 ### Fatiha : Spectacle (menu)
 
 - **Visite cinéma** : les treize lieux enchaînés, bandes noires au format 2,39:1 et titres comme un générique. Elle part du lieu affiché et trace son propre trajet. Toucher l'image la met en pause et rend le globe (on peut regarder autour), « Reprendre » continue ; Échap ou « Quitter » l'arrête, comme tout autre vol (un lieu, la nuit, la plongée, Orbite, un lien). Un onglet caché la met en pause.

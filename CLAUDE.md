@@ -125,6 +125,14 @@ python3 -m satlab bench --campaign standard --out results/standard
   the WMTS: use the WMS (`WebMapServiceImageryProvider`, PNG). The true-colour layer `realEarth` is null until
   `pickTruecolor()` finds a day that answers; guard every use. Open-Meteo, CelesTrak and GDELT rate-limit or refuse the
   cloud's shared address (429 / TLS reset), not a visitor's: keep their error messages.
+  Enquête (menu → `#osint` sheet, `const osint` closure, opened/closed with the other sheets through `closeOsint`):
+  Point, Mesure, Soleil, Images, Journal. All maths live in the pure `GEO` block (Krüger-series UTM/MGRS, Vincenty
+  geodesics, equal-area polygon area, NOAA sun, line of sight). Re-verify any change to `GEO` against independent
+  libraries (pyproj, geographiclib, mgrs, pvlib SPA; never against remembered values) — the reference harness used
+  lives outside the repo. Globe touches reach the tools through `pickHandlers`; the place card is hidden while the sheet
+  is open (`body.osint-open`) because it caught those touches. Dated imagery uses `ImageryLayer.splitDirection` +
+  `scene.splitPosition` with the `#split-handle` slider and joins `dayLayers` while shown. Deliberately left out because
+  they cannot be verified from the sandbox: search by place name and live aircraft. Never add people search.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
