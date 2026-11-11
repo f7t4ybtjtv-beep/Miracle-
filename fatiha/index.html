@@ -545,6 +545,8 @@
   .split-handle::before { content: ''; position: absolute; top: 0; bottom: 0; left: 21px; width: 2px; background: var(--accent); box-shadow: 0 0 8px rgba(0, 0, 0, 0.8); }
   .split-handle span { position: relative; padding: 10px 6px; border-radius: 999px; background: var(--accent); color: var(--bg); font: 600 12px var(--font-mono); }
   @media (max-width: 760px) { .sheet.osint { max-height: 58vh; } }
+  /* While investigating, the globe is the work surface: the place card would cover it and catch the touches. */
+  body.osint-open .card { visibility: hidden; pointer-events: none; }
   /* Short screens (a phone held sideways, a window zoomed to 200 %): the place title shrinks and its text waits for
      "Lire la suite", so the card stays under the status line. */
   @media (max-height: 560px) {
@@ -5244,7 +5246,7 @@
     }
     const band = (lat) => BANDS[Math.min(19, Math.floor((lat + 80) / 8))];
     function toUTM(lat, lon, zone) {
-      if (!(lat >= -80 && lat < 84)) return null;
+      if (!(lat >= -80 && lat < 84) || !Number.isFinite(lon)) return null;    // also refuses NaN
       const z = zone || utmZone(lat, lon), lon0 = (z - 1) * 6 - 180 + 3;
       const p = tmForward(lat, wrap180(lon), lon0);
       return { zone: z, band: band(lat), hemi: lat >= 0 ? 'N' : 'S', easting: p.x + E0, northing: lat >= 0 ? p.y : p.y + 10000000 };
@@ -5534,6 +5536,7 @@
       open = v;
       if (v) { setMenuOpen(false); setWatchOpen(false); setLiveOpen(false); }
       el.classList.toggle('open', v);
+      document.body.classList.toggle('osint-open', v);
       btn.setAttribute('aria-pressed', String(v));
       syncSheets();
       if (v) { el.querySelector('.close').focus(); if (tab === 'soleil') renderSun(); }
