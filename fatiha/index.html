@@ -299,6 +299,7 @@
   .tile.cam .name .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
   .tile.cam .name .p { font: 400 8.5px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile.cam.open { border-color: var(--accent); }
+  .tile.cam.live .badge::before { content: '● '; color: #FF6B6B; }
   .cam-stage iframe, .cam-stage img { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #000; object-fit: cover; }
   .cam-cap { display: grid; gap: 3px; margin-top: 8px; }
   .cam-cap b { font: 400 14px/1.35 var(--font-ui); color: var(--ink); }
@@ -3336,7 +3337,7 @@
   const say = (id, text) => { $(id).textContent = text; };
   const liveEl = $('live'), selectEl = $('live-country'), radioEl = $('radio-audio'), tvEl = $('tv-video');
   const live = { cc: '', lat: null, lon: null, label: '', tab: 'tv', loaded: { radio: '', tv: '', war: '' } };
-  let liveOpen = false, warTimer = 0, warItems = [], warLang = 'all', warLast = 0;
+  let liveOpen = false, camThumbTimer = 0, warTimer = 0, warItems = [], warLang = 'all', warLast = 0;
 
   const placeholder = document.createElement('option');
   placeholder.value = ''; placeholder.textContent = 'Choisis un pays…';
@@ -3376,7 +3377,7 @@
       liveEl.querySelector('.close').focus();
       updateHint(); loadTab();
     } else {
-      clearInterval(warTimer); warTimer = 0; stopPreviews();
+      clearInterval(warTimer); warTimer = 0; clearInterval(camThumbTimer); camThumbTimer = 0; stopPreviews();
       // The big TV player lives in the sheet and has no control elsewhere: closing the sheet stops it. A radio keeps
       // playing, with its stop button in the HUD. The camera player and the camera points go with the sheet too.
       if (!$('tv-stage').hidden) { stopMedia(false); say('tv-status', ''); }
@@ -3393,11 +3394,15 @@
   }
   liveEl.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
   function loadTab() {
-    clearInterval(warTimer); warTimer = 0;
+    clearInterval(warTimer); warTimer = 0; clearInterval(camThumbTimer); camThumbTimer = 0;
     if (live.tab !== 'tv') stopPreviews();
     syncCamPoints();
     if (!liveOpen) return;
-    if (live.tab === 'cam') { renderCam(); return; }
+    if (live.tab === 'cam') {
+      renderCam();
+      camThumbTimer = setInterval(() => { if (!document.hidden) refreshCamThumbs(); }, CAM_THUMB_MS);
+      return;
+    }
     if (live.tab === 'music') { renderMusic(); return; }
     if (live.tab === 'war') {
       if (live.loaded.war !== (live.cc || '*')) loadWar();
@@ -3819,9 +3824,27 @@
     }
     return out;
   }
+  // A YouTube live publishes a recent frame of the stream at hqdefault_live.jpg: the squares show it, refreshed every
+  // minute while the tab is open, and fall back to the video's fixed thumbnail. A square cannot hold a moving player:
+  // YouTube requires embedded players of at least 200 × 200 px. The big player above the squares is the live video.
+  const CAM_THUMB_MS = 60000;
+  const ytId = (u) => { const m = /\/embed\/([\w-]{11})(?:[?#]|$)/.exec(u || ''); return m ? m[1] : ''; };
+  const liveFrame = (id) => `https://i.ytimg.com/vi/${id}/hqdefault_live.jpg?t=${Math.floor(Date.now() / CAM_THUMB_MS)}`;
   function camTile(c) {
-    const tile = makeTile(c.title, c.thumb, c.city || 'Webcam', `${c.title}${c.city ? `, ${c.city}` : ''}${c.provider ? ` (${c.provider})` : ''} : voir la caméra ici`);
+    const id = c.kind === 'youtube' ? ytId(c.player) : '';
+    const tile = makeTile(c.title, id ? null : c.thumb, c.city || 'Webcam', `${c.title}${c.city ? `, ${c.city}` : ''}${c.provider ? ` (${c.provider})` : ''} : voir le direct ici`);
     tile.classList.add('cam'); tile._cam = c;
+    if (id) {
+      tile.classList.add('live'); tile._yt = id;
+      const img = document.createElement('img');
+      img.className = 'logo'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
+      img.addEventListener('load', () => { const ini = tile.querySelector('.initials'); if (ini) ini.remove(); });
+      img.addEventListener('error', () => {
+        if (!img.dataset.fixed && okImage(c.thumb)) { img.dataset.fixed = '1'; img.src = c.thumb; } else img.remove();
+      });
+      img.src = liveFrame(id);
+      tile.querySelector('.initials').after(img);
+    }
     const nm = tile.querySelector('.name'), t = document.createElement('span'), p = document.createElement('span');
     t.className = 't'; t.textContent = c.title; p.className = 'p'; p.textContent = c.provider;
     nm.replaceChildren(t, p);
@@ -3843,11 +3866,28 @@
     const where = live.cc ? nameFr(live.cc) : live.label;
     say('cam-status', !cityCams.length ? 'Aucune caméra de ville dans la sélection pour le moment.'
       : live.cc && !here.length ? `${where} : pas encore de caméra dans cette sélection. En voici ailleurs, les plus proches d’abord. Touche un carré pour la voir ici, ou un point bleu sur le globe.`
-      : `${here.length ? `${where} : ${here.length} caméra${here.length > 1 ? 's' : ''} de ville, puis le reste du monde. ` : ''}Touche un carré pour la voir ici, ou un point bleu sur le globe.`);
+      : `${here.length ? `${where} : ${here.length} caméra${here.length > 1 ? 's' : ''} de ville, puis le reste du monde. ` : ''}Le grand cadre joue le direct ; les carrés montrent sa dernière image, mise à jour chaque minute. Touche un carré ou un point bleu sur le globe pour changer.`);
     if (cam.open) markOpenCam(cam.open);
+  }
+  // Swap in the newer frame only once it has loaded, so a square never flashes empty.
+  function refreshCamThumbs() {
+    $('pane-cam').querySelectorAll('.tile.cam.live').forEach((tile) => {
+      const img = tile.querySelector('img.logo');
+      if (!img || img.dataset.fixed) return;
+      const r = tile.getBoundingClientRect();
+      if (!r.width || r.bottom < 0 || r.top > innerHeight) return;            // only the squares on screen
+      const next = new Image(); next.referrerPolicy = 'no-referrer';
+      next.onload = () => { img.src = next.src; };
+      next.src = liveFrame(tile._yt);
+    });
   }
   function renderCam() {
     renderCityCams();
+    // Open the tab on something that moves: the nearest camera's live player starts, muted (YouTube embeds mute=1).
+    if (!cam.open) {
+      const first = $('pane-cam').querySelector('#cam-here .tile.cam, #cam-world .tile.cam');
+      if (first && first._cam && first._cam.player) openCam(first._cam, false);
+    }
     // Points on the ground: the relief may have loaded since the page opened.
     cityCams.forEach((c) => { const g = globe.getHeight(C.Cartographic.fromDegrees(c.lon, c.lat)); if (Number.isFinite(g)) c.point.position = C.Cartesian3.fromDegrees(c.lon, c.lat, g + 30); });
     $('windy-box').hidden = !windyKey;
