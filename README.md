@@ -28,40 +28,51 @@ dossier projet.
 ## Fatiha
 
 `fatiha/index.html` — **Fatiha, maman d’Amine** (anciennement « Nour, la lumière du dialogue ») : un site autonome qui
-reprend le moteur de survol de `terre.html` avec sa propre identité (lumière
-dorée sur fond de nuit, titres en Cormorant Garamond). Un écran d'accueil
+reprend le moteur de survol de `terre.html` avec sa propre identité, « cinéma spatial » (noir bleuté `#04060B`,
+texte blanc froid, un seul accent bleu glacier `#9FD3FF`, Inter fine et JetBrains Mono). Un écran d'accueil
 précède un voyage vers treize lieux où des cultures se sont rencontrées : Tolède,
 Cordoue, l'Alhambra, Al Quaraouiyine à Fès, Tombouctou, la chapelle Palatine de Palerme,
 Alexandrie, Jérusalem, Petra, Sainte-Sophie, Samarcande, Nalanda et Angkor. Coordonnées réelles ; textes limités à des faits
 vérifiables. L'ancienne adresse `nour/` redirige vers `fatiha/`. Lien direct vers un lieu : `fatiha/index.html#samarcande`,
-vers sa vue de nuit ou sa plongée : `#samarcande/nuit`, `#samarcande/plongee` ; `#visite` lance la visite guidée.
-Le bouton « Partager » de la carte copie ce lien (ou ouvre le partage du téléphone). « Visite guidée » enchaîne les
-lieux avec un arrêt de 12 s (toucher le globe met en pause) ; « Trajet » trace depuis l'espace un arc entre les lieux visités. Les
-données et limites sont les mêmes que pour `terre.html`.
+vers sa vue de nuit ou sa plongée : `#samarcande/nuit`, `#samarcande/plongee` ; `#visite` lance la visite cinéma ;
+`#vue=lat,lon,altitude,cap,inclinaison,heure` rouvre un point de vue exact. Le bouton « Partager » de la fiche copie le
+lien du lieu (ou ouvre le partage du téléphone) ; « Partager cette vue » (menu) copie le point de vue exact.
+« Trajet » (menu, Affichage) trace depuis l'espace un arc entre les lieux visités. La fiche d'un lieu donne aussi la
+météo du moment (Open-Meteo). Les données et limites sont les mêmes que pour `terre.html`.
+
+**Aucun lien vers un autre site** : les sources sont nommées en texte (crédits, titres de presse, source d'un événement naturel), les vidéos, radios et caméras jouent dans la page.
+
+En haut à gauche, le nom et une ligne d'état ; en haut à droite, « Orbite » et « Menu » ; en bas, la bande des lieux.
+Les panneaux (Menu, Veille, The Light · Stream) sont un tiroir à droite sur ordinateur et une feuille en bas sur
+téléphone ; Échap et ✕ les ferment.
 
 ### Fatiha : qualité d'image
 
-Le panneau « Sources et qualité » propose **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans ce même panneau. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
 
 ### Fatiha : veille mondiale (bouton « Veille »)
 
 Couches de données **publiques et agrégées**, activables une à une ou toutes
 d'un coup via « Salle de situation » :
 
-- **Nuages réels** (activé par défaut) : mosaïque quotidienne NASA GIBS / VIIRS, datée de deux jours (le dernier jour toujours complet), visible depuis l'orbite et fondue vers l'imagerie Esri entre 800 et 150 km d'altitude. Le noir (absence de donnée) est rendu transparent.
+- **Nuages réels** (activé par défaut) : mosaïque quotidienne NASA GIBS / VIIRS. Une tuile test est sondée d'abord : NOAA-20, puis NOAA-21, puis SNPP, du jour le plus récent (J-1) au plus ancien (J-30) ; sans réponse, la couche est désactivée. Visible depuis l'orbite et fondue vers l'imagerie Esri entre 800 et 150 km d'altitude. Le noir (absence de donnée) est rendu transparent.
 - **Lumières de nuit** (activé par défaut) : NASA Black Marble 2016, dessiné uniquement du côté nuit du globe et estompé sous 80 km d'altitude.
 - **Séismes 24 h** : flux GeoJSON public de l'USGS (M2,5+), rafraîchi toutes les 5 min ; clic sur un séisme de la liste pour y voler.
 - **Station spatiale** : position et trace de l'ISS via wheretheiss.at, toutes les 5 s.
 - **Précipitations** : imagerie NASA GIBS / IMERG (dernier relevé disponible).
 - **Jour/nuit réel** : horloge réelle, terminateur calculé par la position du soleil.
+- **Satellites militaires** : catalogue public CelesTrak (groupe `military`), positions calculées avec satellite.js et gardées 2 h en cache. CelesTrak coupe les connexions venant de centres de données : la couche le dit et se coupe.
+- **Événements naturels** : NASA EONET (feux, tempêtes, volcans… des 30 derniers jours), un point par événement et une liste ; toucher l'un ou l'autre y fait voler la caméra.
+- **Feux actifs** : points chauds VIIRS (NOAA-20, 375 m) de la veille, rendus en PNG par le service WMS de NASA GIBS (ces couches n'existent qu'en tuiles vectorielles dans le WMTS).
+- **Aurores** : prévision à 30 min du modèle OVATION (NOAA SWPC), dessinée en voile vert.
 - **Salle de situation** : affichage type centre de contrôle (heure UTC, journal d'événements).
 
 L'éclairage du globe suit la vraie position du soleil à toute altitude : la face nocturne est assombrie (30 % de sa luminosité de jour) et le terminateur est visible. Les arrivées aux lieux se font en plein jour (soleil à ~32°). Aucune de ces couches ne suit ni n'identifie de personnes. Elles dépendent de
 services tiers : si une source est indisponible, un message l'indique.
-Les flux (USGS, ISS, NASA GIBS) étaient injoignables depuis l'environnement de
-développement : l'interface a été testée avec des données simulées au format
-documenté, pas avec les flux réels. Une couche NASA se désactive d'elle-même
-après une douzaine d'erreurs de tuiles.
+Les flux sont injoignables depuis le navigateur de test : l'interface a été testée
+avec des réponses simulées au format vérifié le 9 nov. 2026 (EONET, OVATION, GIBS WMS,
+Open-Meteo répondent bien avec CORS), pas avec les flux réels dans le navigateur. Une
+couche NASA se désactive d'elle-même après une douzaine d'erreurs de tuiles.
 
 ### Fatiha : vue de nuit depuis l'orbite
 
@@ -88,21 +99,53 @@ vérifiée, d'où le réglage `?bloom=`.
 ### Fatiha : plongée depuis l'espace
 
 Chaque fiche propose aussi **« Plonger depuis l'espace »** : un vol vers une vue
-d'ensemble où la Terre remplit l'écran, puis une chute de 13 s caméra à la
-verticale jusqu'à environ 300 m au-dessus du lieu, avec une lente rotation. Elle
+d'ensemble où la Terre remplit l'écran, enchaînée sans pause avec une chute de 13 s caméra à la
+verticale jusqu'à environ 300 m au-dessus du lieu, avec un virage de 40°. Elle
 reprend l'idée d'une plongée filmée de l'espace jusqu'à la rue :
 
-- les étoiles s'effacent au départ (ciel noir autour d'une Terre éclairée) ;
-- un **flou de vitesse** radial, calculé d'après la vitesse de descente réelle (il n'apparaît qu'en dessous de quelques centaines de km et retombe quand la caméra ralentit) ;
-- une **brume grise** vers 6 km d'altitude, à la hauteur des nuages (elle suit le bouton « Nuages » : sans nuages, pas de brume). C'est un effet décoratif, pas la météo réelle ;
-- « Revenir au lieu, de jour » ramène à l'arrivée habituelle. Avec « réduire les animations » activé, le vol est raccourci et le flou supprimé.
+- la descente suit une loi tabulée sur la hauteur au-dessus du sol, qui ralentit fortement à la fin : les niveaux de tuiles changent lentement près du sol ;
+- pendant la montée, les tuiles Esri dont la descente aura besoin (au plus 120) sont préchargées ; à la fin, un court palier (2,5 s au plus) attend les dernières tuiles avant la fiche ;
+- un **flou de vitesse** léger, calculé d'après la vitesse de descente réelle, entre quelques milliers et ~20 km au-dessus du sol, nul ensuite ;
+- un **voile** bref vers 3 km au-dessus du sol (il suit le bouton « Nuages »). C'est un effet décoratif, pas la météo réelle ;
+- la qualité ne baisse pas d'elle-même pendant la plongée ;
+- « Retour de jour » ramène à l'arrivée habituelle. Avec « réduire les animations » activé, le vol est raccourci et le flou supprimé.
 
 Limite : la netteté de la dernière image est celle de l'imagerie satellite (Esri)
 à cet endroit. Elle ne montre ni les passants ni les détails d'une vidéo tournée
 au drone. Testé avec une imagerie unie simulée (trajectoire, flou, brume et
 retour vérifiés) ; l'aspect avec la vraie imagerie n'est pas vérifié.
 
-### Fatiha : Direct (bouton « Direct »)
+### Fatiha : Enquête (menu) — outils de sources ouvertes
+
+Un panneau d'outils pour enquêter sur des **lieux et des données publiques** (jamais sur des personnes), sans lien vers
+un autre site :
+
+- **Point** : toucher le globe donne les coordonnées en décimal, DMS, UTM et MGRS, l'altitude du relief et l'heure
+  solaire ; copier, épingler. « Aller à » accepte des coordonnées en décimal, DMS (N/S/E/O) ou MGRS ; pas de
+  recherche par nom, faute de pouvoir la vérifier.
+- **Mesure** : distance géodésique avec caps, surface d'un polygone, profil du relief entre deux points avec ligne de
+  vue (courbure de la Terre et réfraction, coefficient 0,13).
+- **Soleil** : azimut et hauteur du soleil, direction et longueur des ombres, lever, coucher, heure dorée ; les heures
+  où une ombre prend une direction donnée (dater une photo) ; régler le globe sur cette heure.
+- **Images** : deux dates côte à côte avec un rideau (NASA GIBS : VIIRS et MODIS ~250 m, Landsat et Sentinel-2 HLS
+  30 m, lumières de la nuit du jour, inondations) ; la dernière date disponible est cherchée automatiquement.
+- **Journal** : épingles gardées dans le navigateur, export GeoJSON et KML, import GeoJSON.
+
+Vérification : les calculs (UTM, MGRS, géodésiques, surfaces, soleil, ligne de vue) sont comparés à des bibliothèques
+indépendantes sur des centaines de cas — UTM à 10⁻⁵ mm de pyproj, MGRS identique au paquet `mgrs`, géodésiques à
+0,08 mm de geographiclib, surfaces à 3·10⁻⁹ près, soleil à 0,05° de l'algorithme SPA du NREL, lever et coucher à 5 s.
+Les huit couches d'images ont été vérifiées sur le vrai service de la NASA. Le relief réel (AWS) n'est pas joignable
+depuis l'environnement de test : profil et ligne de vue y sont testés sur un relief simulé dont la réponse est connue.
+Bâtiments et arbres ne sont pas dans le modèle de relief.
+
+### Fatiha : Spectacle (menu)
+
+- **Visite cinéma** : les treize lieux enchaînés, bandes noires au format 2,39:1 et titres comme un générique. Elle part du lieu affiché et trace son propre trajet. Toucher l'image la met en pause et rend le globe (on peut regarder autour), « Reprendre » continue ; Échap ou « Quitter » l'arrête, comme tout autre vol (un lieu, la nuit, la plongée, Orbite, un lien). Un onglet caché la met en pause.
+- **Curseur du temps** : l'heure solaire locale sur 24 h, au lieu affiché ou au centre de l'écran.
+- **Partager cette vue** : un lien `#vue=…` vers le point de vue exact, heure comprise.
+- **La Terre entière, aujourd'hui** : les photos du jour de NASA EPIC (satellite DSCOVR, à 1,5 million de km), puis un vol vers le côté photographié.
+
+### Fatiha : The Light · Stream (menu, « En direct »)
 
 Un panneau pour écouter, regarder et s'informer sur le pays d'un lieu, d'un pays
 touché sur le globe ou choisi dans la liste. Rien n'est chargé avant l'ouverture
@@ -110,8 +153,10 @@ d'une rubrique.
 
 - **Radios** : annuaire communautaire radio-browser.info, radios les plus écoutées du pays, flux https seulement. La radio continue pendant le survol, avec un bouton d'arrêt dans la barre d'état.
 - **Télé** : playlists communautaires iptv-org (chaînes gratuites en accès libre), lues par hls.js (chargé à la demande) ou nativement sous Safari. Beaucoup de flux sont géobloqués, hors ligne ou refusés par le navigateur : le panneau le dit. Les chaînes d'un pays peuvent dépendre de l'État.
-- **Caméras** : uniquement des liens vers des annuaires de webcams publiques (carte Windy, directs YouTube filtrés). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée.
-- **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec des liens vers des sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
+- **Musique** : radios radio-browser classées par genre.
+- **Caméras** : 17 caméras de lieux publics (Paris, Jérusalem, Tokyo, Vatican, Venise, New York, Londres, Ajaccio…), directs YouTube publiés par leurs propriétaires (offices de tourisme, chaînes, réseaux de webcams), contrôlés le 9 nov. 2026, un point bleu chacune sur le globe. Windy Webcams seulement si le visiteur apporte une clé (`?wkey=`). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée. Un direct peut s'arrêter ou changer d'adresse.
+- **Bande-son** (menu, Affichage) : une musique calme générée dans le navigateur (WebAudio), qui suit l'altitude et la plongée.
+- **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec le nom de sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
 - Jérusalem n'est rattachée à aucun pays (son statut est disputé) : le panneau demande d'en choisir un.
 
 Vie privée : ouvrir une rubrique contacte radio-browser.info, GitHub (iptv-org),
@@ -126,7 +171,7 @@ l'interface l'indique.
 
 ### Fatiha : image jusqu'à 5K
 
-« Enregistrer en 5K » (panneau « Sources et qualité ») rend la vue courante dans
+« Enregistrer une image 5K » (menu, Qualité d'image) rend la vue courante dans
 un tampon de jusqu'à 5120 px sur le grand côté (moins si l'appareil ne le permet
 pas), ajoute les crédits en bas et télécharge un PNG. L'image est calculée sur
 l'appareil du visiteur, avec les vraies données. Elle demande beaucoup de
