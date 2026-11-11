@@ -91,7 +91,9 @@ python3 -m satlab bench --campaign standard --out results/standard
   non-modal `role="dialog"` (the globe above stays touchable) and on phones Tab loops inside the open one. Place markers
   ignore the depth test, so a `preRender` hook hides those beyond the horizon (`placeOccluder`). Every control is at
   least 44 px; `@media (max-height: 560px / 420px)` keeps the place card under the status line on short screens.
-  Check changes with axe-core (0 WCAG 2.1 AA violations at the last audit).
+  Check changes with axe-core (0 WCAG 2.1 AA violations at the last audit). The owner wants **no link to another site**:
+  sources are named as plain text, nothing gets an outbound `<a href>`, and a MutationObserver unwraps any link Cesium
+  writes into `#cesium-credits` (its logo is hidden); only the 5K download uses a `blob:` link.
   The "The Light · Stream" panel (radios from radio-browser.info, free TV from the iptv-org playlists, music by genre,
   city cameras, GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
   is one block of the script. `CITY_CAMS` holds only cameras whose owner publishes them (checked by hand: embeddable,

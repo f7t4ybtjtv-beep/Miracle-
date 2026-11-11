@@ -147,7 +147,7 @@
     display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font: 400 10px/1.5 var(--font-mono); color: var(--ink-2);
   }
   #cesium-credits[hidden] { display: none; }
-  #cesium-credits a { color: var(--ink-2); }
+  .cesium-credit-logoContainer { display: none !important; }   /* Cesium's own logo, a link to cesium.com */
   #cesium-credits img { max-height: 16px; vertical-align: middle; }
 
   /* Sheets: the menu, Veille and Direct. A drawer on the right on wide screens, a bottom sheet on phones. */
@@ -282,14 +282,13 @@
   .stage video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 14px; }
   .stage .close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; background: rgba(4, 6, 11, 0.7); }
   .live .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  .live .list li > button, .live .list li > a {
+  .live .list li > button, .live .list li > a, .live .list li > .line {
     display: grid; gap: 3px; width: 100%; text-align: left; background: transparent; border: 0; border-radius: 10px;
     padding: 9px 8px; color: var(--ink); font: 400 13.5px/1.4 var(--font-ui); cursor: pointer; text-decoration: none;
   }
   .live .list li > button:hover, .live .list li > a:hover { background: rgba(244, 246, 250, 0.06); }
   .live .list li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
   .live .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-  .live .refs a { color: var(--accent); }
 
   /* The Light · Stream: public webcams (Windy) and music by genre */
   .tiles[hidden], .live .row[hidden] { display: none; }
@@ -305,7 +304,6 @@
   .cam-cap b { font: 400 14px/1.35 var(--font-ui); color: var(--ink); }
   .cam-cap small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
   .cam-cap .acts { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; margin-top: 4px; font: 400 13px var(--font-ui); }
-  .cam-cap a, .windy-credit a { color: var(--accent); }
   #windy-box[hidden], .live .sub[hidden] { display: none; }
   .windy-credit { margin-top: 8px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .04em; }
   .music-head { justify-content: space-between; }
@@ -492,9 +490,6 @@
     .card.expanded .meta { display: block; }
     .chip { padding: 0 12px; font-size: 13.5px; gap: 6px; }
     .card .links { gap: 8px; }
-    /* Four pills on one line: shorter labels; "Partager" keeps its name for screen readers (aria-label). */
-    .chip .wide { display: none; }
-    #card-share { min-width: 44px; justify-content: center; }
     .hud .aux { display: none; }
     .sheet { top: auto; left: 8px; right: 8px; bottom: calc(var(--safe-b) + 8px); width: auto; max-height: 80vh; border-radius: 24px; padding: 14px 14px 20px; }
     /* Keep the top of the globe in view: touching it picks a country (Direct) or a satellite (Veille). */
@@ -625,8 +620,7 @@
     <div class="links">
       <button class="chip primary" id="card-dive" type="button">↓ Plonger</button>
       <button class="chip" id="card-night" type="button">☾ Nuit</button>
-      <a class="chip" id="card-earth" target="_blank" rel="noopener" title="Ouvrir dans Google Earth"><span class="wide">Google</span>Earth ↗</a>
-      <button class="chip" id="card-share" type="button" title="Copier un lien vers ce lieu" aria-label="Partager ce lieu"><span aria-hidden="true">⧉</span><span class="wide">Partager</span></button>
+      <button class="chip" id="card-share" type="button" title="Copier un lien vers ce lieu">⧉ Partager</button>
     </div>
   </section>
 
@@ -734,7 +728,6 @@
           <small id="cam-where"></small>
           <small id="cam-by"></small>
           <div class="acts">
-            <a id="cam-detail" href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer">Page de la caméra ↗</a>
             <button class="btn" id="cam-locate" type="button">Situer sur le globe</button>
           </div>
         </div>
@@ -748,10 +741,8 @@
         <div class="kicker sub">Windy · autour de ce point</div>
         <p class="status" id="windy-status" aria-live="polite"></p>
         <ul class="tiles" id="cam-list"></ul>
-        <p class="note windy-credit">Webcams provided by <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer">windy.com</a></p>
+        <p class="note windy-credit">Webcams provided by windy.com</p>
       </div>
-      <div class="kicker sub">Plus de webcams</div>
-      <ul class="list" id="cam-links"></ul>
       <p class="note">Caméras de lieux publics (places, ports, plages, monuments), publiées par leurs propriétaires : offices de tourisme, villes, chaînes, réseaux de webcams. Elles peuvent être hors ligne, en pause la nuit ou remplacées par une rediffusion. Ce site n’ouvre, n’explore ni ne répertorie aucune caméra privée ou mal protégée : ce serait une intrusion dans la vie privée de personnes.</p>
     </section>
     <section class="pane" id="pane-war">
@@ -764,12 +755,7 @@
       </div>
       <ul class="list" id="war-list"></ul>
       <p class="note">Titres repérés par mots-clés (guerre, frappes, cessez-le-feu…) dans la base d’actualité GDELT, mise à jour environ toutes les 15 minutes. Ils ne sont pas vérifiés : en temps de guerre les faits sont contestés et certains médias dépendent d’un État. Ni images de guerre ni positions de troupes ne sont affichées.</p>
-      <p class="note refs">Sources de référence :
-        <a href="https://news.un.org/fr/news/topic/peace-and-security" target="_blank" rel="noopener noreferrer">ONU Info</a> ·
-        <a href="https://www.icrc.org/fr" target="_blank" rel="noopener noreferrer">CICR</a> ·
-        <a href="https://reliefweb.int/" target="_blank" rel="noopener noreferrer">ReliefWeb</a> ·
-        <a href="https://ucdp.uu.se/" target="_blank" rel="noopener noreferrer">UCDP</a> ·
-        <a href="https://acleddata.com/" target="_blank" rel="noopener noreferrer">ACLED</a></p>
+      <p class="note refs">Sources de référence : ONU Info · CICR · ReliefWeb · UCDP · ACLED</p>
     </section>
     <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, YouTube et les sites des caméras que tu ouvres, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
@@ -909,7 +895,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-11.1';
+  const NOUR_BUILD = '2026-11-11.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1120,6 +1106,11 @@
     terrainShadows: tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED,
     useBrowserRecommendedResolution: false,
   });
+  // The page links to no other site: Cesium and Google credits stay on screen (Google requires them), as text and logos
+  // only. Any link Cesium writes into the credit area is replaced by its content.
+  const unlinkCredits = (root) => root.querySelectorAll('a').forEach((a) => a.replaceWith(...a.childNodes));
+  new MutationObserver(() => unlinkCredits($('cesium-credits'))).observe($('cesium-credits'), { childList: true, subtree: true });
+  unlinkCredits($('cesium-credits'));
   const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
   const canvas = scene.canvas;
 
@@ -1960,9 +1951,6 @@
     $('card-text').textContent = p.text;
     const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
     $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
-    // Google Earth Web deep link: @lat,lon,groundAltitude a, distance d, fov y, heading h, tilt t (0 = straight down), roll r.
-    const tilt = Math.round(90 + p.view.pitch);
-    $('card-earth').href = `https://earth.google.com/web/@${p.lat},${p.lon},${Math.round(groundHeight)}a,${p.view.range}d,35y,${p.view.heading}h,${tilt}t,0r`;
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
     revealCard();
@@ -2439,7 +2427,7 @@
     'Météo des lieux : Open-Meteo · La Terre entière : NASA EPIC Team / DSCOVR',
     'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
     'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, Western Wall Heritage Foundation, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · bande-son générée dans le navigateur',
-    'Rendu : <a href="https://cesium.com/platform/cesiumjs/" target="_blank" rel="noopener">CesiumJS</a> · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
+    'Rendu : CesiumJS · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
 
 
@@ -2915,10 +2903,7 @@
     const line = $('eonet-pick');
     line.replaceChildren(document.createTextNode(`${ev.info.fr} · ${ev.title}\n${eonetDate(ev.t, true)} · ${fmtCoord(ev.lat, ev.lon)}\n`));
     if (ev.source) {
-      const a = document.createElement('a');
-      a.href = ev.source.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      a.textContent = `Source : ${ev.source.id || new URL(ev.source.url).hostname} ↗`;
-      line.append(a);
+      line.append(document.createTextNode(`Source : ${ev.source.id || new URL(ev.source.url).hostname}`));
     } else line.append(document.createTextNode('Source : catalogue NASA EONET'));
     if (fly) flyToPoint(ev.lat, ev.lon, ev.info.range);
   }
@@ -3834,20 +3819,6 @@
     }
     return out;
   }
-  function renderCamLinks() {
-    const name = live.label || (live.cc ? nameFr(live.cc) : '');
-    const links = [];
-    if (live.lat != null) links.push(['Carte Windy des webcams autour de ce point', 'fond cartographique avec les webcams publiques', `https://www.windy.com/-Webcams-webcams?${live.lat.toFixed(3)},${live.lon.toFixed(3)},9`]);
-    if (name) links.push([`Webcams en direct sur YouTube : ${name}`, 'recherche filtrée sur les directs', `https://www.youtube.com/results?search_query=${encodeURIComponent(`webcam live ${name}`)}&sp=EgJAAQ%253D%253D`]);
-    const ul = $('cam-links'); ul.replaceChildren();
-    if (!links.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Choisis un pays ou un lieu pour voir les liens.'; ul.appendChild(li); return; }
-    links.forEach(([title, sub, href]) => {
-      const li = document.createElement('li'), a = document.createElement('a');
-      a.href = href; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      const t = document.createElement('span'); t.textContent = title; const s = document.createElement('small'); s.textContent = `${sub} ↗`;
-      a.append(t, s); li.appendChild(a); ul.appendChild(li);
-    });
-  }
   function camTile(c) {
     const tile = makeTile(c.title, c.thumb, c.city || 'Webcam', `${c.title}${c.city ? `, ${c.city}` : ''}${c.provider ? ` (${c.provider})` : ''} : voir la caméra ici`);
     tile.classList.add('cam'); tile._cam = c;
@@ -3876,7 +3847,6 @@
     if (cam.open) markOpenCam(cam.open);
   }
   function renderCam() {
-    renderCamLinks();
     renderCityCams();
     // Points on the ground: the relief may have loaded since the page opened.
     cityCams.forEach((c) => { const g = globe.getHeight(C.Cartographic.fromDegrees(c.lon, c.lat)); if (Number.isFinite(g)) c.point.position = C.Cartesian3.fromDegrees(c.lon, c.lat, g + 30); });
@@ -3964,11 +3934,8 @@
       .join(' · ');
     const by = $('cam-by'); by.replaceChildren();
     if (c.kind === 'windy') {
-      const a = document.createElement('a'); a.href = 'https://www.windy.com/'; a.target = '_blank'; a.rel = 'noopener noreferrer'; a.textContent = 'windy.com';
-      by.append('Webcams provided by ', a);
+      by.textContent = 'Webcams provided by windy.com';
     } else by.textContent = c.provider ? `Caméra publiée par ${c.provider}` : '';
-    $('cam-detail').href = c.detail;
-    $('cam-detail').textContent = c.kind === 'windy' ? 'Page de la caméra sur windy.com ↗' : 'Page de la caméra ↗';
     $('cam-locate').hidden = c.lat == null;
     $('cam-stage').hidden = false;
     markOpenCam(c);
@@ -4109,12 +4076,12 @@
   }
   function renderWar() {
     const shown = warItems.filter((a) => warLang === 'all' || a.language === warLang).slice(0, 30);
+    // Text only: the site links to no other site (source, language and age stay under each title).
     fillList($('war-list'), shown, (a) => {
-      const link = document.createElement('a');
-      link.href = a.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
+      const item = document.createElement('div'); item.className = 'line';
       const t = document.createElement('span'); t.textContent = a.title;
       const s = document.createElement('small'); s.textContent = [a.domain, a.language, ago(a.when)].filter(Boolean).join(' · ');
-      link.append(t, s); return link;
+      item.append(t, s); return item;
     });
   }
   async function loadWar() {
@@ -4151,10 +4118,6 @@
     } catch (e) {
       warItems = []; renderWar();
       say('war-status', 'Actualité indisponible pour le moment (service injoignable, bloqué ou requête refusée).');
-      const li = document.createElement('li'), a = document.createElement('a');
-      a.href = gdeltUrl('html'); a.target = '_blank'; a.rel = 'noopener noreferrer';
-      const t = document.createElement('span'); t.textContent = 'Ouvrir la recherche directement chez GDELT'; const s = document.createElement('small'); s.textContent = 'nouvel onglet ↗';
-      a.append(t, s); li.appendChild(a); $('war-list').appendChild(li);
     }
   }
   liveEl.querySelectorAll('[data-warlang]').forEach((b) => b.addEventListener('click', () => {

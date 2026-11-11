@@ -40,6 +40,8 @@ lien du lieu (ou ouvre le partage du téléphone) ; « Partager cette vue » (me
 « Trajet » (menu, Affichage) trace depuis l'espace un arc entre les lieux visités. La fiche d'un lieu donne aussi la
 météo du moment (Open-Meteo). Les données et limites sont les mêmes que pour `terre.html`.
 
+**Aucun lien vers un autre site** : les sources sont nommées en texte (crédits, titres de presse, source d'un événement naturel), les vidéos, radios et caméras jouent dans la page.
+
 En haut à gauche, le nom et une ligne d'état ; en haut à droite, « Orbite » et « Menu » ; en bas, la bande des lieux.
 Les panneaux (Menu, Veille, The Light · Stream) sont un tiroir à droite sur ordinateur et une feuille en bas sur
 téléphone ; Échap et ✕ les ferment.
@@ -129,9 +131,9 @@ d'une rubrique.
 - **Radios** : annuaire communautaire radio-browser.info, radios les plus écoutées du pays, flux https seulement. La radio continue pendant le survol, avec un bouton d'arrêt dans la barre d'état.
 - **Télé** : playlists communautaires iptv-org (chaînes gratuites en accès libre), lues par hls.js (chargé à la demande) ou nativement sous Safari. Beaucoup de flux sont géobloqués, hors ligne ou refusés par le navigateur : le panneau le dit. Les chaînes d'un pays peuvent dépendre de l'État.
 - **Musique** : radios radio-browser classées par genre.
-- **Caméras** : 17 caméras de lieux publics (Paris, Jérusalem, Tokyo, Vatican, Venise, New York, Londres, Ajaccio…), directs YouTube publiés par leurs propriétaires (offices de tourisme, chaînes, réseaux de webcams), contrôlés le 9 nov. 2026, un point bleu chacune sur le globe ; plus des liens vers des annuaires de webcams publiques. Windy Webcams seulement si le visiteur apporte une clé (`?wkey=`). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée. Un direct peut s'arrêter ou changer d'adresse.
+- **Caméras** : 17 caméras de lieux publics (Paris, Jérusalem, Tokyo, Vatican, Venise, New York, Londres, Ajaccio…), directs YouTube publiés par leurs propriétaires (offices de tourisme, chaînes, réseaux de webcams), contrôlés le 9 nov. 2026, un point bleu chacune sur le globe. Windy Webcams seulement si le visiteur apporte une clé (`?wkey=`). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée. Un direct peut s'arrêter ou changer d'adresse.
 - **Bande-son** (menu, Affichage) : une musique calme générée dans le navigateur (WebAudio), qui suit l'altitude et la plongée.
-- **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec des liens vers des sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
+- **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec le nom de sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
 - Jérusalem n'est rattachée à aucun pays (son statut est disputé) : le panneau demande d'en choisir un.
 
 Vie privée : ouvrir une rubrique contacte radio-browser.info, GitHub (iptv-org),

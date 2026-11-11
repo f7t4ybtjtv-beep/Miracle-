@@ -44,7 +44,7 @@ vérifié, et surtout ce qui n'est **pas** fini.
   - en haut à gauche, le nom et une ligne d'état ;
   - en haut à droite, les boutons ronds « Orbite » et « Menu » ;
   - en bas, la bande des lieux ;
-  - la fiche du lieu est sans cadre, avec « Lire la suite » et les pastilles Plonger, Nuit et Google Earth ;
+  - la fiche du lieu est sans cadre, avec « Lire la suite » et les pastilles Plonger, Nuit et Partager ;
   - les panneaux (Menu, Veille, The Light · Stream) sont un tiroir à droite sur ordinateur et une feuille en bas sur
     téléphone. Échap et ✕ les ferment.
 - **The Light · Stream** :
@@ -182,6 +182,7 @@ caméra ne joue plus.
 - **Clés** : jamais de clé dans le code. Une clé facultative vient du visiteur par `?gkey=` ou `?wkey=`, et reste
   seulement dans son navigateur.
 - **Google 3D** : pas d'export d'image au-dessus des tuiles Google ; c'est une condition de Google.
+- **Aucun lien vers un autre site** (demande de la propriétaire, 11 nov.) : sources nommées en texte, pas de `<a href>` sortant ; les liens que Cesium écrit dans ses crédits sont remplacés par leur contenu.
 - **Textes venant de l'extérieur** : toujours par `textContent`, jamais par `innerHTML`.
 - **Adresses** : https seulement.
 - **Caméra de la scène** : la faire bouger uniquement par le moteur de vol `startFlight` (jamais `camera.flyTo`).
