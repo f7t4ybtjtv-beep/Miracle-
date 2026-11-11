@@ -534,7 +534,14 @@
   .pins li { padding: 10px; border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 6px; }
   .pins small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
   .pins textarea { min-height: 60px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.6); color: var(--ink); font: 400 13px/1.45 var(--font-ui); resize: vertical; }
-  .btn.file { display: inline-flex; align-items: center; position: relative; overflow: hidden; }
+  .btn.file { display: inline-flex; align-items: center; min-height: 44px; position: relative; overflow: hidden; }
+  .osint .list { list-style: none; margin: 6px 0; padding: 0; display: grid; gap: 2px; }
+  .osint .list li > button {
+    display: grid; gap: 3px; width: 100%; min-height: 44px; text-align: left; background: transparent; border: 0; border-radius: 10px;
+    padding: 9px 8px; color: var(--ink); font: 400 13.5px/1.4 var(--font-mono); cursor: pointer;
+  }
+  .osint .list li > button:hover { background: rgba(244, 246, 250, 0.06); }
+  .osint .list li small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
   .btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; }
   .btn.file:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
   .split-handle {
