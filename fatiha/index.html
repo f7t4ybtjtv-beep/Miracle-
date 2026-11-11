@@ -507,6 +507,44 @@
     .loader .bar i, .eq i { animation: none; }
     .loader .bar i { width: 100%; }
   }
+
+  /* Enquête */
+  .osint .tabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; margin: 12px 0; }
+  .osint .tabs .btn { padding: 0 2px; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .osint .pane { display: none; }
+  .osint .pane.on { display: block; }
+  .osint .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .osint .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+  .readout { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 10px 0; font: 400 12.5px/1.45 var(--font-mono); }
+  .readout dt { color: var(--muted); letter-spacing: .06em; }
+  .readout dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+  .readout-text { margin: 8px 0; font: 400 12.5px/1.6 var(--font-mono); color: var(--ink); white-space: pre-line; }
+  .los-opts { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin: 8px 0; }
+  .los-opts label, .field { display: grid; gap: 4px; font: 400 11.5px var(--font-ui); color: var(--ink-2); }
+  .field { margin: 6px 0; }
+  .osint input, .osint select {
+    min-height: 44px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.6);
+    color: var(--ink); font: 400 14px var(--font-ui); color-scheme: dark;
+  }
+  .osint input[type="number"] { width: 9em; }
+  .goto input { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 13px; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .profile { width: 100%; height: auto; margin: 6px 0; border: 1px solid var(--line); border-radius: 12px; background: rgba(4, 6, 11, 0.5); }
+  .pins { list-style: none; margin: 8px 0; padding: 0; display: grid; gap: 8px; }
+  .pins li { padding: 10px; border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 6px; }
+  .pins small { font: 400 10.5px/1.4 var(--font-mono); color: var(--muted); }
+  .pins textarea { min-height: 60px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.6); color: var(--ink); font: 400 13px/1.45 var(--font-ui); resize: vertical; }
+  .btn.file { display: inline-flex; align-items: center; position: relative; overflow: hidden; }
+  .btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; min-height: 0; }
+  .btn.file:focus-within { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .split-handle {
+    position: fixed; top: 0; bottom: 0; z-index: 6; width: 44px; margin-left: -22px; cursor: ew-resize; touch-action: none;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .split-handle[hidden] { display: none; }
+  .split-handle::before { content: ''; position: absolute; top: 0; bottom: 0; left: 21px; width: 2px; background: var(--accent); box-shadow: 0 0 8px rgba(0, 0, 0, 0.8); }
+  .split-handle span { position: relative; padding: 10px 6px; border-radius: 999px; background: var(--accent); color: var(--bg); font: 600 12px var(--font-mono); }
+  @media (max-width: 760px) { .sheet.osint { max-height: 58vh; } }
   /* Short screens (a phone held sideways, a window zoomed to 200 %): the place title shrinks and its text waits for
      "Lire la suite", so the card stays under the status line. */
   @media (max-height: 560px) {
@@ -565,6 +603,12 @@
       <div class="grid2">
         <button class="opt" id="btn-live" type="button" aria-pressed="false" aria-controls="live"><b>The Light · Stream</b><small>télés et radios du pays, en petits carrés</small></button>
         <button class="opt" id="btn-watch" type="button" aria-pressed="false" aria-controls="watch"><b>Veille</b><small>séismes, station spatiale, satellites militaires, nuages</small></button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Enquête</div>
+      <div class="grid2">
+        <button class="opt" id="btn-osint" type="button" aria-pressed="false" aria-controls="osint"><b>Outils d’enquête</b><small>coordonnées, mesures, soleil, images datées, journal</small></button>
       </div>
     </div>
     <div class="group">
@@ -760,6 +804,118 @@
     </section>
     <p class="note">Ouvrir une rubrique contacte des services tiers qui voient ton adresse IP (radio-browser.info, GitHub, GDELT, jsDelivr, YouTube et les sites des caméras que tu ouvres, les serveurs des radios et des chaînes). Rien n’est chargé avant.</p>
   </aside>
+
+  <aside class="ui sheet osint" id="osint" role="dialog" aria-modal="false" aria-label="Enquête : outils de sources ouvertes">
+    <div class="sheet-head">
+      <div><div class="kicker">Sources ouvertes · données publiques</div><h3>Enquête</h3></div>
+      <button class="close" type="button" data-close="osint" aria-label="Fermer l’enquête">✕</button>
+    </div>
+    <div class="tabs" role="group" aria-label="Outils">
+      <button class="btn" type="button" data-otab="point" aria-pressed="true">Point</button>
+      <button class="btn" type="button" data-otab="mesure" aria-pressed="false">Mesure</button>
+      <button class="btn" type="button" data-otab="soleil" aria-pressed="false">Soleil</button>
+      <button class="btn" type="button" data-otab="images" aria-pressed="false">Images</button>
+      <button class="btn" type="button" data-otab="journal" aria-pressed="false">Journal</button>
+    </div>
+
+    <section class="pane on" id="opane-point">
+      <p class="status" id="pt-status" aria-live="polite">Touche le globe pour lire un point.</p>
+      <dl class="readout" id="pt-out" hidden>
+        <dt>Décimal</dt><dd id="pt-dec"></dd>
+        <dt>DMS</dt><dd id="pt-dms"></dd>
+        <dt>UTM</dt><dd id="pt-utm"></dd>
+        <dt>MGRS</dt><dd id="pt-mgrs"></dd>
+        <dt>Relief</dt><dd id="pt-alt"></dd>
+        <dt>Heure solaire</dt><dd id="pt-solar"></dd>
+      </dl>
+      <div class="row" id="pt-acts" hidden>
+        <button class="btn" id="pt-copy" type="button">Copier</button>
+        <button class="btn" id="pt-pin" type="button">Épingler</button>
+        <button class="btn" id="pt-sun" type="button">Soleil ici</button>
+      </div>
+      <div class="kicker sub">Aller à des coordonnées</div>
+      <form class="row goto" id="pt-goto">
+        <label class="sr" for="pt-input">Coordonnées : décimal, DMS ou MGRS</label>
+        <input id="pt-input" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="34.065, -4.9736 · 34°03′54″N 4°58′25″O · 30S UC 02… ">
+        <button class="btn" type="submit">Y aller</button>
+      </form>
+      <p class="status" id="pt-goto-status" aria-live="polite"></p>
+      <p class="note">Formats acceptés : degrés décimaux (lat, lon), degrés-minutes-secondes avec N/S/E/O, MGRS (1 m à 100 km). UTM et MGRS couvrent 80° S à 84° N. Système WGS84. Le relief vient du modèle AWS Terrain Tiles (SRTM et autres) : précision de quelques mètres à quelques dizaines de mètres.</p>
+    </section>
+
+    <section class="pane" id="opane-mesure">
+      <div class="chips" role="group" aria-label="Type de mesure">
+        <button class="btn" type="button" data-mmode="distance" aria-pressed="true">Distance</button>
+        <button class="btn" type="button" data-mmode="surface" aria-pressed="false">Surface</button>
+        <button class="btn" type="button" data-mmode="profil" aria-pressed="false">Profil et vue</button>
+      </div>
+      <p class="status" id="ms-status" aria-live="polite">Touche le globe pour poser des points.</p>
+      <div class="readout-text" id="ms-out"></div>
+      <div class="los-opts" id="ms-los" hidden>
+        <label>Hauteur de l’observateur (m) <input id="ms-hobs" type="number" min="0" max="10000" step="0.1" value="1.7"></label>
+        <label>Hauteur de la cible (m) <input id="ms-htgt" type="number" min="0" max="10000" step="0.1" value="1.7"></label>
+      </div>
+      <svg class="profile" id="ms-svg" viewBox="0 0 360 140" role="img" aria-label="Profil d’altitude" hidden></svg>
+      <div class="row">
+        <button class="btn" id="ms-undo" type="button">Annuler le dernier point</button>
+        <button class="btn" id="ms-clear" type="button">Effacer</button>
+        <button class="btn" id="ms-pin" type="button">Épingler</button>
+      </div>
+      <p class="note">Distances et surfaces sur l’ellipsoïde WGS84 (géodésiques), sans le relief. Profil : 128 points du modèle de relief ; la ligne de vue tient compte de la courbure de la Terre et de la réfraction (coefficient 0,13). Bâtiments et arbres ne sont pas dans le modèle.</p>
+    </section>
+
+    <section class="pane" id="opane-soleil">
+      <p class="status" id="sn-where" aria-live="polite"></p>
+      <div class="los-opts">
+        <label>Date (UTC) <input id="sn-date" type="date"></label>
+        <label>Heure (UTC) <input id="sn-time" type="time" step="60"></label>
+      </div>
+      <dl class="readout" id="sn-out"></dl>
+      <div class="row">
+        <button class="btn" id="sn-now" type="button">Maintenant</button>
+        <button class="btn" id="sn-clock" type="button">Régler le globe sur cette heure</button>
+      </div>
+      <div class="kicker sub">Dater une photo par l’ombre</div>
+      <div class="los-opts">
+        <label>Direction de l’ombre (° depuis le nord) <input id="sn-shadow" type="number" min="0" max="360" step="0.1" placeholder="ex. 315"></label>
+        <button class="btn" id="sn-find" type="button">Trouver l’heure</button>
+      </div>
+      <ul class="list" id="sn-times"></ul>
+      <p class="note">Position du soleil : équations du calculateur solaire de la NOAA, vérifiées à 0,05° près contre l’algorithme SPA du NREL ; lever et coucher à quelques secondes près. L’ombre d’un objet vertical part à l’opposé du soleil ; sur un terrain en pente, sa longueur change.</p>
+    </section>
+
+    <section class="pane" id="opane-images">
+      <label class="field">Couche
+        <select id="im-layer"></select>
+      </label>
+      <div class="los-opts">
+        <label>Avant <input id="im-before" type="date"></label>
+        <label>Après <input id="im-after" type="date"></label>
+      </div>
+      <div class="row">
+        <button class="btn" id="im-show" type="button">Comparer</button>
+        <button class="btn" id="im-swap" type="button">Échanger</button>
+        <button class="btn" id="im-off" type="button">Retirer</button>
+      </div>
+      <p class="status" id="im-status" aria-live="polite"></p>
+      <p class="note">Images NASA GIBS datées (jour UTC). À gauche du rideau : avant ; à droite : après. Faites glisser la poignée, ou utilisez ← et →. Une date sans passage du satellite au-dessus de la zone reste vide.</p>
+    </section>
+
+    <section class="pane" id="opane-journal">
+      <p class="status" id="jr-status" aria-live="polite"></p>
+      <ul class="pins" id="jr-list"></ul>
+      <div class="row">
+        <button class="btn" id="jr-geojson" type="button">Exporter GeoJSON</button>
+        <button class="btn" id="jr-kml" type="button">Exporter KML</button>
+        <label class="btn file">Importer GeoJSON<input id="jr-import" type="file" accept=".geojson,.json,application/geo+json,application/json"></label>
+      </div>
+      <button class="btn" id="jr-clear" type="button">Tout effacer</button>
+      <p class="note">Le journal reste dans ce navigateur seulement. Rien n’est envoyé. Exportez-le pour le garder ou le partager.</p>
+    </section>
+    <p class="note">Ces outils travaillent sur des lieux et des données publiques. Ils ne cherchent ni ne suivent aucune personne.</p>
+  </aside>
+
+  <div class="split-handle" id="split-handle" role="slider" tabindex="0" aria-label="Rideau de comparaison : avant à gauche, après à droite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden><span aria-hidden="true">‹ ›</span></div>
 
   <div class="cine" id="cine" hidden>
     <div class="cine-bar cine-top">
@@ -3179,8 +3335,10 @@
   document.querySelectorAll('#watch [data-layer]').forEach((b) => {
     b.addEventListener('click', () => setLayer(b.dataset.layer, !veille[b.dataset.layer]));
   });
+  // The Enquête sheet (built further down, in `osint`) closes when another sheet opens.
+  let closeOsint = () => {};
   function setWatchOpen(open) {
-    if (open) { setLiveOpen(false); setMenuOpen(false); }
+    if (open) { setLiveOpen(false); setMenuOpen(false); closeOsint(); }
     $('watch').classList.toggle('open', open);
     $('btn-watch').setAttribute('aria-pressed', String(open));
     syncSheets();
@@ -3194,7 +3352,7 @@
   const menuEl = $('menu'), menuBtn = $('btn-menu');
   function syncSheets() { document.body.classList.toggle('sheet-open', !!document.querySelector('.sheet.open')); }
   function setMenuOpen(open) {
-    if (open) { setWatchOpen(false); setLiveOpen(false); }
+    if (open) { setWatchOpen(false); setLiveOpen(false); closeOsint(); }
     menuEl.classList.toggle('open', open);
     menuBtn.setAttribute('aria-expanded', String(open));
     syncSheets();
@@ -3205,7 +3363,7 @@
     setMenuOpen(true); $('credits-box').open = true;
     $('credits-box').scrollIntoView({ block: 'nearest' });
   });
-  const closeSheet = { menu: () => setMenuOpen(false), watch: () => setWatchOpen(false), live: () => setLiveOpen(false) };
+  const closeSheet = { menu: () => setMenuOpen(false), watch: () => setWatchOpen(false), live: () => setLiveOpen(false), osint: () => closeOsint() };
   document.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', () => { closeSheet[b.dataset.close](); menuBtn.focus(); }));
   // Phones: the open sheet covers most of the screen, so Tab and Shift+Tab loop inside it (keyboard only: touching the
   // globe above it still picks a country or a satellite).
@@ -3373,7 +3531,7 @@
     $('btn-live').setAttribute('aria-pressed', String(open));
     syncSheets();
     if (open) {
-      setWatchOpen(false); setMenuOpen(false);
+      setWatchOpen(false); setMenuOpen(false); closeOsint();
       liveEl.querySelector('.close').focus();
       updateHint(); loadTab();
     } else {
@@ -5023,6 +5181,841 @@
     };
     return { viewFromHash, flyToSharedView, startTour, get touring() { return !!tour; } };
   })();
+
+  // ---------- Enquête: geodesy and sun, pure functions (WGS84). Checked against pyproj, geographiclib, mgrs and pvlib. ----------
+  const GEO = (() => {
+    const A = 6378137, F = 1 / 298.257223563, B = A * (1 - F), E2 = F * (2 - F), RAD = Math.PI / 180, DEG = 180 / Math.PI;
+    const wrap180 = (x) => ((((x + 180) % 360) + 360) % 360) - 180;
+    const wrap360 = (x) => ((x % 360) + 360) % 360;
+
+    // --- Transverse Mercator, Krüger series to n^6 (sub-millimetre inside a UTM zone) ---
+    const n = F / (2 - F), n2 = n * n, n3 = n2 * n, n4 = n3 * n, n5 = n4 * n, n6 = n5 * n;
+    const AA = A / (1 + n) * (1 + n2 / 4 + n4 / 64 + n6 / 256);
+    const alpha = [0,
+      n / 2 - 2 * n2 / 3 + 5 * n3 / 16 + 41 * n4 / 180 - 127 * n5 / 288 + 7891 * n6 / 37800,
+      13 * n2 / 48 - 3 * n3 / 5 + 557 * n4 / 1440 + 281 * n5 / 630 - 1983433 * n6 / 1935360,
+      61 * n3 / 240 - 103 * n4 / 140 + 15061 * n5 / 26880 + 167603 * n6 / 181440,
+      49561 * n4 / 161280 - 179 * n5 / 168 + 6601661 * n6 / 7257600,
+      34729 * n5 / 80640 - 3418889 * n6 / 1995840,
+      212378941 * n6 / 319334400];
+    const beta = [0,
+      n / 2 - 2 * n2 / 3 + 37 * n3 / 96 - n4 / 360 - 81 * n5 / 512 + 96199 * n6 / 604800,
+      n2 / 48 + n3 / 15 - 437 * n4 / 1440 + 46 * n5 / 105 - 1118711 * n6 / 3870720,
+      17 * n3 / 480 - 37 * n4 / 840 - 209 * n5 / 4480 + 5569 * n6 / 90720,
+      4397 * n4 / 161280 - 11 * n5 / 504 - 830251 * n6 / 7257600,
+      4583 * n5 / 161280 - 108847 * n6 / 3991680,
+      20648693 * n6 / 638668800];
+    const K0 = 0.9996, E0 = 500000, e = Math.sqrt(E2);
+    function tmForward(lat, lon, lon0) {
+      const phi = lat * RAD, lam = (lon - lon0) * RAD;
+      const t = Math.sinh(Math.atanh(Math.sin(phi)) - e * Math.atanh(e * Math.sin(phi)));
+      const xi1 = Math.atan2(t, Math.cos(lam)), eta1 = Math.atanh(Math.sin(lam) / Math.sqrt(1 + t * t));
+      let xi = xi1, eta = eta1;
+      for (let j = 1; j <= 6; j++) { xi += alpha[j] * Math.sin(2 * j * xi1) * Math.cosh(2 * j * eta1); eta += alpha[j] * Math.cos(2 * j * xi1) * Math.sinh(2 * j * eta1); }
+      return { x: K0 * AA * eta, y: K0 * AA * xi };
+    }
+    function tmInverse(x, y, lon0) {
+      const xi = y / (K0 * AA), eta = x / (K0 * AA);
+      let xi1 = xi, eta1 = eta;
+      for (let j = 1; j <= 6; j++) { xi1 -= beta[j] * Math.sin(2 * j * xi) * Math.cosh(2 * j * eta); eta1 -= beta[j] * Math.cos(2 * j * xi) * Math.sinh(2 * j * eta); }
+      const tau1 = Math.sin(xi1) / Math.sqrt(Math.sinh(eta1) ** 2 + Math.cos(xi1) ** 2);
+      let tau = tau1;                                           // conformal → geodetic latitude, Newton (Karney 2011)
+      for (let k = 0; k < 6; k++) {
+        const s = Math.sinh(e * Math.atanh(e * tau / Math.sqrt(1 + tau * tau)));
+        const ti = tau * Math.sqrt(1 + s * s) - s * Math.sqrt(1 + tau * tau);
+        const d = (tau1 - ti) / Math.sqrt(1 + ti * ti) * (1 + (1 - E2) * tau * tau) / ((1 - E2) * Math.sqrt(1 + tau * tau));
+        tau += d; if (Math.abs(d) < 1e-14) break;
+      }
+      return { lat: Math.atan(tau) * DEG, lon: lon0 + Math.atan2(Math.sinh(eta1), Math.cos(xi1)) * DEG };
+    }
+
+    // --- UTM and MGRS (latitudes −80° to 84°, where UTM is defined; the polar UPS zones are refused) ---
+    const BANDS = 'CDEFGHJKLMNPQRSTUVWX';
+    function utmZone(lat, lon) {
+      lon = wrap180(lon);
+      let z = Math.floor((lon + 180) / 6) + 1;
+      if (lon === 180) z = 60;
+      if (lat >= 56 && lat < 64 && lon >= 3 && lon < 12) z = 32;                  // Norway
+      if (lat >= 72 && lat < 84) {                                                 // Svalbard
+        if (lon >= 0 && lon < 9) z = 31; else if (lon >= 9 && lon < 21) z = 33;
+        else if (lon >= 21 && lon < 33) z = 35; else if (lon >= 33 && lon < 42) z = 37;
+      }
+      return z;
+    }
+    const band = (lat) => BANDS[Math.min(19, Math.floor((lat + 80) / 8))];
+    function toUTM(lat, lon, zone) {
+      if (!(lat >= -80 && lat < 84)) return null;
+      const z = zone || utmZone(lat, lon), lon0 = (z - 1) * 6 - 180 + 3;
+      const p = tmForward(lat, wrap180(lon), lon0);
+      return { zone: z, band: band(lat), hemi: lat >= 0 ? 'N' : 'S', easting: p.x + E0, northing: lat >= 0 ? p.y : p.y + 10000000 };
+    }
+    function fromUTM(zone, hemi, easting, northing) {
+      return tmInverse(easting - E0, hemi === 'N' ? northing : northing - 10000000, (zone - 1) * 6 - 180 + 3);
+    }
+    const COLS = ['ABCDEFGH', 'JKLMNPQR', 'STUVWXYZ'], ROWS = 'ABCDEFGHJKLMNPQRSTUV';
+    // MGRS keeps the south-west corner of the cell: coordinates are truncated, never rounded (as the mgrs reference does).
+    function toMGRS(lat, lon, digits = 5) {
+      const u = toUTM(lat, lon);
+      if (!u) return null;
+      const set = (u.zone - 1) % 3;
+      const e100 = Math.floor(u.easting / 1e5), n100 = Math.floor(u.northing / 1e5) % 20;
+      const col = COLS[set][e100 - 1];
+      const row = ROWS[(n100 + (u.zone % 2 === 0 ? 5 : 0)) % 20];
+      const f = 10 ** (5 - digits);
+      const ee = String(Math.floor((u.easting % 1e5) / f)).padStart(digits, '0');
+      const nn = String(Math.floor((u.northing % 1e5) / f)).padStart(digits, '0');
+      return { text: `${u.zone}${u.band} ${col}${row} ${ee} ${nn}`, utm: u };
+    }
+    function parseMGRS(str) {
+      const m = /^\s*(\d{1,2})\s*([C-HJ-NP-X])\s*([A-HJ-NP-Z])([A-HJ-NP-V])\s*(\d*)\s*(\d*)\s*$/i.exec(str || '');
+      if (!m) return null;
+      const zone = +m[1], bandL = m[2].toUpperCase(), col = m[3].toUpperCase(), row = m[4].toUpperCase();
+      let digits = m[5] + m[6];
+      if (zone < 1 || zone > 60 || digits.length % 2) return null;
+      const k = digits.length / 2;
+      if (k > 5) return null;
+      const set = (zone - 1) % 3, ci = COLS[set].indexOf(col);
+      if (ci < 0) return null;
+      const easting = (ci + 1) * 1e5 + (k ? +digits.slice(0, k) * 10 ** (5 - k) : 0);
+      let rowN = (ROWS.indexOf(row) - (zone % 2 === 0 ? 5 : 0) + 20) % 20;
+      const cell = 10 ** (5 - k);
+      // The band fixes which 2 000 km cycle the row letter is in: take the northing nearest the band's lower edge.
+      const bandLat = -80 + BANDS.indexOf(bandL) * 8, hemi = bandL >= 'N' ? 'N' : 'S';
+      const lon0 = (zone - 1) * 6 - 180 + 3;
+      let ref = tmForward(bandLat, lon0, lon0).y; if (hemi === 'S') ref += 1e7;
+      let north = rowN * 1e5 + (k ? +digits.slice(k) * 10 ** (5 - k) : 0);
+      while (north < ref - 1e5) north += 2e6;
+      const ll = fromUTM(zone, hemi, easting, north);
+      return { lat: ll.lat, lon: ll.lon, precision: cell, zone, hemi, easting, northing: north };
+    }
+
+    // --- Text → coordinates: decimal ("34.065, -4.9736"), DMS with N/S/E/W or O, or MGRS ---
+    function parseCoords(text) {
+      const s = String(text || '').trim().replace(/[′’]/g, "'").replace(/[″”]/g, '"').replace(/,(?=\d)/g, '.');
+      if (!s || s.length > 80) return null;
+      const g = parseMGRS(s.replace(/\s+/g, ' '));
+      if (g) return { lat: g.lat, lon: g.lon, kind: 'MGRS', precision: g.precision };
+      const dec = /^([+-]?\d{1,2}(?:\.\d+)?)\s*[,; ]\s*([+-]?\d{1,3}(?:\.\d+)?)$/.exec(s);
+      if (dec) {
+        const lat = +dec[1], lon = +dec[2];
+        return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon, kind: 'décimal' } : null;
+      }
+      const part = String.raw`(\d{1,3}(?:\.\d+)?)\s*°?\s*(?:(\d{1,2}(?:\.\d+)?)\s*'?\s*)?(?:(\d{1,2}(?:\.\d+)?)\s*"?\s*)?([NSEWO])`;
+      const re = new RegExp(`^${part}[\\s,;]*${part}$`, 'i'), d = re.exec(s);
+      if (!d) return null;
+      const val = (a, b, c) => +a + (+b || 0) / 60 + (+c || 0) / 3600;
+      const one = [val(d[1], d[2], d[3]), d[4].toUpperCase()], two = [val(d[5], d[6], d[7]), d[8].toUpperCase()];
+      if ((d[2] && +d[2] >= 60) || (d[3] && +d[3] >= 60) || (d[6] && +d[6] >= 60) || (d[7] && +d[7] >= 60)) return null;
+      const isLat = (h) => h === 'N' || h === 'S';
+      const [la, lo] = isLat(one[1]) && !isLat(two[1]) ? [one, two] : !isLat(one[1]) && isLat(two[1]) ? [two, one] : [null, null];
+      if (!la) return null;
+      const lat = la[1] === 'S' ? -la[0] : la[0], lon = lo[1] === 'W' || lo[1] === 'O' ? -lo[0] : lo[0];
+      return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon, kind: 'DMS' } : null;
+    }
+    function toDMS(lat, lon) {
+      const f = (v, pos, neg) => {
+        const h = v < 0 ? neg : pos; let a = Math.abs(v);
+        let d = Math.floor(a), m = Math.floor((a - d) * 60), s = ((a - d) * 60 - m) * 60;
+        s = Math.round(s * 100) / 100; if (s >= 60) { s = 0; m += 1; } if (m >= 60) { m = 0; d += 1; }
+        return `${d}°${String(m).padStart(2, '0')}′${s.toFixed(2).padStart(5, '0')}″${h}`;
+      };
+      return `${f(lat, 'N', 'S')} ${f(lon, 'E', 'O')}`;
+    }
+
+    // --- Geodesics on the ellipsoid: Vincenty (sub-millimetre); nearly antipodal points do not converge → null ---
+    function inverse(lat1, lon1, lat2, lon2) {
+      const L = wrap180(lon2 - lon1) * RAD;
+      const U1 = Math.atan((1 - F) * Math.tan(lat1 * RAD)), U2 = Math.atan((1 - F) * Math.tan(lat2 * RAD));
+      const sU1 = Math.sin(U1), cU1 = Math.cos(U1), sU2 = Math.sin(U2), cU2 = Math.cos(U2);
+      let lam = L, it = 0, sS, cS, sig, sA, c2A, c2Sm;
+      do {
+        const sL = Math.sin(lam), cL = Math.cos(lam);
+        sS = Math.sqrt((cU2 * sL) ** 2 + (cU1 * sU2 - sU1 * cU2 * cL) ** 2);
+        if (sS === 0) return { s: 0, az1: 0, az2: 0 };
+        cS = sU1 * sU2 + cU1 * cU2 * cL; sig = Math.atan2(sS, cS);
+        sA = cU1 * cU2 * sL / sS; c2A = 1 - sA * sA;
+        c2Sm = c2A ? cS - 2 * sU1 * sU2 / c2A : 0;
+        const Cc = F / 16 * c2A * (4 + F * (4 - 3 * c2A));
+        const prev = lam;
+        lam = L + (1 - Cc) * F * sA * (sig + Cc * sS * (c2Sm + Cc * cS * (-1 + 2 * c2Sm * c2Sm)));
+        if (Math.abs(lam - prev) < 1e-13) break;
+      } while (++it < 200);
+      if (it >= 200) return null;
+      const u2 = c2A * (A * A - B * B) / (B * B);
+      const Ak = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2))), Bk = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+      const dS = Bk * sS * (c2Sm + Bk / 4 * (cS * (-1 + 2 * c2Sm * c2Sm) - Bk / 6 * c2Sm * (-3 + 4 * sS * sS) * (-3 + 4 * c2Sm * c2Sm)));
+      const sL = Math.sin(lam), cL = Math.cos(lam);
+      return { s: B * Ak * (sig - dS),
+        az1: wrap360(Math.atan2(cU2 * sL, cU1 * sU2 - sU1 * cU2 * cL) * DEG),
+        az2: wrap360(Math.atan2(cU1 * sL, -sU1 * cU2 + cU1 * sU2 * cL) * DEG) };
+    }
+    function direct(lat1, lon1, az1, s) {
+      const a1 = az1 * RAD, sa1 = Math.sin(a1), ca1 = Math.cos(a1);
+      const tU1 = (1 - F) * Math.tan(lat1 * RAD), cU1 = 1 / Math.sqrt(1 + tU1 * tU1), sU1 = tU1 * cU1;
+      const s1 = Math.atan2(tU1, ca1), sA = cU1 * sa1, c2A = 1 - sA * sA;
+      const u2 = c2A * (A * A - B * B) / (B * B);
+      const Ak = 1 + u2 / 16384 * (4096 + u2 * (-768 + u2 * (320 - 175 * u2))), Bk = u2 / 1024 * (256 + u2 * (-128 + u2 * (74 - 47 * u2)));
+      let sig = s / (B * Ak), prev, c2Sm, sS, cS, it = 0;
+      do {
+        c2Sm = Math.cos(2 * s1 + sig); sS = Math.sin(sig); cS = Math.cos(sig);
+        const dS = Bk * sS * (c2Sm + Bk / 4 * (cS * (-1 + 2 * c2Sm * c2Sm) - Bk / 6 * c2Sm * (-3 + 4 * sS * sS) * (-3 + 4 * c2Sm * c2Sm)));
+        prev = sig; sig = s / (B * Ak) + dS;
+      } while (Math.abs(sig - prev) > 1e-13 && ++it < 200);
+      const x = sU1 * sS - cU1 * cS * ca1;
+      const lat2 = Math.atan2(sU1 * cS + cU1 * sS * ca1, (1 - F) * Math.sqrt(sA * sA + x * x));
+      const lam = Math.atan2(sS * sa1, cU1 * cS - sU1 * sS * ca1);
+      const Cc = F / 16 * c2A * (4 + F * (4 - 3 * c2A));
+      const L = lam - (1 - Cc) * F * sA * (sig + Cc * sS * (c2Sm + Cc * cS * (-1 + 2 * c2Sm * c2Sm)));
+      return { lat: lat2 * DEG, lon: wrap180(lon1 + L * DEG) };
+    }
+    // Points along the geodesic from a to b (both ends included).
+    function geodesicPoints(a, b, count) {
+      const inv = inverse(a.lat, a.lon, b.lat, b.lon);
+      if (!inv) return null;
+      const out = [];
+      for (let i = 0; i <= count; i++) out.push(i === count ? { lat: b.lat, lon: b.lon } : direct(a.lat, a.lon, inv.az1, inv.s * i / count));
+      return out;
+    }
+    // Area inside a polygon whose sides are geodesics: sides densified to < 1 km, then Lambert azimuthal equal-area on
+    // the ellipsoid (exact for area) centred on the polygon, then the shoelace sum.
+    function area(points) {
+      if (!points || points.length < 3) return 0;
+      const dense = [];
+      for (let i = 0; i < points.length; i++) {
+        const a = points[i], b = points[(i + 1) % points.length];
+        const inv = inverse(a.lat, a.lon, b.lat, b.lon);
+        if (!inv) return NaN;
+        const k = Math.max(1, Math.ceil(inv.s / 1000));
+        for (let j = 0; j < k; j++) dense.push(j ? direct(a.lat, a.lon, inv.az1, inv.s * j / k) : a);
+      }
+      const qf = (phi) => { const s = Math.sin(phi); return (1 - E2) * (s / (1 - E2 * s * s) - Math.log((1 - e * s) / (1 + e * s)) / (2 * e)); };
+      const qp = qf(Math.PI / 2), Rq = A * Math.sqrt(qp / 2);
+      const beta = (phi) => Math.asin(C.Math.clamp(qf(phi) / qp, -1, 1));
+      let lat0 = 0, x0 = 0, y0 = 0;
+      for (const p of dense) { const c = Math.cos(p.lat * RAD); x0 += c * Math.cos(p.lon * RAD); y0 += c * Math.sin(p.lon * RAD); lat0 += Math.sin(p.lat * RAD); }
+      const lon0 = Math.atan2(y0, x0), b0 = beta(Math.asin(C.Math.clamp(lat0 / Math.hypot(x0, y0, lat0), -1, 1)));
+      let sum = 0, prev = null, first = null;
+      for (const p of dense) {
+        const b = beta(p.lat * RAD), l = p.lon * RAD - lon0;
+        const k = Math.sqrt(2 / (1 + Math.sin(b0) * Math.sin(b) + Math.cos(b0) * Math.cos(b) * Math.cos(l)));
+        const q = { x: Rq * k * Math.cos(b) * Math.sin(l), y: Rq * k * (Math.cos(b0) * Math.sin(b) - Math.sin(b0) * Math.cos(b) * Math.cos(l)) };
+        if (prev) sum += prev.x * q.y - q.x * prev.y; else first = q;
+        prev = q;
+      }
+      sum += prev.x * first.y - first.x * prev.y;
+      return Math.abs(sum) / 2;
+    }
+
+    // --- Sun (NOAA solar calculator equations; apparent elevation with the NOAA refraction model) ---
+    function sun(date, lat, lon) {
+      const jd = date.getTime() / 864e5 + 2440587.5, T = (jd - 2451545) / 36525;
+      const L0 = wrap360(280.46646 + T * (36000.76983 + T * 0.0003032));
+      const M = 357.52911 + T * (35999.05029 - 0.0001537 * T), Mr = M * RAD;
+      const ecc = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+      const Cc = Math.sin(Mr) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * Mr) * (0.019993 - 0.000101 * T) + Math.sin(3 * Mr) * 0.000289;
+      const omega = 125.04 - 1934.136 * T;
+      const lambda = L0 + Cc - 0.00569 - 0.00478 * Math.sin(omega * RAD);
+      const eps0 = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+      const eps = eps0 + 0.00256 * Math.cos(omega * RAD);
+      const decl = Math.asin(Math.sin(eps * RAD) * Math.sin(lambda * RAD));
+      const y = Math.tan(eps * RAD / 2) ** 2;
+      const eqt = 4 * DEG * (y * Math.sin(2 * L0 * RAD) - 2 * ecc * Math.sin(Mr) + 4 * ecc * y * Math.sin(Mr) * Math.cos(2 * L0 * RAD)
+        - 0.5 * y * y * Math.sin(4 * L0 * RAD) - 1.25 * ecc * ecc * Math.sin(2 * Mr));               // minutes
+      const minutes = date.getUTCHours() * 60 + date.getUTCMinutes() + date.getUTCSeconds() / 60 + date.getUTCMilliseconds() / 6e4;
+      const tst = ((minutes + eqt + 4 * lon) % 1440 + 1440) % 1440;
+      const ha = (tst / 4 < 0 ? tst / 4 + 180 : tst / 4 - 180) * RAD;
+      const phi = lat * RAD;
+      const cz = C.Math.clamp(Math.sin(phi) * Math.sin(decl) + Math.cos(phi) * Math.cos(decl) * Math.cos(ha), -1, 1);
+      const zen = Math.acos(cz), elev = 90 - zen * DEG;
+      const az = wrap360(Math.atan2(Math.sin(ha), Math.cos(ha) * Math.sin(phi) - Math.tan(decl) * Math.cos(phi)) * DEG + 180);
+      let refr = 0;
+      if (elev <= 85) {
+        const te = Math.tan(elev * RAD);
+        refr = elev > 5 ? 58.1 / te - 0.07 / te ** 3 + 0.000086 / te ** 5
+          : elev > -0.575 ? 1735 + elev * (-518.2 + elev * (103.4 + elev * (-12.79 + elev * 0.711))) : -20.772 / te;
+        refr /= 3600;
+      }
+      return { azimuth: az, elevation: elev + refr, trueElevation: elev, declination: decl * DEG, eqTime: eqt };
+    }
+    // Times when the sun's true (geometric) elevation crosses `target` during the local day (local mean solar time)
+    // that contains `date`, by scanning then bisecting. Sunrise and sunset: −0.833° (refraction + half the disc).
+    function sunCrossings(date, lat, lon, target) {
+      const shift = lon / 15 * 3600e3, localDay = Math.floor((date.getTime() + shift) / 864e5) * 864e5;
+      const start = localDay - shift, f = (t) => sun(new Date(t), lat, lon).trueElevation - target;
+      const out = []; let t0 = start, f0 = f(t0);
+      for (let t1 = start + 600e3; t1 <= start + 864e5; t1 += 600e3) {
+        const f1 = f(t1);
+        if (f0 === 0 || f0 * f1 < 0) {
+          let lo = t0, hi = t1, flo = f0;
+          for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2, fm = f(mid); if (flo * fm <= 0) hi = mid; else { lo = mid; flo = fm; } }
+          out.push({ time: new Date((lo + hi) / 2), rising: f1 > f0 });
+        }
+        t0 = t1; f0 = f1;
+      }
+      return out;
+    }
+    // Times on a UTC day when the shadow of a vertical object points along `shadowAz` (sun azimuth = shadowAz + 180),
+    // with the sun up.
+    function shadowTimes(date, lat, lon, shadowAz) {
+      const want = wrap360(shadowAz + 180);
+      const day = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+      const start = day - lon / 15 * 3600e3 - 12 * 3600e3, d = (t) => wrap180(sun(new Date(t), lat, lon).azimuth - want);
+      const out = []; let t0 = start, d0 = d(t0);
+      for (let t1 = start + 300e3; t1 <= start + 48 * 3600e3; t1 += 300e3) {
+        const d1 = d(t1);
+        if (d0 * d1 <= 0 && Math.abs(d0 - d1) < 90) {
+          let lo = t0, hi = t1, dlo = d0;
+          for (let k = 0; k < 40; k++) { const mid = (lo + hi) / 2, dm = d(mid); if (dlo * dm <= 0) hi = mid; else { lo = mid; dlo = dm; } }
+          const t = new Date((lo + hi) / 2), s = sun(t, lat, lon);
+          const local = new Date(t.getTime() + lon / 15 * 3600e3);
+          if (s.elevation > 0 && local.getUTCDate() === new Date(day + 12 * 3600e3).getUTCDate()) out.push({ time: t, elevation: s.elevation });
+        }
+        t0 = t1; d0 = d1;
+      }
+      return out;
+    }
+
+    // --- Line of sight over a profile: heights above the ellipsoid at distances along the ground, observer and target
+    // raised by their own heights, Earth curvature with refraction coefficient k (effective radius R / (1 − k)). ---
+    function lineOfSight(profile, hObs, hTgt, k = 0.13) {
+      const R = 6371008.8 / (1 - k), n = profile.length;
+      if (n < 2) return null;
+      const D = profile[n - 1].d, z0 = profile[0].h + hObs, z1 = profile[n - 1].h + hTgt;
+      let first = null, clearance = Infinity;
+      for (let i = 1; i < n - 1; i++) {
+        const d = profile[i].d, drop = d * (D - d) / (2 * R);          // the bulge of the Earth under the chord
+        const ray = z0 + (z1 - z0) * d / D, ground = profile[i].h + drop;
+        const c = ray - ground;
+        if (c < clearance) clearance = c;
+        if (c < 0 && !first) first = { index: i, d, h: profile[i].h, by: -c };
+      }
+      return { visible: !first, first, clearance };
+    }
+
+    return { toUTM, fromUTM, toMGRS, parseMGRS, parseCoords, toDMS, inverse, direct, geodesicPoints, area, sun, sunCrossings, shadowTimes, lineOfSight, utmZone };
+  })();
+
+  // ---------- Enquête: open-source investigation tools on public, geographic data ----------
+  // Point (coordinates in every usual format, go to coordinates), Mesure (geodesic distance, area, terrain profile and
+  // line of sight), Soleil (sun position, shadows, dating a photo by its shadow), Images (NASA GIBS imagery of two
+  // dates side by side) and Journal (pins kept in this browser, GeoJSON / KML export and import). The maths are in GEO
+  // above. Nothing here looks for or follows people, and nothing links to another site.
+  const osint = (() => {
+    const el = $('osint'), btn = $('btn-osint'), layers = viewer.imageryLayers;
+    const src = new C.CustomDataSource('osint'); viewer.dataSources.add(src);
+    const ACC = C.Color.fromCssColorString('#9FD3FF'), RED = C.Color.fromCssColorString('#FF6B6B'), INK = C.Color.fromCssColorString('#F4F6FA');
+    const nf = (x, d) => x.toLocaleString('fr-FR', { minimumFractionDigits: d, maximumFractionDigits: d });
+    const fmtDist = (m) => (m < 1000 ? `${nf(m, 1)} m` : `${nf(m / 1000, 3)} km`);
+    const fmtArea = (a) => (a < 1e4 ? `${nf(a, 0)} m²` : a < 1e6 ? `${nf(a / 1e4, 2)} ha (${nf(a, 0)} m²)` : `${nf(a / 1e6, 3)} km²`);
+    const hhmm = (d, sec) => d.toISOString().slice(11, sec ? 19 : 16);
+    const today = () => new Date().toISOString().slice(0, 10);
+    let open = false, tab = 'point';
+    const ent = new Map();                                       // drawn things by key, replaced as a whole
+    function draw(key, spec) { if (ent.has(key)) src.entities.remove(ent.get(key)); ent.delete(key); if (spec) ent.set(key, src.entities.add(spec)); }
+    function dropPrefix(prefix) { for (const k of [...ent.keys()]) if (k.startsWith(prefix)) draw(k, null); }
+    const pos = (g) => C.Cartesian3.fromDegrees(g.lon, g.lat);
+    const dot = (g, color, size = 10) => ({ position: pos(g), point: { pixelSize: size, color, outlineColor: C.Color.BLACK, outlineWidth: 2,
+      heightReference: C.HeightReference.CLAMP_TO_GROUND, disableDepthTestDistance: Number.POSITIVE_INFINITY } });
+    // A geodesic drawn on the ground: points every ≤ 2 km (at most 64 per side) so the line follows the true path.
+    function geoLine(list, closed) {
+      const out = [], ring = closed ? list.concat([list[0]]) : list;
+      for (let i = 0; i + 1 < ring.length; i++) {
+        const a = ring[i], b = ring[i + 1], inv = GEO.inverse(a.lat, a.lon, b.lat, b.lon);
+        const n = inv ? Math.min(64, Math.max(1, Math.ceil(inv.s / 2000))) : 1;
+        const seg = (inv && GEO.geodesicPoints(a, b, n)) || [a, b];
+        out.push(...(i ? seg.slice(1) : seg));
+      }
+      return out;
+    }
+
+    // ----- Sheet and tabs -----
+    function setOpen(v) {
+      if (v === open) return;
+      open = v;
+      if (v) { setMenuOpen(false); setWatchOpen(false); setLiveOpen(false); }
+      el.classList.toggle('open', v);
+      btn.setAttribute('aria-pressed', String(v));
+      syncSheets();
+      if (v) { el.querySelector('.close').focus(); if (tab === 'soleil') renderSun(); }
+    }
+    closeOsint = () => setOpen(false);
+    btn.addEventListener('click', () => setOpen(!open));
+    function setTab(t) {
+      tab = t;
+      el.querySelectorAll('[data-otab]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.otab === t)));
+      ['point', 'mesure', 'soleil', 'images', 'journal'].forEach((x) => $(`opane-${x}`).classList.toggle('on', x === t));
+      if (t === 'soleil') renderSun();
+      if (t === 'journal') renderJournal();
+      if (t === 'images' && !imagesSeen) { imagesSeen = true; findLatest(); }
+    }
+    let imagesSeen = false;
+    el.querySelectorAll('[data-otab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.otab)));
+
+    // ----- Touching the globe: the ground point under the finger (terrain first, else the ellipsoid) -----
+    const ray = new C.Ray();
+    function groundAt(px) {
+      camera.getPickRay(px, ray);
+      const p = globe.pick(ray, scene) || camera.pickEllipsoid(px, globe.ellipsoid);
+      if (!p) return null;
+      const c = C.Cartographic.fromCartesian(p);
+      return c ? { lat: C.Math.toDegrees(c.latitude), lon: C.Math.toDegrees(c.longitude) } : null;
+    }
+    pickHandlers.push((picked, px) => {
+      if (!open || !(tab === 'point' || tab === 'mesure' || tab === 'soleil')) return false;
+      const g = groundAt(px);
+      if (!g) return false;
+      if (tab === 'point') setPoint(g); else if (tab === 'mesure') addMeasurePoint(g); else { sunAt = g; renderSun(); }
+      return true;
+    });
+    function centreGround() { return groundAt(new C.Cartesian2(canvas.clientWidth / 2, canvas.clientHeight / 2)); }
+    // Terrain heights from the same model as the globe (level 13, about 20 m), with a time limit.
+    function sampleHeights(list) {
+      const cartos = list.map((g) => C.Cartographic.fromDegrees(g.lon, g.lat));
+      const limit = new Promise((res) => setTimeout(() => res(null), 10000));
+      return Promise.race([C.sampleTerrain(viewer.terrainProvider, 13, cartos).catch(() => null), limit])
+        .then((r) => (r ? r.map((c) => (Number.isFinite(c.height) ? c.height : null)) : null));
+    }
+    function goTo(g, range) {
+      endTourHook(); ++flightToken; setActive(null); hideCard(); stopOrbit(); cancelFlight(); clouds.removeAll();
+      setPhase('Enquête');
+      startFlight(C.Cartesian3.fromDegrees(g.lon, g.lat, 0), { heading: 0, pitch: -60, range }, {
+        onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Enquête'),
+        onDone: () => setPhase('Enquête'),
+      });
+    }
+    function copyText(text, statusId) {
+      const ok = () => say(statusId, 'Copié.'), no = () => say(statusId, 'Copie impossible ici : sélectionne le texte à la main.');
+      try { if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(ok, no); return; } } catch (e) { /* below */ }
+      no();
+    }
+
+    // ----- Point -----
+    let point = null, pointTok = 0;
+    function solarTime(g, when) {
+      const s = GEO.sun(when, g.lat, g.lon);
+      const min = ((when.getUTCHours() * 60 + when.getUTCMinutes() + when.getUTCSeconds() / 60 + s.eqTime + 4 * g.lon) % 1440 + 1440) % 1440;
+      return `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(Math.floor(min % 60)).padStart(2, '0')}`;
+    }
+    function pointText() {
+      return ['dec', 'dms', 'utm', 'mgrs', 'alt'].map((k) => `${$(`pt-${k}`).previousElementSibling.textContent} : ${$(`pt-${k}`).textContent}`).join('\n');
+    }
+    function setPoint(g) {
+      point = { lat: g.lat, lon: g.lon };
+      const m = GEO.toMGRS(g.lat, g.lon);
+      $('pt-dec').textContent = `${g.lat.toFixed(6)}, ${g.lon.toFixed(6)}`;
+      $('pt-dms').textContent = GEO.toDMS(g.lat, g.lon);
+      $('pt-utm').textContent = m ? `${m.utm.zone}${m.utm.band} ${Math.floor(m.utm.easting)} E · ${Math.floor(m.utm.northing)} N` : 'hors UTM (zone polaire)';
+      $('pt-mgrs').textContent = m ? m.text : 'hors MGRS-UTM (zone polaire)';
+      $('pt-solar').textContent = `${solarTime(g, new Date())} heure solaire vraie, maintenant`;
+      const now = globe.getHeight(C.Cartographic.fromDegrees(g.lon, g.lat));
+      $('pt-alt').textContent = Number.isFinite(now) ? `≈ ${nf(Math.round(now), 0)} m (lecture…)` : 'lecture…';
+      const tok = ++pointTok;
+      sampleHeights([g]).then((h) => {
+        if (tok !== pointTok) return;
+        $('pt-alt').textContent = h && h[0] !== null ? `${nf(Math.round(h[0]), 0)} m au-dessus de l’ellipsoïde (modèle de relief)` : 'indisponible';
+      });
+      $('pt-out').hidden = false; $('pt-acts').hidden = false;
+      say('pt-status', 'Point lu. Touche ailleurs pour en lire un autre.');
+      draw('point', dot(g, ACC, 12));
+    }
+    $('pt-copy').addEventListener('click', () => { if (point) copyText(pointText(), 'pt-status'); });
+    $('pt-pin').addEventListener('click', () => {
+      if (!point) return;
+      const m = GEO.toMGRS(point.lat, point.lon);
+      addPin({ kind: 'point', title: 'Point', lat: point.lat, lon: point.lon, note: m ? `MGRS ${m.text}` : '' });
+    });
+    $('pt-sun').addEventListener('click', () => { if (point) { sunAt = { ...point }; setTab('soleil'); } });
+    $('pt-goto').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const g = GEO.parseCoords($('pt-input').value);
+      if (!g) { say('pt-goto-status', 'Format non reconnu. Exemples : 34.065, -4.9736 · 34°03′54″N 4°58′25″O · 30S UC 02651 70097'); return; }
+      say('pt-goto-status', `Lu en ${g.kind}${g.precision > 1 ? ` (case de ${g.precision} m, coin sud-ouest)` : ''} : ${fmtCoord(g.lat, g.lon)}.`);
+      setPoint(g);
+      goTo(g, 3000);
+    });
+
+    // ----- Mesure -----
+    let mmode = 'distance', mpts = [], profile = null, profTok = 0;
+    function setMode(m) {
+      mmode = m; mpts = []; profile = null; ++profTok;
+      el.querySelectorAll('[data-mmode]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.mmode === m)));
+      $('ms-los').hidden = m !== 'profil';
+      renderMeasure();
+    }
+    el.querySelectorAll('[data-mmode]').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mmode)));
+    function addMeasurePoint(g) {
+      if (mmode === 'profil' && mpts.length >= 2) mpts = [];
+      mpts.push({ lat: g.lat, lon: g.lon });
+      renderMeasure();
+    }
+    function measureSummary() {
+      if (mmode === 'surface') {
+        if (mpts.length < 3) return null;
+        const per = mpts.reduce((s, a, i) => { const b = mpts[(i + 1) % mpts.length], v = GEO.inverse(a.lat, a.lon, b.lat, b.lon); return s + (v ? v.s : NaN); }, 0);
+        return { kind: 'surface', area: GEO.area(mpts), perimeter: per };
+      }
+      if (mpts.length < 2) return null;
+      const segs = [];
+      for (let i = 0; i + 1 < mpts.length; i++) { const a = mpts[i], b = mpts[i + 1]; segs.push(GEO.inverse(a.lat, a.lon, b.lat, b.lon)); }
+      return { kind: mmode, segs, total: segs.reduce((s, v) => s + (v ? v.s : NaN), 0) };
+    }
+    function renderMeasure() {
+      dropPrefix('m-'); $('ms-svg').hidden = true;
+      mpts.forEach((g, i) => draw(`m-p${i}`, dot(g, i === 0 ? INK : ACC, 9)));
+      if (mmode === 'surface' && mpts.length >= 3) {
+        const ring = geoLine(mpts, true);
+        draw('m-poly', { polygon: { hierarchy: ring.map(pos), material: ACC.withAlpha(0.18), heightReference: C.HeightReference.CLAMP_TO_GROUND } });
+        draw('m-line', { polyline: { positions: ring.map(pos), width: 2.5, material: ACC, clampToGround: true } });
+      } else if (mpts.length >= 2) {
+        draw('m-line', { polyline: { positions: geoLine(mpts, false).map(pos), width: 3, material: ACC, clampToGround: true } });
+      }
+      const sum = measureSummary();
+      const lines = [];
+      if (!sum) {
+        say('ms-status', mmode === 'surface' ? `Touche le globe pour poser les sommets (${mpts.length} / 3 au moins).`
+          : mmode === 'profil' ? 'Touche le point de l’observateur, puis celui de la cible.' : 'Touche le globe pour poser des points.');
+      } else if (sum.kind === 'surface') {
+        say('ms-status', `${mpts.length} sommets. Touche pour en ajouter.`);
+        lines.push(Number.isFinite(sum.area) ? `Surface : ${fmtArea(sum.area)}` : 'Surface : impossible (côté presque opposé sur la Terre)', `Périmètre : ${fmtDist(sum.perimeter)}`);
+      } else {
+        say('ms-status', mmode === 'profil' ? 'Lecture du relief…' : `${mpts.length} points. Touche pour prolonger.`);
+        sum.segs.forEach((v, i) => lines.push(v ? `${i + 1} → ${i + 2} : ${fmtDist(v.s)} · cap ${nf(v.az1, 1)}°` : `${i + 1} → ${i + 2} : points presque opposés, non calculé`));
+        if (sum.segs.length > 1) lines.push(`Total : ${fmtDist(sum.total)}`);
+      }
+      $('ms-out').textContent = lines.join('\n');
+      if (mmode === 'profil' && mpts.length === 2) runProfile();
+    }
+    async function runProfile() {
+      const [a, b] = mpts, inv = GEO.inverse(a.lat, a.lon, b.lat, b.lon);
+      if (!inv) { say('ms-status', 'Points presque opposés sur la Terre : profil impossible.'); return; }
+      const N = 128, pts = GEO.geodesicPoints(a, b, N), tok = ++profTok;
+      const hs = await sampleHeights(pts);
+      if (tok !== profTok) return;
+      if (!hs || hs.some((h) => h === null)) { say('ms-status', 'Relief indisponible pour ce tracé (réseau ou zone hors modèle).'); return; }
+      profile = pts.map((p, i) => ({ d: inv.s * i / N, h: hs[i], lat: p.lat, lon: p.lon }));
+      drawProfile();
+    }
+    function drawProfile() {
+      if (!profile) return;
+      const hObs = Math.max(0, +$('ms-hobs').value || 0), hTgt = Math.max(0, +$('ms-htgt').value || 0);
+      const los = GEO.lineOfSight(profile, hObs, hTgt);
+      const D = profile[profile.length - 1].d, Rk = 6371008.8 / (1 - 0.13);
+      // Drawn as the line of sight sees it: the Earth's bulge (with refraction) is added to the ground, so the ray is straight.
+      const g = profile.map((p) => ({ d: p.d, z: p.h + p.d * (D - p.d) / (2 * Rk) }));
+      const z0 = profile[0].h + hObs, z1 = profile[profile.length - 1].h + hTgt;
+      const zs = g.map((p) => p.z).concat([z0, z1]), lo = Math.min(...zs), hi = Math.max(...zs), span = Math.max(1, hi - lo);
+      const X = (d) => 8 + d / D * 344, Y = (z) => 128 - (z - lo) / span * 112;
+      const svg = $('ms-svg'), NS = 'http://www.w3.org/2000/svg';
+      svg.replaceChildren();
+      const mk = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); svg.appendChild(n); return n; };
+      mk('polygon', { points: `${X(0)},132 ${g.map((p) => `${X(p.d).toFixed(1)},${Y(p.z).toFixed(1)}`).join(' ')} ${X(D)},132`, fill: 'rgba(159,211,255,0.16)', stroke: '#9FD3FF', 'stroke-width': '1.2' });
+      mk('line', { x1: X(0), y1: Y(z0), x2: X(D), y2: Y(z1), stroke: los.visible ? '#F4F6FA' : '#FF6B6B', 'stroke-width': '1.4', 'stroke-dasharray': '4 3' });
+      if (los.first) mk('circle', { cx: X(los.first.d), cy: Y(g[los.first.index].z), r: 4, fill: '#FF6B6B' });
+      $('ms-svg').hidden = false;
+      const heights = profile.map((p) => p.h);
+      const lines = [`Distance au sol : ${fmtDist(D)} · cap ${nf(GEO.inverse(mpts[0].lat, mpts[0].lon, mpts[1].lat, mpts[1].lon).az1, 1)}°`,
+        `Relief : de ${nf(Math.min(...heights), 0)} m à ${nf(Math.max(...heights), 0)} m`,
+        los.visible ? `Ligne de vue : dégagée (marge minimale ${nf(los.clearance, 1)} m)`
+          : `Ligne de vue : masquée par le relief à ${fmtDist(los.first.d)} de l’observateur (il dépasse de ${nf(los.first.by, 1)} m)`];
+      $('ms-out').textContent = lines.join('\n');
+      say('ms-status', 'Profil lu. Touche deux nouveaux points pour un autre profil.');
+    }
+    ['ms-hobs', 'ms-htgt'].forEach((id) => $(id).addEventListener('input', drawProfile));
+    $('ms-undo').addEventListener('click', () => { mpts.pop(); profile = null; ++profTok; renderMeasure(); });
+    $('ms-clear').addEventListener('click', () => { mpts = []; profile = null; ++profTok; renderMeasure(); });
+    $('ms-pin').addEventListener('click', () => {
+      const sum = measureSummary();
+      if (!sum) { say('ms-status', 'Rien à épingler : pose d’abord des points.'); return; }
+      const c = mpts[0];
+      const title = sum.kind === 'surface' ? `Surface ${fmtArea(sum.area)}` : sum.kind === 'profil' ? `Profil ${fmtDist(sum.total)}` : `Distance ${fmtDist(sum.total)}`;
+      addPin({ kind: sum.kind, title, lat: c.lat, lon: c.lon, note: $('ms-out').textContent, geom: mpts.map((g) => [g.lon, g.lat]) });
+    });
+
+    // ----- Soleil -----
+    let sunAt = null;
+    function setNow() { const n = new Date(); $('sn-date').value = n.toISOString().slice(0, 10); $('sn-time').value = n.toISOString().slice(11, 16); }
+    setNow();
+    function sunDate() { const d = $('sn-date').value, t = $('sn-time').value; if (!d || !t) return null; const x = new Date(`${d}T${t}:00Z`); return Number.isNaN(x.getTime()) ? null : x; }
+    function sunPlace() { return sunAt || point || centreGround(); }
+    function addRow(dl, k, v) { const dt = document.createElement('dt'), dd = document.createElement('dd'); dt.textContent = k; dd.textContent = v; dl.append(dt, dd); }
+    function renderSun() {
+      const g = sunPlace(), when = sunDate(), dl = $('sn-out');
+      dl.replaceChildren(); dropPrefix('s-');
+      if (!g) { say('sn-where', 'Touche le globe pour choisir le lieu.'); return; }
+      say('sn-where', `Lieu : ${fmtCoord(g.lat, g.lon)}. Touche le globe pour en changer.`);
+      if (!when) { addRow(dl, 'Date', 'à compléter'); return; }
+      const s = GEO.sun(when, g.lat, g.lon);
+      addRow(dl, 'Azimut', `${nf(s.azimuth, 1)}° (depuis le nord, sens horaire)`);
+      addRow(dl, 'Hauteur', `${nf(s.elevation, 1)}° (apparente, avec la réfraction)`);
+      if (s.elevation > 0) {
+        const ratio = 1 / Math.tan(s.elevation * Math.PI / 180);
+        addRow(dl, 'Ombre', `vers ${nf((s.azimuth + 180) % 360, 1)}° · longueur ${nf(ratio, 2)} × la hauteur de l’objet`);
+        const tip = GEO.direct(g.lat, g.lon, (s.azimuth + 180) % 360, Math.min(3000, 100 * ratio));
+        draw('s-shadow', { polyline: { positions: [pos(g), pos(tip)], width: 4, material: C.Color.BLACK.withAlpha(0.75), clampToGround: true } });
+        const sunTip = GEO.direct(g.lat, g.lon, s.azimuth, 300);
+        draw('s-sun', { polyline: { positions: [pos(g), pos(sunTip)], width: 2, material: new C.PolylineDashMaterialProperty({ color: C.Color.fromCssColorString('#FFD15C') }), clampToGround: true } });
+      } else addRow(dl, 'Ombre', 'aucune : le soleil est sous l’horizon');
+      draw('s-at', dot(g, C.Color.fromCssColorString('#FFD15C'), 11));
+      const c = GEO.sunCrossings(when, g.lat, g.lon, -0.833);
+      const rise = c.find((x) => x.rising), set = c.find((x) => !x.rising);
+      addRow(dl, 'Lever', rise ? `${hhmm(rise.time)} UTC` : 'aucun ce jour (jour ou nuit polaire)');
+      addRow(dl, 'Coucher', set ? `${hhmm(set.time)} UTC` : 'aucun ce jour (jour ou nuit polaire)');
+      const g6 = GEO.sunCrossings(when, g.lat, g.lon, 6), gm4 = GEO.sunCrossings(when, g.lat, g.lon, -4);
+      const am = [gm4.find((x) => x.rising), g6.find((x) => x.rising)], pm = [g6.find((x) => !x.rising), gm4.find((x) => !x.rising)];
+      if (am[0] && am[1]) addRow(dl, 'Heure dorée', `matin ${hhmm(am[0].time)}–${hhmm(am[1].time)} UTC`);
+      if (pm[0] && pm[1]) addRow(dl, pm[0] && am[0] && am[1] ? 'Heure dorée ' : 'Heure dorée', `soir ${hhmm(pm[0].time)}–${hhmm(pm[1].time)} UTC`);
+    }
+    ['sn-date', 'sn-time'].forEach((id) => $(id).addEventListener('input', renderSun));
+    $('sn-now').addEventListener('click', () => { setNow(); renderSun(); });
+    $('sn-clock').addEventListener('click', () => {
+      const when = sunDate();
+      if (!when) return;
+      if (veille.live) setLayer('live', false);
+      nightClock = false;
+      clock.currentTime = C.JulianDate.fromDate(when);
+      say('sn-where', `Globe réglé sur le ${when.toISOString().slice(0, 10)} à ${hhmm(when)} UTC.`);
+    });
+    $('sn-find').addEventListener('click', () => {
+      const g = sunPlace(), when = sunDate(), az = parseFloat(String($('sn-shadow').value).replace(',', '.')), ul = $('sn-times');
+      ul.replaceChildren();
+      if (!g || !when || !(az >= 0 && az <= 360)) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Choisis le lieu, la date et une direction d’ombre entre 0 et 360°.'; ul.appendChild(li); return; }
+      const found = GEO.shadowTimes(when, g.lat, g.lon, az);
+      if (!found.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Aucune heure ce jour-là : avec le soleil levé, l’ombre ne prend jamais cette direction ici.'; ul.appendChild(li); return; }
+      found.forEach((f) => {
+        const li = document.createElement('li'), b = document.createElement('button'), t = document.createElement('span'), sm = document.createElement('small');
+        b.type = 'button';
+        t.textContent = `${hhmm(f.time, true)} UTC`;
+        sm.textContent = `soleil à ${nf(f.elevation, 1)}° · ombre ${nf(1 / Math.tan(f.elevation * Math.PI / 180), 2)} × la hauteur`;
+        b.append(t, sm); li.appendChild(b); ul.appendChild(li);
+        b.addEventListener('click', () => { $('sn-time').value = f.time.toISOString().slice(11, 16); renderSun(); });
+      });
+    });
+
+    // ----- Images datées -----
+    const IMG = [
+      { id: 'VIIRS_NOAA20_CorrectedReflectance_TrueColor', label: 'VIIRS NOAA-20 · vraies couleurs · 250 m', m: 'GoogleMapsCompatible_Level9', ext: 'jpg', max: 9, day: true },
+      { id: 'VIIRS_SNPP_CorrectedReflectance_TrueColor', label: 'VIIRS Suomi NPP · vraies couleurs · 250 m', m: 'GoogleMapsCompatible_Level9', ext: 'jpg', max: 9, day: true },
+      { id: 'MODIS_Terra_CorrectedReflectance_TrueColor', label: 'MODIS Terra · vraies couleurs · 250 m', m: 'GoogleMapsCompatible_Level9', ext: 'jpg', max: 9, day: true },
+      { id: 'MODIS_Aqua_CorrectedReflectance_TrueColor', label: 'MODIS Aqua · vraies couleurs · 250 m', m: 'GoogleMapsCompatible_Level9', ext: 'jpg', max: 9, day: true },
+      { id: 'HLS_L30_Nadir_BRDF_Adjusted_Reflectance', label: 'Landsat 8 et 9 (HLS) · 30 m', m: 'GoogleMapsCompatible_Level12', ext: 'png', max: 12, day: true },
+      { id: 'HLS_S30_Nadir_BRDF_Adjusted_Reflectance', label: 'Sentinel-2 (HLS) · 30 m', m: 'GoogleMapsCompatible_Level12', ext: 'png', max: 12, day: true },
+      { id: 'VIIRS_SNPP_DayNightBand_At_Sensor_Radiance', label: 'Lumières de la nuit (VIIRS) · 750 m', m: 'GoogleMapsCompatible_Level8', ext: 'png', max: 8, day: false },
+      { id: 'VIIRS_Combined_Flood_1-Day', label: 'Eau et inondations sur 1 jour (VIIRS)', m: 'GoogleMapsCompatible_Level9', ext: 'png', max: 9, day: false },
+    ];
+    IMG.forEach((d, i) => { const o = document.createElement('option'); o.value = String(i); o.textContent = d.label; $('im-layer').appendChild(o); });
+    const daysAgo = (n) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+    $('im-after').value = daysAgo(1); $('im-before').value = daysAgo(31);
+    $('im-after').max = $('im-before').max = today();
+    let cmp = null, split = 0.5;
+    const handle = $('split-handle');
+    function tileOf(lat, lon, z) {
+      const n = 2 ** z, la = C.Math.clamp(lat, -85, 85) * Math.PI / 180;
+      return { x: Math.min(n - 1, Math.floor((lon + 180) / 360 * n)), y: Math.min(n - 1, Math.floor((1 - Math.log(Math.tan(la) + 1 / Math.cos(la)) / Math.PI) / 2 * n)), z };
+    }
+    function addDated(d, date, side) {
+      const provider = new C.UrlTemplateImageryProvider({ url: gibsUrl(d.id, d.m, d.ext, date), maximumLevel: d.max,
+        credit: new C.Credit(`Images datées : NASA GIBS (${d.label.split(' ·')[0]}, ${date})`) });
+      provider.errorEvent.addEventListener((e) => { e.retry = false; });     // a day without a pass: empty tiles, no retries
+      const under = layers.indexOf(labels);
+      const layer = layers.addImageryProvider(provider, under >= 0 ? under : undefined);
+      layer.splitDirection = side;
+      if (d.day) dayLayers.push([layer, 1.0]);
+      return layer;
+    }
+    function compareOff() {
+      if (!cmp) return;
+      for (const L of [cmp.left, cmp.right]) {
+        const i = dayLayers.findIndex((x) => x[0] === L); if (i >= 0) dayLayers.splice(i, 1);
+        layers.remove(L, true);
+      }
+      cmp = null; handle.hidden = true; scene.splitPosition = 0.5;
+    }
+    function placeHandle() {
+      scene.splitPosition = split;
+      handle.style.left = `${(split * 100).toFixed(2)}%`;
+      handle.setAttribute('aria-valuenow', String(Math.round(split * 100)));
+    }
+    async function compareOn() {
+      const d = IMG[+$('im-layer').value], b = $('im-before').value, a = $('im-after').value;
+      if (!d || !b || !a) { say('im-status', 'Choisis une couche et deux dates.'); return; }
+      if (b > today() || a > today()) { say('im-status', 'Une date est dans le futur.'); return; }
+      compareOff();
+      cmp = { left: addDated(d, b, C.SplitDirection.LEFT), right: addDated(d, a, C.SplitDirection.RIGHT), d, b, a };
+      handle.hidden = false; placeHandle();
+      say('im-status', `Avant : ${b} (gauche) · après : ${a} (droite). Vérification des images…`);
+      // One tile under the centre of the screen, at the layer's coarsest useful level, for each date.
+      const c = centreGround() || { lat: 0, lon: 0 }, z = Math.min(d.max, 6), t = tileOf(c.lat, c.lon, z), mine = cmp;
+      const url = (date) => gibsUrl(d.id, d.m, d.ext, date).replace('{z}', t.z).replace('{y}', t.y).replace('{x}', t.x);
+      const [okB, okA] = await Promise.all([probeGibsTile(url(b)), probeGibsTile(url(a))]);
+      if (cmp !== mine) return;
+      const miss = [!okB && b, !okA && a].filter(Boolean);
+      say('im-status', miss.length ? `Pas d’image ici pour ${miss.join(' et ')} (jour sans passage, couverture partielle ou date hors archive). Avant : gauche · après : droite.`
+        : `Avant : ${b} (gauche) · après : ${a} (droite). Images présentes au centre de l’écran.`);
+    }
+    // The newest day with an image under the centre of the screen, going back up to 60 days (layers are published
+    // with a delay of a day for VIIRS and MODIS to about a week for HLS, and a satellite can be out of service).
+    let latestTok = 0;
+    async function findLatest() {
+      const d = IMG[+$('im-layer').value], tok = ++latestTok;
+      if (!d) return;
+      const c = centreGround() || { lat: 30, lon: 10 }, z = Math.min(d.max, 4), t = tileOf(c.lat, c.lon, z);
+      say('im-status', 'Recherche de la dernière image disponible ici…');
+      for (const n of [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60]) {
+        const date = daysAgo(n);
+        const ok = await probeGibsTile(gibsUrl(d.id, d.m, d.ext, date).replace('{z}', t.z).replace('{y}', t.y).replace('{x}', t.x));
+        if (tok !== latestTok) return;
+        if (ok) {
+          $('im-after').value = date;
+          $('im-before').value = new Date(Date.parse(date) - 30 * 864e5).toISOString().slice(0, 10);
+          say('im-status', `Dernière image disponible ici : ${date} (après). Avant : 30 jours plus tôt. Change les dates si besoin, puis Comparer.`);
+          return;
+        }
+      }
+      say('im-status', 'Aucune image de cette couche ici depuis 60 jours (couverture partielle ou couche interrompue).');
+    }
+    $('im-layer').addEventListener('change', findLatest);
+    $('im-show').addEventListener('click', compareOn);
+    $('im-swap').addEventListener('click', () => { const b = $('im-before').value; $('im-before').value = $('im-after').value; $('im-after').value = b; if (cmp) compareOn(); });
+    $('im-off').addEventListener('click', () => { compareOff(); say('im-status', 'Comparaison retirée.'); });
+    handle.addEventListener('pointerdown', (e) => {
+      handle.setPointerCapture(e.pointerId);
+      const move = (ev) => { split = C.Math.clamp(ev.clientX / window.innerWidth, 0.02, 0.98); placeHandle(); };
+      const up = () => { handle.removeEventListener('pointermove', move); handle.removeEventListener('pointerup', up); handle.removeEventListener('pointercancel', up); };
+      handle.addEventListener('pointermove', move); handle.addEventListener('pointerup', up); handle.addEventListener('pointercancel', up);
+      e.preventDefault();
+    });
+    handle.addEventListener('keydown', (e) => {
+      const step = { ArrowLeft: -0.02, ArrowRight: 0.02, Home: -1, End: 1 }[e.key];
+      if (step === undefined) return;
+      e.preventDefault(); split = C.Math.clamp(split + step, 0.02, 0.98); placeHandle();
+    });
+
+    // ----- Journal -----
+    const JKEY = 'nour.osint.journal', KINDS = ['point', 'distance', 'surface', 'profil'];
+    const str = (v, max) => (typeof v === 'string' ? v.slice(0, max) : '');
+    function clean(p) {
+      if (!p || typeof p !== 'object') return null;
+      const lat = +p.lat, lon = +p.lon;
+      if (!(Math.abs(lat) <= 90 && Math.abs(lon) <= 180)) return null;
+      const t = typeof p.t === 'string' && !Number.isNaN(Date.parse(p.t)) ? new Date(p.t).toISOString() : new Date().toISOString();
+      const geom = Array.isArray(p.geom) ? p.geom.slice(0, 2000).filter((q) => Array.isArray(q) && Math.abs(+q[0]) <= 180 && Math.abs(+q[1]) <= 90).map((q) => [+q[0], +q[1]]) : null;
+      return { id: str(p.id, 40) || `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`, kind: KINDS.includes(p.kind) ? p.kind : 'point',
+        title: str(p.title, 120) || 'Sans titre', note: str(p.note, 4000), lat, lon, t, geom: geom && geom.length > 1 ? geom : null };
+    }
+    let pins = [];
+    try { pins = (JSON.parse(localStorage.getItem(JKEY) || '[]') || []).map(clean).filter(Boolean); } catch (e) { pins = []; }
+    function save() {
+      try { localStorage.setItem(JKEY, JSON.stringify(pins)); return true; } catch (e) { say('jr-status', 'Journal non enregistré : ce navigateur bloque le stockage.'); return false; }
+    }
+    function drawPins() {
+      dropPrefix('j-');
+      for (const p of pins) {
+        draw(`j-${p.id}`, { ...dot(p, C.Color.fromCssColorString('#FFD15C'), 9), label: { text: p.title, font: '400 13px Inter, system-ui, sans-serif', fillColor: INK,
+          outlineColor: C.Color.BLACK, outlineWidth: 3, style: C.LabelStyle.FILL_AND_OUTLINE, pixelOffset: new C.Cartesian2(0, -16),
+          heightReference: C.HeightReference.CLAMP_TO_GROUND, disableDepthTestDistance: Number.POSITIVE_INFINITY, distanceDisplayCondition: new C.DistanceDisplayCondition(0, 3e6) } });
+        if (p.geom) {
+          const g = p.geom.map(([lon, lat]) => ({ lat, lon }));
+          draw(`j-${p.id}-g`, { polyline: { positions: geoLine(g, p.kind === 'surface').map(pos), width: 2, material: C.Color.fromCssColorString('#FFD15C').withAlpha(0.8), clampToGround: true } });
+        }
+      }
+    }
+    function addPin(p) {
+      const c = clean({ ...p, t: new Date().toISOString() });
+      if (!c) return;
+      pins.push(c);
+      const kept = save(); drawPins(); renderJournal();
+      const msg = `Épinglé dans le journal (${pins.length}).${kept ? '' : ' Non enregistré : stockage bloqué.'}`;
+      say('jr-status', msg);
+      if (tab === 'point') say('pt-status', msg); else if (tab === 'mesure') say('ms-status', msg);
+    }
+    function renderJournal() {
+      const ul = $('jr-list'); ul.replaceChildren();
+      if (!pins.length) { const li = document.createElement('li'); li.className = 'note'; li.textContent = 'Journal vide. Épingle un point ou une mesure depuis les autres onglets.'; ul.appendChild(li); return; }
+      pins.forEach((p) => {
+        const li = document.createElement('li');
+        const title = document.createElement('input'); title.type = 'text'; title.value = p.title; title.maxLength = 120; title.setAttribute('aria-label', 'Titre');
+        const note = document.createElement('textarea'); note.value = p.note; note.maxLength = 4000; note.setAttribute('aria-label', `Note : ${p.title}`);
+        const meta = document.createElement('small'); const m = GEO.toMGRS(p.lat, p.lon);
+        meta.textContent = `${p.t.slice(0, 16).replace('T', ' ')} UTC · ${fmtCoord(p.lat, p.lon)}${m ? ` · ${m.text}` : ''}`;
+        const row = document.createElement('div'); row.className = 'row';
+        const fly = document.createElement('button'); fly.className = 'btn'; fly.type = 'button'; fly.textContent = 'Y aller';
+        const del = document.createElement('button'); del.className = 'btn'; del.type = 'button'; del.textContent = 'Supprimer';
+        row.append(fly, del); li.append(title, note, meta, row); ul.appendChild(li);
+        title.addEventListener('change', () => { p.title = title.value.slice(0, 120) || 'Sans titre'; save(); drawPins(); });
+        note.addEventListener('change', () => { p.note = note.value.slice(0, 4000); save(); });
+        fly.addEventListener('click', () => goTo(p, p.geom ? 20000 : 3000));
+        del.addEventListener('click', () => { pins = pins.filter((x) => x !== p); save(); drawPins(); renderJournal(); say('jr-status', 'Supprimé.'); });
+      });
+    }
+    const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[ch]));
+    function geometryOf(p) {
+      if (p.geom && p.kind === 'surface') return { type: 'Polygon', coordinates: [p.geom.concat([p.geom[0]])] };
+      if (p.geom) return { type: 'LineString', coordinates: p.geom };
+      return { type: 'Point', coordinates: [p.lon, p.lat] };
+    }
+    function geojsonText() {
+      return JSON.stringify({ type: 'FeatureCollection', features: pins.map((p) => ({ type: 'Feature', geometry: geometryOf(p),
+        properties: { title: p.title, note: p.note, time: p.t, kind: p.kind, lat: p.lat, lon: p.lon } })) }, null, 1);
+    }
+    function kmlText() {
+      const coords = (list) => list.map(([lon, lat]) => `${lon},${lat},0`).join(' ');
+      const body = pins.map((p) => {
+        const g = geometryOf(p);
+        const geo = g.type === 'Point' ? `<Point><coordinates>${p.lon},${p.lat},0</coordinates></Point>`
+          : g.type === 'LineString' ? `<LineString><tessellate>1</tessellate><coordinates>${coords(g.coordinates)}</coordinates></LineString>`
+          : `<Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>${coords(g.coordinates[0])}</coordinates></LinearRing></outerBoundaryIs></Polygon>`;
+        return `<Placemark><name>${esc(p.title)}</name><description>${esc(p.note)}</description><TimeStamp><when>${p.t}</when></TimeStamp>${geo}</Placemark>`;
+      }).join('\n');
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Fatiha · journal d’enquête</name>\n${body}\n</Document></kml>\n`;
+    }
+    function download(name, text, type) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+    }
+    const stamp = () => new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
+    $('jr-geojson').addEventListener('click', () => { if (!pins.length) { say('jr-status', 'Journal vide.'); return; } download(`fatiha-enquete-${stamp()}.geojson`, geojsonText(), 'application/geo+json'); say('jr-status', `${pins.length} éléments exportés (GeoJSON).`); });
+    $('jr-kml').addEventListener('click', () => { if (!pins.length) { say('jr-status', 'Journal vide.'); return; } download(`fatiha-enquete-${stamp()}.kml`, kmlText(), 'application/vnd.google-earth.kml+xml'); say('jr-status', `${pins.length} éléments exportés (KML).`); });
+    function importGeoJSON(text) {
+      let data; try { data = JSON.parse(text); } catch (e) { return { added: 0, skipped: 0, error: 'fichier illisible (JSON invalide)' }; }
+      const feats = data && data.type === 'FeatureCollection' && Array.isArray(data.features) ? data.features : data && data.type === 'Feature' ? [data] : null;
+      if (!feats) return { added: 0, skipped: 0, error: 'ce n’est pas un GeoJSON (FeatureCollection ou Feature)' };
+      let added = 0, skipped = 0;
+      for (const f of feats.slice(0, 2000)) {
+        const g = f && f.geometry, pr = (f && f.properties) || {};
+        let p = null;
+        if (g && g.type === 'Point' && Array.isArray(g.coordinates)) p = clean({ ...pr, kind: KINDS.includes(pr.kind) ? pr.kind : 'point', lon: g.coordinates[0], lat: g.coordinates[1], t: pr.time, geom: null });
+        else if (g && (g.type === 'LineString' || g.type === 'Polygon')) {
+          const list = g.type === 'LineString' ? g.coordinates : Array.isArray(g.coordinates) && g.coordinates[0];
+          const ring = Array.isArray(list) ? (g.type === 'Polygon' ? list.slice(0, -1) : list) : [];
+          if (ring.length >= 2 && Array.isArray(ring[0])) p = clean({ ...pr, kind: g.type === 'Polygon' ? 'surface' : (pr.kind === 'profil' ? 'profil' : 'distance'), lon: ring[0][0], lat: ring[0][1], t: pr.time, geom: ring });
+        }
+        if (p) { p.id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`; pins.push(p); added++; } else skipped++;
+      }
+      save(); drawPins(); renderJournal();
+      return { added, skipped };
+    }
+    $('jr-import').addEventListener('change', (e) => {
+      const f = e.target.files && e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      if (f.size > 2e6) { say('jr-status', 'Fichier trop gros (2 Mo au plus).'); return; }
+      f.text().then((t) => { const r = importGeoJSON(t); say('jr-status', r.error ? `Import impossible : ${r.error}.` : `${r.added} éléments importés${r.skipped ? `, ${r.skipped} ignorés (géométrie non prise en charge)` : ''}.`); },
+        () => say('jr-status', 'Fichier illisible.'));
+    });
+    $('jr-clear').addEventListener('click', () => {
+      if (!pins.length || !window.confirm(`Effacer les ${pins.length} éléments du journal ?`)) return;
+      pins = []; save(); drawPins(); renderJournal(); say('jr-status', 'Journal effacé.');
+    });
+    drawPins();
+
+    return {
+      get open() { return open; }, setOpen, setTab, setMode, setPoint, addMeasurePoint, compareOn, compareOff, findLatest, importGeoJSON, geojsonText, kmlText, renderSun,
+      get state() { return { tab, mmode, mpts: mpts.slice(), profile: profile && profile.length, pins: pins.length, cmp: cmp && { b: cmp.b, a: cmp.a, id: cmp.d.id }, split }; },
+    };
+  })();
+  // Exposed for automated tests only.
+  window.__osint = { GEO, osint };
 
   // ---------- Opening shot ----------
   // Start far out with the sunlit side facing the viewer, then settle in.
