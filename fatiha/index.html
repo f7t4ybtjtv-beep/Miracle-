@@ -3874,8 +3874,9 @@
     $('pane-cam').querySelectorAll('.tile.cam.live').forEach((tile) => {
       const img = tile.querySelector('img.logo');
       if (!img || img.dataset.fixed) return;
-      const r = tile.getBoundingClientRect();
-      if (!r.width || r.bottom < 0 || r.top > innerHeight) return;            // only the squares on screen
+      // Only the squares on screen: inside the sheet's scrolling area as well as inside the window.
+      const r = tile.getBoundingClientRect(), box = liveEl.getBoundingClientRect();
+      if (!r.width || r.bottom < Math.max(0, box.top) || r.top > Math.min(innerHeight, box.bottom)) return;
       const next = new Image(); next.referrerPolicy = 'no-referrer';
       next.onload = () => { img.src = next.src; };
       next.src = liveFrame(tile._yt);
