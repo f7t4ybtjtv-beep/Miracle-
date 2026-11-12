@@ -132,6 +132,70 @@ class TestCheckerSoundness(unittest.TestCase):
         self.assertTrue(checker.check_proof(1, [[1], [-1]], checker._parse_proof("0\n"))[0])
         self.assertFalse(checker.check_proof(1, [[1], [-1]], checker._parse_proof("d 1 0\n0\n"))[0])
 
+    def test_rup_matches_naive_unit_propagation(self):
+        """Le moteur RUP (deux littéraux surveillés, réordonnés en place et
+        réutilisés d'un appel à l'autre, suppressions paresseuses) doit
+        décider exactement comme une propagation unitaire naïve écrite ici
+        indépendamment ; et toute preuve acceptée doit porter sur une
+        formule réellement insatisfiable (force brute)."""
+
+        def naive_rup(live, lemma):
+            assign = {}
+            for lit in lemma:
+                if assign.get(abs(lit), lit < 0) != (lit < 0):
+                    return True  # lemme tautologique
+                assign[abs(lit)] = lit < 0
+            changed = True
+            while changed:
+                changed = False
+                for c in live:
+                    if any(assign.get(abs(l)) == (l > 0) for l in c):
+                        continue
+                    free = {l for l in c if abs(l) not in assign}
+                    if not free:
+                        return True
+                    if len(free) == 1:
+                        lit = free.pop()
+                        assign[abs(lit)] = lit > 0
+                        changed = True
+            return False
+
+        def satisfiable(nv, cls):
+            return any(all(any(bits[abs(l) - 1] == (l > 0) for l in c) for c in cls)
+                       for bits in itertools.product((False, True), repeat=nv))
+
+        rng = random.Random(2026)
+        decisions = accepted = 0
+        for _ in range(600):
+            nv = rng.randint(1, 6)
+            rc = lambda k: [rng.choice((-1, 1)) * rng.randint(1, nv) for _ in range(k)]
+            cls = [rc(rng.randint(1, 4)) for _ in range(rng.randint(1, 4 * nv + 4))]
+            db, live, steps = checker._RupDB(), [], []
+            for c in cls:
+                db.add(c)
+                live.append(list(c))
+            for _ in range(rng.randint(1, 20)):
+                if live and rng.random() < .25:
+                    c = rng.choice(live)
+                    db.delete(c)
+                    live.remove(c)
+                    steps.append((True, c))
+                    continue
+                lemma = rc(rng.randint(0, 3))
+                got = db.rup(lemma)
+                self.assertEqual(got, naive_rup(live, lemma), (nv, cls, steps, lemma))
+                decisions += 1
+                steps.append((False, lemma))
+                if got:
+                    db.add(lemma)
+                    live.append(lemma)
+            if checker.check_proof(nv, cls, steps)[0]:
+                accepted += 1
+                self.assertFalse(satisfiable(nv, cls), (nv, cls, steps))
+        # garde-fou : le test doit exercer les deux issues
+        self.assertGreater(decisions, 3000)
+        self.assertGreater(accepted, 100)
+
     def test_proof_reused_on_weakened_formula_is_rejected(self):
         cnf, _ = generators.pigeonhole(4)
         res = cdcl.solve(cnf)
