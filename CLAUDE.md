@@ -133,6 +133,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   is open (`body.osint-open`) because it caught those touches. Dated imagery uses `ImageryLayer.splitDirection` +
   `scene.splitPosition` with the `#split-handle` slider and joins `dayLayers` while shown. Deliberately left out because
   they cannot be verified from the sandbox: search by place name and live aircraft. Never add people search.
+  The opening journey (planets drawn on a 2D canvas, `#intro-canvas`) lives in its own `<script>` placed BEFORE the Cesium
+  script tag so it starts while Cesium downloads; it exposes `window.__intro` (`active`, `arrived`, `skip()`, `stop(quiet)`,
+  `whenArrived(cb)`, settable `time` for tests). `ready()` hands over with `intro.whenArrived(open)`; `fail()` and deep links
+  stop it. Off with reduced motion, a hash in the URL, or `?intro=0`: test harnesses that click `#btn-start` must add
+  `?intro=0` (the button is hidden during the journey). The page now has two inline scripts: syntax-check each one.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 

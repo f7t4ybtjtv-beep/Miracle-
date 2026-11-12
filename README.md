@@ -46,6 +46,15 @@ En haut à gauche, le nom et une ligne d'état ; en haut à droite, « Orbite »
 Les panneaux (Menu, Veille, The Light · Stream) sont un tiroir à droite sur ordinateur et une feuille en bas sur
 téléphone ; Échap et ✕ les ferment.
 
+### Fatiha : voyage d'ouverture
+
+À la place d'une barre de chargement, la page s'ouvre sur un vol à travers le système solaire : Neptune, Uranus,
+Saturne, Jupiter, Mars, la Lune, puis la Terre, où le vrai globe prend le relais. Les planètes sont **dessinées**
+(illustrations, tailles et vitesse non à l'échelle) ; les chiffres affichés sont réels (distance moyenne au Soleil
+et diamètre équatorial, fiches planétaires de la NASA, arrondis). « Passer » (ou Échap) saute à l'arrivée.
+Le voyage n'est pas joué avec « mouvement réduit », sur un lien direct (`#tolede`, `#vue=…`) ni avec `?intro=0`
+(utilisé par les tests) : la fiche-titre simple le remplace.
+
 ### Fatiha : qualité d'image
 
 Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
