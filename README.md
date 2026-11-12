@@ -57,7 +57,7 @@ Le voyage n'est pas joué avec « mouvement réduit », sur un lien direct (`#to
 
 ### Fatiha : qualité d'image
 
-Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site (`2026-11-12.4`) est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
 
 ### Fatiha : veille mondiale (bouton « Veille »)
 
@@ -163,14 +163,14 @@ d'une rubrique.
 - **Radios** : annuaire communautaire radio-browser.info, radios les plus écoutées du pays, flux https seulement. La radio continue pendant le survol, avec un bouton d'arrêt dans la barre d'état.
 - **Télé** : playlists communautaires iptv-org (chaînes gratuites en accès libre), lues par hls.js (chargé à la demande) ou nativement sous Safari. Beaucoup de flux sont géobloqués, hors ligne ou refusés par le navigateur : le panneau le dit. Les chaînes d'un pays peuvent dépendre de l'État.
 - **Musique** : radios radio-browser classées par genre.
-- **Caméras** : 17 caméras de lieux publics (Paris, Jérusalem, Tokyo, Vatican, Venise, New York, Londres, Ajaccio…), directs YouTube publiés par leurs propriétaires (offices de tourisme, chaînes, réseaux de webcams), contrôlés le 9 nov. 2026, un point bleu chacune sur le globe. Windy Webcams seulement si le visiteur apporte une clé (`?wkey=`). Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée. Un direct peut s'arrêter ou changer d'adresse.
+- **Caméras** : 17 caméras de lieux publics (Paris, Jérusalem, Tokyo, Vatican, Venise, New York, Londres, Ajaccio…), directs YouTube publiés par leurs propriétaires (offices de tourisme, chaînes, réseaux de webcams), contrôlés le 9 nov. 2026, un point bleu chacune sur le globe. Sous cette liste, et seulement tant que l'onglet est ouvert sur un point connu, les widgets officiels de Windy.com : les webcams publiques les plus proches (`webcams.windy.com/webcams/public/embed/nearby`) et la carte (`embed.windy.com/embed.html`). Un pays choisi dans la liste est centré sur sa capitale (l'Allemagne sur Berlin) ; un lieu du parcours ou un point touché recentre les widgets. Aucune iframe vers `www.windy.com`, aucun appel à `api.windy.com`. Le site n'ouvre, n'explore ni ne répertorie aucune caméra privée ou mal protégée. Un direct peut s'arrêter ou changer d'adresse.
 - **Bande-son** (menu, Affichage) : une musique calme générée dans le navigateur (WebAudio), qui suit l'altitude et la plongée.
 - **Conflits** : titres de presse repérés par mots-clés dans GDELT (environ 15 minutes de latence, dernières 24 h, filtre FR/EN), sans images ni positions de troupes, avec le nom de sources de référence (ONU Info, CICR, ReliefWeb, UCDP, ACLED). Ce sont des titres automatiques, non vérifiés ; en temps de guerre les faits sont contestés.
 - Jérusalem n'est rattachée à aucun pays (son statut est disputé) : le panneau demande d'en choisir un.
 
 Vie privée : ouvrir une rubrique contacte radio-browser.info, GitHub (iptv-org),
-GDELT, jsDelivr et les serveurs des radios et des chaînes, qui voient l'adresse IP
-du visiteur.
+GDELT, jsDelivr, Windy.com (onglet Caméras, seulement sur un point connu) et les
+serveurs des radios et des chaînes, qui voient l'adresse IP du visiteur.
 
 Limites : aucun de ces services n'est joignable depuis l'environnement de
 développement. Le code a été testé avec des réponses simulées au format
