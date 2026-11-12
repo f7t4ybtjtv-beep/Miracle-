@@ -1,0 +1,420 @@
+diff --git a/fatiha/index.html b/fatiha/index.html
+index e7efbf3..cc112de 100644
+--- a/fatiha/index.html
++++ b/fatiha/index.html
+@@ -940,7 +940,7 @@
+   const dayLayers = [[naturalEarth, 1.0], [satellite, satellite.brightness], [realEarth, 1.0]];
+   const lookPoint = new C.Cartesian3(), screenCentre = new C.Cartesian2();
+   let nightLook = 0, starGain = 1;
+-  let rush = 0, haze = 0, prevH = 0, prevT = 0;     // dive blur and haze, see the "nour_rush" stage
++  let rush = 0, haze = 0, cloudZoom = 1, prevA = 0, prevT = 0;     // dive blur and haze, see the "nour_rush" stage
+   scene.preRender.addEventListener(() => {
+     const h = camera.positionCartographic.height;
+     screenCentre.x = canvas.clientWidth / 2; screenCentre.y = canvas.clientHeight / 2;
+@@ -951,17 +951,23 @@
+     const k = 1 - 0.45 * nightLook;
+     for (const [layer, base] of dayLayers) layer.brightness = base * k;
+     glowFx.enabled = nightLook > 0.02 && tierName !== 'light';   // no halo passes by day or on the light tier
+-    // Dive: blur from how fast the altitude changes (e-folds per second), only once below a few hundred km, and a
+-    // grey haze around 6 km up where the cloud layer is. Off outside a dive, and with reduced motion.
++    // Dive: a light speed blur from how fast the height above the ground changes (e-folds per second), only between a
++    // few thousand km and ~20 km above the ground, and a short pass through the cloud layer around 3 km above the
++    // ground. Both are 0 in the last kilometre, outside a dive and with reduced motion, so the final frames stay sharp.
+     const nowMs = performance.now();
+     if (diving && !prefersReduced.matches) {
+-      if (prevH > 0) {
+-        const rate = Math.abs(Math.log(h / prevH)) / Math.max((nowMs - prevT) / 1000, 1e-3);
+-        rush += (Math.min(1, rate / 2.0) * (1 - ramp(h, 4e5, 4e6)) - rush) * 0.25;
++      const agl = Math.max(h - diveGround, 1);
++      const dt = Math.max((nowMs - prevT) / 1000, 1e-3);
++      if (prevA > 0) {
++        const rate = Math.abs(Math.log(agl / prevA)) / dt;
++        const goal = Math.min(0.35, rate / 4) * (1 - ramp(h, 4e5, 4e6)) * ramp(agl, 2e4, 6e4);
++        rush += (goal - rush) * (1 - Math.exp(-dt / 0.12));      // smoothing that does not depend on the frame rate
+       }
+-      prevH = h; prevT = nowMs;
+-      haze = cloudsOn ? Math.exp(-0.5 * Math.pow(Math.log(Math.max(h, 1) / 6000) / 0.55, 2)) : 0;
+-    } else { rush = 0; haze = 0; prevH = 0; }
++      prevA = agl; prevT = nowMs;
++      const x = Math.log(agl / 3000) / 0.33;
++      haze = cloudsOn ? 0.5 * Math.exp(-0.5 * x * x) * ramp(agl, 900, 1500) : 0;
++      cloudZoom = Math.min(4, Math.max(0.25, Math.pow(agl / 3000, 1.2)));   // the haze pattern opens up as it is crossed
++    } else { rush = 0; haze = 0; prevA = 0; }
+     rushFx.enabled = rush > 0.02 || haze > 0.02;
+   });
+ 
+@@ -1129,13 +1135,16 @@
+   glowFx.enabled = false;
+   scene.postProcessStages.add(glowFx);
+   // Dive finish (last stage): radial blur towards the screen centre, strength `rush`, and a cloud haze of strength `haze`.
++  // Linear sampling and taps whose weight falls off along the line, so a short blur never shows separate copies.
+   const rushFx = new C.PostProcessStage({
+     name: 'nour_rush',
+-    uniforms: { rush: () => rush, haze: () => haze, seed: () => (performance.now() % 100000) / 1000 },
++    sampleMode: C.PostProcessStageSampleMode.LINEAR,
++    uniforms: { rush: () => rush, haze: () => haze, cloudZoom: () => cloudZoom, seed: () => (performance.now() % 100000) / 1000 },
+     fragmentShader: `
+       uniform sampler2D colorTexture;
+       uniform float rush;
+       uniform float haze;
++      uniform float cloudZoom;
+       uniform float seed;
+       in vec2 v_textureCoordinates;
+       float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+@@ -1147,11 +1156,20 @@
+       void main() {
+         vec2 uv = v_textureCoordinates;
+         vec2 toCentre = uv - 0.5;
+-        vec3 sum = vec3(0.0);
+-        for (int i = 0; i < 12; i++) sum += texture(colorTexture, uv - toCentre * (rush * 0.10 * float(i) / 11.0)).rgb;
+-        vec3 color = sum / 12.0;
++        vec3 color = texture(colorTexture, uv).rgb;
++        if (rush > 0.0) {
++          vec3 sum = color;
++          float wsum = 1.0;
++          for (int i = 1; i < 10; i++) {
++            float f = float(i) / 9.0;
++            float w = 1.0 - 0.7 * f;
++            sum += texture(colorTexture, uv - toCentre * (rush * 0.10 * f)).rgb * w;
++            wsum += w;
++          }
++          color = sum / wsum;
++        }
+         if (haze > 0.0) {
+-          vec2 q = uv * vec2(2.2, 3.4) + toCentre * 1.5 + seed * 0.25;
++          vec2 q = toCentre * vec2(czm_viewport.z / czm_viewport.w, 1.0) * 6.0 * cloudZoom + vec2(3.1, 1.7) + seed * 0.05;
+           float n = 0.55 * noise(q) + 0.3 * noise(q * 2.1 + 7.0) + 0.15 * noise(q * 4.3 + 3.0);
+           vec3 fog = vec3(0.60, 0.64, 0.70) * (0.55 + 0.6 * n);
+           color = mix(color, fog, clamp(haze * (0.55 + 0.4 * n), 0.0, 0.92));
+@@ -1336,6 +1354,17 @@
+     return slerpUnit(p1, p2, q, out);
+   }
+   const lerpAngle = (a, b, t) => a + C.Math.negativePiToPi(b - a) * t;
++  // Dive descent law F(t), 0 → 1, applied to the logarithm of the height above the ground: the rate (e-folds per
++  // second) ramps up over the first 12 % of the time, holds (about 1.2 e-folds/s, 1.7 imagery levels/s for 13 s),
++  // then slows from 52 % on and is nearly zero in the last second, so tile levels change slowly near the ground and
++  // the last frames are still. Tabulated once.
++  const DIVE_F = (() => {
++    const N = 512, f = new Float64Array(N + 1), F = new Float64Array(N + 1);
++    for (let i = 0; i <= N; i++) f[i] = smooth(0, 0.12, i / N) * Math.pow(1 - smooth(0.52, 1, i / N), 0.8);
++    for (let i = 1; i <= N; i++) F[i] = F[i - 1] + (f[i] + f[i - 1]) / 2;
++    for (let i = 0; i <= N; i++) F[i] /= F[N];
++    return (t) => { const x = C.Math.clamp(t, 0, 1) * N, i = Math.min(N - 1, Math.floor(x)); return F[i] + (F[i + 1] - F[i]) * (x - i); };
++  })();
+   const ellipsoid = C.Ellipsoid.WGS84;
+   function unitOf(carto) { return C.Cartesian3.normalize(C.Cartesian3.fromRadians(carto.longitude, carto.latitude, 0), new C.Cartesian3()); }
+   function cartoOfUnit(u, height) {
+@@ -1350,7 +1379,9 @@
+   function releaseLookAt() { camera.lookAtTransform(C.Matrix4.IDENTITY); }
+ 
+   function cancelFlight() {
+-    if (!flight) return;
++    const f = flight;
++    endDive(false);            // a touch or another flight ends a dive: no blur, haze or prefetch left behind
++    if (!f) return;
+     flight = null;
+     ctl.enableInputs = true;
+     setPhase(activePlace ? 'Survol libre' : 'Exploration libre');
+@@ -1363,7 +1394,8 @@
+    */
+   function startFlight(target, view, opts) {
+     stopOrbit(); releaseLookAt(); flight = null;
+-    diving = !!(opts && opts.dive);     // the dive drives its own speed blur and cloud haze
++    const dive = !!(opts && opts.dive), apex = !!(opts && opts.apex);
++    diving = dive;                      // the dive drives its own speed blur and cloud haze
+     const startCarto = camera.positionCartographic.clone();
+     const startHeading = camera.heading, startPitch = camera.pitch, startRoll = C.Math.negativePiToPi(camera.roll);
+ 
+@@ -1389,9 +1421,13 @@
+     const hEnd = Math.max(endCarto.height, 50);
+     const hPeak = Math.max(h0, hEnd, C.Math.clamp(arcMeters * 0.6, 0, 9.0e6));
+     const L0 = Math.log(h0), Lf = Math.log(hEnd), Lp = Math.log(hPeak);
+-    // A dive (straight down from space) descends the whole time instead of holding at the top first.
+-    const altitudeAt = diving
+-      ? (s) => Math.exp(L0 + (Lf - L0) * Math.pow(s, 1.35))
++    // A dive (straight down from space) follows DIVE_F in the log of the height above the target's ground, so the
++    // apparent speed is the same over a mountain town as over the sea. A climb to an apex (`apex`, the first leg of
++    // the dive) rises the whole time and slows into the top instead of holding there.
++    const ground = ellipsoid.cartesianToCartographic(target).height || 0;
++    const A0 = Math.log(Math.max(h0 - ground, 50)), Af = Math.log(Math.max(hEnd - ground, 50));
++    const altitudeAt = dive ? (s) => ground + Math.exp(A0 + (Af - A0) * DIVE_F(s))
++      : apex ? (s) => Math.exp(L0 + (Lf - L0) * s)
+       : (s) => Math.exp(L0 + (Lp - L0) * smooth(0.0, 0.35, s) + (Lf - Lp) * smooth(0.4, 1.0, s));
+ 
+     // Pitch: tilt down towards nadir during the climb, then open up to the
+@@ -1399,7 +1435,7 @@
+     // bound the tilt rate whatever the altitude change.
+     const NADIR = D2R(-89.5);
+     const climbing = hPeak > h0 * 1.5;
+-    const pitchAt = diving ? (s) => C.Math.lerp(startPitch, NADIR, smooth(0, 0.12, s)) : (s) => {
++    const pitchAt = dive ? (s) => C.Math.lerp(startPitch, NADIR, smooth(0, 0.12, s)) : (s) => {
+       const up = climbing ? C.Math.lerp(startPitch, NADIR, smooth(0, 0.45, s)) : startPitch;
+       const down = C.Math.lerp(NADIR, P, smooth(0.5, 1.0, s));
+       return C.Math.lerp(up, down, smooth(0.3, 0.5, s));
+@@ -1450,7 +1486,7 @@
+       t0, duration, onDone: opts && opts.onDone,
+       step(now) {
+         const t = C.Math.clamp((now - t0) / duration, 0, 1);
+-        const s = reduced ? t : easeInOutSine(t);
++        const s = reduced || dive ? t : easeInOutSine(t);     // DIVE_F has its own ease in and out
+ 
+         const q = qForDistance(lookup(progress, s) * trackLen[N]);
+         const g = bezierUnit(uStart, uCtrl, uEnd, q, tmp.b);
+@@ -1463,7 +1499,8 @@
+         // Heading: on long flights settle to north while in orbit, then turn
+         // to the arrival heading over the whole descent.
+         const toNorth = longHaul ? smooth(0, 0.4, s) : 0;
+-        hpr.heading = diving ? lerpAngle(startHeading, H, smooth(0, 1, s))   // a slow turn all the way down
++        // The dive turns with the zoom (same share of the turn per e-fold), so the turn eases out with the descent.
++        hpr.heading = dive ? lerpAngle(startHeading, H, DIVE_F(s))
+           : lerpAngle(lerpAngle(startHeading, 0, toNorth), H, smooth(longHaul ? 0.35 : 0.05, 0.98, s));
+         hpr.pitch = pitchAt(s);
+         hpr.roll = startRoll * (1 - smooth(0, 0.2, s));
+@@ -1477,6 +1514,23 @@
+     ctl.enableInputs = false;
+   }
+ 
++  // End of a dive: the camera holds still until every visible tile is loaded (6 calm frames in a row), for at most
++  // `maxMs`, so the card comes up over a sharp picture. A touch ends the wait early (`onCancel`).
++  function startSettle(maxMs, onDone) {
++    stopOrbit(); flight = null;
++    const t0 = performance.now();
++    let calm = 0;
++    flight = {
++      onDone, onCancel: onDone,
++      step(now) {
++        const loaded = googleOn && googleReady && googleTileset ? googleTileset.tilesLoaded : globe.tilesLoaded;
++        calm = loaded ? calm + 1 : 0;
++        return calm >= 6 || now - t0 >= maxMs;
++      },
++    };
++    ctl.enableInputs = false;
++  }
++
+   function startOrbit(target) {
+     if (prefersReduced.matches) return;
+     // Express the current pose as heading/pitch/range so lookAt starts exactly here.
+@@ -1492,7 +1546,7 @@
+   // Cancel automated motion as soon as the visitor takes the controls.
+   ['pointerdown', 'wheel', 'touchstart'].forEach((ev) => {
+     canvas.addEventListener(ev, () => {
+-      if (flight) { cancelFlight(); }
++      if (flight) { const f = flight; cancelFlight(); if (f.onCancel) f.onCancel(); }
+       if (orbit) { stopOrbit(); }
+     }, { passive: true });
+   });
+@@ -1607,12 +1661,18 @@
+     if (p) (nightView ? flyToPlace(p) : flyToNight(p));
+   });
+ 
+-  // Dive: the whole way down from space with the camera straight down, through the clouds, ending around 300 m up,
+-  // with the speed blur of a free fall (see the "nour_rush" stage). Satellite imagery cannot show passers-by, so the
+-  // card says what the last frame can and cannot show.
++  // Dive: a climb to a straight-down view from space, then the whole way down with the camera straight down, through
++  // the clouds, ending around 300 m up, with a light speed blur in the fast part (see the "nour_rush" stage) and a
++  // short settle while the last tiles come in. Satellite imagery cannot show passers-by, so the card says what the
++  // last frame can and cannot show.
+   let diveView = false;      // the dive card is showing
+-  let diving = false;        // a dive is under way
+-  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000 };
++  let diving = false;        // the descent is under way (blur and haze)
++  let diveSeq = false;       // a dive is under way, from the click to the card (no quality step-down meanwhile)
++  let diveStage = null;      // 'ascent' | 'descent' | 'settle' | 'done' (for tests)
++  let diveGround = 0;        // ground height under the dive target, m
++  // duration: the descent (tests shorten it); climb: the first leg; turn: heading at the end, degrees; settle: the
++  // longest wait for tiles at the end; prefetch: the most Esri tiles requested ahead.
++  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 2500, prefetch: 120 };
+   function setDiveButton() {
+     $('card-dive').textContent = diveView ? '↺ Retour de jour' : '↓ Plonger';
+     $('card-dive').title = diveView ? 'Revenir au lieu, de jour' : 'Plonger depuis l’espace jusqu’au lieu';
+@@ -1627,6 +1687,126 @@
+     $('card-meta').textContent = `Imagerie : Esri, Maxar, Earthstar Geographics · heure solaire ≈ ${String(Math.floor(p.solarHour)).padStart(2, '0')}h${String(Math.round((p.solarHour % 1) * 60)).padStart(2, '0')}`;
+     revealCard();
+   }
++  // ---------- Dive prefetch ----------
++  // While the camera climbs, the Esri tiles the descent will need under the target (level 8 down to the level of the
++  // final view, nearest the target first, at most DIVE.prefetch tiles, 6 at a time) are requested and kept decoded in
++  // a Map. Cesium's own request for the same x/y/level is then answered from that Map through a wrapper of the
++  // provider's requestImage, so the tile is never fetched twice. What is left is dropped when the dive ends; a
++  // cancelled dive also cancels the requests in flight. Tiles Cesium still holds are not asked for again.
++  const satProvider = satellite.imageryProvider;
++  const satRequestImage = satProvider.requestImage.bind(satProvider);
++  const prefetched = new Map();          // "level/x/y" → Promise<image>
++  const prefetchStats = { planned: 0, requested: 0, loaded: 0, failed: 0, served: 0 };
++  let prefetchJob = null;
++  satProvider.requestImage = (x, y, level, request) => {
++    const key = `${level}/${x}/${y}`;
++    const hit = prefetched.get(key);
++    if (!hit) return satRequestImage(x, y, level, request);
++    prefetched.delete(key); prefetchStats.served++;
++    // Should that prefetch fail or be cancelled after all, the tile is fetched the usual way.
++    return hit.catch(() => satRequestImage(x, y, level, request) || Promise.reject(new Error('tile')));
++  };
++  // Imagery Cesium already has for this tile (states 2-4: received, texture loaded, ready). Private cache of the pinned
++  // version; if it changes, everything is simply prefetched.
++  function satHas(x, y, level) {
++    try { const im = satellite._imageryCache[JSON.stringify([x, y, level])]; return !!im && im.state >= 2 && im.state <= 4; }
++    catch (e) { return false; }
++  }
++  // Which tiles: for heights from 2 500 km down to the end of the dive, the terrain level Cesium refines to under the
++  // camera (it splits a tile while geometricError · screen height in CSS px / (distance · 2·tan(fovy/2)) exceeds
++  // maximumScreenSpaceError), the imagery level it drapes on it (texel ≈ the terrain tile's error), and the imagery
++  // tiles covering the terrain tiles under the screen footprint, turned as the dive turns.
++  function planDivePrefetch(p, cap) {
++    const ts = satProvider.tilingScheme, tt = globe.terrainProvider.tilingScheme;
++    const target = C.Cartographic.fromDegrees(p.lon, p.lat);
++    const w = canvas.clientWidth || 400, hgt = canvas.clientHeight || 800, aspect = w / hgt;
++    const fov = camera.frustum.fov || D2R(60);
++    const tanY = aspect <= 1 ? Math.tan(fov / 2) : Math.tan(fov / 2) / aspect, tanX = tanY * aspect;
++    const K = hgt / (2 * tanY), sse = globe.maximumScreenSpaceError;
++    const e0 = globe.terrainProvider.getLevelMaximumGeometricError(0);
++    const R = ellipsoid.maximumRadius, cosLat = Math.cos(target.latitude);
++    const texel0 = R * ts.rectangle.width * cosLat / (satProvider.tileWidth * ts.getNumberOfXTilesAtLevel(0));
++    const top = Math.log(DIVE.startRange), end = Math.log(DIVE.endRange);
++    const cand = new Map();
++    const corner = new C.Cartographic();
++    for (let la = Math.log(2.5e6); ; la -= 0.07) {
++      const a = Math.exp(Math.max(la, end));
++      const L = Math.max(0, Math.ceil(Math.log2(e0 * K / (a * sse))));
++      const level = Math.min(satProvider.maximumLevel, Math.round(Math.log2(texel0 * 2 ** L / e0)));
++      if (level >= 8) {
++        const turn = D2R(DIVE.turn) * C.Math.clamp((top - Math.log(a)) / (top - end), 0, 1);
++        const hx = a * tanX, hy = a * tanY;
++        const ex = (Math.abs(hx * Math.cos(turn)) + Math.abs(hy * Math.sin(turn))) / (R * cosLat);
++        const ey = (Math.abs(hx * Math.sin(turn)) + Math.abs(hy * Math.cos(turn))) / R;
++        const nw = tt.positionToTileXY(C.Cartographic.fromRadians(target.longitude - ex, target.latitude + ey, 0, corner), L);
++        const se = tt.positionToTileXY(C.Cartographic.fromRadians(target.longitude + ex, target.latitude - ey, 0, corner), L);
++        if (nw && se) {
++          const r0 = tt.tileXYToRectangle(nw.x, nw.y, L), r1 = tt.tileXYToRectangle(se.x, se.y, L), eps = 1e-9;
++          const i0 = ts.positionToTileXY(C.Cartographic.fromRadians(r0.west + eps, r0.north - eps, 0, corner), level);
++          const i1 = ts.positionToTileXY(C.Cartographic.fromRadians(r1.east - eps, r1.south + eps, 0, corner), level);
++          if (i0 && i1) {
++            for (let x = i0.x; x <= i1.x; x++) for (let y = i0.y; y <= i1.y; y++) {
++              const key = `${level}/${x}/${y}`;
++              if (cand.has(key)) continue;
++              const r = ts.tileXYToRectangle(x, y, level);
++              const d = Math.hypot(((r.west + r.east) / 2 - target.longitude) / r.width, ((r.north + r.south) / 2 - target.latitude) / r.height);
++              cand.set(key, { key, x, y, level, d });
++            }
++          }
++        }
++      }
++      if (la <= end) break;
++    }
++    const all = [...cand.values()].filter((c) => !satHas(c.x, c.y, c.level)).sort((a, b) => a.d - b.d);
++    const deepest = all.reduce((m, c) => Math.max(m, c.level), 0);
++    const pick = new Map();
++    const take = (c) => { if (pick.size < cap) pick.set(c.key, c); };
++    all.filter((c) => c.d <= 0.75).forEach(take);               // every level: the tiles at the target
++    all.filter((c) => c.level >= deepest - 1).forEach(take);    // the final view and the level before it
++    all.forEach(take);                                          // then outwards, all levels
++    prefetchStats.planned = pick.size;
++    return [...pick.values()].sort((a, b) => a.level - b.level || a.d - b.d);   // in the order the descent needs them
++  }
++  function prefetchStart(list) {
++    prefetchStop(true);
++    Object.assign(prefetchStats, { requested: 0, loaded: 0, failed: 0, served: 0 });
++    const job = prefetchJob = { list, i: 0, active: new Set(), stopped: false };
++    const pump = () => {
++      while (!job.stopped && job.active.size < 6 && job.i < job.list.length) {
++        const { key, x, y, level } = job.list[job.i++];
++        if (prefetched.has(key)) continue;
++        const request = new C.Request({ throttle: false, throttleByServer: false, type: C.RequestType.IMAGERY });
++        const loading = satRequestImage(x, y, level, request);
++        if (!loading) continue;
++        prefetchStats.requested++;
++        job.active.add(request);
++        const done = loading.then((img) => { prefetchStats.loaded++; return img; });
++        prefetched.set(key, done);
++        done.catch(() => { prefetchStats.failed++; if (prefetched.get(key) === done) prefetched.delete(key); })
++          .finally(() => { job.active.delete(request); pump(); });
++      }
++    };
++    pump();
++  }
++  // cancelActive: also cancel the requests in flight (the dive was abandoned). Otherwise they finish (Cesium may be
++  // waiting for some of them) and only the unused tiles are dropped.
++  function prefetchStop(cancelActive) {
++    if (prefetchJob) {
++      prefetchJob.stopped = true;
++      if (cancelActive) prefetchJob.active.forEach((r) => r.cancel());
++      prefetchJob = null;
++    }
++    for (const pending of prefetched.values()) pending.then((img) => { if (img && img.close) img.close(); }, () => {});
++    prefetched.clear();
++  }
++  // Ends a dive, finished (card shown) or not (touch, another flight): no blur or haze, no prefetch left, and the
++  // frame-rate watch resumes after a warm-up.
++  function endDive(finished) {
++    if (diveSeq) { slowWindows = 0; warmUntil = performance.now() + 5000; }
++    diving = false; diveSeq = false; diveStage = finished ? 'done' : null;
++    prefetchStop(!finished);
++  }
++
+   async function flyToDive(p) {
+     const token = ++flightToken;
+     hideCard(); stopOrbit(); cancelFlight();
+@@ -1636,17 +1816,29 @@
+     const target = C.Cartesian3.fromDegrees(p.lon, p.lat, groundHeight);
+     placeClouds(p, groundHeight);
+     nightClock = false;
++    diveSeq = true; diveStage = 'ascent'; diveGround = groundHeight;
++    if (satellite.show && !(googleOn && googleReady)) prefetchStart(planDivePrefetch(p, DIVE.prefetch));
+     const time = veille.live ? undefined : timeForSolarHour(p.lon, p.solarHour);
+-    // Leg 1: up to a straight-down view over the place where the Earth fills the frame. Leg 2: the dive.
++    const phaseAt = (agl) => (agl > 1.2e5 ? 'Orbite' : agl > 1500 && agl < 7000 && cloudsOn ? 'Traversée des nuages' : 'Plongée');
++    // Leg 1: a climb that slows into a straight-down view over the place where the Earth fills the frame. Leg 2 starts
++    // at once from that apex: the descent, then the settle while the last tiles come in, then the card.
+     startFlight(target, { heading: 0, pitch: -90, range: DIVE.startRange }, {
+-      duration: camera.positionCartographic.height > 5e6 ? 3500 : 6500, time,
++      apex: true, duration: camera.positionCartographic.height > 5e6 ? 3000 : DIVE.climb, time,
+       onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : 'Montée en orbite'),
+       onDone: () => {
+         if (token !== flightToken) return;
+-        startFlight(target, { heading: 110, pitch: -90, range: DIVE.endRange }, {
++        diveStage = 'descent';
++        startFlight(target, { heading: DIVE.turn, pitch: -90, range: DIVE.endRange }, {
+           dive: true, duration: DIVE.duration,
+-          onProgress: (s, h) => setPhase(h > 1.2e5 ? 'Orbite' : h > 1.5e4 ? 'Traversée des nuages' : 'Plongée'),
+-          onDone: () => { diving = false; setPhase('Vue du dessus'); showDiveCard(p, groundHeight); },
++          onProgress: (s, h) => setPhase(phaseAt(h - groundHeight)),
++          onDone: () => {
++            diving = false; diveStage = 'settle';
++            setPhase('Mise au point');
++            startSettle(prefersReduced.matches ? 1200 : DIVE.settle, () => {
++              if (token !== flightToken) return;
++              endDive(true); setPhase('Vue du dessus'); showDiveCard(p, groundHeight);
++            });
++          },
+         });
+       },
+     });
+@@ -1713,7 +1905,8 @@
+     });
+   }
+ 
+-  function setPhase(t) { $('hud-phase').textContent = t; }
++  let phaseText = null;      // written only when it changes: flights call this on every frame
++  function setPhase(t) { if (t !== phaseText) { phaseText = t; $('hud-phase').textContent = t; } }
+ 
+   $('btn-orbit').addEventListener('click', returnToOrbit);
+   $('btn-labels').addEventListener('click', (e) => {
+@@ -1788,7 +1981,8 @@
+       const fps = frames * 1000 / (now - fpsT);
+       frames = 0; fpsT = now;
+       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
+-      slowWindows = (now > warmUntil && fps < 24 && !capturing) ? slowWindows + 1 : 0;
++      // Nor a dive: it loads tiles at every level on purpose (endDive gives a warm-up afterwards).
++      slowWindows = (now > warmUntil && fps < 24 && !capturing && !diveSeq) ? slowWindows + 1 : 0;
+       const i = TIER_ORDER.indexOf(tierName);
+       if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
+     }
+@@ -2878,7 +3072,7 @@
+   });
+ 
+   // Exposed for automated tests only.
+-  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
++  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+ })();
+ </script>
+ </body>
