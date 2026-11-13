@@ -100,7 +100,7 @@
     color: var(--ink-2); opacity: .62; transition: opacity .3s, color .3s; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
   .place span { font: 400 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
-  .place small { font: 400 10.5px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .place small { font: 400 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .place:hover { opacity: 1; }
   .place[aria-current="true"] { opacity: 1; color: var(--ink); }
   .place[aria-current="true"] span { border-bottom-color: var(--accent); }
@@ -118,12 +118,18 @@
     text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75), 0 0 3px rgba(0, 0, 0, 0.85);   /* the second one holds small text over bright ground */
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
+  /* A soft dark veil behind the text: the place card sits over bright ground (sand, cities, snow). */
+  .card { isolation: isolate; }
+  .card::before {
+    content: ''; position: absolute; z-index: -1; inset: -26px calc(-1 * var(--gutter)) -18px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(4, 6, 11, 0), rgba(4, 6, 11, 0.7) 22%, rgba(4, 6, 11, 0.7) 78%, rgba(4, 6, 11, 0));
+  }
   .card h2 { margin: 8px 0 8px; font: 300 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
   .card .kicker { color: var(--ink-2); }
-  .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
+  .card .coords { font: 400 12px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
   .card p { margin: 14px 0 0; max-width: 54ch; font: 400 16px/1.6 var(--font-ui); color: var(--ink-2); }
-  .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
-  .card .meta { margin-top: 10px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
+  .card .more { display: none; margin-top: 4px; padding: 15px 0; line-height: 14px; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
+  .card .meta { margin-top: 10px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
   .chip {
     display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px;
@@ -188,7 +194,7 @@
   }
   .quality button[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
   .quality button:disabled { opacity: .4; cursor: not-allowed; }
-  #credits { margin-top: 14px; font: 400 11px/1.7 var(--font-mono); color: var(--muted); }
+  #credits { margin-top: 14px; font: 400 12px/1.7 var(--font-mono); color: var(--muted); }
   #credits a { color: var(--ink-2); }
 
   /* Generic controls inside sheets */
@@ -239,7 +245,7 @@
   .watch #eonet-pick a { color: var(--accent); }
   .watch .legend { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; font: 400 10.5px var(--font-mono); color: var(--muted); }
   .watch .legend .ramp { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(70, 255, 150, 0.12), rgba(70, 255, 150, 1)); }
-  .card .weather { margin-top: 8px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
+  .card .weather { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
   .card .weather:empty { display: none; }
   .card .weather .w-note { color: var(--muted); }
   /* Phones: one line (now, sky, wind) on the folded card; sunrise, sunset and the source once it is expanded. */
@@ -265,13 +271,15 @@
   }
   .tile video, .tile img.logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tile img.logo { object-fit: contain; padding: 22%; opacity: .9; }
-  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 300 26px var(--font-ui); color: var(--ink-2); }
+  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 8px; font: 300 20px var(--font-ui); color: var(--ink-2); white-space: nowrap; overflow: hidden; }
+  .tile.named .initials { display: flex; align-items: center; justify-content: center; padding: 26px 6px 8px; font: 500 12px/1.3 var(--font-ui); color: var(--ink); text-align: center; white-space: normal; overflow-wrap: anywhere; }
+  .tile.named .name, .tile.has-logo .initials { display: none; }
   .tile .name {
     position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 7px 6px; font: 500 10.5px/1.25 var(--font-ui);
     background: linear-gradient(transparent, rgba(4, 6, 11, 0.85)); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   }
   .tile .badge {
-    position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 999px; font: 500 8.5px var(--font-mono); letter-spacing: .12em;
+    position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 999px; font: 500 10.5px var(--font-mono); letter-spacing: .12em;
     text-transform: uppercase; background: rgba(4, 6, 11, 0.6); color: var(--muted);
   }
   .tile.on .badge { color: #FF6B6B; }
@@ -305,7 +313,7 @@
   .tile.cam .badge { max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
   .tile.cam .name { display: grid; gap: 2px; }
   .tile.cam .name .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .tile.cam .name .p { font: 400 8.5px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.cam .name .p { font: 400 10px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile.cam.open { border-color: var(--accent); }
   .tile.cam.live .badge::before { content: '● '; color: #FF6B6B; }
   .cam-stage iframe, .cam-stage img { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #000; object-fit: cover; }
@@ -366,7 +374,7 @@
   .cine.paused .cine-quit { opacity: 1; }
   .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
   .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 300 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
-  .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
+  .cine-coords { font: 400 12px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
   body.cine-on .ui { visibility: hidden; }
   /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
   body.cine-on #credit-line, body.cine-on #cesium-credits { visibility: visible; z-index: 31; pointer-events: none; }
@@ -380,7 +388,7 @@
   .timebar[hidden] { display: none; }
   .tb-time { display: grid; gap: 2px; min-width: 0; }
   .tb-time b { font: 400 18px/1.1 var(--font-mono); letter-spacing: .04em; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 10px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .timebar input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; cursor: pointer; }
   /* The track reads as a day: night at both ends, local solar noon in the middle. */
   .timebar input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
@@ -426,12 +434,12 @@
   .epic-info .status { margin: 4px 0; }
   .epic-date { margin: 0; font: 400 18px/1.4 var(--font-ui); color: var(--ink); }
   .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
-  .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .epic-mono { font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
   .epic-nav .round { width: 44px; padding: 0; font-size: 20px; }
   .epic-nav .round:disabled { opacity: .3; cursor: default; border-color: var(--line); color: var(--ink); }
   .epic-count { min-width: 60px; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--ink-2); }
-  .epic-credit { margin: 12px 0 0; font: 400 10.5px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
+  .epic-credit { margin: 12px 0 0; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
   @media (max-width: 760px) {
     .timebar {
       bottom: calc(var(--safe-b) + 88px); grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "time close" "range range";
@@ -439,7 +447,7 @@
     }
     .tb-time { grid-area: time; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
     .tb-time small { max-width: none; }
-    .timebar input[type="range"] { grid-area: range; height: 36px; }
+    .timebar input[type="range"] { grid-area: range; height: 44px; }
     .timebar .close { grid-area: close; }
     body.time-open .card { visibility: hidden; }     /* the bottom of a phone screen is for the bar and the places */
     .epic-head h3 { font-size: 22px; }
@@ -483,7 +491,7 @@
   }
   .loader.journey .intro-caption::before {
     content: ''; position: absolute; z-index: -1; inset: -28px calc(-1 * var(--gutter)) -22px;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.84), rgba(0, 0, 0, 0.68) 62%, rgba(0, 0, 0, 0.3));
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent); mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent);
   }
   .loader.journey .intro-caption.show { opacity: 1; }
@@ -492,7 +500,7 @@
   .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
     display: block; position: absolute; left: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0; max-width: none;
-    font: 400 10px var(--font-mono); letter-spacing: .08em; color: var(--muted);
+    font: 400 12px/1.5 var(--font-mono); letter-spacing: .08em; color: var(--muted); text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
   }
   .loader.journey .intro-skip:not([hidden]) {
     display: inline-flex; align-items: center; position: absolute; top: calc(var(--safe-t) + var(--gutter)); right: var(--gutter);
@@ -4014,16 +4022,18 @@
   // ----- Tiles: small squares with a logo (or initials), a name and a badge -----
   const okImage = (u) => typeof u === 'string' && u.startsWith('https://');
   const initials = (name) => name.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '·';
-  function makeTile(name, logo, badge, label) {
+  // big: a channel or station shows its name in the middle of the square (no glyph); without a logo the name strip is hidden.
+  function makeTile(name, logo, badge, label, big = false) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-label', label);
-    const ini = document.createElement('span'); ini.className = 'initials'; ini.textContent = initials(name); ini.setAttribute('aria-hidden', 'true');
+    const ini = document.createElement('span'); ini.className = 'initials'; ini.textContent = big ? name : initials(name); ini.setAttribute('aria-hidden', 'true');
+    if (big) b.classList.add(okImage(logo) ? 'has-logo' : 'named');
     b.append(ini);
     if (okImage(logo)) {
       const img = document.createElement('img');
       img.className = 'logo'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
       img.addEventListener('load', () => ini.remove(), { once: true });
-      img.addEventListener('error', () => img.remove(), { once: true });
+      img.addEventListener('error', () => { img.remove(); if (big) { b.classList.remove('has-logo'); b.classList.add('named'); } }, { once: true });
       img.src = logo; b.append(img);
     }
     const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = badge;
@@ -4198,7 +4208,7 @@
     return stations;
   }
   function stationTile(st, statusId) {
-    const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`);
+    const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`, true);
     tile.addEventListener('click', () => {
       if (tile.classList.contains('playing')) { stopMedia(); say(statusId, 'Radio arrêtée.'); }
       else playMedia('radio', st, statusId, tile);
@@ -4246,7 +4256,7 @@
     stopPreviews(); onScreen.clear();
     if (previewObserver) previewObserver.disconnect();
     fillList($('tv-list'), channels, (c) => {
-      const tile = makeTile(c.label, c.logo, 'Direct', `${c.label}${c.group ? ` (${c.group})` : ''} : regarder en grand avec le son`);
+      const tile = makeTile(c.label, c.logo, 'Direct', `${c.label}${c.group ? ` (${c.group})` : ''} : regarder en grand avec le son`, true);
       tile._channel = { name: c.label, url: c.url, hls: c.hls };
       tile.addEventListener('click', () => playMedia('tv', tile._channel, 'tv-status', tile));
       if (previewObserver) previewObserver.observe(tile);
@@ -5251,7 +5261,7 @@
     function renderTime(minutes, ref) {
       $('tb-clock').textContent = hhmm(minutes);
       $('tb-where').textContent = timeLocked ? 'le vol règle l’heure…'
-        : `heure solaire · ${ref.label} · ${C.JulianDate.toDate(clock.currentTime).toISOString().slice(11, 16)} UTC`;
+        : `heure solaire · ${ref.label}`;
       timeRange.setAttribute('aria-valuetext', `${hhmm(minutes).replace(':', ' h ')}, heure solaire ${ref.at}`);
     }
     function syncTime() {
