@@ -471,7 +471,12 @@
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
-    opacity: 0; transition: opacity .5s ease; pointer-events: none; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+    opacity: 0; transition: opacity .5s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+  }
+  .loader.journey .intro-caption::before {
+    content: ''; position: absolute; z-index: -1; inset: -28px calc(-1 * var(--gutter)) -22px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0));
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent); mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent);
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
@@ -542,6 +547,7 @@
   .osint .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
   .osint .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
   .readout { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 10px 0; font: 400 12.5px/1.45 var(--font-mono); }
+  .readout[hidden], .osint .row[hidden] { display: none; }
   .readout dt { color: var(--muted); letter-spacing: .06em; }
   .readout dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
   .readout-text { margin: 8px 0; font: 400 12.5px/1.6 var(--font-mono); color: var(--ink); white-space: pre-line; }
@@ -643,7 +649,7 @@
     <div class="group">
       <div class="kicker">Enquête</div>
       <div class="grid2">
-        <button class="opt" id="btn-osint" type="button" aria-pressed="false" aria-controls="osint"><b>Outils d’enquête</b><small>coordonnées, mesures, soleil, images datées, journal</small></button>
+        <button class="opt" id="btn-osint" style="grid-column: 1 / -1" type="button" aria-pressed="false" aria-controls="osint"><b>Outils d’enquête</b><small>coordonnées, mesures, soleil, images datées, journal</small></button>
       </div>
     </div>
     <div class="group">
@@ -1311,7 +1317,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.2';
+  const NOUR_BUILD = '2026-11-13.3';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -2442,7 +2448,7 @@
   let diveGround = 0;        // ground height under the dive target, m
   // duration: the descent (tests shorten it); climb: the first leg; turn: heading at the end, degrees; settle: the
   // longest wait for tiles at the end; prefetch: the most Esri tiles requested ahead.
-  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 2500, prefetch: 120 };
+  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 4000, prefetch: 120 };
   function setDiveButton() {
     $('card-dive').textContent = diveView ? '↺ Retour de jour' : '↓ Plonger';
     $('card-dive').title = diveView ? 'Revenir au lieu, de jour' : 'Plonger depuis l’espace jusqu’au lieu';
@@ -2657,11 +2663,16 @@
         setPhase(h > 1.2e5 ? 'Orbite' : h > 1.2e4 ? 'Traversée de l\'atmosphère' : 'Approche');
       },
       onDone: () => {
-        setPhase('Arrivée');
-        showCard(p, groundHeight);
-        startOrbit(target);
-        recordVisit(p);
-        setHash(p.id);
+        // Hold still until the ground tiles are in, so the card never comes up over a blurred picture.
+        setPhase('Mise au point');
+        startSettle(prefersReduced.matches || (opts && opts.tour) ? 1200 : DIVE.settle, () => {
+          if (token !== flightToken) return;
+          setPhase('Arrivée');
+          showCard(p, groundHeight);
+          startOrbit(target);
+          recordVisit(p);
+          setHash(p.id);
+        });
       },
     });
   }
@@ -3473,8 +3484,7 @@
       if (token === weatherToken) paintWeather(w);
     }).catch(() => {
       if (token !== weatherToken) return;
-      const note = document.createElement('span'); note.className = 'w-note'; note.textContent = 'Météo du moment indisponible.';
-      el.replaceChildren(note);
+      el.replaceChildren();
     });
   }
   // The weather belongs to the place card that asked for it: when the card goes away (a flight, a night or dive view),
@@ -4117,7 +4127,7 @@
       try { text = await fetchText(`https://iptv-org.github.io/iptv/countries/${code}.m3u`, 12000); break; } catch (e) { /* try the next spelling */ }
     }
     if (token !== tvToken) return;
-    if (text === null) { say('tv-status', `${nameFr(cc)} : aucune playlist disponible (ou service injoignable).`); return; }
+    if (text === null) { say('tv-status', `Pas de chaîne pour ${nameFr(cc)} en ce moment : la liste est vide ou le service ne répond pas. Choisis un autre pays ou réessaie plus tard.`); return; }
     // iptv-org names carry tags such as "(720p)", "[Geo-blocked]" or "[Not 24/7]": geo-blocked channels go last.
     const channels = parseM3u(text)
       .filter((c) => c.name && !c.needsHeaders && okStream(c.url) && !/xxx|adult|porn/i.test(`${c.group} ${c.name}`))
