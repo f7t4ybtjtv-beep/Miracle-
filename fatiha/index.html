@@ -58,8 +58,8 @@
   }
   .top > * { pointer-events: auto; }
   .brand { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
-  .brand h1 { margin: 0; font: 300 15px/1 var(--font-ui); letter-spacing: .52em; text-transform: uppercase; color: var(--ink); }
-  .brand .tag { display: block; margin-top: 9px; font: 300 13px var(--font-ui); letter-spacing: .1em; color: var(--ink-2); }
+  .brand h1 { margin: 0; font: 400 15px/1 var(--font-ui); letter-spacing: .52em; text-transform: uppercase; color: var(--ink); }
+  .brand .tag { display: block; margin-top: 9px; font: 400 13px var(--font-ui); letter-spacing: .1em; color: var(--ink-2); }
   .hud {
     margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
     font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
@@ -99,7 +99,7 @@
     display: grid; gap: 5px; min-height: 48px; padding: 6px 0; background: none; border: 0; cursor: pointer; text-align: left;
     color: var(--ink-2); opacity: .62; transition: opacity .3s, color .3s; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
-  .place span { font: 300 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+  .place span { font: 400 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
   .place small { font: 400 10.5px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
   .place:hover { opacity: 1; }
   .place[aria-current="true"] { opacity: 1; color: var(--ink); }
@@ -118,10 +118,10 @@
     text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75), 0 0 3px rgba(0, 0, 0, 0.85);   /* the second one holds small text over bright ground */
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
-  .card h2 { margin: 8px 0 8px; font: 200 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
+  .card h2 { margin: 8px 0 8px; font: 300 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
   .card .kicker { color: var(--ink-2); }
   .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
-  .card p { margin: 14px 0 0; max-width: 54ch; font: 300 16px/1.6 var(--font-ui); color: var(--ink-2); }
+  .card p { margin: 14px 0 0; max-width: 54ch; font: 400 16px/1.6 var(--font-ui); color: var(--ink-2); }
   .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
   .card .meta { margin-top: 10px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
@@ -162,7 +162,7 @@
   .sheet.open { display: block; animation: sheet-in .35s ease; }
   @keyframes sheet-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
   .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .sheet h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); letter-spacing: .01em; }
+  .sheet h3 { margin: 6px 0 0; font: 300 26px/1.1 var(--font-ui); letter-spacing: .01em; }
   .close {
     flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: transparent;
     color: var(--ink); cursor: pointer; font-size: 16px;
@@ -257,7 +257,7 @@
   }
   .tile video, .tile img.logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tile img.logo { object-fit: contain; padding: 22%; opacity: .9; }
-  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 200 26px var(--font-ui); color: var(--ink-2); }
+  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 300 26px var(--font-ui); color: var(--ink-2); }
   .tile .name {
     position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 7px 6px; font: 500 10.5px/1.25 var(--font-ui);
     background: linear-gradient(transparent, rgba(4, 6, 11, 0.85)); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
@@ -357,7 +357,7 @@
   .cine.paused .cine-btns { pointer-events: auto; }
   .cine.paused .cine-quit { opacity: 1; }
   .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
-  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 200 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
+  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 300 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
   .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
   body.cine-on .ui { visibility: hidden; }
   /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
@@ -405,7 +405,7 @@
   }
   .epic[hidden] { display: none; }
   .epic-head { width: min(760px, 100%); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .epic-head h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); }
+  .epic-head h3 { margin: 6px 0 0; font: 300 26px/1.1 var(--font-ui); }
   .epic-photo { margin: 0; width: 100%; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
   /* The photo is square with the disc on black: fade the corners into the backdrop. */
   .epic-photo img {
@@ -416,7 +416,7 @@
   .epic-photo img.loading { opacity: .35; }
   .epic-info { width: min(640px, 100%); text-align: center; }
   .epic-info .status { margin: 4px 0; }
-  .epic-date { margin: 0; font: 300 18px/1.4 var(--font-ui); color: var(--ink); }
+  .epic-date { margin: 0; font: 400 18px/1.4 var(--font-ui); color: var(--ink); }
   .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
   .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
@@ -448,9 +448,9 @@
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
-  .loader h2 { margin: 18px 0 0; font: 200 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
-  .loader .tagline { margin: 18px 0 30px; font: 300 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
-  .loader p { margin: 0 auto; max-width: 48ch; font: 300 15px/1.7 var(--font-ui); color: var(--ink-2); }
+  .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
+  .loader .tagline { margin: 18px 0 30px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
   .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
   .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
@@ -475,7 +475,7 @@
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
-  .intro-name { margin: 8px 0 10px; font: 200 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
+  .intro-name { margin: 8px 0 10px; font: 300 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
   .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
     display: block; position: absolute; left: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0; max-width: none;
@@ -1147,7 +1147,7 @@
   }
   // Built one at a time between frames, in the order they are needed, so no single frame waits for all of them.
   const queue = [...BODIES, EARTH];
-  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 768 : 512)); setTimeout(build, 30); })();
+  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 1024 : 768)); setTimeout(build, 30); })();
 
   // ----- Timeline (seconds of animation time; the clock stops while the page is hidden or blocked) -----
   const START = 1.6, STAGGER = 2.1, PASS = 4.0, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.0;
@@ -1156,7 +1156,7 @@
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
   function resize() {
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(3, window.devicePixelRatio || 1);
     W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
   }
@@ -1311,7 +1311,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.1';
+  const NOUR_BUILD = '2026-11-13.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
