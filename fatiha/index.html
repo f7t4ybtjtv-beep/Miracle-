@@ -58,8 +58,8 @@
   }
   .top > * { pointer-events: auto; }
   .brand { text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7); }
-  .brand h1 { margin: 0; font: 300 15px/1 var(--font-ui); letter-spacing: .52em; text-transform: uppercase; color: var(--ink); }
-  .brand .tag { display: block; margin-top: 9px; font: 300 13px var(--font-ui); letter-spacing: .1em; color: var(--ink-2); }
+  .brand h1 { margin: 0; font: 400 15px/1 var(--font-ui); letter-spacing: .52em; text-transform: uppercase; color: var(--ink); }
+  .brand .tag { display: block; margin-top: 9px; font: 400 13px var(--font-ui); letter-spacing: .1em; color: var(--ink-2); }
   .hud {
     margin-top: 16px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px;
     font: 400 11px/1.5 var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-2);
@@ -99,7 +99,7 @@
     display: grid; gap: 5px; min-height: 48px; padding: 6px 0; background: none; border: 0; cursor: pointer; text-align: left;
     color: var(--ink-2); opacity: .62; transition: opacity .3s, color .3s; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
-  .place span { font: 300 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
+  .place span { font: 400 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
   .place small { font: 400 10.5px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
   .place:hover { opacity: 1; }
   .place[aria-current="true"] { opacity: 1; color: var(--ink); }
@@ -118,10 +118,10 @@
     text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75), 0 0 3px rgba(0, 0, 0, 0.85);   /* the second one holds small text over bright ground */
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
-  .card h2 { margin: 8px 0 8px; font: 200 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
+  .card h2 { margin: 8px 0 8px; font: 300 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
   .card .kicker { color: var(--ink-2); }
   .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
-  .card p { margin: 14px 0 0; max-width: 54ch; font: 300 16px/1.6 var(--font-ui); color: var(--ink-2); }
+  .card p { margin: 14px 0 0; max-width: 54ch; font: 400 16px/1.6 var(--font-ui); color: var(--ink-2); }
   .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
   .card .meta { margin-top: 10px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
@@ -162,7 +162,7 @@
   .sheet.open { display: block; animation: sheet-in .35s ease; }
   @keyframes sheet-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
   .sheet-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .sheet h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); letter-spacing: .01em; }
+  .sheet h3 { margin: 6px 0 0; font: 300 26px/1.1 var(--font-ui); letter-spacing: .01em; }
   .close {
     flex: none; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); background: transparent;
     color: var(--ink); cursor: pointer; font-size: 16px;
@@ -198,6 +198,14 @@
   }
   .btn:hover { color: var(--ink); border-color: var(--line-2); }
   .btn[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+  .more-note summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; font: 400 12.5px var(--font-ui); color: var(--ink-2); }
+  .more-note summary::-webkit-details-marker { display: none; }
+  .more-note[open] summary { color: var(--ink); }
+  .more-note .note { margin-top: 0; }
+  .more-note ul { margin: 0 0 10px; padding-left: 18px; font: 400 12.5px/1.6 var(--font-ui); color: var(--ink-2); }
+  .more-note li { margin: 6px 0; }
+  .note.keys { display: none; }
+  @media (hover: hover) and (pointer: fine) { .note.keys { display: block; } }
   .status { margin: 10px 0; font: 400 11.5px/1.65 var(--font-mono); color: var(--ink-2); white-space: pre-line; }
   .note { margin: 10px 0; font: 400 11.5px/1.6 var(--font-ui); color: var(--muted); }
 
@@ -257,7 +265,7 @@
   }
   .tile video, .tile img.logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tile img.logo { object-fit: contain; padding: 22%; opacity: .9; }
-  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 200 26px var(--font-ui); color: var(--ink-2); }
+  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 300 26px var(--font-ui); color: var(--ink-2); }
   .tile .name {
     position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 7px 6px; font: 500 10.5px/1.25 var(--font-ui);
     background: linear-gradient(transparent, rgba(4, 6, 11, 0.85)); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
@@ -371,7 +379,7 @@
   .cine.paused .cine-btns { pointer-events: auto; }
   .cine.paused .cine-quit { opacity: 1; }
   .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
-  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 200 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
+  .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 300 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
   .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
   body.cine-on .ui { visibility: hidden; }
   /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
@@ -419,7 +427,7 @@
   }
   .epic[hidden] { display: none; }
   .epic-head { width: min(760px, 100%); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .epic-head h3 { margin: 6px 0 0; font: 200 26px/1.1 var(--font-ui); }
+  .epic-head h3 { margin: 6px 0 0; font: 300 26px/1.1 var(--font-ui); }
   .epic-photo { margin: 0; width: 100%; min-height: 0; display: grid; place-items: center; touch-action: pan-y; }
   /* The photo is square with the disc on black: fade the corners into the backdrop. */
   .epic-photo img {
@@ -430,7 +438,7 @@
   .epic-photo img.loading { opacity: .35; }
   .epic-info { width: min(640px, 100%); text-align: center; }
   .epic-info .status { margin: 4px 0; }
-  .epic-date { margin: 0; font: 300 18px/1.4 var(--font-ui); color: var(--ink); }
+  .epic-date { margin: 0; font: 400 18px/1.4 var(--font-ui); color: var(--ink); }
   .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
   .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
@@ -462,9 +470,9 @@
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
-  .loader h2 { margin: 18px 0 0; font: 200 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
-  .loader .tagline { margin: 18px 0 30px; font: 300 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
-  .loader p { margin: 0 auto; max-width: 48ch; font: 300 15px/1.7 var(--font-ui); color: var(--ink-2); }
+  .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
+  .loader .tagline { margin: 18px 0 30px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
   .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
   .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
@@ -476,7 +484,7 @@
   .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
-  #intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+  #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
   .loader.journey { background: #000; }
   .loader.journey #intro-canvas { display: block; }
@@ -485,22 +493,33 @@
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
-    opacity: 0; transition: opacity .5s ease; pointer-events: none; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+    opacity: 0; transition: opacity .5s ease; pointer-events: none; isolation: isolate;
+    /* Neptune (and each later disc) crosses this block. The scrim plus a tight halo keep the step line readable. */
+    text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 18px rgba(0, 0, 0, 0.95), 0 2px 22px rgba(0, 0, 0, 0.9);
+  }
+  .loader.journey .intro-caption::before {
+    content: ''; position: absolute; z-index: -1; inset: -36px calc(-1 * var(--gutter)) -28px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.72) 48%, rgba(0, 0, 0, 0.28) 78%, rgba(0, 0, 0, 0));
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 84%, transparent); mask-image: linear-gradient(180deg, transparent, #000 18%, #000 84%, transparent);
   }
   .loader.journey .intro-caption.show { opacity: 1; }
-  .intro-caption .kicker { color: var(--ink-2); }
-  .intro-name { margin: 8px 0 10px; font: 200 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
+  .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
+  .intro-name { margin: 8px 0 10px; font: 300 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
   .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
     display: block; position: absolute; left: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0; max-width: none;
     font: 400 10px var(--font-mono); letter-spacing: .08em; color: var(--muted);
   }
   .loader.journey .intro-skip:not([hidden]) {
-    display: inline-flex; align-items: center; position: absolute; top: calc(var(--safe-t) + var(--gutter)); right: var(--gutter);
-    height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.45);
+    display: inline-flex; align-items: center; position: absolute; z-index: 6; pointer-events: auto;
+    /* One row under Orbite/Menu (44px). Same corner, but the rectangles do not meet. */
+    top: calc(var(--safe-t) + var(--gutter) + 56px); right: var(--gutter);
+    height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.72);
     color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .08em; cursor: pointer;
   }
   .loader.journey .intro-skip:hover { border-color: var(--accent); color: var(--accent); }
+  /* The veil covers this corner until it has finished fading. Tools must not take Passer's tap. */
+  body:not(.veil-gone) .ui.top .tools { pointer-events: none; }
 
   /* Wide screens */
   @media (min-width: 900px) {
@@ -556,6 +575,7 @@
   .osint .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
   .osint .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
   .readout { display: grid; grid-template-columns: max-content 1fr; gap: 6px 12px; margin: 10px 0; font: 400 12.5px/1.45 var(--font-mono); }
+  .readout[hidden], .osint .row[hidden] { display: none; }
   .readout dt { color: var(--muted); letter-spacing: .06em; }
   .readout dd { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
   .readout-text { margin: 8px 0; font: 400 12.5px/1.6 var(--font-mono); color: var(--ink); white-space: pre-line; }
@@ -624,6 +644,7 @@
       <div class="hud" aria-live="off">
         <span class="phase" id="hud-phase">Orbite</span>
         <span>Alt. <b id="hud-alt">—</b></span>
+        <span>Cap <b id="hud-cap">—</b></span>
         <span class="aux"><b id="hud-pos">—</b></span>
         <span class="aux" id="hud-quality"></span>
         <span class="sit-only"><b id="hud-utc">—</b></span>
@@ -657,7 +678,7 @@
     <div class="group">
       <div class="kicker">Enquête</div>
       <div class="grid2">
-        <button class="opt" id="btn-osint" type="button" aria-pressed="false" aria-controls="osint"><b>Outils d’enquête</b><small>coordonnées, mesures, soleil, images datées, journal</small></button>
+        <button class="opt" id="btn-osint" style="grid-column: 1 / -1" type="button" aria-pressed="false" aria-controls="osint"><b>Outils d’enquête</b><small>coordonnées, mesures, soleil, images datées, journal</small></button>
       </div>
     </div>
     <div class="group">
@@ -666,6 +687,8 @@
         <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les treize lieux, comme un film</small></button>
         <button class="opt" id="btn-time" type="button" aria-pressed="false" aria-controls="timebar"><b>Curseur du temps</b><small>fais tourner le soleil sur 24 heures</small></button>
         <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
+        <button class="opt" id="btn-random" type="button"><b>Lieu au hasard</b><small>un lieu que tu n’as pas encore vu</small></button>
+        <button class="opt" id="btn-full" type="button" aria-pressed="false" hidden><b>Plein écran</b><small>cache les barres du navigateur</small></button>
         <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
       </div>
     </div>
@@ -678,6 +701,13 @@
         <button class="opt" id="btn-google" type="button" aria-pressed="false" hidden><b>Google 3D</b><small>villes photoréalistes</small></button>
         <button class="opt" id="btn-soundtrack" type="button" aria-pressed="false"><b>Bande-son</b><small>musique générée, suit l’altitude</small></button>
       </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Carnet de voyage</div>
+      <p class="status" id="carnet" aria-live="polite"></p>
+      <div class="quality"><button type="button" id="btn-carnet-clear">Effacer le carnet</button></div>
+      <p class="note">Le carnet reste dans ce navigateur. Distances : lignes géodésiques entre les lieux, dans l’ordre de tes visites (pas des trajets réels).</p>
+      <p class="note keys">Clavier : ← → lieu précédent ou suivant · P plonger · N nuit · O orbite · H lieu au hasard · M menu.</p>
     </div>
     <div class="group">
       <div class="kicker">Qualité d’image</div>
@@ -795,7 +825,7 @@
       </div>
       <p class="status" id="tv-status" aria-live="polite"></p>
       <ul class="tiles" id="tv-list"></ul>
-      <p class="note">Les carrés montrent le direct sans le son, en basse définition, et seulement ceux qui sont à l’écran. Touche un carré pour l’agrandir avec le son. Playlists communautaires iptv-org : chaînes gratuites en accès libre ; beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+      <details class="more-note"><summary>Comment ça marche ›</summary><p class="note">Les carrés montrent le direct sans le son, en basse définition, et seulement ceux qui sont à l’écran. Touche un carré pour l’agrandir avec le son. Playlists communautaires iptv-org : chaînes gratuites en accès libre ; beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p></details>
     </section>
     <section class="pane" id="pane-radio">
       <audio id="radio-audio" controls preload="none"></audio>
@@ -960,6 +990,16 @@
       <p class="note">Le journal reste dans ce navigateur seulement. Rien n’est envoyé. Exportez-le pour le garder ou le partager.</p>
     </section>
     <p class="note">Ces outils travaillent sur des lieux et des données publiques. Ils ne cherchent ni ne suivent aucune personne.</p>
+    <details class="more-note" id="missing-help">
+      <summary>Une personne a disparu : que faire ›</summary>
+      <ul>
+        <li><b>Appelle tout de suite</b> la police ou la gendarmerie : le 17 en France, le 112 partout en Europe. N’attends pas.</li>
+        <li><b>Un enfant ou un adolescent</b> : sa disparition est toujours traitée comme inquiétante, même une fugue. Le 116 000 (gratuit, numéro européen des enfants disparus) écoute et conseille les familles ; il ne remplace pas le signalement à la police.</li>
+        <li><b>Un adulte</b> : une enquête est ouverte si la disparition est jugée inquiétante (personne vulnérable, absence inhabituelle de nouvelles, danger). Un proche ou l’employeur peut la demander.</li>
+        <li><b>Prépare</b> une photo récente, la description des vêtements, le dernier lieu et la dernière heure connus, le numéro de téléphone de la personne.</li>
+      </ul>
+      <p class="note">Ce site ne fait aucune reconnaissance de visages et ne cherche personne sur des caméras : c’est interdit, cela se trompe et cela met des gens en danger. Retrouver une personne est le travail des enquêteurs. Les outils ci-dessus peuvent seulement aider à vérifier où et quand une photo de lieu a été prise. Sources : ministère de la Justice (justice.fr), association 116 000 Enfants Disparus.</p>
+    </details>
   </aside>
 
   <div class="split-handle" id="split-handle" role="slider" tabindex="0" aria-label="Rideau de comparaison : avant à gauche, après à droite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden><span aria-hidden="true">‹ ›</span></div>
@@ -1085,9 +1125,10 @@
       colour: bands(['#6f9fd6', '#7fb0e0', '#8cbbe6', '#79a9dc', '#6b9ad2'], 0.04, 3) },
     { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, tilt: 1.71, gas: true,
       colour: bands(['#a3dbe0', '#b2e5e7', '#b9e9ea', '#a8dfe2'], 0.02, 5) },
-    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, tilt: 0.47, gas: true, rings: true,
+    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, tilt: 0.47, gas: true, rings: true, moons: [[20.3, 0.043, 1]],   // Titan
       colour: bands(['#a8946a', '#d6c08e', '#e3d2a6', '#cdb680', '#dccb9c', '#c2aa78', '#b8a172'], 0.03, 7) },
     { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, tilt: 0.05, gas: true,
+      moons: [[5.9, 0.026, -1], [9.4, 0.022, 1], [15.0, 0.037, -1], [26.3, 0.034, 1]],   // Io, Europa, Ganymede, Callisto
       colour: (lat, lon) => {
         const c = jupiterBands(lat, lon), e = ((lon + 0.45) / 0.13) ** 2 + ((lat - 0.38) / 0.07) ** 2;   // the Great Red Spot, 22° south, about 16 000 km across
         return e < 1.6 ? mix(c, spot, 0.85 * (1 - smooth(0.4, 1.6, e))) : c;
@@ -1129,27 +1170,36 @@
     }
     g.putImageData(img, 0, 0);
     if (!spec.rings) return { image: disc, k: mid / R };
-    const ring = document.createElement('canvas'); ring.width = ring.height = N;
-    const r = ring.getContext('2d');
-    [[1.24, 1.53, 'rgba(150,135,105,0.32)'], [1.53, 1.95, 'rgba(222,203,160,0.92)'], [2.03, 2.27, 'rgba(196,178,140,0.78)']].forEach(([a, b, fill]) => {
-      r.beginPath();
-      r.ellipse(mid, mid, b * R, b * R * 0.34, spec.tilt, 0, 2 * Math.PI);
-      r.ellipse(mid, mid, a * R, a * R * 0.34, spec.tilt, 0, 2 * Math.PI);
-      r.fillStyle = fill; r.fill('evenodd');
-    });
+    // Rings, pixel by pixel: fine ringlets, and the planet's shadow falling across the far side. A ring point is in
+    // shadow when it lies behind the planet as seen from the Sun and within one radius of the Sun–planet line.
+    const RINGS = [[1.24, 1.53, [150, 135, 105], 0.32], [1.53, 1.95, [222, 203, 160], 0.92], [2.03, 2.27, [196, 178, 140], 0.78]];
+    const OPEN = 0.34, DEPTH = Math.sqrt(1 - OPEN * OPEN) / OPEN;
+    const far = g.createImageData(N, N), near = g.createImageData(N, N);
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+      const sx = x + 0.5 - mid, sy = y + 0.5 - mid, u = sx * ct + sy * st, v = sy * ct - sx * st;
+      const rho = Math.hypot(u, v / OPEN) / R;
+      if (rho < 1.24 || rho > 2.27) continue;
+      const band = RINGS.find((q) => rho >= q[0] && rho <= q[1]);
+      if (!band) continue;
+      const z = v * DEPTH, along = sx * LIGHT[0] + sy * LIGHT[1] + z * LIGHT[2];
+      const off = (sx * sx + sy * sy + z * z - along * along) / (R * R);      // squared distance to the Sun–planet line
+      const shadow = along < 0 ? 0.08 + 0.92 * smooth(0.9, 1.1, off) : 1;
+      const edge = Math.min(1, (rho - band[0]) * R * 0.8, (band[1] - rho) * R * 0.8);
+      const k = (0.74 + 0.5 * vnoise(rho * 85, 0.5, 61)) * shadow, d = (v > 0 ? near : far).data, i = (y * N + x) * 4;
+      d[i] = band[2][0] * k; d[i + 1] = band[2][1] * k; d[i + 2] = band[2][2] * k;
+      d[i + 3] = 255 * band[3] * Math.max(0, edge) * (0.8 + 0.2 * vnoise(rho * 240, 1.5, 63));
+    }
     const out = document.createElement('canvas'); out.width = out.height = N;
-    const o = out.getContext('2d');
-    const half = (upper) => {            // the far half of the rings goes behind the planet, the near half in front
-      o.save(); o.translate(mid, mid); o.rotate(spec.tilt);
-      o.beginPath(); o.rect(-N, upper ? -N : 0, 2 * N, N); o.clip();
-      o.rotate(-spec.tilt); o.translate(-mid, -mid); o.drawImage(ring, 0, 0); o.restore();
-    };
-    half(true); o.drawImage(disc, 0, 0); half(false);
+    const o = out.getContext('2d'), layer = document.createElement('canvas'); layer.width = layer.height = N;
+    const lg = layer.getContext('2d');
+    lg.putImageData(far, 0, 0); o.drawImage(layer, 0, 0);          // the far half goes behind the planet
+    o.drawImage(disc, 0, 0);
+    lg.putImageData(near, 0, 0); o.drawImage(layer, 0, 0);         // the near half passes in front
     return { image: out, k: mid / R };
   }
   // Built one at a time between frames, in the order they are needed, so no single frame waits for all of them.
   const queue = [...BODIES, EARTH];
-  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : 512); setTimeout(build, 30); })();
+  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 1024 : 768)); setTimeout(build, 30); })();
 
   // ----- Timeline (seconds of animation time; the clock stops while the page is hidden or blocked) -----
   const START = 1.6, STAGGER = 2.1, PASS = 4.0, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.0;
@@ -1158,7 +1208,7 @@
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
   function resize() {
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    dpr = Math.min(3, window.devicePixelRatio || 1);
     W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
   }
@@ -1168,7 +1218,8 @@
     shown = key;
     caption.classList.toggle('show', !!b);
     if (!b) return;
-    kicker.textContent = b.kind; nameEl.textContent = b.name;
+    const step = b === EARTH ? BODIES.length + 1 : BODIES.indexOf(b) + 1;
+    kicker.textContent = `${String(step).padStart(2, '0')} / ${String(BODIES.length + 1).padStart(2, '0')}\n${b.kind}`; nameEl.textContent = b.name;
     factEl.textContent = waiting ? `${b.fact}\nle globe se prépare…` : b.fact;
   }
   function frame(now) {
@@ -1179,14 +1230,15 @@
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
     const cx = W / 2, cy = H / 2, span = Math.max(W, H) * 0.6;
     // Stars streaming out of the point we fly towards.
-    ctx.fillStyle = '#F4F6FA';
+    ctx.strokeStyle = '#F4F6FA'; ctx.lineCap = 'round';
     for (const s of stars) {
       s.z -= dt * 0.085;
       if (s.z < 0.05) s.z += 0.95;
       const x = cx + s.x / s.z * span * 0.5, y = cy + s.y / s.z * span * 0.5, near = 1 - s.z;
       if (x < 0 || x > W || y < 0 || y > H) continue;
       ctx.globalAlpha = Math.min(1, near * 1.4) * 0.85;
-      const d = 0.5 + near * 1.3; ctx.fillRect(x, y, d, d);
+      const d = 0.5 + near * 1.3, zb = s.z * 1.035;      // a short streak back along its path
+      ctx.lineWidth = d; ctx.beginPath(); ctx.moveTo(cx + s.x / zb * span * 0.5, cy + s.y / zb * span * 0.5); ctx.lineTo(x, y); ctx.stroke();
     }
     // The Earth, last and straight ahead: it ends at the size of the globe in the first Cesium view (seen from
     // 110 000 km, field of view 60° on the long side), so the picture and the real globe can cross-fade.
@@ -1207,6 +1259,13 @@
       const x = cx + side * 1.75 * r * Math.cos(slope), y = cy + 1.75 * r * Math.sin(slope) + r * 0.12;
       ctx.globalAlpha = Math.min(1, u / 0.06, (1 - u) / 0.1);
       ctx.drawImage(b.sprite.image, x - r * b.sprite.k, y - r * b.sprite.k, 2 * r * b.sprite.k, 2 * r * b.sprite.k);
+      // Large moons, at their real distances and sizes in planet radii, along the equator.
+      ctx.fillStyle = '#CFC8BD';
+      for (const [dist, size, way] of b.moons || []) {
+        const mx = x + way * dist * r * Math.cos(b.tilt), my = y + way * dist * r * Math.sin(b.tilt), mr = Math.max(0.7, size * r);
+        if (mx < -mr || mx > W + mr || my < -mr || my > H + mr) continue;
+        ctx.beginPath(); ctx.arc(mx, my, mr, 0, 2 * Math.PI); ctx.fill();
+      }
       if (u > 0.2 && u < 0.72) current = b;
     }
     ctx.globalAlpha = 1;
@@ -1304,7 +1363,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-12.4';
+  const NOUR_BUILD = '2026-11-13.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1343,7 +1402,7 @@
     ultra:    { label: 'Ultra · HDR 5K', sse: 0.7, dpr: 3, msaa: 1, clouds: 48, shadows: true, ultra: true },
     high:     { label: 'Haute',     sse: 1.0, dpr: 3, msaa: 4, clouds: 48, shadows: true  },
     balanced: { label: 'Équilibrée', sse: 1.4, dpr: 3, msaa: 2, clouds: 28, shadows: false },
-    light:    { label: 'Légère',    sse: 3.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
+    light:    { label: 'Légère',    sse: 2.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
   };
   const TIER_ORDER = ['high', 'balanced', 'light'];
   // Long side of the Ultra buffer: 5120 px, capped by the GPU, and by 4096 px on phones and tablets, whose
@@ -2280,6 +2339,14 @@
 
   // End of a dive: the camera holds still until every visible tile is loaded (6 calm frames in a row), for at most
   // `maxMs`, so the card comes up over a sharp picture. A touch ends the wait early (`onCancel`).
+  // "Sharp" means: no tile on screen is still waiting for its terrain or imagery. globe.tilesLoaded also waits for
+  // the low-priority queue (ancestors and siblings preloaded off screen), which never empties while the camera moves.
+  // The two queues are private fields of the pinned Cesium version: fall back on tilesLoaded if they are missing.
+  function groundSharp() {
+    if (googleOn && googleReady && googleTileset) return googleTileset.tilesLoaded;
+    const sf = globe._surface, hi = sf && sf._tileLoadQueueHigh, med = sf && sf._tileLoadQueueMedium;
+    return hi && med ? hi.length + med.length === 0 : globe.tilesLoaded;
+  }
   function startSettle(maxMs, onDone) {
     stopOrbit(); flight = null;
     const t0 = performance.now();
@@ -2287,8 +2354,7 @@
     flight = {
       onDone, onCancel: onDone,
       step(now) {
-        const loaded = googleOn && googleReady && googleTileset ? googleTileset.tilesLoaded : globe.tilesLoaded;
-        calm = loaded ? calm + 1 : 0;
+        calm = groundSharp() ? calm + 1 : 0;
         return calm >= 6 || now - t0 >= maxMs;
       },
     };
@@ -2361,7 +2427,9 @@
       + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
     $('card-text').textContent = p.text;
     const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
-    $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
+    const from = PLACES.find((x) => x.id === route[route.length - 1]);
+    const leg = from && from.id !== p.id ? GEO.inverse(from.lat, from.lon, p.lat, p.lon) : null;
+    $('card-meta').textContent = `${leg ? `à ${Math.round(leg.s / 1000).toLocaleString('fr-FR')} km de ${from.name} · ` : ''}${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
     revealCard();
@@ -2435,7 +2503,7 @@
   let diveGround = 0;        // ground height under the dive target, m
   // duration: the descent (tests shorten it); climb: the first leg; turn: heading at the end, degrees; settle: the
   // longest wait for tiles at the end; prefetch: the most Esri tiles requested ahead.
-  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 2500, prefetch: 120 };
+  const DIVE = { startRange: 2.2e7, endRange: 320, duration: 13000, climb: 4500, turn: 40, settle: 4000, prefetch: 120 };
   function setDiveButton() {
     $('card-dive').textContent = diveView ? '↺ Retour de jour' : '↓ Plonger';
     $('card-dive').title = diveView ? 'Revenir au lieu, de jour' : 'Plonger depuis l’espace jusqu’au lieu';
@@ -2650,11 +2718,16 @@
         setPhase(h > 1.2e5 ? 'Orbite' : h > 1.2e4 ? 'Traversée de l\'atmosphère' : 'Approche');
       },
       onDone: () => {
-        setPhase('Arrivée');
-        showCard(p, groundHeight);
-        startOrbit(target);
-        recordVisit(p);
-        setHash(p.id);
+        // Hold still until the ground tiles are in, so the card never comes up over a blurred picture.
+        setPhase('Mise au point');
+        startSettle(prefersReduced.matches || (opts && opts.tour) ? 1200 : 7000, () => {
+          if (token !== flightToken) return;
+          setPhase('Arrivée');
+          showCard(p, groundHeight);
+          startOrbit(target);
+          recordVisit(p);
+          setHash(p.id);
+        });
       },
     });
   }
@@ -2709,11 +2782,77 @@
     const prevId = route[route.length - 1];
     const btn = list.querySelector(`.place[data-id="${p.id}"]`);
     if (btn) btn.dataset.visited = '';
-    if (prevId === p.id) return;
+    if (prevId === p.id) { carnetAdd(p, null); return; }
     route.push(p.id);
     const prev = prevId && PLACES.find((x) => x.id === prevId);
     if (prev) addArc(prev, p);
+    carnetAdd(p, prev || null);
   }
+  // Travel log: places seen and the geodesic length of the legs flown, kept in this browser only.
+  const CARNET_KEY = 'nour.carnet';
+  const carnet = { seen: [], km: 0 };
+  try {
+    const saved = JSON.parse(localStorage.getItem(CARNET_KEY) || 'null');
+    if (saved && Array.isArray(saved.seen) && Number.isFinite(saved.km) && saved.km >= 0) {
+      carnet.seen = saved.seen.filter((id) => PLACES.some((x) => x.id === id)); carnet.km = saved.km;
+    }
+  } catch (e) { /* storage blocked or unreadable: start an empty log */ }
+  function paintCarnet() {
+    const n = carnet.seen.length;
+    $('carnet').textContent = n ? `${n} / ${PLACES.length} lieux vus · ${Math.round(carnet.km).toLocaleString('fr-FR')} km parcourus`
+      : `Aucun lieu vu pour l’instant (${PLACES.length} à découvrir).`;
+    $('btn-carnet-clear').disabled = !n;
+    carnet.seen.forEach((id) => { const b = list.querySelector(`.place[data-id="${id}"]`); if (b) b.dataset.visited = ''; });
+  }
+  function carnetAdd(p, prev) {
+    if (!carnet.seen.includes(p.id)) carnet.seen.push(p.id);
+    const leg = prev ? GEO.inverse(prev.lat, prev.lon, p.lat, p.lon) : null;
+    if (leg) carnet.km += leg.s / 1000;
+    try { localStorage.setItem(CARNET_KEY, JSON.stringify(carnet)); } catch (e) { /* this visit only */ }
+    paintCarnet();
+  }
+  $('btn-carnet-clear').addEventListener('click', () => {
+    carnet.seen = []; carnet.km = 0;
+    try { localStorage.removeItem(CARNET_KEY); } catch (e) { /* nothing stored */ }
+    list.querySelectorAll('.place[data-visited]').forEach((b) => delete b.dataset.visited);
+    paintCarnet();
+  });
+  paintCarnet();
+  // A place not seen yet, or any other place once all are seen.
+  function randomPlace() {
+    const others = PLACES.filter((x) => x !== activePlace);
+    const fresh = others.filter((x) => !carnet.seen.includes(x.id));
+    const pool = fresh.length ? fresh : others;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  $('btn-random').addEventListener('click', () => { setMenuOpen(false); flyToPlace(randomPlace()); });
+  // Full screen: only where the browser offers it for a page (not Safari on iPhone).
+  const fullBtn = $('btn-full'), fullRoot = document.documentElement;
+  if (fullRoot.requestFullscreen && document.fullscreenEnabled) {
+    fullBtn.hidden = false;
+    fullBtn.addEventListener('click', () => {
+      (document.fullscreenElement ? document.exitFullscreen() : fullRoot.requestFullscreen()).catch(() => {});
+    });
+    document.addEventListener('fullscreenchange', () => fullBtn.setAttribute('aria-pressed', String(!!document.fullscreenElement)));
+  }
+  // Keyboard: never while typing, with a modifier, during the opening, or with a panel open (M still toggles the menu).
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+    const t = e.target, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || (t && (t.isContentEditable || t.getAttribute('role') === 'slider'))) return;
+    if (!document.querySelector('.loader.done') || document.body.classList.contains('cine-on')) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === 'm') { $('btn-menu').click(); return; }
+    if (document.querySelector('.sheet.open')) return;
+    const shown = $('card').classList.contains('show');
+    if (k === 'ArrowRight' || k === 'ArrowLeft') {
+      const i = activePlace ? PLACES.indexOf(activePlace) : (k === 'ArrowRight' ? -1 : 0);
+      flyToPlace(PLACES[(i + (k === 'ArrowRight' ? 1 : -1) + PLACES.length) % PLACES.length]); e.preventDefault();
+    } else if (k === 'o') returnToOrbit();
+    else if (k === 'h') flyToPlace(randomPlace());
+    else if (k === 'p' && shown) $('card-dive').click();
+    else if (k === 'n' && shown && !$('card-night').hidden) $('card-night').click();
+  });
   function clearRoute() {
     route.length = 0; routeSource.entities.removeAll();
     list.querySelectorAll('.place[data-visited]').forEach((b) => delete b.dataset.visited);
@@ -2812,8 +2951,10 @@
       frames = 0; fpsT = now;
       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
       // Nor a dive: it loads tiles at every level on purpose (endDive gives a warm-up afterwards).
-      slowWindows = (now > warmUntil && fps < 24 && !capturing && !diveSeq) ? slowWindows + 1 : 0;
+      // The last step (light) costs sharpness (coarser ground, 2x pixels): only a really low frame rate takes it.
       const i = TIER_ORDER.indexOf(tierName);
+      const floor = TIER_ORDER[i + 1] === 'light' ? 15 : 24;
+      slowWindows = (now > warmUntil && fps < floor && !capturing && !diveSeq) ? slowWindows + 1 : 0;
       if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
     }
     if (now - hudT > 200) {
@@ -2823,6 +2964,8 @@
       const agl = g !== undefined ? c.height - g : c.height;
       $('hud-alt').textContent = fmtAlt(Math.max(agl, 0));
       $('hud-pos').textContent = fmtCoord(R2D(c.latitude), R2D(c.longitude));
+      const cap = ((Math.round(R2D(camera.heading)) % 360) + 360) % 360;
+      $('hud-cap').textContent = `${String(cap).padStart(3, '0')}° ${['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'][Math.round(cap / 45) % 8]}`;
       if (veille.sit) $('hud-utc').textContent = fmtUTC(new Date());
     }
   });
@@ -2838,7 +2981,7 @@
     'Enquête : images datées NASA GIBS (VIIRS, MODIS, Landsat et Sentinel-2 HLS, VIIRS Day/Night, inondations) · relief AWS Terrain Tiles · calculs WGS84 dans la page',
     'Météo des lieux : Open-Meteo · La Terre entière : NASA EPIC Team / DSCOVR',
     'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
-    'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, Western Wall Heritage Foundation, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · webcams publiques et carte : widgets Windy.com · bande-son générée dans le navigateur',
+    'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · webcams publiques et carte : widgets Windy.com · bande-son générée dans le navigateur',
     'Ouverture : planètes dessinées (illustrations, pas à l’échelle) · distances et diamètres : NASA, fiches planétaires',
     'Rendu : CesiumJS · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
@@ -3466,8 +3609,7 @@
       if (token === weatherToken) paintWeather(w);
     }).catch(() => {
       if (token !== weatherToken) return;
-      const note = document.createElement('span'); note.className = 'w-note'; note.textContent = 'Météo du moment indisponible.';
-      el.replaceChildren(note);
+      el.replaceChildren();
     });
   }
   // The weather belongs to the place card that asked for it: when the card goes away (a flight, a night or dive view),
@@ -4111,7 +4253,7 @@
       try { text = await fetchText(`https://iptv-org.github.io/iptv/countries/${code}.m3u`, 12000); break; } catch (e) { /* try the next spelling */ }
     }
     if (token !== tvToken) return;
-    if (text === null) { say('tv-status', `${nameFr(cc)} : aucune playlist disponible (ou service injoignable).`); return; }
+    if (text === null) { say('tv-status', `Pas de chaîne pour ${nameFr(cc)} en ce moment : la liste est vide ou le service ne répond pas. Choisis un autre pays ou réessaie plus tard.`); return; }
     // iptv-org names carry tags such as "(720p)", "[Geo-blocked]" or "[Not 24/7]": geo-blocked channels go last.
     const channels = parseM3u(text)
       .filter((c) => c.name && !c.needsHeaders && okStream(c.url) && !/xxx|adult|porn/i.test(`${c.group} ${c.name}`))
@@ -4139,7 +4281,8 @@
   const CITY_CAMS = [
     /*CITY_CAMS_START*/
     // Checked 9 Nov. 2026 (embeddable, live, plays in the embedded player; owner identified) and again on 10 Nov.
-    // (oEmbed answers with the owner's channel). Jerusalem has no country code, as in PLACES.
+    // (oEmbed answers with the owner's channel). 13 Nov.: all answer again except the Kotel plaza camera (oEmbed 403,
+    // embedding refused by its owner): removed. Jerusalem has no country code, as in PLACES.
     { id: 'ajaccio-1', city: 'Ajaccio', cc: 'FR', lat: 41.9192, lon: 8.7386, title: 'Ajaccio, golfe et port', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/effQzzJ6-1E?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=effQzzJ6-1E', thumb: 'https://i.ytimg.com/vi/effQzzJ6-1E/hqdefault.jpg' },
     { id: 'lehavre-port-1', city: 'Le Havre', cc: 'FR', lat: 49.487, lon: 0.1035, title: 'Port du Havre et MuMa', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/wHWL7lDnChY?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=wHWL7lDnChY', thumb: 'https://i.ytimg.com/vi/wHWL7lDnChY/hqdefault.jpg' },
     { id: 'toulouse-garonne-1', city: 'Toulouse', cc: 'FR', lat: 43.5996, lon: 1.4386, title: 'La Garonne à Toulouse', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/Reuz0dRsBk0?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=Reuz0dRsBk0', thumb: 'https://i.ytimg.com/vi/Reuz0dRsBk0/hqdefault.jpg' },
@@ -4151,7 +4294,6 @@
     { id: 'washington-whitehouse-1', city: 'Washington', cc: 'US', lat: 38.8977, lon: -77.0365, title: 'Maison-Blanche', provider: 'earthTV', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/5p_KGD4fJZs?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=5p_KGD4fJZs', thumb: 'https://i.ytimg.com/vi/5p_KGD4fJZs/hqdefault.jpg' },
     { id: 'paris-sacrecoeur', city: 'Paris', cc: 'FR', lat: 48.8867, lon: 2.3431, title: 'Sacré-Cœur de Montmartre', provider: 'PARIS TV', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/-xzg3wujOVM?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=-xzg3wujOVM', thumb: 'https://i.ytimg.com/vi/-xzg3wujOVM/hqdefault.jpg' },
     { id: 'jerusalem-kotel-earthcam', city: 'Jérusalem', cc: '', lat: 31.7767, lon: 35.2345, title: 'Mur occidental', provider: 'EarthCam', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/77akujLn4k8?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=77akujLn4k8', thumb: 'https://i.ytimg.com/vi/77akujLn4k8/hqdefault.jpg' },
-    { id: 'jerusalem-kotel-plaza', city: 'Jérusalem', cc: '', lat: 31.7765, lon: 35.2342, title: 'Grande place du Kotel', provider: 'Western Wall Heritage Foundation', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/LMHUcDktP-w?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=LMHUcDktP-w', thumb: 'https://i.ytimg.com/vi/LMHUcDktP-w/hqdefault.jpg' },
     { id: 'tokyo-shibuya-ann', city: 'Tokyo', cc: 'JP', lat: 35.6595, lon: 139.7005, title: 'Carrefour de Shibuya', provider: 'ANNnewsCH (TV Asahi)', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/5B4LmH4JbnY?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=5B4LmH4JbnY', thumb: 'https://i.ytimg.com/vi/5B4LmH4JbnY/hqdefault.jpg' },
     { id: 'tokyo-shibuya-fnn', city: 'Tokyo', cc: 'JP', lat: 35.6596, lon: 139.7004, title: 'Carrefour de Shibuya, autre vue', provider: 'FNN (Fuji TV)', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/dfVK7ld38Ys?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=dfVK7ld38Ys', thumb: 'https://i.ytimg.com/vi/dfVK7ld38Ys/hqdefault.jpg' },
     { id: 'vatican-media', city: 'Vatican', cc: 'VA', lat: 41.9022, lon: 12.4568, title: 'Place Saint-Pierre', provider: 'Vatican Media Live', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/03pYP2Nmreo?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=03pYP2Nmreo', thumb: 'https://i.ytimg.com/vi/03pYP2Nmreo/hqdefault.jpg' },
@@ -6595,6 +6737,10 @@
     if (loader.classList.contains('done')) return;
     loader.classList.add('done');
     loader.inert = true; loader.setAttribute('aria-hidden', 'true');   // faded out: no longer reachable by Tab
+    // Orbite/Menu stay inert until the veil has actually left (1.2 s fade; none with reduced motion).
+    const liftVeil = () => document.body.classList.add('veil-gone');
+    loader.addEventListener('transitionend', (e) => { if (e.propertyName === 'opacity') liftVeil(); }, { once: true });
+    setTimeout(liftVeil, 1400);
     // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
     const h = parseHash();
@@ -6617,7 +6763,7 @@
   });
 
   // Exposed for automated tests only.
-  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get route() { return route.slice(); }, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get route() { return route.slice(); }, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; }, get sharp() { return groundSharp(); } };
 })();
 </script>
 </body>

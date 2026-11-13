@@ -57,7 +57,17 @@ Le voyage n'est pas joué avec « mouvement réduit », sur un lien direct (`#to
 
 ### Fatiha : qualité d'image
 
-Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendu à 2× la résolution CSS) et ne baisse que si la fréquence d'images reste sous 24 i/s de façon prolongée, après un temps de chauffe. La version du site (`2026-11-12.4`) est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendue à la résolution réelle de l'écran, jusqu'à 3×) et ne baisse que si la fréquence d'images reste basse de façon prolongée, après un temps de chauffe. La version du site (`2026-11-13.2`) est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+
+Le mode automatique ne descend en « Légère » que si l'image reste sous 15 images par seconde (24 pour passer de « Haute » à « Équilibrée ») : ce dernier palier coûte de la netteté. À l'arrivée sur un lieu, la caméra attend (« Mise au point », 7 s au plus) que les images du sol visibles soient chargées avant d'afficher la fiche.
+
+### Fatiha : boussole, carnet de voyage, raccourcis
+
+- **Boussole** : la ligne d'état affiche le cap de la caméra (« Cap 336° NO »).
+- **Fiche** : distance géodésique (WGS84) depuis le lieu précédent, « à 229 km de Tolède ».
+- **Menu** : « Lieu au hasard » (un lieu pas encore vu), « Plein écran » (seulement si le navigateur le permet : pas Safari sur iPhone), « Carnet de voyage » (lieux vus et kilomètres parcourus, gardés dans ce navigateur sous `nour.carnet`, bouton « Effacer »).
+- **Clavier** (ordinateur) : ← → lieu précédent ou suivant, P plonger, N nuit, O orbite, H lieu au hasard, M menu. Inactif pendant la saisie, la visite cinéma ou quand un panneau est ouvert.
+- **Enquête** : un encadré « Une personne a disparu : que faire » donne les numéros officiels (17, 112, 116 000) en texte simple. Le site ne fait ni reconnaissance de visages ni recherche de personnes.
 
 ### Fatiha : veille mondiale (bouton « Veille »)
 
