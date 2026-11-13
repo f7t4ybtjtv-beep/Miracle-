@@ -198,6 +198,12 @@
   }
   .btn:hover { color: var(--ink); border-color: var(--line-2); }
   .btn[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+  .more-note summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; list-style: none; font: 400 12.5px var(--font-ui); color: var(--ink-2); }
+  .more-note summary::-webkit-details-marker { display: none; }
+  .more-note[open] summary { color: var(--ink); }
+  .more-note .note { margin-top: 0; }
+  .more-note ul { margin: 0 0 10px; padding-left: 18px; font: 400 12.5px/1.6 var(--font-ui); color: var(--ink-2); }
+  .more-note li { margin: 6px 0; }
   .note.keys { display: none; }
   @media (hover: hover) and (pointer: fine) { .note.keys { display: block; } }
   .status { margin: 10px 0; font: 400 11.5px/1.65 var(--font-mono); color: var(--ink-2); white-space: pre-line; }
@@ -799,7 +805,7 @@
       </div>
       <p class="status" id="tv-status" aria-live="polite"></p>
       <ul class="tiles" id="tv-list"></ul>
-      <p class="note">Les carrés montrent le direct sans le son, en basse définition, et seulement ceux qui sont à l’écran. Touche un carré pour l’agrandir avec le son. Playlists communautaires iptv-org : chaînes gratuites en accès libre ; beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p>
+      <details class="more-note"><summary>Comment ça marche ›</summary><p class="note">Les carrés montrent le direct sans le son, en basse définition, et seulement ceux qui sont à l’écran. Touche un carré pour l’agrandir avec le son. Playlists communautaires iptv-org : chaînes gratuites en accès libre ; beaucoup sont géobloquées ou hors ligne, et certaines dépendent d’un État : recoupe avec d’autres sources.</p></details>
     </section>
     <section class="pane" id="pane-radio">
       <audio id="radio-audio" controls preload="none"></audio>
@@ -966,6 +972,16 @@
       <p class="note">Le journal reste dans ce navigateur seulement. Rien n’est envoyé. Exportez-le pour le garder ou le partager.</p>
     </section>
     <p class="note">Ces outils travaillent sur des lieux et des données publiques. Ils ne cherchent ni ne suivent aucune personne.</p>
+    <details class="more-note" id="missing-help">
+      <summary>Une personne a disparu : que faire ›</summary>
+      <ul>
+        <li><b>Appelle tout de suite</b> la police ou la gendarmerie : le 17 en France, le 112 partout en Europe. N’attends pas.</li>
+        <li><b>Un enfant ou un adolescent</b> : sa disparition est toujours traitée comme inquiétante, même une fugue. Le 116 000 (gratuit, numéro européen des enfants disparus) écoute et conseille les familles ; il ne remplace pas le signalement à la police.</li>
+        <li><b>Un adulte</b> : une enquête est ouverte si la disparition est jugée inquiétante (personne vulnérable, absence inhabituelle de nouvelles, danger). Un proche ou l’employeur peut la demander.</li>
+        <li><b>Prépare</b> une photo récente, la description des vêtements, le dernier lieu et la dernière heure connus, le numéro de téléphone de la personne.</li>
+      </ul>
+      <p class="note">Ce site ne fait aucune reconnaissance de visages et ne cherche personne sur des caméras : c’est interdit, cela se trompe et cela met des gens en danger. Retrouver une personne est le travail des enquêteurs. Les outils ci-dessus peuvent seulement aider à vérifier où et quand une photo de lieu a été prise. Sources : ministère de la Justice (justice.fr), association 116 000 Enfants Disparus.</p>
+    </details>
   </aside>
 
   <div class="split-handle" id="split-handle" role="slider" tabindex="0" aria-label="Rideau de comparaison : avant à gauche, après à droite" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" hidden><span aria-hidden="true">‹ ›</span></div>
@@ -1329,7 +1345,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.4';
+  const NOUR_BUILD = '2026-11-13.5';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -2305,6 +2321,14 @@
 
   // End of a dive: the camera holds still until every visible tile is loaded (6 calm frames in a row), for at most
   // `maxMs`, so the card comes up over a sharp picture. A touch ends the wait early (`onCancel`).
+  // "Sharp" means: no tile on screen is still waiting for its terrain or imagery. globe.tilesLoaded also waits for
+  // the low-priority queue (ancestors and siblings preloaded off screen), which never empties while the camera moves.
+  // The two queues are private fields of the pinned Cesium version: fall back on tilesLoaded if they are missing.
+  function groundSharp() {
+    if (googleOn && googleReady && googleTileset) return googleTileset.tilesLoaded;
+    const sf = globe._surface, hi = sf && sf._tileLoadQueueHigh, med = sf && sf._tileLoadQueueMedium;
+    return hi && med ? hi.length + med.length === 0 : globe.tilesLoaded;
+  }
   function startSettle(maxMs, onDone) {
     stopOrbit(); flight = null;
     const t0 = performance.now();
@@ -2312,8 +2336,7 @@
     flight = {
       onDone, onCancel: onDone,
       step(now) {
-        const loaded = googleOn && googleReady && googleTileset ? googleTileset.tilesLoaded : globe.tilesLoaded;
-        calm = loaded ? calm + 1 : 0;
+        calm = groundSharp() ? calm + 1 : 0;
         return calm >= 6 || now - t0 >= maxMs;
       },
     };
@@ -2940,7 +2963,7 @@
     'Enquête : images datées NASA GIBS (VIIRS, MODIS, Landsat et Sentinel-2 HLS, VIIRS Day/Night, inondations) · relief AWS Terrain Tiles · calculs WGS84 dans la page',
     'Météo des lieux : Open-Meteo · La Terre entière : NASA EPIC Team / DSCOVR',
     'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
-    'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, Western Wall Heritage Foundation, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · bande-son générée dans le navigateur',
+    'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · bande-son générée dans le navigateur',
     'Ouverture : planètes dessinées (illustrations, pas à l’échelle) · distances et diamètres : NASA, fiches planétaires',
     'Rendu : CesiumJS · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
@@ -4239,7 +4262,8 @@
   const CITY_CAMS = [
     /*CITY_CAMS_START*/
     // Checked 9 Nov. 2026 (embeddable, live, plays in the embedded player; owner identified) and again on 10 Nov.
-    // (oEmbed answers with the owner's channel). Jerusalem has no country code, as in PLACES.
+    // (oEmbed answers with the owner's channel). 13 Nov.: all answer again except the Kotel plaza camera (oEmbed 403,
+    // embedding refused by its owner): removed. Jerusalem has no country code, as in PLACES.
     { id: 'ajaccio-1', city: 'Ajaccio', cc: 'FR', lat: 41.9192, lon: 8.7386, title: 'Ajaccio, golfe et port', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/effQzzJ6-1E?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=effQzzJ6-1E', thumb: 'https://i.ytimg.com/vi/effQzzJ6-1E/hqdefault.jpg' },
     { id: 'lehavre-port-1', city: 'Le Havre', cc: 'FR', lat: 49.487, lon: 0.1035, title: 'Port du Havre et MuMa', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/wHWL7lDnChY?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=wHWL7lDnChY', thumb: 'https://i.ytimg.com/vi/wHWL7lDnChY/hqdefault.jpg' },
     { id: 'toulouse-garonne-1', city: 'Toulouse', cc: 'FR', lat: 43.5996, lon: 1.4386, title: 'La Garonne à Toulouse', provider: 'Vision-Environnement', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/Reuz0dRsBk0?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=Reuz0dRsBk0', thumb: 'https://i.ytimg.com/vi/Reuz0dRsBk0/hqdefault.jpg' },
@@ -4251,7 +4275,6 @@
     { id: 'washington-whitehouse-1', city: 'Washington', cc: 'US', lat: 38.8977, lon: -77.0365, title: 'Maison-Blanche', provider: 'earthTV', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/5p_KGD4fJZs?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=5p_KGD4fJZs', thumb: 'https://i.ytimg.com/vi/5p_KGD4fJZs/hqdefault.jpg' },
     { id: 'paris-sacrecoeur', city: 'Paris', cc: 'FR', lat: 48.8867, lon: 2.3431, title: 'Sacré-Cœur de Montmartre', provider: 'PARIS TV', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/-xzg3wujOVM?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=-xzg3wujOVM', thumb: 'https://i.ytimg.com/vi/-xzg3wujOVM/hqdefault.jpg' },
     { id: 'jerusalem-kotel-earthcam', city: 'Jérusalem', cc: '', lat: 31.7767, lon: 35.2345, title: 'Mur occidental', provider: 'EarthCam', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/77akujLn4k8?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=77akujLn4k8', thumb: 'https://i.ytimg.com/vi/77akujLn4k8/hqdefault.jpg' },
-    { id: 'jerusalem-kotel-plaza', city: 'Jérusalem', cc: '', lat: 31.7765, lon: 35.2342, title: 'Grande place du Kotel', provider: 'Western Wall Heritage Foundation', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/LMHUcDktP-w?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=LMHUcDktP-w', thumb: 'https://i.ytimg.com/vi/LMHUcDktP-w/hqdefault.jpg' },
     { id: 'tokyo-shibuya-ann', city: 'Tokyo', cc: 'JP', lat: 35.6595, lon: 139.7005, title: 'Carrefour de Shibuya', provider: 'ANNnewsCH (TV Asahi)', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/5B4LmH4JbnY?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=5B4LmH4JbnY', thumb: 'https://i.ytimg.com/vi/5B4LmH4JbnY/hqdefault.jpg' },
     { id: 'tokyo-shibuya-fnn', city: 'Tokyo', cc: 'JP', lat: 35.6596, lon: 139.7004, title: 'Carrefour de Shibuya, autre vue', provider: 'FNN (Fuji TV)', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/dfVK7ld38Ys?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=dfVK7ld38Ys', thumb: 'https://i.ytimg.com/vi/dfVK7ld38Ys/hqdefault.jpg' },
     { id: 'vatican-media', city: 'Vatican', cc: 'VA', lat: 41.9022, lon: 12.4568, title: 'Place Saint-Pierre', provider: 'Vatican Media Live', kind: 'youtube', embed: 'https://www.youtube-nocookie.com/embed/03pYP2Nmreo?autoplay=1&mute=1&playsinline=1', source: 'https://www.youtube.com/watch?v=03pYP2Nmreo', thumb: 'https://i.ytimg.com/vi/03pYP2Nmreo/hqdefault.jpg' },
@@ -6440,7 +6463,7 @@
   });
 
   // Exposed for automated tests only.
-  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get route() { return route.slice(); }, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; } };
+  window.__terre = { viewer, PLACES, DIVE, get diveState() { return { diving, rush: +rush.toFixed(2), haze: +haze.toFixed(2), fx: rushFx.enabled, stage: diveStage, prefetch: { ...prefetchStats, held: prefetched.size } }; }, flyToPlace, returnToOrbit, get route() { return route.slice(); }, get flight() { return flight; }, get flying() { return !!flight; }, get orbiting() { return !!orbit; }, get tier() { return tierName; }, get sharp() { return groundSharp(); } };
 })();
 </script>
 </body>
