@@ -198,6 +198,8 @@
   }
   .btn:hover { color: var(--ink); border-color: var(--line-2); }
   .btn[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+  .note.keys { display: none; }
+  @media (hover: hover) and (pointer: fine) { .note.keys { display: block; } }
   .status { margin: 10px 0; font: 400 11.5px/1.65 var(--font-mono); color: var(--ink-2); white-space: pre-line; }
   .note { margin: 10px 0; font: 400 11.5px/1.6 var(--font-ui); color: var(--muted); }
 
@@ -616,6 +618,7 @@
       <div class="hud" aria-live="off">
         <span class="phase" id="hud-phase">Orbite</span>
         <span>Alt. <b id="hud-alt">—</b></span>
+        <span>Cap <b id="hud-cap">—</b></span>
         <span class="aux"><b id="hud-pos">—</b></span>
         <span class="aux" id="hud-quality"></span>
         <span class="sit-only"><b id="hud-utc">—</b></span>
@@ -658,6 +661,8 @@
         <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les treize lieux, comme un film</small></button>
         <button class="opt" id="btn-time" type="button" aria-pressed="false" aria-controls="timebar"><b>Curseur du temps</b><small>fais tourner le soleil sur 24 heures</small></button>
         <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
+        <button class="opt" id="btn-random" type="button"><b>Lieu au hasard</b><small>un lieu que tu n’as pas encore vu</small></button>
+        <button class="opt" id="btn-full" type="button" aria-pressed="false" hidden><b>Plein écran</b><small>cache les barres du navigateur</small></button>
         <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
       </div>
     </div>
@@ -670,6 +675,13 @@
         <button class="opt" id="btn-google" type="button" aria-pressed="false" hidden><b>Google 3D</b><small>villes photoréalistes</small></button>
         <button class="opt" id="btn-soundtrack" type="button" aria-pressed="false"><b>Bande-son</b><small>musique générée, suit l’altitude</small></button>
       </div>
+    </div>
+    <div class="group">
+      <div class="kicker">Carnet de voyage</div>
+      <p class="status" id="carnet" aria-live="polite"></p>
+      <div class="quality"><button type="button" id="btn-carnet-clear">Effacer le carnet</button></div>
+      <p class="note">Le carnet reste dans ce navigateur. Distances : lignes géodésiques entre les lieux, dans l’ordre de tes visites (pas des trajets réels).</p>
+      <p class="note keys">Clavier : ← → lieu précédent ou suivant · P plonger · N nuit · O orbite · H lieu au hasard · M menu.</p>
     </div>
     <div class="group">
       <div class="kicker">Qualité d’image</div>
@@ -1317,7 +1329,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.3';
+  const NOUR_BUILD = '2026-11-13.4';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1356,7 +1368,7 @@
     ultra:    { label: 'Ultra · HDR 5K', sse: 0.7, dpr: 3, msaa: 1, clouds: 48, shadows: true, ultra: true },
     high:     { label: 'Haute',     sse: 1.0, dpr: 3, msaa: 4, clouds: 48, shadows: true  },
     balanced: { label: 'Équilibrée', sse: 1.4, dpr: 3, msaa: 2, clouds: 28, shadows: false },
-    light:    { label: 'Légère',    sse: 3.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
+    light:    { label: 'Légère',    sse: 2.0, dpr: 2, msaa: 1, clouds: 10, shadows: false },
   };
   const TIER_ORDER = ['high', 'balanced', 'light'];
   // Long side of the Ultra buffer: 5120 px, capped by the GPU, and by 4096 px on phones and tablets, whose
@@ -2374,7 +2386,9 @@
       + (groundHeight > 0 ? ` · relief ≈ ${Math.round(groundHeight)} m` : '');
     $('card-text').textContent = p.text;
     const hh = Math.floor(p.solarHour), mm = Math.round((p.solarHour - hh) * 60);
-    $('card-meta').textContent = `${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
+    const from = PLACES.find((x) => x.id === route[route.length - 1]);
+    const leg = from && from.id !== p.id ? GEO.inverse(from.lat, from.lon, p.lat, p.lon) : null;
+    $('card-meta').textContent = `${leg ? `à ${Math.round(leg.s / 1000).toLocaleString('fr-FR')} km de ${from.name} · ` : ''}${p.meta} · éclairage : heure solaire ≈ ${String(hh).padStart(2, '0')}h${String(mm).padStart(2, '0')}`;
     p.ground = groundHeight;
     nightView = false; diveView = false; setNightButton(); setDiveButton();
     revealCard();
@@ -2665,7 +2679,7 @@
       onDone: () => {
         // Hold still until the ground tiles are in, so the card never comes up over a blurred picture.
         setPhase('Mise au point');
-        startSettle(prefersReduced.matches || (opts && opts.tour) ? 1200 : DIVE.settle, () => {
+        startSettle(prefersReduced.matches || (opts && opts.tour) ? 1200 : 7000, () => {
           if (token !== flightToken) return;
           setPhase('Arrivée');
           showCard(p, groundHeight);
@@ -2727,11 +2741,77 @@
     const prevId = route[route.length - 1];
     const btn = list.querySelector(`.place[data-id="${p.id}"]`);
     if (btn) btn.dataset.visited = '';
-    if (prevId === p.id) return;
+    if (prevId === p.id) { carnetAdd(p, null); return; }
     route.push(p.id);
     const prev = prevId && PLACES.find((x) => x.id === prevId);
     if (prev) addArc(prev, p);
+    carnetAdd(p, prev || null);
   }
+  // Travel log: places seen and the geodesic length of the legs flown, kept in this browser only.
+  const CARNET_KEY = 'nour.carnet';
+  const carnet = { seen: [], km: 0 };
+  try {
+    const saved = JSON.parse(localStorage.getItem(CARNET_KEY) || 'null');
+    if (saved && Array.isArray(saved.seen) && Number.isFinite(saved.km) && saved.km >= 0) {
+      carnet.seen = saved.seen.filter((id) => PLACES.some((x) => x.id === id)); carnet.km = saved.km;
+    }
+  } catch (e) { /* storage blocked or unreadable: start an empty log */ }
+  function paintCarnet() {
+    const n = carnet.seen.length;
+    $('carnet').textContent = n ? `${n} / ${PLACES.length} lieux vus · ${Math.round(carnet.km).toLocaleString('fr-FR')} km parcourus`
+      : `Aucun lieu vu pour l’instant (${PLACES.length} à découvrir).`;
+    $('btn-carnet-clear').disabled = !n;
+    carnet.seen.forEach((id) => { const b = list.querySelector(`.place[data-id="${id}"]`); if (b) b.dataset.visited = ''; });
+  }
+  function carnetAdd(p, prev) {
+    if (!carnet.seen.includes(p.id)) carnet.seen.push(p.id);
+    const leg = prev ? GEO.inverse(prev.lat, prev.lon, p.lat, p.lon) : null;
+    if (leg) carnet.km += leg.s / 1000;
+    try { localStorage.setItem(CARNET_KEY, JSON.stringify(carnet)); } catch (e) { /* this visit only */ }
+    paintCarnet();
+  }
+  $('btn-carnet-clear').addEventListener('click', () => {
+    carnet.seen = []; carnet.km = 0;
+    try { localStorage.removeItem(CARNET_KEY); } catch (e) { /* nothing stored */ }
+    list.querySelectorAll('.place[data-visited]').forEach((b) => delete b.dataset.visited);
+    paintCarnet();
+  });
+  paintCarnet();
+  // A place not seen yet, or any other place once all are seen.
+  function randomPlace() {
+    const others = PLACES.filter((x) => x !== activePlace);
+    const fresh = others.filter((x) => !carnet.seen.includes(x.id));
+    const pool = fresh.length ? fresh : others;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  $('btn-random').addEventListener('click', () => { setMenuOpen(false); flyToPlace(randomPlace()); });
+  // Full screen: only where the browser offers it for a page (not Safari on iPhone).
+  const fullBtn = $('btn-full'), fullRoot = document.documentElement;
+  if (fullRoot.requestFullscreen && document.fullscreenEnabled) {
+    fullBtn.hidden = false;
+    fullBtn.addEventListener('click', () => {
+      (document.fullscreenElement ? document.exitFullscreen() : fullRoot.requestFullscreen()).catch(() => {});
+    });
+    document.addEventListener('fullscreenchange', () => fullBtn.setAttribute('aria-pressed', String(!!document.fullscreenElement)));
+  }
+  // Keyboard: never while typing, with a modifier, during the opening, or with a panel open (M still toggles the menu).
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+    const t = e.target, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || (t && (t.isContentEditable || t.getAttribute('role') === 'slider'))) return;
+    if (!document.querySelector('.loader.done') || document.body.classList.contains('cine-on')) return;
+    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    if (k === 'm') { $('btn-menu').click(); return; }
+    if (document.querySelector('.sheet.open')) return;
+    const shown = $('card').classList.contains('show');
+    if (k === 'ArrowRight' || k === 'ArrowLeft') {
+      const i = activePlace ? PLACES.indexOf(activePlace) : (k === 'ArrowRight' ? -1 : 0);
+      flyToPlace(PLACES[(i + (k === 'ArrowRight' ? 1 : -1) + PLACES.length) % PLACES.length]); e.preventDefault();
+    } else if (k === 'o') returnToOrbit();
+    else if (k === 'h') flyToPlace(randomPlace());
+    else if (k === 'p' && shown) $('card-dive').click();
+    else if (k === 'n' && shown && !$('card-night').hidden) $('card-night').click();
+  });
   function clearRoute() {
     route.length = 0; routeSource.entities.removeAll();
     list.querySelectorAll('.place[data-visited]').forEach((b) => delete b.dataset.visited);
@@ -2830,8 +2910,10 @@
       frames = 0; fpsT = now;
       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
       // Nor a dive: it loads tiles at every level on purpose (endDive gives a warm-up afterwards).
-      slowWindows = (now > warmUntil && fps < 24 && !capturing && !diveSeq) ? slowWindows + 1 : 0;
+      // The last step (light) costs sharpness (coarser ground, 2x pixels): only a really low frame rate takes it.
       const i = TIER_ORDER.indexOf(tierName);
+      const floor = TIER_ORDER[i + 1] === 'light' ? 15 : 24;
+      slowWindows = (now > warmUntil && fps < floor && !capturing && !diveSeq) ? slowWindows + 1 : 0;
       if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
     }
     if (now - hudT > 200) {
@@ -2841,6 +2923,8 @@
       const agl = g !== undefined ? c.height - g : c.height;
       $('hud-alt').textContent = fmtAlt(Math.max(agl, 0));
       $('hud-pos').textContent = fmtCoord(R2D(c.latitude), R2D(c.longitude));
+      const cap = ((Math.round(R2D(camera.heading)) % 360) + 360) % 360;
+      $('hud-cap').textContent = `${String(cap).padStart(3, '0')}° ${['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'][Math.round(cap / 45) % 8]}`;
       if (veille.sit) $('hud-utc').textContent = fmtUTC(new Date());
     }
   });
