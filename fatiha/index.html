@@ -1094,32 +1094,53 @@
     titan:   { src: 'media/planets/titan.webp', body: 1.188 },
     earth:   { src: 'media/planets/earth.webp', body: 1 },
   };
+  // Halo follows the photograph's own silhouette (the real limb), not a drawn circle, so a gibbous plate
+  // does not grow a ring on the empty night side.
+  const LIMB = {
+    neptune: 'rgba(140, 190, 230, 0.9)', uranus: 'rgba(180, 222, 226, 0.7)', saturn: 'rgba(220, 196, 150, 0.45)',
+    jupiter: 'rgba(214, 176, 130, 0.4)', mars: 'rgba(186, 112, 80, 0.4)', titan: 'rgba(214, 156, 96, 0.65)',
+    earth: 'rgba(150, 198, 255, 0.85)',
+  };
+  function makeHalo(im, color) {
+    if (!color) return null;
+    const pad = 28, c = document.createElement('canvas');
+    c.width = im.naturalWidth + pad * 2; c.height = im.naturalHeight + pad * 2;
+    const g = c.getContext('2d');
+    g.shadowColor = color; g.shadowBlur = 18;
+    g.drawImage(im, pad, pad);
+    g.shadowBlur = 0; g.globalCompositeOperation = 'destination-out';
+    g.drawImage(im, pad, pad);
+    return c;
+  }
   const sprites = {};
   api.photos.total = Object.keys(PHOTOS).length;
   Object.keys(PHOTOS).forEach((key) => {
     const im = new Image();
     im.decoding = 'async';
-    im.onload = () => { sprites[key] = { image: im, body: PHOTOS[key].body, w: im.naturalWidth, h: im.naturalHeight }; api.photos.loaded++; };
+    im.onload = () => {
+      sprites[key] = { image: im, body: PHOTOS[key].body, w: im.naturalWidth, h: im.naturalHeight, halo: makeHalo(im, LIMB[key]) };
+      api.photos.loaded++;
+    };
     im.onerror = () => { api.photos.failed++; };
     im.src = PHOTOS[key].src;
   });
   const TITAN = 'Titan — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA06230';
   const BODIES = [
-    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, photo: 'neptune', limb: 'rgba(126, 176, 222, 0.55)',
+    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, photo: 'neptune',
       credit: 'Neptune — NASA/JPL, Voyager 2, caméra NAC, PIA01492' },
-    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, photo: 'uranus', limb: 'rgba(168, 216, 220, 0.42)',
+    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, photo: 'uranus',
       credit: 'Uranus — NASA/JPL-Caltech, Voyager 2, ISS, PIA18182' },
-    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, photo: 'saturn', limb: 'rgba(214, 186, 140, 0.34)', moonTilt: 0.04,
+    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, photo: 'saturn', moonTilt: 0.04,
       credit: 'Saturne — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA11141', extraCredit: TITAN,
-      moons: [{ dist: 3.15, size: 0.086, way: 1, photo: 'titan', limb: 'rgba(206, 148, 88, 0.5)' }] },
-    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, photo: 'jupiter', limb: 'rgba(206, 164, 122, 0.4)',
+      moons: [{ dist: 3.15, size: 0.086, way: 1, photo: 'titan' }] },
+    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, photo: 'jupiter',
       credit: 'Jupiter — NASA/JPL-Caltech/SwRI/MSSS/Roman Tkachenko, Juno, JunoCam, PIA21381' },
-    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, photo: 'mars', limb: 'rgba(176, 104, 74, 0.26)',
+    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, photo: 'mars',
       credit: 'Mars — ESA/MPS pour l’équipe OSIRIS, Rosetta, OSIRIS, CC BY-SA 3.0 IGO' },
-    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, photo: 'lune', limb: null,
+    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, photo: 'lune',
       credit: 'Lune — NASA/JPL, Galileo, SSI, PIA00405' },
   ];
-  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', size: 1, photo: 'earth', limb: 'rgba(130, 186, 255, 0.5)',
+  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', size: 1, photo: 'earth',
     credit: 'Terre — NASA, Apollo 17, Hasselblad, AS17-148-22727' };
   const TOTAL = BODIES.length + 1;
 
@@ -1161,19 +1182,15 @@
     ctx.drawImage(sp.image, x - dw / 2, y - dh / 2, dw, dh);
     return true;
   }
-  function drawLimb(x, y, r, tint) {
-    if (!tint || r < 3) return;
-    const g = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 1.22);
-    g.addColorStop(0, 'rgba(0,0,0,0)');
-    g.addColorStop(0.62, tint);
-    g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g;
-    ctx.beginPath();
-    ctx.arc(x, y, r * 1.22, 0, Math.PI * 2);
-    ctx.fill();
+  function drawLimb(key, x, y, r) {
+    const sp = sprites[key];
+    if (!sp || !sp.halo || r < 3) return;
+    const dw = 2 * r / sp.body, scale = dw / sp.w;
+    const hw = sp.halo.width * scale, hh = sp.halo.height * scale;
+    ctx.drawImage(sp.halo, x - hw / 2, y - hh / 2, hw, hh);
   }
   function drawBody(b, x, y, r) {
-    drawLimb(x, y, r, b.limb);
+    drawLimb(b.photo, x, y, r);
     drawSprite(b.photo, x, y, r);
     const ang = b.moonTilt || 0;
     for (const m of b.moons || []) {
@@ -1181,7 +1198,7 @@
       const mx = x + m.way * m.dist * r * Math.cos(ang), my = y + m.way * m.dist * r * Math.sin(ang);
       const mr = Math.max(1.2, m.size * r);
       if (mx < -80 || mx > W + 80 || my < -80 || my > H + 80) continue;
-      drawLimb(mx, my, mr, m.limb);
+      drawLimb(m.photo, mx, my, mr);
       drawSprite(m.photo, mx, my, mr);
     }
   }
