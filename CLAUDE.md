@@ -138,6 +138,13 @@ python3 -m satlab bench --campaign standard --out results/standard
   `whenArrived(cb)`, settable `time` for tests). `ready()` hands over with `intro.whenArrived(open)`; `fail()` and deep links
   stop it. Off with reduced motion, a hash in the URL, or `?intro=0`: test harnesses that click `#btn-start` must add
   `?intro=0` (the button is hidden during the journey). The page now has two inline scripts: syntax-check each one.
+  The journey also has a Moroccan Darija voice, off until the visitor taps "Voix en darija" (browsers forbid sound that starts
+  by itself; the choice is kept in `nour.voix`, and a refusal by the browser never overwrites it). The table `VOICE` holds, per
+  caption, an mp3 in `fatiha/audio/` and the same sentence in Arabic script, shown under the caption while the voice is on;
+  with the voice on the journey clock runs at half speed (`VOICE_RATE`) so a planet stays as long as its sentence. The words
+  were written without a native speaker and must be listened to before they are trusted: to fix one, edit its line in `VOICE`
+  and replace its mp3. `__intro.voice` and a stubbed `HTMLMediaElement.play` are enough to test it. The sky behind (Milky Way,
+  star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
   `groundSharp()` is the "picture is sharp" test (the high and medium tile queues of `globe._surface`, private fields
   of the pinned Cesium, are empty); `globe.tilesLoaded` also waits for the off-screen preload queue and never turns
   true while the camera orbits. `startSettle` uses it at the end of a dive and of `flyToPlace`. Cesium loads tiles

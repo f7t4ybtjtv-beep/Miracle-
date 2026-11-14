@@ -487,11 +487,11 @@
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
-    opacity: 0; transition: opacity .5s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+    max-width: 560px; opacity: 0; transition: opacity .3s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
   }
   .loader.journey .intro-caption::before {
     content: ''; position: absolute; z-index: -1; inset: -28px calc(-1 * var(--gutter)) -22px;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.84), rgba(0, 0, 0, 0.68) 62%, rgba(0, 0, 0, 0.3));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.36) 60%, rgba(0, 0, 0, 0));
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent); mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent);
   }
   .loader.journey .intro-caption.show { opacity: 1; }
@@ -508,6 +508,17 @@
     color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .08em; cursor: pointer;
   }
   .loader.journey .intro-skip:hover { border-color: var(--accent); color: var(--accent); }
+  /* Voice in Moroccan Darija: starts only after a tap, with the same words written in Arabic script */
+  .intro-voice, .intro-darija { display: none; }
+  .loader.journey .intro-voice:not([hidden]) {
+    display: inline-flex; align-items: center; gap: 8px; position: absolute; top: calc(var(--safe-t) + var(--gutter)); left: var(--gutter);
+    height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.45);
+    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .06em; cursor: pointer;
+  }
+  .loader.journey .intro-voice:hover, .loader.journey .intro-voice[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .loader.journey.voice .intro-darija {
+    display: block; margin-top: 14px; max-width: 30em; font: 400 clamp(18px, 4.8vw, 26px)/1.75 var(--font-ui); color: var(--ink);
+  }
 
   /* Wide screens */
   @media (min-width: 900px) {
@@ -1052,9 +1063,14 @@
       <div class="kicker" id="intro-kicker"></div>
       <div class="intro-name" id="intro-name"></div>
       <div class="intro-fact" id="intro-fact"></div>
+      <div class="intro-darija" id="intro-darija" dir="rtl" lang="ar-MA"></div>
     </div>
     <p class="intro-note">Illustration · tailles et vitesse non à l’échelle</p>
     <button class="intro-skip" id="intro-skip" type="button" hidden>Passer ›</button>
+    <button class="intro-voice" id="intro-voice" type="button" aria-pressed="false" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      <span id="intro-voice-label">Voix en darija</span>
+    </button>
     <div class="inner">
       <h2>Fatiha</h2>
       <p class="tagline">maman d’Amine</p>
@@ -1191,43 +1207,146 @@
   const queue = [...BODIES, EARTH];
   (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 1024 : 768)); setTimeout(build, 30); })();
 
+  // ----- Voice: Moroccan Darija, only after a tap (browsers refuse sound that starts by itself) -----
+  // [file in fatiha/audio, the same words in Arabic script shown under the caption]. One table, so a wrong word is a
+  // one-line fix: change the text here and replace the matching mp3.
+  const VOICE = {
+    welcome: ['darija-accueil', 'مرحبا بيك. هاد الرحلة كتبدا من بعيد بزاف، من الطرف ديال المجموعة الشمسية. غادي نقربو شوية بشوية، حتى نوصلو للأرض.'],
+    Neptune: ['darija-neptune', 'هادا نبتون. هو أبعد كوكب على الشمس. بارد بزاف، ولونو زرق.'],
+    Uranus: ['darija-uranus', 'هادا أورانوس. حتى هو كوكب بارد، وكيدور وهو مايل على جنبو.'],
+    Saturne: ['darija-saturne', 'هادا زحل. معروف بالحلقات ديالو، اللي فيهم الثلج والحجر.'],
+    Jupiter: ['darija-jupiter', 'هادا المشتري، أكبر كوكب كاين. والبقعة الحمرا اللي فيه، عاصفة كبر من الأرض.'],
+    Mars: ['darija-mars', 'هادا المريخ، الكوكب الحمر. صغر من الأرض، وفيه الثلج فالقطبين ديالو.'],
+    Lune: ['darija-lune', 'وهادا القمر ديالنا. قريب لينا بزاف، وكيدور على الأرض.'],
+    Terre: ['darija-terre', 'وها حنا وصلنا. هادي الأرض، الدار ديالنا. دابا نقدرو نشوفو البلايص من الفوق.'],
+  };
+  // Atmosphere colour of each body (r,g,b), for the soft halo around it.
+  const GLOW = { Neptune: '120,165,225', Uranus: '170,225,228', Saturne: '225,205,150', Jupiter: '225,190,150', Mars: '215,120,80', Lune: '200,200,205', Terre: '110,160,235' };
+
   // ----- Timeline (seconds of animation time; the clock stops while the page is hidden or blocked) -----
-  const START = 1.6, STAGGER = 2.1, PASS = 4.0, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.0;
-  const stars = Array.from({ length: 280 }, (_, i) => ({ x: hash(i, 1, 51) * 2 - 1, y: hash(i, 2, 51) * 2 - 1, z: 0.05 + 0.95 * hash(i, 3, 51) }));
-  let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null;
+  // With the voice on the clock runs at half speed, so each planet stays on screen as long as its sentence lasts.
+  const START = 3.0, STAGGER = 2.8, PASS = 6.4, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.5, VOICE_RATE = 0.5;
+  const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome' };
+  const TINT = ['244,246,250', '188,210,255', '255,224,188'];   // white, blue-white, warm
+  const stars = Array.from({ length: 420 }, (_, i) => {
+    const r = hash(i, 4, 51);
+    return { x: hash(i, 1, 51) * 2 - 1, y: hash(i, 2, 51) * 2 - 1, z: 0.05 + 0.95 * hash(i, 3, 51), c: r < 0.6 ? 0 : r < 0.85 ? 1 : 2, tw: 1 + 3 * hash(i, 5, 51), ph: 6.28 * hash(i, 6, 51) };
+  }).sort((p, q) => p.c - q.c);   // sorted by tint: three colour changes per frame instead of hundreds
+  let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null, sky = null, rate = 1;
+  let voiceOn = false, muted = false, busy = false, audio = null, voiceQ = [], curVK = null, voiced = null, swapTimer = 0;
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
+  const darijaEl = document.getElementById('intro-darija'), voiceBtn = document.getElementById('intro-voice'), voiceLabel = document.getElementById('intro-voice-label');
+
+  // The sky behind everything, drawn once per size: a faint Milky Way band, a field of small stars, a few bright ones.
+  function buildSky() {
+    sky = document.createElement('canvas'); sky.width = canvas.width; sky.height = canvas.height;
+    const g = sky.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const diag = Math.hypot(W, H);
+    g.save(); g.translate(W * 0.5, H * 0.5); g.rotate(-0.5);
+    for (let i = 0; i < 48; i++) {
+      const px = (i / 47 - 0.5) * diag * 1.15, py = (vnoise(i * 0.6, 3, 71) - 0.5) * H * 0.1, r = H * (0.14 + 0.2 * vnoise(i * 0.45, 9, 73));
+      const gr = g.createRadialGradient(px, py, 0, px, py, r);
+      gr.addColorStop(0, vnoise(i * 0.3, 5, 75) > 0.62 ? 'rgba(255,214,170,0.05)' : 'rgba(150,172,255,0.055)'); gr.addColorStop(1, 'rgba(120,140,255,0)');
+      g.fillStyle = gr; g.fillRect(px - r, py - r, 2 * r, 2 * r);
+    }
+    g.fillStyle = '#DDE6FF';
+    for (let i = 0; i < 900; i++) {   // dense dust of faint stars inside the band
+      const u = hash(i, 11, 77) * 2 - 1, v = (hash(i, 12, 77) + hash(i, 13, 77) + hash(i, 14, 77) - 1.5) / 1.5;
+      g.globalAlpha = 0.15 + 0.6 * hash(i, 15, 77) ** 2; g.fillRect(u * diag * 0.55, v * H * 0.16, 0.9, 0.9);
+    }
+    g.restore();
+    for (let i = 0; i < 650; i++) {   // the general field: many small, a few bright
+      const x = hash(i, 21, 79) * W, y = hash(i, 22, 79) * H, m = hash(i, 23, 79) ** 3, k = hash(i, 24, 79);
+      g.globalAlpha = 0.25 + 0.75 * m; g.fillStyle = k < 0.7 ? '#F4F6FA' : k < 0.88 ? '#BCD2FF' : '#FFE0BC';
+      g.beginPath(); g.arc(x, y, (0.6 + 1.5 * m) * 0.6, 0, 6.2832); g.fill();
+    }
+    g.globalAlpha = 1;
+    for (let i = 0; i < 14; i++) {   // a few stars with a soft halo
+      const x = hash(i, 31, 81) * W, y = hash(i, 32, 81) * H, r = (2.5 + 4 * hash(i, 33, 81)) * 2.2;
+      const gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.12, 'rgba(235,242,255,0.7)'); gr.addColorStop(0.35, 'rgba(210,222,255,0.16)'); gr.addColorStop(1, 'rgba(200,215,255,0)');
+      g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
+  }
   function resize() {
     dpr = Math.min(3, window.devicePixelRatio || 1);
     W = canvas.clientWidth; H = canvas.clientHeight;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    buildSky();
   }
+
+  // ----- Voice -----
+  const savedVoice = () => { try { return localStorage.getItem('nour.voix') === '1'; } catch (e) { return false; } };
+  const saveVoice = (v) => { try { localStorage.setItem('nour.voix', v ? '1' : '0'); } catch (e) { /* private mode */ } };
+  function pump() {
+    if (busy || !voiceQ.length || !voiceOn || muted) return;
+    const k = voiceQ.shift(); busy = true;
+    audio = new Audio(`audio/${VOICE[k][0]}.mp3`);
+    audio.addEventListener('ended', () => { busy = false; pump(); });
+    audio.addEventListener('error', () => { busy = false; pump(); });
+    const p = audio.play();
+    if (p && p.catch) p.catch(() => { busy = false; setVoice(false); });   // sound refused: stay silent, the button stays there
+  }
+  function voicePlay(k) { if (voiceOn && !muted && VOICE[k]) { voiceQ.push(k); pump(); } }
+  function voiceStop() { voiceQ = []; busy = false; if (audio) { audio.pause(); audio = null; } }
+  // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
+  function setVoice(on, tap) {
+    voiceOn = on;
+    voiceBtn.setAttribute('aria-pressed', String(on));
+    voiceLabel.textContent = on ? 'Voix activée' : 'Voix en darija';
+    loader.classList.toggle('voice', on);
+    if (tap) saveVoice(on);
+    if (!on) { voiceStop(); return; }
+    const k = curVK || (t < START + 0.2 * PASS ? 'welcome' : null);   // say what is on screen right now
+    if (k) { voiced = k; voicePlay(k); }
+  }
+
+  // Caption: the old one fades out, then the new one fades in.
   function setCaption(b, waiting) {
     const key = b ? b.name + (waiting ? '…' : '') : null;
     if (key === shown) return;
-    shown = key;
-    caption.classList.toggle('show', !!b);
-    if (!b) return;
-    const step = b === EARTH ? BODIES.length + 1 : BODIES.indexOf(b) + 1;
-    kicker.textContent = `${String(step).padStart(2, '0')} / ${String(BODIES.length + 1).padStart(2, '0')}\n${b.kind}`; nameEl.textContent = b.name;
-    factEl.textContent = waiting ? `${b.fact}\nle globe se prépare…` : b.fact;
+    const prev = shown; shown = key;
+    clearTimeout(swapTimer);
+    const apply = () => {
+      caption.classList.toggle('show', !!b);
+      if (!b) { curVK = null; voiced = null; return; }
+      const vk = b.voiceKey || b.name, step = b === EARTH ? BODIES.length + 1 : BODIES.indexOf(b) + 1;
+      curVK = vk;
+      kicker.textContent = step > 0 ? `${String(step).padStart(2, '0')} / ${String(BODIES.length + 1).padStart(2, '0')}\n${b.kind}` : b.kind;
+      nameEl.textContent = b.name;
+      factEl.textContent = waiting ? (b.fact ? `${b.fact}\nle globe se prépare…` : 'le globe se prépare…') : b.fact;
+      darijaEl.textContent = VOICE[vk] ? VOICE[vk][1] : '';
+      if (voiced !== vk) { voiced = vk; voicePlay(vk); }
+    };
+    if (prev && b && prev.replace('…', '') !== b.name) { caption.classList.remove('show'); swapTimer = setTimeout(apply, 300); } else apply();
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now; t += dt;
+    const real = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
+    rate += ((voiceOn && !muted && !api.arrived ? VOICE_RATE : 1) - rate) * Math.min(1, real * 3);
+    const dt = real * rate; t += dt;
     if (!W || canvas.clientWidth !== W || canvas.clientHeight !== H) resize();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    const cx = W / 2, cy = H / 2, span = Math.max(W, H) * 0.6;
-    // Stars streaming out of the point we fly towards.
-    ctx.strokeStyle = '#F4F6FA'; ctx.lineCap = 'round';
+    ctx.globalAlpha = 1; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    // A slow sway of the camera, so the sky is never quite still.
+    const swayX = Math.sin(t * 0.31) * W * 0.01, swayY = Math.cos(t * 0.23) * H * 0.008;
+    const cx = W / 2 + swayX, cy = H / 2 + swayY, span = Math.max(W, H) * 0.6;
+    if (sky) ctx.drawImage(sky, -14 - swayX * 0.5, -14 - swayY * 0.5, W + 28, H + 28);
+    // Stars streaming out of the point we fly towards; the streaks stretch as one planet hands over to the next.
+    let pulse = 0;
+    for (let i = 0; i < BODIES.length; i++) { const dd = t - (START + i * STAGGER + 0.9 * PASS); pulse = Math.max(pulse, Math.exp(-dd * dd / 0.6)); }
+    const speed = 0.085 * (1 + 1.8 * pulse), tail = 1.035 + 0.06 * pulse;
+    ctx.lineCap = 'round';
+    let tint = -1;
     for (const s of stars) {
-      s.z -= dt * 0.085;
+      s.z -= dt * speed;
       if (s.z < 0.05) s.z += 0.95;
       const x = cx + s.x / s.z * span * 0.5, y = cy + s.y / s.z * span * 0.5, near = 1 - s.z;
       if (x < 0 || x > W || y < 0 || y > H) continue;
-      ctx.globalAlpha = Math.min(1, near * 1.4) * 0.85;
-      const d = 0.5 + near * 1.3, zb = s.z * 1.035;      // a short streak back along its path
+      if (s.c !== tint) { tint = s.c; ctx.strokeStyle = `rgb(${TINT[tint]})`; }
+      ctx.globalAlpha = Math.min(1, near * 1.4) * 0.9 * (0.82 + 0.18 * Math.sin(t * s.tw + s.ph));
+      const d = 0.5 + near * 1.4, zb = s.z * tail;      // a short streak back along its path
       ctx.lineWidth = d; ctx.beginPath(); ctx.moveTo(cx + s.x / zb * span * 0.5, cy + s.y / zb * span * 0.5); ctx.lineTo(x, y); ctx.stroke();
     }
     // The Earth, last and straight ahead: it ends at the size of the globe in the first Cesium view (seen from
@@ -1236,6 +1355,10 @@
     if (ue > 0 && EARTH.sprite) {
       const target = Math.max(W, H) * 0.0475, grow = leaving < 0 ? 1 : Math.exp(0.5 * (t - leaving));
       const r = target * Math.exp(-3.4 * (1 - ue) * (1 - ue)) * grow;
+      ctx.globalAlpha = Math.min(1, ue * 4) * 0.16;
+      const halo = ctx.createRadialGradient(cx, cy, r * 0.95, cx, cy, r * 1.22);
+      halo.addColorStop(0, `rgba(${GLOW.Terre},1)`); halo.addColorStop(1, `rgba(${GLOW.Terre},0)`);
+      ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(cx, cy, r * 1.22, 0, 6.2832); ctx.fill();
       ctx.globalAlpha = Math.min(1, ue * 4);
       ctx.drawImage(EARTH.sprite.image, cx - r * EARTH.sprite.k, cy - r * EARTH.sprite.k, 2 * r * EARTH.sprite.k, 2 * r * EARTH.sprite.k);
     }
@@ -1246,8 +1369,14 @@
       const b = BODIES[i], u = (t - START - i * STAGGER) / PASS;
       if (u <= 0 || u >= 1 || !b.sprite) continue;
       const r = base * b.size / (48 * Math.exp(-5.39 * u)), side = i % 2 ? 1 : -1, slope = (i % 3 - 1) * 0.22;
-      const x = cx + side * 1.75 * r * Math.cos(slope), y = cy + 1.75 * r * Math.sin(slope) + r * 0.12;
-      ctx.globalAlpha = Math.min(1, u / 0.06, (1 - u) / 0.1);
+      const x = cx + side * 1.75 * r * Math.cos(slope), y = cy + 1.75 * r * Math.sin(slope) + r * 0.12 + Math.sin(t * 0.5 + i) * r * 0.015;
+      const fade = smooth(0, 0.12, u) * smooth(0, 0.2, 1 - u);
+      if (r < Math.max(W, H) * 2) {   // a soft atmosphere around the disc
+        const rim = GLOW[b.name], halo = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 1.45);
+        halo.addColorStop(0, `rgba(${rim},0.24)`); halo.addColorStop(1, `rgba(${rim},0)`);
+        ctx.globalAlpha = fade; ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(x, y, r * 1.45, 0, 6.2832); ctx.fill();
+      }
+      ctx.globalAlpha = fade;
       ctx.drawImage(b.sprite.image, x - r * b.sprite.k, y - r * b.sprite.k, 2 * r * b.sprite.k, 2 * r * b.sprite.k);
       // Large moons, at their real distances and sizes in planet radii, along the equator.
       ctx.fillStyle = '#CFC8BD';
@@ -1260,24 +1389,33 @@
     }
     ctx.globalAlpha = 1;
     if (t > 2.4) loader.classList.add('under-way');
-    if (ue >= 1 && !api.arrived) { api.arrived = true; skipBtn.hidden = true; }
+    if (ue >= 1 && !api.arrived) { api.arrived = true; skipBtn.hidden = true; voiceBtn.hidden = true; }
     if (api.arrived && onArrive && leaving < 0) { leaving = t; const cb = onArrive; onArrive = null; cb(); }
-    setCaption(current || (ue > 0.25 && leaving < 0 ? EARTH : null), api.arrived);
+    const stage = current || (ue > 0.25 && leaving < 0 ? EARTH : null) || (voiceOn && !muted && leaving < 0 && t < START + 0.2 * PASS ? WELCOME : null);
+    setCaption(stage, api.arrived);
     if (leaving >= 0 && t - leaving > 1.6) api.stop(true);
   }
   api.active = true;
   api.whenArrived = (cb) => { onArrive = cb; };
-  api.skip = () => { if (t < EARTH_AT + EARTH_TAKES - 0.6) t = EARTH_AT + EARTH_TAKES - 0.6; };
-  // `quiet`: the loader is already fading out, leave it as it is. Otherwise fall back to the plain title card.
+  // Skipping also silences the voice for the rest of the journey.
+  api.skip = () => {
+    muted = true; voiceStop(); loader.classList.remove('voice'); voiceBtn.hidden = true;
+    if (t < EARTH_AT + EARTH_TAKES - 0.6) t = EARTH_AT + EARTH_TAKES - 0.6;
+  };
+  // `quiet`: the loader is already fading out, leave it as it is (a sentence still being said carries on).
+  // Otherwise fall back to the plain title card and stop the voice.
   api.stop = (quiet) => {
-    cancelAnimationFrame(raf); api.active = false; api.whenArrived = (cb) => cb();
-    if (!quiet) loader.classList.remove('journey', 'under-way');
+    cancelAnimationFrame(raf); clearTimeout(swapTimer); api.active = false; api.whenArrived = (cb) => cb();
+    if (!quiet) { voiceStop(); loader.classList.remove('journey', 'under-way', 'voice'); }
   };
   Object.defineProperty(api, 'time', { get: () => t, set: (v) => { t = v; } });   // tests
+  Object.defineProperty(api, 'voice', { get: () => ({ on: voiceOn, busy, key: curVK, queued: voiceQ.length, muted }) });   // tests
   loader.classList.add('journey');
-  skipBtn.hidden = false;
+  skipBtn.hidden = false; voiceBtn.hidden = false;
   skipBtn.addEventListener('click', api.skip);
+  voiceBtn.addEventListener('click', () => setVoice(!voiceOn, true));
   window.addEventListener('keydown', (e) => { if (api.active && (e.key === 'Escape' || e.key === 'Enter')) api.skip(); });
+  if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
 })();
 </script>
