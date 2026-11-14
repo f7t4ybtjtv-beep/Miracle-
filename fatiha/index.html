@@ -1230,25 +1230,90 @@
   // before the first planet it is slower still, for the welcome.
   const VOICE_RATE = 0.5, WELCOME_RATE = 0.3, welcomeEnd = () => starts[0] + 0.18 * PASS;
   let rate = 1, voiceOn = false, muted = false, busy = false, audio = null, voiceQ = [], curVK = null, voiced = null, swapTimer = 0, sky = null;
+  // One element, kept in the page: a fresh Audio() per sentence is collected or paused by iOS
+  // (often right after the first syllable, when the globe's WebGL context appears).
+  let wantPlay = false, voiceToken = 0, swappingSrc = false, voiceGesture = false, voiceBlocked = false, voiceResumeAt = 0, voiceRetries = 0;
   const darijaEl = document.getElementById('intro-darija'), voiceBtn = document.getElementById('intro-voice'), voiceLabel = document.getElementById('intro-voice-label');
   const savedVoice = () => { try { return localStorage.getItem('nour.voix') === '1'; } catch (e) { return false; } };
   const saveVoice = (v) => { try { localStorage.setItem('nour.voix', v ? '1' : '0'); } catch (e) { /* private mode */ } };
+  function ensureAudio() {
+    if (audio) return audio;
+    const a = document.createElement('audio');
+    a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
+    a.preload = 'auto';
+    a.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;opacity:0;pointer-events:none';
+    loader.appendChild(a);
+    a.addEventListener('ended', () => { if (!wantPlay) return; busy = false; pump(); });
+    a.addEventListener('error', () => { if (!wantPlay) return; busy = false; pump(); });
+    a.addEventListener('pause', () => {
+      // src changes pause the element on purpose. An outside pause (WebGL, iOS audio session)
+      // must not swallow the rest of the sentence.
+      if (swappingSrc || !wantPlay || muted || !voiceOn || a.ended) return;
+      const dur = a.duration;
+      if (!(a.currentTime > 0.05) || (dur && a.currentTime > dur - 0.25)) return;
+      const now = performance.now();
+      if (now - voiceResumeAt < 500) return;
+      voiceResumeAt = now;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
+    });
+    audio = a;
+    return a;
+  }
+  // Called from the tap, before play(): opens the iOS audio session. A remembered choice
+  // that starts by itself is refused; the button then asks for this tap.
+  function unlockVoice() {
+    voiceGesture = true;
+    ensureAudio();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      const ctx = new AC();
+      const buf = ctx.createBuffer(1, 1, ctx.sampleRate || 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf; src.connect(ctx.destination); src.start(0);
+      const close = () => { try { ctx.close(); } catch (e) { /* already closed */ } };
+      if (ctx.resume) ctx.resume().then(close, close); else close();
+    } catch (e) { /* the element unlock is what play() needs */ }
+  }
+  function markNeedsTap() {
+    voiceOn = false; voiceBlocked = true; wantPlay = false; busy = false; voiceQ = [];
+    voiceBtn.setAttribute('aria-pressed', 'false');
+    loader.classList.remove('voice');
+    voiceLabel.textContent = 'Touchez pour écouter';
+  }
   function pump() {
     if (busy || !voiceQ.length || !voiceOn || muted) return;
-    const k = voiceQ.shift(); busy = true;
-    audio = new Audio(`audio/${VOICE[k][0]}.mp3`);
-    audio.addEventListener('ended', () => { busy = false; pump(); });
-    audio.addEventListener('error', () => { busy = false; pump(); });
-    const p = audio.play();
-    if (p && p.catch) p.catch(() => { busy = false; setVoice(false); });   // sound refused: stay silent, the button stays there
+    const k = voiceQ.shift();
+    const file = VOICE[k] && VOICE[k][0];
+    if (!file) { pump(); return; }
+    const a = ensureAudio();
+    const token = ++voiceToken;
+    busy = true; wantPlay = true; voiceBlocked = false;
+    const url = `audio/${file}.mp3`;
+    if (!a.src.endsWith('/' + url) && !a.src.endsWith(url)) {
+      swappingSrc = true; a.src = url; swappingSrc = false;
+    }
+    const p = a.play();
+    if (p && p.then) p.then(() => { if (token === voiceToken) { voiceBlocked = false; voiceRetries = 0; } }, () => {
+      if (token !== voiceToken || !wantPlay) return;
+      // Refused (no gesture yet): do not forget the saved choice, just ask for a tap.
+      if (!voiceGesture) { markNeedsTap(); return; }
+      busy = false;
+      if (voiceRetries < 1) { voiceRetries++; voiceQ.unshift(k); pump(); return; }
+      voiceRetries = 0; wantPlay = false; markNeedsTap();
+    });
   }
   function voicePlay(k) { if (voiceOn && !muted && VOICE[k]) { voiceQ.push(k); pump(); } }
-  function voiceStop() { voiceQ = []; busy = false; if (audio) { audio.pause(); audio = null; } }
+  function voiceStop() {
+    voiceQ = []; busy = false; wantPlay = false; voiceToken++;
+    if (audio) { swappingSrc = true; audio.pause(); swappingSrc = false; }
+  }
   // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
   function setVoice(on, tap) {
     voiceOn = on;
     voiceBtn.setAttribute('aria-pressed', String(on));
-    voiceLabel.textContent = on ? 'Voix activée' : 'Voix en darija';
+    voiceLabel.textContent = on ? 'Voix activée' : (voiceBlocked ? 'Touchez pour écouter' : 'Voix en darija');
     loader.classList.toggle('voice', on);
     if (tap) saveVoice(on);
     if (!on) { voiceStop(); return; }
@@ -1436,7 +1501,7 @@
   loader.classList.add('journey');
   skipBtn.hidden = false; voiceBtn.hidden = false;
   skipBtn.addEventListener('click', api.skip);
-  voiceBtn.addEventListener('click', () => setVoice(!voiceOn, true));
+  voiceBtn.addEventListener('click', () => { if (!voiceOn) unlockVoice(); setVoice(!voiceOn, true); });
   window.addEventListener('keydown', (e) => { if (api.active && (e.key === 'Escape' || e.key === 'Enter')) api.skip(); });
   if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
@@ -1514,7 +1579,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.1-stable';
+  const NOUR_BUILD = '2026-11-14.1-stable2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
