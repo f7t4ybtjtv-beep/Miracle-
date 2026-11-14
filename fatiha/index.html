@@ -480,7 +480,10 @@
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
   .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
-  .loader .tagline { margin: 18px 0 30px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  .loader .tagline { margin: 18px 0 8px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .12em; text-transform: lowercase; color: var(--ink-2); }
+  /* Dedication: keep the real names (Rafa, Mélissa), so no lowercase transform here */
+  .loader .tagline.dedic { text-transform: none; }
+  .loader .dedicace { margin: 0 0 30px; font: 400 clamp(12px, 3.2vw, 15px) var(--font-ui); letter-spacing: .14em; color: var(--muted); }
   /* Amiri Quran, SIL Open Font License (fonts/OFL-amiri-quran.txt): served from this site, no outside request */
   @font-face { font-family: "Amiri Quran"; src: url("fonts/amiri-quran.woff2") format("woff2"); font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
   .verse { margin: 0 auto 26px; max-width: 34em; }
@@ -1124,7 +1127,8 @@
     </select>
     <div class="inner">
       <h2>Fatiha</h2>
-      <p class="tagline">maman d’Amine</p>
+      <p class="tagline dedic">c’est pour toi Rafa, ma rafale</p>
+      <p class="dedicace">de la part de Mélissa</p>
       <!-- Qur'an 51:47, Uthmani text (drawn with the bundled Amiri Quran font: system fonts lose some of its signs) and Muhammad Hamidullah's French translation, both copied from a reference edition:
            never retype or reword either one; check against the source before any change. -->
       <figure class="verse">
@@ -1771,7 +1775,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.4';
+  const NOUR_BUILD = '2026-11-14.5';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
