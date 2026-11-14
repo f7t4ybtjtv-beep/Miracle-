@@ -98,7 +98,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   city cameras, GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
   is one block of the script. `CITY_CAMS` holds only cameras whose owner publishes them (checked by hand: embeddable,
   live, plays embedded); YouTube players must keep `referrerpolicy="strict-origin"` (with `no-referrer` YouTube shows
-  error 153), and SkylineWebcams forbids embedding. Windy stays dormant unless a visitor brings `?wkey=`. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
+  error 153), and SkylineWebcams forbids embedding. Windy's public widgets (`webcams.windy.com/webcams/public/embed/nearby` and `embed.windy.com/embed.html`) are created only while the Cameras tab is open on a known point: a place, a touched point, or the capital (or centre) of a country picked from the list. Do not iframe `www.windy.com` (`frame-ancestors 'self' *.windy.com`) and do not call `api.windy.com`. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
   from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
   whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
   The "Plonger" card button chains two `startFlight` legs (climb to a straight-down view with `apex: true`, then at once
@@ -145,6 +145,12 @@ python3 -m satlab bench --campaign standard --out results/standard
   were written without a native speaker and must be listened to before they are trusted: to fix one, edit its line in `VOICE`
   and replace its mp3. `__intro.voice` and a stubbed `HTMLMediaElement.play` are enough to test it. The sky behind (Milky Way,
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
+  Background music is one song, `fatiha/audio/fond.mp3` (the owner's own, tags and cover stripped), played in a loop by
+  `window.__music`, a block of the first script placed before the journey so it exists with or without it. Off until a
+  "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the choice
+  is kept in `nour.musique` and a remembered "on" restarts at the next gesture. The Darija voice calls `duck()`, the main
+  script calls `hold(mediaAudible())` twice a second, and the song and the generated "Bande-son" exclude each other.
+  iPhone ignores `volume`, so there the song pauses during a sentence. `__music.state` is the test hook.
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.
