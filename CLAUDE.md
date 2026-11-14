@@ -145,6 +145,12 @@ python3 -m satlab bench --campaign standard --out results/standard
   were written without a native speaker and must be listened to before they are trusted: to fix one, edit its line in `VOICE`
   and replace its mp3. `__intro.voice` and a stubbed `HTMLMediaElement.play` are enough to test it. The sky behind (Milky Way,
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
+  Background music is one song, `fatiha/audio/fond.mp3` (the owner's own, tags and cover stripped), played in a loop by
+  `window.__music`, a block of the first script placed before the journey so it exists with or without it. Off until a
+  "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the choice
+  is kept in `nour.musique` and a remembered "on" restarts at the next gesture. The Darija voice calls `duck()`, the main
+  script calls `hold(mediaAudible())` twice a second, and the song and the generated "Bande-son" exclude each other.
+  iPhone ignores `volume`, so there the song pauses during a sentence. `__music.state` is the test hook.
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.
