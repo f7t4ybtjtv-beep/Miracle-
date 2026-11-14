@@ -133,11 +133,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   is open (`body.osint-open`) because it caught those touches. Dated imagery uses `ImageryLayer.splitDirection` +
   `scene.splitPosition` with the `#split-handle` slider and joins `dayLayers` while shown. Deliberately left out because
   they cannot be verified from the sandbox: search by place name and live aircraft. Never add people search.
-  The opening journey (planets drawn on a 2D canvas, `#intro-canvas`) lives in its own `<script>` placed BEFORE the Cesium
+  The opening journey (real probe photos on a 2D canvas, `#intro-canvas`, cockpit HUD) lives in its own `<script>` placed BEFORE the Cesium
   script tag so it starts while Cesium downloads; it exposes `window.__intro` (`active`, `arrived`, `skip()`, `stop(quiet)`,
   `whenArrived(cb)`, settable `time` for tests). `ready()` hands over with `intro.whenArrived(open)`; `fail()` and deep links
-  stop it. Off with reduced motion, a hash in the URL, or `?intro=0`: test harnesses that click `#btn-start` must add
-  `?intro=0` (the button is hidden during the journey). The page now has two inline scripts: syntax-check each one.
+  stop it. Reduced motion fades the still photographs instead of flying. A hash in the URL or `?intro=0` skips it: test harnesses that click `#btn-start` must add
+  `?intro=0` (the button is hidden during the journey). The page now has two inline scripts: syntax-check each one. Photos live in `fatiha/media/planets/`. The Film menu entry stays hidden until `media/systeme-solaire-v2.mp4` answers.
   `groundSharp()` is the "picture is sharp" test (the high and medium tile queues of `globe._surface`, private fields
   of the pinned Cesium, are empty); `globe.tilesLoaded` also waits for the off-screen preload queue and never turns
   true while the camera orbits. `startSettle` uses it at the end of a dive and of `flyToPlace`. Cesium loads tiles
