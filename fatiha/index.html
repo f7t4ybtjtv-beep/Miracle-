@@ -46,7 +46,7 @@
   .vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 58%, rgba(2, 3, 8, 0.6) 100%); }
   .shade { position: fixed; left: 0; right: 0; pointer-events: none; }
   .shade-top { top: 0; height: 170px; background: linear-gradient(rgba(4, 6, 11, 0.72), transparent); }
-  .shade-bottom { bottom: 0; height: 48vh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
+  .shade-bottom { bottom: 0; height: 48vh; height: 48dvh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
 
   .ui { position: fixed; z-index: 5; }
   .kicker { font: 500 11px/1.4 var(--font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
@@ -100,7 +100,7 @@
     color: var(--ink-2); opacity: .62; transition: opacity .3s, color .3s; text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
   }
   .place span { font: 400 19px/1.15 var(--font-ui); white-space: nowrap; padding-bottom: 4px; border-bottom: 1px solid transparent; }
-  .place small { font: 400 10.5px var(--font-mono); letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+  .place small { font: 400 12px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
   .place:hover { opacity: 1; }
   .place[aria-current="true"] { opacity: 1; color: var(--ink); }
   .place[aria-current="true"] span { border-bottom-color: var(--accent); }
@@ -118,12 +118,18 @@
     text-shadow: 0 1px 14px rgba(0, 0, 0, 0.75), 0 0 3px rgba(0, 0, 0, 0.85);   /* the second one holds small text over bright ground */
   }
   .card.show { opacity: 1; transform: none; pointer-events: auto; }
+  /* A soft dark veil behind the text: the place card sits over bright ground (sand, cities, snow). */
+  .card { isolation: isolate; }
+  .card::before {
+    content: ''; position: absolute; z-index: -1; inset: -26px calc(-1 * var(--gutter)) -18px; pointer-events: none;
+    background: linear-gradient(180deg, rgba(4, 6, 11, 0), rgba(4, 6, 11, 0.7) 22%, rgba(4, 6, 11, 0.7) 78%, rgba(4, 6, 11, 0));
+  }
   .card h2 { margin: 8px 0 8px; font: 300 44px/1.04 var(--font-ui); letter-spacing: -.01em; }
   .card .kicker { color: var(--ink-2); }
-  .card .coords { font: 400 11.5px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
+  .card .coords { font: 400 12px var(--font-mono); letter-spacing: .1em; color: var(--ink-2); }
   .card p { margin: 14px 0 0; max-width: 54ch; font: 400 16px/1.6 var(--font-ui); color: var(--ink-2); }
-  .card .more { display: none; margin-top: 4px; padding: 6px 0; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
-  .card .meta { margin-top: 10px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
+  .card .more { display: none; margin-top: 4px; padding: 15px 0; line-height: 14px; background: none; border: 0; color: var(--accent); font: 400 13px var(--font-ui); cursor: pointer; }
+  .card .meta { margin-top: 10px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .card .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
   .chip {
     display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px;
@@ -188,7 +194,7 @@
   }
   .quality button[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
   .quality button:disabled { opacity: .4; cursor: not-allowed; }
-  #credits { margin-top: 14px; font: 400 11px/1.7 var(--font-mono); color: var(--muted); }
+  #credits { margin-top: 14px; font: 400 12px/1.7 var(--font-mono); color: var(--muted); }
   #credits a { color: var(--ink-2); }
 
   /* Generic controls inside sheets */
@@ -239,7 +245,7 @@
   .watch #eonet-pick a { color: var(--accent); }
   .watch .legend { display: flex; align-items: center; gap: 10px; margin: 6px 0 2px; font: 400 10.5px var(--font-mono); color: var(--muted); }
   .watch .legend .ramp { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(90deg, rgba(70, 255, 150, 0.12), rgba(70, 255, 150, 1)); }
-  .card .weather { margin-top: 8px; font: 400 11.5px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
+  .card .weather { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); }
   .card .weather:empty { display: none; }
   .card .weather .w-note { color: var(--muted); }
   /* Phones: one line (now, sky, wind) on the folded card; sunrise, sunset and the source once it is expanded. */
@@ -265,13 +271,15 @@
   }
   .tile video, .tile img.logo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .tile img.logo { object-fit: contain; padding: 22%; opacity: .9; }
-  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; font: 300 26px var(--font-ui); color: var(--ink-2); }
+  .tile .initials { position: absolute; inset: 0; display: grid; place-items: center; padding: 0 8px; font: 300 20px var(--font-ui); color: var(--ink-2); white-space: nowrap; overflow: hidden; }
+  .tile.named .initials { display: flex; align-items: center; justify-content: center; padding: 26px 6px 8px; font: 500 12px/1.3 var(--font-ui); color: var(--ink); text-align: center; white-space: normal; overflow-wrap: anywhere; }
+  .tile.named .name, .tile.has-logo .initials { display: none; }
   .tile .name {
     position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 7px 6px; font: 500 10.5px/1.25 var(--font-ui);
     background: linear-gradient(transparent, rgba(4, 6, 11, 0.85)); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
   }
   .tile .badge {
-    position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 999px; font: 500 8.5px var(--font-mono); letter-spacing: .12em;
+    position: absolute; top: 6px; left: 6px; padding: 2px 6px; border-radius: 999px; font: 500 10.5px var(--font-mono); letter-spacing: .12em;
     text-transform: uppercase; background: rgba(4, 6, 11, 0.6); color: var(--muted);
   }
   .tile.on .badge { color: #FF6B6B; }
@@ -305,7 +313,7 @@
   .tile.cam .badge { max-width: calc(100% - 12px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
   .tile.cam .name { display: grid; gap: 2px; }
   .tile.cam .name .t { overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-  .tile.cam .name .p { font: 400 8.5px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tile.cam .name .p { font: 400 10px/1.3 var(--font-mono); letter-spacing: .03em; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tile.cam.open { border-color: var(--accent); }
   .tile.cam.live .badge::before { content: '● '; color: #FF6B6B; }
   .cam-stage iframe, .cam-stage img { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 14px; background: #000; object-fit: cover; }
@@ -366,7 +374,7 @@
   .cine.paused .cine-quit { opacity: 1; }
   .cine-country { font: 400 12px/1.4 var(--font-ui); letter-spacing: .36em; text-transform: uppercase; color: var(--ink-2); }
   .cine-name { margin: 10px 0 12px; max-width: min(92vw, 11em); font: 300 clamp(34px, 7vw, 104px)/1.02 var(--font-ui); letter-spacing: -.005em; color: var(--ink); }
-  .cine-coords { font: 400 11px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
+  .cine-coords { font: 400 12px var(--font-mono); letter-spacing: .14em; color: var(--muted); }
   body.cine-on .ui { visibility: hidden; }
   /* Attribution stays on screen during the tour, over the bars: the imagery line, and Google's credits in Google 3D mode. */
   body.cine-on #credit-line, body.cine-on #cesium-credits { visibility: visible; z-index: 31; pointer-events: none; }
@@ -380,7 +388,7 @@
   .timebar[hidden] { display: none; }
   .tb-time { display: grid; gap: 2px; min-width: 0; }
   .tb-time b { font: 400 18px/1.1 var(--font-mono); letter-spacing: .04em; color: var(--ink); font-variant-numeric: tabular-nums; }
-  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 10px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .tb-time small { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 400 12px/1.3 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .timebar input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; min-width: 0; height: 44px; margin: 0; background: transparent; cursor: pointer; }
   /* The track reads as a day: night at both ends, local solar noon in the middle. */
   .timebar input[type="range"]::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--line-2), var(--accent) 50%, var(--line-2)); }
@@ -426,12 +434,12 @@
   .epic-info .status { margin: 4px 0; }
   .epic-date { margin: 0; font: 400 18px/1.4 var(--font-ui); color: var(--ink); }
   .epic-line { margin: 4px 0 0; font: 400 12.5px/1.5 var(--font-ui); color: var(--ink-2); }
-  .epic-mono { font: 400 10.5px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
+  .epic-mono { font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--muted); }
   .epic-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
   .epic-nav .round { width: 44px; padding: 0; font-size: 20px; }
   .epic-nav .round:disabled { opacity: .3; cursor: default; border-color: var(--line); color: var(--ink); }
   .epic-count { min-width: 60px; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--ink-2); }
-  .epic-credit { margin: 12px 0 0; font: 400 10.5px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
+  .epic-credit { margin: 12px 0 0; font: 400 12px var(--font-mono); letter-spacing: .12em; color: var(--muted); }
   @media (max-width: 760px) {
     .timebar {
       bottom: calc(var(--safe-b) + 88px); grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "time close" "range range";
@@ -439,7 +447,7 @@
     }
     .tb-time { grid-area: time; grid-auto-flow: column; justify-content: start; align-items: baseline; gap: 10px; }
     .tb-time small { max-width: none; }
-    .timebar input[type="range"] { grid-area: range; height: 36px; }
+    .timebar input[type="range"] { grid-area: range; height: 44px; }
     .timebar .close { grid-area: close; }
     body.time-open .card { visibility: hidden; }     /* the bottom of a phone screen is for the bar and the places */
     .epic-head h3 { font-size: 22px; }
@@ -453,11 +461,18 @@
     position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
     background: radial-gradient(ellipse 75% 60% at 50% 42%, var(--bg-2), var(--bg) 72%);
     transition: opacity 1.2s ease;
+    touch-action: none; overscroll-behavior: none;
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
   .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
   .loader .tagline { margin: 18px 0 30px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  /* Amiri Quran, SIL Open Font License (fonts/OFL-amiri-quran.txt): served from this site, no outside request */
+  @font-face { font-family: "Amiri Quran"; src: url("fonts/amiri-quran.woff2") format("woff2"); font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
+  .verse { margin: 0 auto 26px; max-width: 34em; }
+  .verse-ar { margin: 0; font: 400 clamp(24px, 6vw, 38px)/2.1 "Amiri Quran", "Geeza Pro", "Noto Naskh Arabic", serif; color: var(--ink); }
+  .verse-fr { margin-top: 6px; font: 400 15px/1.6 var(--font-ui); font-style: italic; color: var(--ink); }
+  .verse figcaption { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
   .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
   .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
@@ -470,29 +485,30 @@
   .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
-  #intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+  #intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; touch-action: none; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
-  .loader.journey { background: #000; }
+  .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
   .loader.journey .inner { position: relative; transition: opacity 1s ease; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.8); }
   .loader.journey .bar, .loader.journey .start { display: none; }
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
-    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
-    opacity: 0; transition: opacity .5s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh); bottom: calc(var(--safe-b) + 15dvh);
+    max-width: 560px; opacity: 0; transition: opacity .3s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
   }
   .loader.journey .intro-caption::before {
     content: ''; position: absolute; z-index: -1; inset: -28px calc(-1 * var(--gutter)) -22px;
-    background: linear-gradient(90deg, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.5) 60%, rgba(0, 0, 0, 0));
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.58), rgba(0, 0, 0, 0.36) 60%, rgba(0, 0, 0, 0));
     -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent); mask-image: linear-gradient(180deg, transparent, #000 22%, #000 80%, transparent);
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
-  .intro-name { margin: 8px 0 10px; font: 300 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
-  .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); white-space: pre-line; }
+  .intro-name { margin: 8px 0 10px; font: 300 clamp(32px, 6.5vw, 60px)/1.05 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+  .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
-    display: block; position: absolute; left: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0; max-width: none;
-    font: 400 10px var(--font-mono); letter-spacing: .08em; color: var(--muted);
+    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0;
+    max-width: 46rem; font: 400 12px/1.45 var(--font-mono); letter-spacing: .03em; color: var(--muted); white-space: pre-line;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
   }
   .loader.journey .intro-skip:not([hidden]) {
     display: inline-flex; align-items: center; position: absolute; top: calc(var(--safe-t) + var(--gutter)); right: var(--gutter);
@@ -500,6 +516,17 @@
     color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .08em; cursor: pointer;
   }
   .loader.journey .intro-skip:hover { border-color: var(--accent); color: var(--accent); }
+  /* Voice in Moroccan Darija: starts only after a tap, with the same words written in Arabic script */
+  .intro-voice, .intro-darija { display: none; }
+  .loader.journey .intro-voice:not([hidden]) {
+    display: inline-flex; align-items: center; gap: 8px; position: absolute; top: calc(var(--safe-t) + var(--gutter)); left: var(--gutter);
+    height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.45);
+    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .06em; cursor: pointer;
+  }
+  .loader.journey .intro-voice:hover, .loader.journey .intro-voice[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .loader.journey.voice .intro-darija {
+    display: block; margin-top: 14px; max-width: 30em; font: 400 clamp(18px, 4.8vw, 26px)/1.75 var(--font-ui); color: var(--ink);
+  }
 
   /* Wide screens */
   @media (min-width: 900px) {
@@ -537,7 +564,7 @@
     .sheet.watch { max-height: 58vh; }
     body.sheet-open .card, body.sheet-open .places { visibility: hidden; }
     .sheet h3 { font-size: 22px; }
-    .shade-bottom { height: 62vh; }
+    .shade-bottom { height: 62vh; height: 62dvh; }
     @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1044,12 +1071,24 @@
       <div class="kicker" id="intro-kicker"></div>
       <div class="intro-name" id="intro-name"></div>
       <div class="intro-fact" id="intro-fact"></div>
+      <div class="intro-darija" id="intro-darija" dir="rtl" lang="ar-MA"></div>
     </div>
-    <p class="intro-note">Illustration · tailles et vitesse non à l’échelle</p>
+    <p class="intro-note" id="intro-credit">Photos de sondes · tailles et vitesse non à l’échelle</p>
     <button class="intro-skip" id="intro-skip" type="button" hidden>Passer ›</button>
+    <button class="intro-voice" id="intro-voice" type="button" aria-pressed="false" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      <span id="intro-voice-label">Voix en darija</span>
+    </button>
     <div class="inner">
       <h2>Fatiha</h2>
       <p class="tagline">maman d’Amine</p>
+      <!-- Qur'an 51:47, Uthmani text (drawn with the bundled Amiri Quran font: system fonts lose some of its signs) and Muhammad Hamidullah's French translation, both copied from a reference edition:
+           never retype or reword either one; check against the source before any change. -->
+      <figure class="verse">
+        <blockquote class="verse-ar" dir="rtl" lang="ar">وَٱلسَّمَآءَ بَنَيْنَٰهَا بِأَيْي۟دٍۢ وَإِنَّا لَمُوسِعُونَ</blockquote>
+        <div class="verse-fr">Le ciel, Nous l’avons construit par Notre puissance : et Nous l’étendons [constamment] dans l’immensité.</div>
+        <figcaption>Coran, sourate 51 (Adh-Dhâriyât), verset 47 · traduction Muhammad Hamidullah</figcaption>
+      </figure>
       <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à treize lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
       <div class="bar" id="loader-bar"><i></i></div>
       <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
@@ -1059,217 +1098,412 @@
 
 <script>
 // ---------- Opening journey ----------
-// Instead of a loading bar: a flight past the planets, from Neptune inwards, one by one, down to the Earth, drawn on a
-// 2D canvas while Cesium and the first tiles load behind it. It runs before the Cesium script so it starts at once.
-// The planets are drawn here (illustrations, not photographs); sizes and speed are not to scale. The figures in the
-// captions are real: mean distance to the Sun and equatorial diameter (NASA planetary fact sheets, rounded).
-// Not shown with reduced motion, with ?intro=0 (tests) or on a deep link: the plain title card is used instead.
+// A slow flight from Neptune inwards, on a 2D canvas, while Cesium loads behind it. This script sits before the
+// Cesium tag so it starts at once. Each disc is a masked probe photograph (see the credit line): the terminator and
+// the night side are the ones in that exposure, one sun, no repaint. A thin limb halo sits outside the atmosphere.
+// Sizes and speed are not to scale. The figures are real: mean distance to the Sun and equatorial diameter (NASA
+// planetary fact sheets, rounded). Not shown with reduced motion, with ?intro=0 (tests) or on a deep link.
 (() => {
   'use strict';
-  const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); } };
+  const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); }, photos: { loaded: 0, failed: 0, total: 0 } };
   const loader = document.getElementById('loader'), canvas = document.getElementById('intro-canvas');
   const off = new URLSearchParams(location.search).get('intro') === '0';
   if (off || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  // ----- Procedural planets -----
-  const hash = (x, y, s) => { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(s, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-  const vnoise = (x, y, s) => {
-    const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
-    const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
-    return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+  // body = planet diameter / image width, measured on the masked file, so Saturn's rings extend past the ball
+  // and a gibbous plate is sized by its real limb. Files reused from the probe-photo set.
+  const PHOTOS = {
+    neptune: { src: 'media/planets/neptune.webp', body: 1 },
+    uranus:  { src: 'media/planets/uranus.webp', body: 1 },
+    saturn:  { src: 'media/planets/saturn.webp', body: 0.397 },
+    jupiter: { src: 'media/planets/jupiter.webp', body: 1.824 },
+    mars:    { src: 'media/planets/mars.webp', body: 1 },
+    lune:    { src: 'media/planets/moon.webp', body: 1 },
+    titan:   { src: 'media/planets/titan.webp', body: 1.188 },
+    earth:   { src: 'media/planets/earth.webp', body: 1 },
   };
-  const fbm = (x, y, s) => 0.5 * vnoise(x, y, s) + 0.3 * vnoise(x * 2.1, y * 2.1, s + 1) + 0.2 * vnoise(x * 4.3, y * 4.3, s + 2);
-  const rgb = (hex) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
-  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  // Cloud bands by latitude, stirred a little by noise.
-  const bands = (colours, stir, seed) => {
-    const pal = colours.map(rgb);
-    return (lat, lon) => {
-      let v = lat / Math.PI + 0.5 + stir * (fbm(lon * 2.2, lat * 7, seed) - 0.5);
-      v = Math.min(0.9999, Math.max(0, v)) * (pal.length - 1);
-      const i = Math.floor(v), c = mix(pal[i], pal[i + 1], v - i), k = 0.93 + 0.14 * vnoise(lon * 2.5, lat * 46, seed + 7);
-      return [c[0] * k, c[1] * k, c[2] * k];
-    };
+  // Halo follows the photograph's own silhouette (the real limb), not a drawn circle, so a gibbous plate
+  // does not grow a ring on the empty night side.
+  const LIMB = {
+    neptune: 'rgba(140, 190, 230, 0.9)', uranus: 'rgba(180, 222, 226, 0.7)', saturn: 'rgba(220, 196, 150, 0.45)',
+    jupiter: 'rgba(214, 176, 130, 0.4)', mars: 'rgba(186, 112, 80, 0.4)', titan: 'rgba(214, 156, 96, 0.65)',
+    earth: 'rgba(150, 198, 255, 0.85)',
   };
-  const jupiterBands = bands(['#8f7a66', '#c9b79c', '#b98f68', '#e6d8bf', '#c39c73', '#ead9c0', '#a9744e', '#dcc7a6', '#b58c66', '#cdbba1', '#8c7765'], 0.05, 11);
-  const spot = rgb('#b5573a');
-  const mars = { a: rgb('#c1663c'), b: rgb('#a8502e'), dark: rgb('#6e3a26'), ice: rgb('#efe9e2') };
-  const moon = { a: rgb('#a9a8a4'), b: rgb('#8f8e8b'), mare: rgb('#6c6d70') };
-  const earth = { sea: rgb('#2c5aa0'), land: rgb('#5d7d52'), cloud: rgb('#f2f4f6') };
-  const LIGHT = (() => { const v = [-0.5, -0.38, 0.78], n = Math.hypot(...v); return v.map((c) => c / n); })();
-  const BODIES = [
-    // Neptune's true colour is a pale blue only a little deeper than Uranus's (Irwin et al., MNRAS, 2024); the deep
-    // blue of the Voyager pictures came from contrast stretching.
-    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, tilt: 0.49, gas: true,
-      colour: bands(['#6f9fd6', '#7fb0e0', '#8cbbe6', '#79a9dc', '#6b9ad2'], 0.04, 3) },
-    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, tilt: 1.71, gas: true,
-      colour: bands(['#a3dbe0', '#b2e5e7', '#b9e9ea', '#a8dfe2'], 0.02, 5) },
-    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, tilt: 0.47, gas: true, rings: true, moons: [[20.3, 0.043, 1]],   // Titan
-      colour: bands(['#a8946a', '#d6c08e', '#e3d2a6', '#cdb680', '#dccb9c', '#c2aa78', '#b8a172'], 0.03, 7) },
-    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, tilt: 0.05, gas: true,
-      moons: [[5.9, 0.026, -1], [9.4, 0.022, 1], [15.0, 0.037, -1], [26.3, 0.034, 1]],   // Io, Europa, Ganymede, Callisto
-      colour: (lat, lon) => {
-        const c = jupiterBands(lat, lon), e = ((lon + 0.45) / 0.13) ** 2 + ((lat - 0.38) / 0.07) ** 2;   // the Great Red Spot, 22° south, about 16 000 km across
-        return e < 1.6 ? mix(c, spot, 0.85 * (1 - smooth(0.4, 1.6, e))) : c;
-      } },
-    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, tilt: 0.44,
-      colour: (lat, lon) => {
-        let c = mix(mars.a, mars.b, fbm(lon * 1.6 + 9, lat * 1.6, 21));
-        c = mix(c, mars.dark, 0.75 * smooth(0.52, 0.66, fbm(lon * 1.3, lat * 1.9 + 4, 23)));
-        const cap = lat + 0.12 * (fbm(lon * 3, 2, 25) - 0.5);
-        return mix(c, mars.ice, Math.max(smooth(-1.22, -1.32, cap), smooth(1.38, 1.46, cap)));
-      } },
-    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, tilt: 0,
-      colour: (lat, lon) => {
-        const c = mix(moon.a, moon.b, fbm(lon * 5, lat * 5, 31));
-        return mix(c, moon.mare, 0.85 * smooth(0.5, 0.6, fbm(lon * 1.4 + 2, lat * 1.6 + 1, 33)));
-      } },
-  ];
-  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', tilt: 0.41,
-    colour: (lat, lon) => {
-      const c = mix(earth.sea, earth.land, smooth(0.56, 0.62, fbm(lon * 1.5 + 5, lat * 1.8, 41)));
-      return mix(c, earth.cloud, 0.85 * smooth(0.55, 0.7, fbm(lon * 2.6, lat * 3.4 + 7, 43)));
-    } };
-
-  // One lit sphere, with Saturn's rings in their real proportions (C 1.24–1.53, B 1.53–1.95, A 2.03–2.27 radii).
-  function sprite(spec, size) {
-    const N = spec.rings ? Math.round(size * 2.4) : size, R = size / 2 - 1.5, mid = N / 2;
-    const disc = document.createElement('canvas'); disc.width = disc.height = N;
-    const g = disc.getContext('2d'), img = g.createImageData(N, N), px = img.data;
-    const ct = Math.cos(spec.tilt), st = Math.sin(spec.tilt), lo = Math.floor(mid - R - 2), hi = Math.ceil(mid + R + 2);
-    for (let y = lo; y < hi; y++) for (let x = lo; x < hi; x++) {
-      const nx = (x + 0.5 - mid) / R, ny = (y + 0.5 - mid) / R, rr = nx * nx + ny * ny;
-      if (rr > 1.03) continue;
-      const nz = Math.sqrt(Math.max(0, 1 - rr)), bx = nx * ct + ny * st, by = ny * ct - nx * st;
-      const c = spec.colour(Math.asin(Math.max(-1, Math.min(1, by))), Math.atan2(bx, nz));
-      const lit = (0.02 + 0.98 * smooth(-0.08, 0.72, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2])) * (spec.gas ? 0.6 + 0.4 * nz : 0.82 + 0.18 * nz);
-      const i = (y * N + x) * 4;
-      px[i] = c[0] * lit; px[i + 1] = c[1] * lit; px[i + 2] = c[2] * lit;
-      px[i + 3] = 255 * Math.min(1, Math.max(0, (1 - Math.sqrt(rr)) * R + 0.5));
-    }
-    g.putImageData(img, 0, 0);
-    if (!spec.rings) return { image: disc, k: mid / R };
-    // Rings, pixel by pixel: fine ringlets, and the planet's shadow falling across the far side. A ring point is in
-    // shadow when it lies behind the planet as seen from the Sun and within one radius of the Sun–planet line.
-    const RINGS = [[1.24, 1.53, [150, 135, 105], 0.32], [1.53, 1.95, [222, 203, 160], 0.92], [2.03, 2.27, [196, 178, 140], 0.78]];
-    const OPEN = 0.34, DEPTH = Math.sqrt(1 - OPEN * OPEN) / OPEN;
-    const far = g.createImageData(N, N), near = g.createImageData(N, N);
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      const sx = x + 0.5 - mid, sy = y + 0.5 - mid, u = sx * ct + sy * st, v = sy * ct - sx * st;
-      const rho = Math.hypot(u, v / OPEN) / R;
-      if (rho < 1.24 || rho > 2.27) continue;
-      const band = RINGS.find((q) => rho >= q[0] && rho <= q[1]);
-      if (!band) continue;
-      const z = v * DEPTH, along = sx * LIGHT[0] + sy * LIGHT[1] + z * LIGHT[2];
-      const off = (sx * sx + sy * sy + z * z - along * along) / (R * R);      // squared distance to the Sun–planet line
-      const shadow = along < 0 ? 0.08 + 0.92 * smooth(0.9, 1.1, off) : 1;
-      const edge = Math.min(1, (rho - band[0]) * R * 0.8, (band[1] - rho) * R * 0.8);
-      const k = (0.74 + 0.5 * vnoise(rho * 85, 0.5, 61)) * shadow, d = (v > 0 ? near : far).data, i = (y * N + x) * 4;
-      d[i] = band[2][0] * k; d[i + 1] = band[2][1] * k; d[i + 2] = band[2][2] * k;
-      d[i + 3] = 255 * band[3] * Math.max(0, edge) * (0.8 + 0.2 * vnoise(rho * 240, 1.5, 63));
-    }
-    const out = document.createElement('canvas'); out.width = out.height = N;
-    const o = out.getContext('2d'), layer = document.createElement('canvas'); layer.width = layer.height = N;
-    const lg = layer.getContext('2d');
-    lg.putImageData(far, 0, 0); o.drawImage(layer, 0, 0);          // the far half goes behind the planet
-    o.drawImage(disc, 0, 0);
-    lg.putImageData(near, 0, 0); o.drawImage(layer, 0, 0);         // the near half passes in front
-    return { image: out, k: mid / R };
+  function makeHalo(im, color) {
+    if (!color) return null;
+    const pad = 28, c = document.createElement('canvas');
+    c.width = im.naturalWidth + pad * 2; c.height = im.naturalHeight + pad * 2;
+    const g = c.getContext('2d');
+    g.shadowColor = color; g.shadowBlur = 18;
+    g.drawImage(im, pad, pad);
+    g.shadowBlur = 0; g.globalCompositeOperation = 'destination-out';
+    g.drawImage(im, pad, pad);
+    return c;
   }
-  // Built one at a time between frames, in the order they are needed, so no single frame waits for all of them.
-  const queue = [...BODIES, EARTH];
-  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 1024 : 768)); setTimeout(build, 30); })();
+  const sprites = {};
+  api.photos.total = Object.keys(PHOTOS).length;
+  Object.keys(PHOTOS).forEach((key) => {
+    const im = new Image();
+    im.decoding = 'async';
+    im.onload = () => {
+      sprites[key] = { image: im, body: PHOTOS[key].body, w: im.naturalWidth, h: im.naturalHeight, halo: makeHalo(im, LIMB[key]) };
+      api.photos.loaded++;
+    };
+    im.onerror = () => { api.photos.failed++; };
+    im.src = PHOTOS[key].src;
+  });
+  const TITAN = 'Titan — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA06230';
+  const BODIES = [
+    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, photo: 'neptune',
+      credit: 'Neptune — NASA/JPL, Voyager 2, caméra NAC, PIA01492' },
+    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, photo: 'uranus',
+      credit: 'Uranus — NASA/JPL-Caltech, Voyager 2, ISS, PIA18182' },
+    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, photo: 'saturn', moonTilt: 0.04,
+      credit: 'Saturne — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA11141', extraCredit: TITAN,
+      moons: [{ dist: 3.15, size: 0.086, way: 1, photo: 'titan' }] },
+    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, photo: 'jupiter',
+      credit: 'Jupiter — NASA/JPL-Caltech/SwRI/MSSS/Roman Tkachenko, Juno, JunoCam, PIA21381' },
+    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, photo: 'mars',
+      credit: 'Mars — ESA/MPS pour l’équipe OSIRIS, Rosetta, OSIRIS, CC BY-SA 3.0 IGO' },
+    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, photo: 'lune',
+      credit: 'Lune — NASA/JPL, Galileo, SSI, PIA00405' },
+  ];
+  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', size: 1, photo: 'earth',
+    credit: 'Terre — NASA, Apollo 17, Hasselblad, AS17-148-22727' };
+  const TOTAL = BODIES.length + 1;
 
-  // ----- Timeline (seconds of animation time; the clock stops while the page is hidden or blocked) -----
-  const START = 1.6, STAGGER = 2.1, PASS = 4.0, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.0;
-  const stars = Array.from({ length: 280 }, (_, i) => ({ x: hash(i, 1, 51) * 2 - 1, y: hash(i, 2, 51) * 2 - 1, z: 0.05 + 0.95 * hash(i, 3, 51) }));
+  // Slow cinematic passes. The gap after Jupiter is the long empty stretch inward to Mars.
+  const START = 1.8, PASS = 6.4, EARTH_TAKES = 4.2;
+  const GAPS = [5.6, 5.8, 5.6, 6.4, 5.0, 4.2];
+  const starts = [];
+  let acc = START;
+  for (let i = 0; i < BODIES.length; i++) { starts.push(acc); acc += GAPS[i]; }
+  const EARTH_AT = acc;
+
+  const hash = (x, y, s) => { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(s, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  // Sparse field, fixed magnitudes. No streaks and no twinkle: a long exposure of deep space, drifting slowly.
+  const stars = Array.from({ length: 150 }, (_, i) => {
+    const faint = Math.pow(hash(i, 4, 51), 0.42);
+    const b = 0.12 + 0.88 * (1 - faint);
+    const warm = hash(i, 5, 51);
+    return {
+      x: hash(i, 1, 51), y: hash(i, 2, 51), b,
+      rgb: `${Math.round(214 + warm * 36)},${Math.round(218 + warm * 22)},${Math.round(232 - warm * 28)}`,
+      s: b > 0.82 ? 1.7 : b > 0.5 ? 1.15 : 0.75,
+      drift: 0.25 + hash(i, 6, 51) * 0.75,
+    };
+  });
+
   let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null;
+  let allocW = 0, allocH = 0, resizeTimer = 0;
+  // Phones (touch and a narrow screen, or iOS): the journey canvas stays at 1.5×. A 3× buffer
+  // at the same time as the globe is what made Safari kill the tab.
+  const phoneJourney = (() => {
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const shortest = Math.min(window.screen.width || window.innerWidth, window.screen.height || window.innerHeight);
+    const narrow = shortest <= 760 || matchMedia('(max-width: 760px)').matches;
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    return (touch && narrow) || iOS;
+  })();
+  const journeyDpr = () => phoneJourney ? Math.min(1.5, window.devicePixelRatio || 1) : Math.min(3, window.devicePixelRatio || 1);
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
-  function resize() {
-    dpr = Math.min(3, window.devicePixelRatio || 1);
-    W = canvas.clientWidth; H = canvas.clientHeight;
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  const creditEl = document.getElementById('intro-credit');
+  // ----- Voice: Moroccan Darija, only after a tap (browsers refuse sound that starts by itself) -----
+  // [file in fatiha/audio, the same words in Arabic script shown under the caption]. One table, so a wrong word is a
+  // one-line fix: change the text here and replace the matching mp3.
+  const VOICE = {
+    welcome: ['darija-accueil', 'مرحبا بيك. هاد الرحلة كتبدا من بعيد بزاف، من الطرف ديال المجموعة الشمسية. غادي نقربو شوية بشوية، حتى نوصلو للأرض.'],
+    Neptune: ['darija-neptune', 'هادا نبتون. هو أبعد كوكب على الشمس. بارد بزاف، ولونو زرق.'],
+    Uranus: ['darija-uranus', 'هادا أورانوس. حتى هو كوكب بارد، وكيدور وهو مايل على جنبو.'],
+    Saturne: ['darija-saturne', 'هادا زحل. معروف بالحلقات ديالو، اللي فيهم الثلج والحجر.'],
+    Jupiter: ['darija-jupiter', 'هادا المشتري، أكبر كوكب كاين. والبقعة الحمرا اللي فيه، عاصفة كبر من الأرض.'],
+    Mars: ['darija-mars', 'هادا المريخ، الكوكب الحمر. صغر من الأرض، وفيه الثلج فالقطبين ديالو.'],
+    Lune: ['darija-lune', 'وهادا القمر ديالنا. قريب لينا بزاف، وكيدور على الأرض.'],
+    Terre: ['darija-terre', 'وها حنا وصلنا. هادي الأرض، الدار ديالنا. دابا نقدرو نشوفو البلايص من الفوق.'],
+  };
+  const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome', credit: 'Photos de sondes · tailles et vitesse non à l’échelle' };
+  // With the voice on the clock runs slower (VOICE_RATE), so a planet stays on screen as long as its sentence lasts;
+  // before the first planet it is slower still, for the welcome.
+  const VOICE_RATE = 0.5, WELCOME_RATE = 0.3, welcomeEnd = () => starts[0] + 0.18 * PASS;
+  let rate = 1, voiceOn = false, muted = false, busy = false, audio = null, voiceQ = [], curVK = null, voiced = null, swapTimer = 0, sky = null;
+  // One element, kept in the page: a fresh Audio() per sentence is collected or paused by iOS
+  // (often right after the first syllable, when the globe's WebGL context appears).
+  let wantPlay = false, voiceToken = 0, swappingSrc = false, voiceGesture = false, voiceBlocked = false, voiceResumeAt = 0, voiceRetries = 0;
+  const darijaEl = document.getElementById('intro-darija'), voiceBtn = document.getElementById('intro-voice'), voiceLabel = document.getElementById('intro-voice-label');
+  const savedVoice = () => { try { return localStorage.getItem('nour.voix') === '1'; } catch (e) { return false; } };
+  const saveVoice = (v) => { try { localStorage.setItem('nour.voix', v ? '1' : '0'); } catch (e) { /* private mode */ } };
+  function ensureAudio() {
+    if (audio) return audio;
+    const a = document.createElement('audio');
+    a.setAttribute('playsinline', ''); a.setAttribute('webkit-playsinline', '');
+    a.preload = 'auto';
+    a.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;opacity:0;pointer-events:none';
+    loader.appendChild(a);
+    a.addEventListener('ended', () => { if (!wantPlay) return; busy = false; pump(); });
+    a.addEventListener('error', () => { if (!wantPlay) return; busy = false; pump(); });
+    a.addEventListener('pause', () => {
+      // src changes pause the element on purpose. An outside pause (WebGL, iOS audio session)
+      // must not swallow the rest of the sentence.
+      if (swappingSrc || !wantPlay || muted || !voiceOn || a.ended) return;
+      const dur = a.duration;
+      if (!(a.currentTime > 0.05) || (dur && a.currentTime > dur - 0.25)) return;
+      const now = performance.now();
+      if (now - voiceResumeAt < 500) return;
+      voiceResumeAt = now;
+      const p = a.play();
+      if (p && p.catch) p.catch(() => {});
+    });
+    audio = a;
+    return a;
   }
+  // Called from the tap, before play(): opens the iOS audio session. A remembered choice
+  // that starts by itself is refused; the button then asks for this tap.
+  function unlockVoice() {
+    voiceGesture = true;
+    ensureAudio();
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      const ctx = new AC();
+      const buf = ctx.createBuffer(1, 1, ctx.sampleRate || 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf; src.connect(ctx.destination); src.start(0);
+      const close = () => { try { ctx.close(); } catch (e) { /* already closed */ } };
+      if (ctx.resume) ctx.resume().then(close, close); else close();
+    } catch (e) { /* the element unlock is what play() needs */ }
+  }
+  function markNeedsTap() {
+    voiceOn = false; voiceBlocked = true; wantPlay = false; busy = false; voiceQ = [];
+    voiceBtn.setAttribute('aria-pressed', 'false');
+    loader.classList.remove('voice');
+    voiceLabel.textContent = 'Touchez pour écouter';
+  }
+  function pump() {
+    if (busy || !voiceQ.length || !voiceOn || muted) return;
+    const k = voiceQ.shift();
+    const file = VOICE[k] && VOICE[k][0];
+    if (!file) { pump(); return; }
+    const a = ensureAudio();
+    const token = ++voiceToken;
+    busy = true; wantPlay = true; voiceBlocked = false;
+    const url = `audio/${file}.mp3`;
+    if (!a.src.endsWith('/' + url) && !a.src.endsWith(url)) {
+      swappingSrc = true; a.src = url; swappingSrc = false;
+    }
+    const p = a.play();
+    if (p && p.then) p.then(() => { if (token === voiceToken) { voiceBlocked = false; voiceRetries = 0; } }, () => {
+      if (token !== voiceToken || !wantPlay) return;
+      // Refused (no gesture yet): do not forget the saved choice, just ask for a tap.
+      if (!voiceGesture) { markNeedsTap(); return; }
+      busy = false;
+      if (voiceRetries < 1) { voiceRetries++; voiceQ.unshift(k); pump(); return; }
+      voiceRetries = 0; wantPlay = false; markNeedsTap();
+    });
+  }
+  function voicePlay(k) { if (voiceOn && !muted && VOICE[k]) { voiceQ.push(k); pump(); } }
+  function voiceStop() {
+    voiceQ = []; busy = false; wantPlay = false; voiceToken++;
+    if (audio) { swappingSrc = true; audio.pause(); swappingSrc = false; }
+  }
+  // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
+  function setVoice(on, tap) {
+    voiceOn = on;
+    voiceBtn.setAttribute('aria-pressed', String(on));
+    voiceLabel.textContent = on ? 'Voix activée' : (voiceBlocked ? 'Touchez pour écouter' : 'Voix en darija');
+    loader.classList.toggle('voice', on);
+    if (tap) saveVoice(on);
+    if (!on) { voiceStop(); return; }
+    const k = curVK || (t < welcomeEnd() ? 'welcome' : null);   // say what is on screen right now
+    if (k) { voiced = k; voicePlay(k); }
+  }
+
+  // The sky behind everything, drawn once per size: a faint Milky Way band, a field of small stars, a few bright ones.
+  function buildSky() {
+    sky = document.createElement('canvas'); sky.width = canvas.width; sky.height = canvas.height;
+    const g = sky.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const diag = Math.hypot(W, H);
+    g.save(); g.translate(W * 0.5, H * 0.5); g.rotate(-0.5);
+    for (let i = 0; i < 48; i++) {
+      const px = (i / 47 - 0.5) * diag * 1.15, py = (hash(i, 3, 71) - 0.5) * H * 0.1, r = H * (0.14 + 0.2 * hash(i, 9, 73));
+      const gr = g.createRadialGradient(px, py, 0, px, py, r);
+      gr.addColorStop(0, hash(i, 5, 75) > 0.62 ? 'rgba(255,214,170,0.05)' : 'rgba(150,172,255,0.055)'); gr.addColorStop(1, 'rgba(120,140,255,0)');
+      g.fillStyle = gr; g.fillRect(px - r, py - r, 2 * r, 2 * r);
+    }
+    g.fillStyle = '#DDE6FF';
+    for (let i = 0; i < 900; i++) {   // dense dust of faint stars inside the band
+      const u = hash(i, 11, 77) * 2 - 1, v = (hash(i, 12, 77) + hash(i, 13, 77) + hash(i, 14, 77) - 1.5) / 1.5;
+      g.globalAlpha = 0.15 + 0.6 * hash(i, 15, 77) ** 2; g.fillRect(u * diag * 0.55, v * H * 0.16, 0.9, 0.9);
+    }
+    g.restore();
+    for (let i = 0; i < 650; i++) {   // the general field: many small, a few bright
+      const x = hash(i, 21, 79) * W, y = hash(i, 22, 79) * H, m = hash(i, 23, 79) ** 3, k = hash(i, 24, 79);
+      g.globalAlpha = 0.25 + 0.75 * m; g.fillStyle = k < 0.7 ? '#F4F6FA' : k < 0.88 ? '#BCD2FF' : '#FFE0BC';
+      g.beginPath(); g.arc(x, y, (0.6 + 1.5 * m) * 0.6, 0, 6.2832); g.fill();
+    }
+    g.globalAlpha = 1;
+    for (let i = 0; i < 14; i++) {   // a few stars with a soft halo
+      const x = hash(i, 31, 81) * W, y = hash(i, 32, 81) * H, r = (2.5 + 4 * hash(i, 33, 81)) * 2.2;
+      const gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.12, 'rgba(235,242,255,0.7)'); gr.addColorStop(0.35, 'rgba(210,222,255,0.16)'); gr.addColorStop(1, 'rgba(200,215,255,0)');
+      g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r);
+    }
+  }
+  function resize() {
+    if (!api.active) return;
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    if (!cw || !ch) return;
+    const next = journeyDpr();
+    // The iOS address bar changes the height by well under 150 px. Reallocating the
+    // full-screen canvas and rebuilding the sky for that is a visible stutter.
+    if (allocW && cw === allocW && Math.abs(ch - allocH) < 150 && next === dpr) return;
+    dpr = next;
+    W = cw; H = ch;
+    allocW = cw; allocH = ch;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    buildSky();
+  }
+  function scheduleResize() {
+    if (resizeTimer) return;
+    resizeTimer = setTimeout(() => { resizeTimer = 0; resize(); }, 180);
+  }
+  // Drop the bitmap at once so the journey cannot keep a full-screen buffer over the globe.
+  function releaseJourneyCanvas() {
+    cancelAnimationFrame(raf); raf = 0;
+    clearTimeout(resizeTimer); resizeTimer = 0;
+    canvas.width = 0; canvas.height = 0;
+    canvas.style.display = 'none';
+    sky = null;
+    W = 0; H = 0; allocW = 0; allocH = 0;
+  }
+  function drawSprite(key, x, y, r) {
+    const sp = sprites[key];
+    if (!sp || r < 0.5) return false;
+    const dw = 2 * r / sp.body, dh = dw * sp.h / sp.w;
+    ctx.drawImage(sp.image, x - dw / 2, y - dh / 2, dw, dh);
+    return true;
+  }
+  function drawLimb(key, x, y, r) {
+    const sp = sprites[key];
+    if (!sp || !sp.halo || r < 3) return;
+    const dw = 2 * r / sp.body, scale = dw / sp.w;
+    const hw = sp.halo.width * scale, hh = sp.halo.height * scale;
+    ctx.drawImage(sp.halo, x - hw / 2, y - hh / 2, hw, hh);
+  }
+  function drawBody(b, x, y, r) {
+    drawLimb(b.photo, x, y, r);
+    drawSprite(b.photo, x, y, r);
+    const ang = b.moonTilt || 0;
+    for (const m of b.moons || []) {
+      if (!m.photo) continue;
+      const mx = x + m.way * m.dist * r * Math.cos(ang), my = y + m.way * m.dist * r * Math.sin(ang);
+      const mr = Math.max(1.2, m.size * r);
+      if (mx < -80 || mx > W + 80 || my < -80 || my > H + 80) continue;
+      drawLimb(m.photo, mx, my, mr);
+      drawSprite(m.photo, mx, my, mr);
+    }
+  }
+  function drawStars(dt) {
+    for (const s of stars) {
+      s.x -= dt * 0.006 * s.drift;
+      if (s.x < 0) s.x += 1;
+      ctx.globalAlpha = s.b * 0.85;
+      ctx.fillStyle = `rgb(${s.rgb})`;
+      ctx.fillRect(s.x * W, s.y * H, s.s, s.s);
+    }
+  }
+  // Caption: the old one fades out, then the new one fades in.
   function setCaption(b, waiting) {
     const key = b ? b.name + (waiting ? '…' : '') : null;
     if (key === shown) return;
-    shown = key;
-    caption.classList.toggle('show', !!b);
-    if (!b) return;
-    const step = b === EARTH ? BODIES.length + 1 : BODIES.indexOf(b) + 1;
-    kicker.textContent = `${String(step).padStart(2, '0')} / ${String(BODIES.length + 1).padStart(2, '0')}\n${b.kind}`; nameEl.textContent = b.name;
-    factEl.textContent = waiting ? `${b.fact}\nle globe se prépare…` : b.fact;
+    const prev = shown; shown = key;
+    clearTimeout(swapTimer);
+    const apply = () => {
+      caption.classList.toggle('show', !!b);
+      if (b) {
+        const vk = b.voiceKey || b.name, step = b === EARTH ? TOTAL : BODIES.indexOf(b) + 1;
+        curVK = vk;
+        kicker.textContent = step > 0 ? `${String(step).padStart(2, '0')} / ${String(TOTAL).padStart(2, '0')}\n${b.kind}` : b.kind;
+        nameEl.textContent = b.name;
+        factEl.textContent = waiting ? (b.fact ? `${b.fact}\nle globe se prépare…` : 'le globe se prépare…') : b.fact;
+        darijaEl.textContent = VOICE[vk] ? VOICE[vk][1] : '';
+        if (voiced !== vk) { voiced = vk; voicePlay(vk); }
+      } else { curVK = null; voiced = null; }
+      creditEl.textContent = b
+        ? b.credit + (b.extraCredit ? '\n' + b.extraCredit : '')
+        : 'Photos de sondes · tailles et vitesse non à l’échelle';
+    };
+    if (prev && b && prev.replace('…', '') !== b.name) { caption.classList.remove('show'); swapTimer = setTimeout(apply, 300); } else apply();
   }
   function frame(now) {
+    if (!api.active) return;
     raf = requestAnimationFrame(frame);
-    const dt = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now; t += dt;
-    if (!W || canvas.clientWidth !== W || canvas.clientHeight !== H) resize();
+    const real = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
+    rate += ((voiceOn && !muted && !api.arrived ? (t < welcomeEnd() ? WELCOME_RATE : VOICE_RATE) : 1) - rate) * Math.min(1, real * 3);
+    const dt = real * rate; t += dt;
+    if (!allocW) resize();
+    else if (canvas.clientWidth !== allocW || Math.abs(canvas.clientHeight - allocH) >= 150) scheduleResize();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    const cx = W / 2, cy = H / 2, span = Math.max(W, H) * 0.6;
-    // Stars streaming out of the point we fly towards.
-    ctx.strokeStyle = '#F4F6FA'; ctx.lineCap = 'round';
-    for (const s of stars) {
-      s.z -= dt * 0.085;
-      if (s.z < 0.05) s.z += 0.95;
-      const x = cx + s.x / s.z * span * 0.5, y = cy + s.y / s.z * span * 0.5, near = 1 - s.z;
-      if (x < 0 || x > W || y < 0 || y > H) continue;
-      ctx.globalAlpha = Math.min(1, near * 1.4) * 0.85;
-      const d = 0.5 + near * 1.3, zb = s.z * 1.035;      // a short streak back along its path
-      ctx.lineWidth = d; ctx.beginPath(); ctx.moveTo(cx + s.x / zb * span * 0.5, cy + s.y / zb * span * 0.5); ctx.lineTo(x, y); ctx.stroke();
-    }
-    // The Earth, last and straight ahead: it ends at the size of the globe in the first Cesium view (seen from
-    // 110 000 km, field of view 60° on the long side), so the picture and the real globe can cross-fade.
+    const cx = W / 2, cy = H / 2;
+    if (sky) ctx.drawImage(sky, 0, 0, W, H);
+    drawStars(dt);
+    // Earth, last and dead ahead. It ends at the size of the globe in the first Cesium view (110 000 km, 60° on
+    // the long side) so the photograph and the real globe can cross-fade.
     const ue = Math.min(1, Math.max(0, (t - EARTH_AT) / EARTH_TAKES));
-    if (ue > 0 && EARTH.sprite) {
-      const target = Math.max(W, H) * 0.0475, grow = leaving < 0 ? 1 : Math.exp(0.5 * (t - leaving));
-      const r = target * Math.exp(-3.4 * (1 - ue) * (1 - ue)) * grow;
-      ctx.globalAlpha = Math.min(1, ue * 4);
-      ctx.drawImage(EARTH.sprite.image, cx - r * EARTH.sprite.k, cy - r * EARTH.sprite.k, 2 * r * EARTH.sprite.k, 2 * r * EARTH.sprite.k);
+    if (ue > 0) {
+      const target = Math.max(W, H) * 0.0475, grow = leaving < 0 ? 1 : Math.exp(0.35 * (t - leaving));
+      const r = target * Math.exp(-2.4 * (1 - ue) * (1 - ue)) * grow;
+      ctx.globalAlpha = Math.min(1, ue * 3);
+      drawBody(EARTH, cx, cy, r);
     }
-    // The planets, far ones first: each one comes out of the point ahead, grows and slides past on one side.
-    const base = 0.3 * Math.sqrt(W * H);
     let current = null;
+    const reach = Math.min(W, H);
     for (let i = BODIES.length - 1; i >= 0; i--) {
-      const b = BODIES[i], u = (t - START - i * STAGGER) / PASS;
-      if (u <= 0 || u >= 1 || !b.sprite) continue;
-      const r = base * b.size / (48 * Math.exp(-5.39 * u)), side = i % 2 ? 1 : -1, slope = (i % 3 - 1) * 0.22;
-      const x = cx + side * 1.75 * r * Math.cos(slope), y = cy + 1.75 * r * Math.sin(slope) + r * 0.12;
-      ctx.globalAlpha = Math.min(1, u / 0.06, (1 - u) / 0.1);
-      ctx.drawImage(b.sprite.image, x - r * b.sprite.k, y - r * b.sprite.k, 2 * r * b.sprite.k, 2 * r * b.sprite.k);
-      // Large moons, at their real distances and sizes in planet radii, along the equator.
-      ctx.fillStyle = '#CFC8BD';
-      for (const [dist, size, way] of b.moons || []) {
-        const mx = x + way * dist * r * Math.cos(b.tilt), my = y + way * dist * r * Math.sin(b.tilt), mr = Math.max(0.7, size * r);
-        if (mx < -mr || mx > W + mr || my < -mr || my > H + mr) continue;
-        ctx.beginPath(); ctx.arc(mx, my, mr, 0, 2 * Math.PI); ctx.fill();
-      }
-      if (u > 0.2 && u < 0.72) current = b;
+      const b = BODIES[i], u = (t - starts[i]) / PASS;
+      if (u <= 0 || u >= 1) continue;
+      const r = reach * b.size * (0.04 + 0.30 * Math.pow(u, 1.15));
+      const side = i % 2 ? 1 : -1, drift = u * u;
+      const x = cx + side * drift * W * 0.42, y = cy + ((i % 3) - 1) * drift * H * 0.08;
+      ctx.globalAlpha = Math.min(1, u / 0.08, (1 - u) / 0.14);
+      drawBody(b, x, y, r);
+      if (u > 0.18 && u < 0.78) current = b;
     }
     ctx.globalAlpha = 1;
     if (t > 2.4) loader.classList.add('under-way');
-    if (ue >= 1 && !api.arrived) { api.arrived = true; skipBtn.hidden = true; }
+    if (ue >= 1 && !api.arrived) { api.arrived = true; skipBtn.hidden = true; voiceBtn.hidden = true; }
     if (api.arrived && onArrive && leaving < 0) { leaving = t; const cb = onArrive; onArrive = null; cb(); }
-    setCaption(current || (ue > 0.25 && leaving < 0 ? EARTH : null), api.arrived);
+    setCaption(current || (ue > 0.25 && leaving < 0 ? EARTH : null) || (voiceOn && !muted && leaving < 0 && t < welcomeEnd() ? WELCOME : null), api.arrived);
     if (leaving >= 0 && t - leaving > 1.6) api.stop(true);
   }
   api.active = true;
   api.whenArrived = (cb) => { onArrive = cb; };
-  api.skip = () => { if (t < EARTH_AT + EARTH_TAKES - 0.6) t = EARTH_AT + EARTH_TAKES - 0.6; };
-  // `quiet`: the loader is already fading out, leave it as it is. Otherwise fall back to the plain title card.
+  // Skipping also silences the voice for the rest of the journey.
+  api.skip = () => {
+    muted = true; voiceStop(); loader.classList.remove('voice'); voiceBtn.hidden = true; skipBtn.hidden = true;
+    if (!api.arrived) api.arrived = true;
+    // Passer drops the canvas immediately: the photograph must not keep animating over the globe.
+    releaseJourneyCanvas();
+    const cb = onArrive; onArrive = null;
+    api.stop(true);
+    if (cb) cb();
+  };
   api.stop = (quiet) => {
-    cancelAnimationFrame(raf); api.active = false; api.whenArrived = (cb) => cb();
-    if (!quiet) loader.classList.remove('journey', 'under-way');
+    releaseJourneyCanvas(); clearTimeout(swapTimer); api.active = false; api.whenArrived = (cb) => cb();
+    // quiet: the loader is already fading out and a sentence still being said carries on; otherwise stop the voice too.
+    if (!quiet) { voiceStop(); loader.classList.remove('journey', 'under-way', 'voice'); }
   };
   Object.defineProperty(api, 'time', { get: () => t, set: (v) => { t = v; } });   // tests
+  Object.defineProperty(api, 'voice', { get: () => ({ on: voiceOn, busy, key: curVK, queued: voiceQ.length, muted }) });   // tests
   loader.classList.add('journey');
-  skipBtn.hidden = false;
+  skipBtn.hidden = false; voiceBtn.hidden = false;
   skipBtn.addEventListener('click', api.skip);
+  voiceBtn.addEventListener('click', () => { if (!voiceOn) unlockVoice(); setVoice(!voiceOn, true); });
   window.addEventListener('keydown', (e) => { if (api.active && (e.key === 'Escape' || e.key === 'Enter')) api.skip(); });
+  if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
 })();
 </script>
@@ -1345,12 +1579,16 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.5';
+  const NOUR_BUILD = '2026-11-14.1-stable2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const intro = window.__intro || { active: false, stop() {}, whenArrived(cb) { cb(); } };   // the opening journey
+  // While the journey canvas is on screen the globe is created but not drawn every frame.
+  // openingHeld runs once, when that canvas is released (the flight must not start underneath it).
+  let globeHeld = false;
+  let openingHeld = null;
   function fail(message) {
     intro.stop();
     $('loader-text').textContent = message;
@@ -1395,8 +1633,27 @@
     const limit = Math.min(cap, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
     return Math.max(1, limit / (Math.max(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1)));
   }
-  const renderScale = (t) => (t.ultra ? ultraScale() : Math.min(1, t.dpr / (window.devicePixelRatio || 1)));
-  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr);
+  // Phones (touch + a narrow screen, or iOS) cannot afford a 3× framebuffer on top of the journey.
+  function isHandheld() {
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const shortest = Math.min(window.screen.width || window.innerWidth, window.screen.height || window.innerHeight);
+    const narrow = shortest <= 760 || matchMedia('(max-width: 760px)').matches;
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    return (touch && narrow) || iOS;
+  }
+  const phone = isHandheld();
+  // 1.5× while the journey is up, 2× after. A chosen Ultra tier still respects the cap.
+  function phoneDprCap() {
+    if (!phone) return Infinity;
+    return intro.active ? 1.5 : 2;
+  }
+  const renderScale = (t) => {
+    const cap = phoneDprCap();
+    if (t.ultra && !(cap < Infinity)) return ultraScale();
+    return Math.min(1, Math.min(t.dpr, cap) / (window.devicePixelRatio || 1));
+  };
+  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr, phoneDprCap());
   const msaaFor = (t) => (t.ultra || effectiveDpr(t) >= 2 ? 1 : t.msaa);
   const fxaaFor = (t) => !t.ultra && effectiveDpr(t) < 2;
   // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
@@ -1419,7 +1676,13 @@
     return TIER_BY_CHOICE[choice] ? choice : 'auto';
   }
   let quality = readQuality();
-  let tierName = TIER_BY_CHOICE[quality] || detectTier();
+  // After a lost WebGL context the page reloads once and starts light for that visit only.
+  let recoverLight = false;
+  try {
+    recoverLight = sessionStorage.getItem('nour.recoverLight') === '1';
+    if (recoverLight) sessionStorage.removeItem('nour.recoverLight');
+  } catch (e) { recoverLight = false; }
+  let tierName = TIER_BY_CHOICE[quality] || ((phone || recoverLight) ? 'light' : detectTier());
   let tier = TIERS[tierName];
 
   // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
@@ -1565,6 +1828,60 @@
   unlinkCredits($('cesium-credits'));
   const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
   const canvas = scene.canvas;
+  // One full-screen animation at a time. The journey canvas is already running; the globe
+  // keeps its render loop but does not draw until the journey releases the canvas.
+  // (preUpdate still runs, so a flight started underneath would force a draw every frame
+  // via the camera-changed check — the opening flight waits in openingHeld.)
+  if (intro.active) {
+    globeHeld = true;
+    scene.requestRenderMode = true;
+    scene.maximumRenderTimeChange = Number.POSITIVE_INFINITY;
+  }
+  // Cesium 1.145 never listens for a lost WebGL context: the canvas stays black and the
+  // render loop stops. preventDefault asks the browser to restore it; one reload rebuilds
+  // every GL resource. A second loss in the same tab explains itself instead of looping.
+  canvas.addEventListener('webglcontextlost', (event) => {
+    event.preventDefault();
+    try { viewer.useDefaultRenderLoop = false; } catch (e) { /* already stopped */ }
+  }, false);
+  canvas.addEventListener('webglcontextrestored', () => {
+    let already = false;
+    try {
+      already = sessionStorage.getItem('nour.glrestore') === '1';
+      sessionStorage.setItem('nour.glrestore', '1');
+    } catch (e) { already = false; }
+    if (already) {
+      fail("Le rendu 3D s'est interrompu. Rechargez la page pour retrouver le globe.");
+      return;
+    }
+    try { sessionStorage.setItem('nour.recoverLight', '1'); } catch (e) { /* reload at the same tier */ }
+    location.reload();
+  }, false);
+  // On a phone, ignore the address-bar resize (height only, under 150 px) and debounce a
+  // real one so the drawing buffer is not reallocated on every frame of the animation.
+  if (phone) {
+    const widget = viewer.cesiumWidget;
+    const origResize = widget.resize.bind(widget);
+    let stableW = 0, stableH = 0, resizeTimer = 0;
+    widget.resize = function () {
+      const c = widget.canvas;
+      const cw = c.clientWidth, ch = c.clientHeight;
+      if (widget._forceResize || !stableW || !cw || !ch) {
+        clearTimeout(resizeTimer); resizeTimer = 0;
+        origResize();
+        stableW = c.clientWidth; stableH = c.clientHeight;
+        return;
+      }
+      if (cw === stableW && Math.abs(ch - stableH) < 150) return;
+      if (cw === stableW && ch === stableH) return;
+      if (resizeTimer) return;
+      resizeTimer = setTimeout(() => {
+        resizeTimer = 0;
+        origResize();
+        stableW = c.clientWidth; stableH = c.clientHeight;
+      }, 180);
+    };
+  }
 
   // Satellite imagery (Esri World Imagery). If a tile fails, Natural Earth
   // underneath stays visible instead of a hole.
@@ -1591,6 +1908,13 @@
       this.credit = undefined;
       this.proxy = undefined;
       this.hasAlphaChannel = true;
+      // One 256² canvas for every tile. A new canvas per tile, held until the GPU upload,
+      // was a large part of the memory that made iOS kill the tab. Tiles are shaded one
+      // at a time and the result is snapshotted (ImageBitmap) before the canvas is reused.
+      this._cv = document.createElement('canvas');
+      this._cv.width = this._cv.height = 256;
+      this._ctx = this._cv.getContext('2d', { willReadFrequently: true });
+      this._queue = Promise.resolve();
     }
     getTileCredits() { return []; }
     pickFeatures() { return undefined; }
@@ -1599,42 +1923,46 @@
       const loading = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
       if (!loading) return undefined;
       return loading.then((img) => {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = 256;
-        const ctx = cv.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0, 256, 256);
-        if (img.close) img.close();
-        const src = ctx.getImageData(0, 0, 256, 256).data;
-        const h = new Float32Array(256 * 256);
-        for (let i = 0, j = 0; i < h.length; i++, j += 4) {
-          const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
-          h[i] = v > 0 ? v : 0;
-        }
-        const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
-        const cell = 156543.03392 * Math.cos((rect.north + rect.south) / 2) / (1 << level);
-        const zf = 1.6;                                   // gentle vertical exaggeration
-        const zen = D2R(45), azm = D2R(135);              // light from the north-west
-        const cz = Math.cos(zen), sz = Math.sin(zen), flat = cz;
-        const out = ctx.createImageData(256, 256), o = out.data;
-        const at = (r, c) => h[Math.min(255, Math.max(0, r)) * 256 + Math.min(255, Math.max(0, c))];
-        for (let r = 0; r < 256; r++) {
-          for (let c = 0; c < 256; c++) {
-            const a = at(r - 1, c - 1), b = at(r - 1, c), cc = at(r - 1, c + 1);
-            const d = at(r, c - 1), f = at(r, c + 1);
-            const g = at(r + 1, c - 1), hh = at(r + 1, c), i = at(r + 1, c + 1);
-            const dx = ((cc + 2 * f + i) - (a + 2 * d + g)) / (8 * cell);
-            const dy = ((g + 2 * hh + i) - (a + 2 * b + cc)) / (8 * cell);
-            const slope = Math.atan(zf * Math.hypot(dx, dy));
-            const aspect = Math.atan2(dy, -dx);
-            const shade = cz * Math.cos(slope) + sz * Math.sin(slope) * Math.cos(azm - aspect);
-            const dlt = shade - flat, k = (r * 256 + c) * 4;
-            if (dlt < 0) { o[k + 3] = Math.min(0.5, -dlt * 1.3) * 255; }
-            else { o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = Math.min(0.1, dlt * 0.4) * 255; }
-          }
-        }
-        ctx.putImageData(out, 0, 0);
-        return cv;
+        const task = this._queue.then(() => this._shade(img, x, y, level), () => this._shade(img, x, y, level));
+        this._queue = task.then(() => undefined, () => undefined);
+        return task;
       });
+    }
+    _shade(img, x, y, level) {
+      const ctx = this._ctx;
+      ctx.drawImage(img, 0, 0, 256, 256);
+      if (img.close) img.close();
+      const src = ctx.getImageData(0, 0, 256, 256).data;
+      const h = new Float32Array(256 * 256);
+      for (let i = 0, j = 0; i < h.length; i++, j += 4) {
+        const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
+        h[i] = v > 0 ? v : 0;
+      }
+      const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
+      const cell = 156543.03392 * Math.cos((rect.north + rect.south) / 2) / (1 << level);
+      const zf = 1.6;                                   // gentle vertical exaggeration
+      const zen = D2R(45), azm = D2R(135);              // light from the north-west
+      const cz = Math.cos(zen), sz = Math.sin(zen), flat = cz;
+      const out = ctx.createImageData(256, 256), o = out.data;
+      const at = (r, c) => h[Math.min(255, Math.max(0, r)) * 256 + Math.min(255, Math.max(0, c))];
+      for (let r = 0; r < 256; r++) {
+        for (let c = 0; c < 256; c++) {
+          const a = at(r - 1, c - 1), b = at(r - 1, c), cc = at(r - 1, c + 1);
+          const d = at(r, c - 1), f = at(r, c + 1);
+          const g = at(r + 1, c - 1), hh = at(r + 1, c), i = at(r + 1, c + 1);
+          const dx = ((cc + 2 * f + i) - (a + 2 * d + g)) / (8 * cell);
+          const dy = ((g + 2 * hh + i) - (a + 2 * b + cc)) / (8 * cell);
+          const slope = Math.atan(zf * Math.hypot(dx, dy));
+          const aspect = Math.atan2(dy, -dx);
+          const shade = cz * Math.cos(slope) + sz * Math.sin(slope) * Math.cos(azm - aspect);
+          const dlt = shade - flat, k = (r * 256 + c) * 4;
+          if (dlt < 0) { o[k + 3] = Math.min(0.5, -dlt * 1.3) * 255; }
+          else { o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = Math.min(0.1, dlt * 0.4) * 255; }
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+      // Snapshot so the next tile can reuse _cv before Cesium uploads this one.
+      return typeof createImageBitmap === 'function' ? createImageBitmap(this._cv) : this._cv;
     }
   }
   const hillshade = viewer.imageryLayers.addImageryProvider(new HillshadeImageryProvider());
@@ -1771,7 +2099,7 @@
   globe.showWaterEffect = false;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
-  globe.tileCacheSize = 1000;
+  globe.tileCacheSize = phone ? 100 : 1000;
   globe.preloadSiblings = true;
   globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
   globe.atmosphereLightIntensity = 10;
@@ -2615,7 +2943,7 @@
   // Ends a dive, finished (card shown) or not (touch, another flight): no blur or haze, no prefetch left, and the
   // frame-rate watch resumes after a warm-up.
   function endDive(finished) {
-    if (diveSeq) { slowWindows = 0; warmUntil = performance.now() + 5000; }
+    if (diveSeq) { slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 5000; }
     diving = false; diveSeq = false; diveStage = finished ? 'done' : null;
     prefetchStop(!finished);
   }
@@ -2891,7 +3219,8 @@
   // HUD readout + adaptive quality (steps down if frame rate stays low).
   const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
     : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
-  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
+  let frames = 0, fpsT = performance.now(), slowWindows = 0, fastWindows = 0, hudT = 0;
+  let warmUntil = performance.now() + (phone ? 4000 : 12000);
   let capturing = false;     // a high-resolution capture is slow on purpose: never read it as a weak device
   function applyTier(name) {
     tierName = name; tier = TIERS[name];
@@ -2907,6 +3236,28 @@
     try { scene.msaaSamples = msaaFor(tier); } catch (e) { /* no multisampling on this device */ }
     $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   }
+  // The journey's stop releases the globe. Installed here, once applyTier exists, and still
+  // during the synchronous setup (the journey's rAF cannot run until this script yields).
+  function releaseGlobe() {
+    if (!globeHeld) return;
+    globeHeld = false;
+    scene.maximumRenderTimeChange = 0;
+    scene.requestRenderMode = false;
+    frames = 0; fpsT = performance.now(); slowWindows = 0; fastWindows = 0;
+    warmUntil = performance.now() + (phone ? 4000 : 12000);
+    applyTier(tierName);   // intro.active is now false, so the phone cap rises from 1.5× to 2×
+    const held = openingHeld; openingHeld = null;
+    if (held) held();
+    scene.requestRender();
+  }
+  if (globeHeld) {
+    const origStop = intro.stop;
+    intro.stop = function (quiet) {
+      const result = origStop.apply(this, arguments);
+      releaseGlobe();
+      return result;
+    };
+  }
   $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   function syncQualityButtons() {
     document.querySelectorAll('#menu [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
@@ -2915,8 +3266,8 @@
     quality = choice;
     try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
     catch (e) { /* storage blocked: the choice applies to this visit only */ }
-    slowWindows = 0; warmUntil = performance.now() + 6000;
-    applyTier(TIER_BY_CHOICE[choice] || detectTier());
+    slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 6000;
+    applyTier(TIER_BY_CHOICE[choice] || (phone ? 'light' : detectTier()));
     syncQualityButtons();
   }
   document.querySelectorAll('#menu [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
@@ -2924,7 +3275,7 @@
   window.addEventListener('resize', () => { if (tier.ultra && !capturing) viewer.resolutionScale = renderScale(tier); });
   syncQualityButtons();
   // A hidden tab stops frames: do not count that gap as slowness.
-  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
+  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; fastWindows = 0; warmUntil = fpsT + 4000; });
   scene.postRender.addEventListener(() => {
     frames++;
     const now = performance.now();
@@ -2936,8 +3287,18 @@
       // The last step (light) costs sharpness (coarser ground, 2x pixels): only a really low frame rate takes it.
       const i = TIER_ORDER.indexOf(tierName);
       const floor = TIER_ORDER[i + 1] === 'light' ? 15 : 24;
-      slowWindows = (now > warmUntil && fps < floor && !capturing && !diveSeq) ? slowWindows + 1 : 0;
-      if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
+      const cooled = now > warmUntil && !capturing && !diveSeq;
+      slowWindows = (cooled && fps < floor) ? slowWindows + 1 : 0;
+      if (quality === 'auto' && slowWindows >= 3 && i >= 0 && i < TIER_ORDER.length - 1) {
+        applyTier(TIER_ORDER[i + 1]); slowWindows = 0; fastWindows = 0; warmUntil = now + 6000;
+      }
+      // Phones start on Légère. Step back up only after several calm, fast windows.
+      // The pixel cap stays at 2×, so a higher tier spends the headroom on terrain, not on a 3× buffer.
+      const quick = cooled && fps >= 45 && phone && quality === 'auto' && i > 0;
+      fastWindows = quick ? fastWindows + 1 : 0;
+      if (fastWindows >= 3) {
+        applyTier(TIER_ORDER[i - 1]); fastWindows = 0; slowWindows = 0; warmUntil = now + 6000;
+      }
     }
     if (now - hudT > 200) {
       hudT = now;
@@ -4014,16 +4375,18 @@
   // ----- Tiles: small squares with a logo (or initials), a name and a badge -----
   const okImage = (u) => typeof u === 'string' && u.startsWith('https://');
   const initials = (name) => name.replace(/[^\p{L}\p{N} ]/gu, ' ').split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '·';
-  function makeTile(name, logo, badge, label) {
+  // big: a channel or station shows its name in the middle of the square (no glyph); without a logo the name strip is hidden.
+  function makeTile(name, logo, badge, label, big = false) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'tile'; b.setAttribute('aria-label', label);
-    const ini = document.createElement('span'); ini.className = 'initials'; ini.textContent = initials(name); ini.setAttribute('aria-hidden', 'true');
+    const ini = document.createElement('span'); ini.className = 'initials'; ini.textContent = big ? name : initials(name); ini.setAttribute('aria-hidden', 'true');
+    if (big) b.classList.add(okImage(logo) ? 'has-logo' : 'named');
     b.append(ini);
     if (okImage(logo)) {
       const img = document.createElement('img');
       img.className = 'logo'; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async'; img.referrerPolicy = 'no-referrer';
       img.addEventListener('load', () => ini.remove(), { once: true });
-      img.addEventListener('error', () => img.remove(), { once: true });
+      img.addEventListener('error', () => { img.remove(); if (big) { b.classList.remove('has-logo'); b.classList.add('named'); } }, { once: true });
       img.src = logo; b.append(img);
     }
     const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = badge;
@@ -4198,7 +4561,7 @@
     return stations;
   }
   function stationTile(st, statusId) {
-    const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`);
+    const tile = makeTile(st.name, st.logo, 'Radio', `${st.name}${st.sub ? ` (${st.sub})` : ''} : écouter`, true);
     tile.addEventListener('click', () => {
       if (tile.classList.contains('playing')) { stopMedia(); say(statusId, 'Radio arrêtée.'); }
       else playMedia('radio', st, statusId, tile);
@@ -4246,7 +4609,7 @@
     stopPreviews(); onScreen.clear();
     if (previewObserver) previewObserver.disconnect();
     fillList($('tv-list'), channels, (c) => {
-      const tile = makeTile(c.label, c.logo, 'Direct', `${c.label}${c.group ? ` (${c.group})` : ''} : regarder en grand avec le son`);
+      const tile = makeTile(c.label, c.logo, 'Direct', `${c.label}${c.group ? ` (${c.group})` : ''} : regarder en grand avec le son`, true);
       tile._channel = { name: c.label, url: c.url, hls: c.hls };
       tile.addEventListener('click', () => playMedia('tv', tile._channel, 'tv-status', tile));
       if (previewObserver) previewObserver.observe(tile);
@@ -5251,7 +5614,7 @@
     function renderTime(minutes, ref) {
       $('tb-clock').textContent = hhmm(minutes);
       $('tb-where').textContent = timeLocked ? 'le vol règle l’heure…'
-        : `heure solaire · ${ref.label} · ${C.JulianDate.toDate(clock.currentTime).toISOString().slice(11, 16)} UTC`;
+        : `heure solaire · ${ref.label}`;
       timeRange.setAttribute('aria-valuetext', `${hhmm(minutes).replace(':', ' h ')}, heure solaire ${ref.at}`);
     }
     function syncTime() {
@@ -6444,11 +6807,17 @@
     // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
     const h = parseHash();
-    if (h && !activePlace && !spectacle.touring) goToHash(h);
-    else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
-      duration: 7500,
-      onDone: () => setPhase('Orbite'),
-    });
+    const begin = () => {
+      if (h && !activePlace && !spectacle.touring) goToHash(h);
+      else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
+        duration: 7500,
+        onDone: () => setPhase('Orbite'),
+      });
+    };
+    // While the journey canvas is still up it is the only animated full-screen view.
+    // api.stop releases it and then runs this flight.
+    if (globeHeld) openingHeld = begin;
+    else begin();
   }
   const removeTileListener = globe.tileLoadProgressEvent.addEventListener((queued) => {
     if (queued === 0 && globe.tilesLoaded) ready();
