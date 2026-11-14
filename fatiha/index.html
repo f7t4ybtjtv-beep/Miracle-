@@ -46,7 +46,7 @@
   .vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 58%, rgba(2, 3, 8, 0.6) 100%); }
   .shade { position: fixed; left: 0; right: 0; pointer-events: none; }
   .shade-top { top: 0; height: 170px; background: linear-gradient(rgba(4, 6, 11, 0.72), transparent); }
-  .shade-bottom { bottom: 0; height: 48vh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
+  .shade-bottom { bottom: 0; height: 48vh; height: 48dvh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
 
   .ui { position: fixed; z-index: 5; }
   .kicker { font: 500 11px/1.4 var(--font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
@@ -461,6 +461,7 @@
     position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
     background: radial-gradient(ellipse 75% 60% at 50% 42%, var(--bg-2), var(--bg) 72%);
     transition: opacity 1.2s ease;
+    touch-action: none; overscroll-behavior: none;
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
@@ -484,15 +485,15 @@
   .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
-  #intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+  #intro-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: none; touch-action: none; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
-  .loader.journey { background: #000; }
+  .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
   .loader.journey .inner { position: relative; transition: opacity 1s ease; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.8); }
   .loader.journey .bar, .loader.journey .start { display: none; }
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
-    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
+    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh); bottom: calc(var(--safe-b) + 15dvh);
     max-width: 560px; opacity: 0; transition: opacity .3s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
   }
   .loader.journey .intro-caption::before {
@@ -563,7 +564,7 @@
     .sheet.watch { max-height: 58vh; }
     body.sheet-open .card, body.sheet-open .places { visibility: hidden; }
     .sheet h3 { font-size: 22px; }
-    .shade-bottom { height: 62vh; }
+    .shade-bottom { height: 62vh; height: 62dvh; }
     @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1196,6 +1197,18 @@
   });
 
   let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null;
+  let allocW = 0, allocH = 0, resizeTimer = 0;
+  // Phones (touch and a narrow screen, or iOS): the journey canvas stays at 1.5×. A 3× buffer
+  // at the same time as the globe is what made Safari kill the tab.
+  const phoneJourney = (() => {
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const shortest = Math.min(window.screen.width || window.innerWidth, window.screen.height || window.innerHeight);
+    const narrow = shortest <= 760 || matchMedia('(max-width: 760px)').matches;
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    return (touch && narrow) || iOS;
+  })();
+  const journeyDpr = () => phoneJourney ? Math.min(1.5, window.devicePixelRatio || 1) : Math.min(3, window.devicePixelRatio || 1);
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
   const creditEl = document.getElementById('intro-credit');
@@ -1275,10 +1288,31 @@
     }
   }
   function resize() {
-    dpr = Math.min(3, window.devicePixelRatio || 1);
-    W = canvas.clientWidth; H = canvas.clientHeight;
+    if (!api.active) return;
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    if (!cw || !ch) return;
+    const next = journeyDpr();
+    // The iOS address bar changes the height by well under 150 px. Reallocating the
+    // full-screen canvas and rebuilding the sky for that is a visible stutter.
+    if (allocW && cw === allocW && Math.abs(ch - allocH) < 150 && next === dpr) return;
+    dpr = next;
+    W = cw; H = ch;
+    allocW = cw; allocH = ch;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     buildSky();
+  }
+  function scheduleResize() {
+    if (resizeTimer) return;
+    resizeTimer = setTimeout(() => { resizeTimer = 0; resize(); }, 180);
+  }
+  // Drop the bitmap at once so the journey cannot keep a full-screen buffer over the globe.
+  function releaseJourneyCanvas() {
+    cancelAnimationFrame(raf); raf = 0;
+    clearTimeout(resizeTimer); resizeTimer = 0;
+    canvas.width = 0; canvas.height = 0;
+    canvas.style.display = 'none';
+    sky = null;
+    W = 0; H = 0; allocW = 0; allocH = 0;
   }
   function drawSprite(key, x, y, r) {
     const sp = sprites[key];
@@ -1340,11 +1374,13 @@
     if (prev && b && prev.replace('…', '') !== b.name) { caption.classList.remove('show'); swapTimer = setTimeout(apply, 300); } else apply();
   }
   function frame(now) {
+    if (!api.active) return;
     raf = requestAnimationFrame(frame);
     const real = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
     rate += ((voiceOn && !muted && !api.arrived ? (t < welcomeEnd() ? WELCOME_RATE : VOICE_RATE) : 1) - rate) * Math.min(1, real * 3);
     const dt = real * rate; t += dt;
-    if (!W || canvas.clientWidth !== W || canvas.clientHeight !== H) resize();
+    if (!allocW) resize();
+    else if (canvas.clientWidth !== allocW || Math.abs(canvas.clientHeight - allocH) >= 150) scheduleResize();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
     const cx = W / 2, cy = H / 2;
@@ -1382,11 +1418,16 @@
   api.whenArrived = (cb) => { onArrive = cb; };
   // Skipping also silences the voice for the rest of the journey.
   api.skip = () => {
-    muted = true; voiceStop(); loader.classList.remove('voice'); voiceBtn.hidden = true;
-    if (t < EARTH_AT + EARTH_TAKES - 0.6) t = EARTH_AT + EARTH_TAKES - 0.6;
+    muted = true; voiceStop(); loader.classList.remove('voice'); voiceBtn.hidden = true; skipBtn.hidden = true;
+    if (!api.arrived) api.arrived = true;
+    // Passer drops the canvas immediately: the photograph must not keep animating over the globe.
+    releaseJourneyCanvas();
+    const cb = onArrive; onArrive = null;
+    api.stop(true);
+    if (cb) cb();
   };
   api.stop = (quiet) => {
-    cancelAnimationFrame(raf); clearTimeout(swapTimer); api.active = false; api.whenArrived = (cb) => cb();
+    releaseJourneyCanvas(); clearTimeout(swapTimer); api.active = false; api.whenArrived = (cb) => cb();
     // quiet: the loader is already fading out and a sentence still being said carries on; otherwise stop the voice too.
     if (!quiet) { voiceStop(); loader.classList.remove('journey', 'under-way', 'voice'); }
   };
@@ -1473,12 +1514,16 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.6';
+  const NOUR_BUILD = '2026-11-14.1-stable';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   const intro = window.__intro || { active: false, stop() {}, whenArrived(cb) { cb(); } };   // the opening journey
+  // While the journey canvas is on screen the globe is created but not drawn every frame.
+  // openingHeld runs once, when that canvas is released (the flight must not start underneath it).
+  let globeHeld = false;
+  let openingHeld = null;
   function fail(message) {
     intro.stop();
     $('loader-text').textContent = message;
@@ -1523,8 +1568,27 @@
     const limit = Math.min(cap, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
     return Math.max(1, limit / (Math.max(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1)));
   }
-  const renderScale = (t) => (t.ultra ? ultraScale() : Math.min(1, t.dpr / (window.devicePixelRatio || 1)));
-  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr);
+  // Phones (touch + a narrow screen, or iOS) cannot afford a 3× framebuffer on top of the journey.
+  function isHandheld() {
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const shortest = Math.min(window.screen.width || window.innerWidth, window.screen.height || window.innerHeight);
+    const narrow = shortest <= 760 || matchMedia('(max-width: 760px)').matches;
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    return (touch && narrow) || iOS;
+  }
+  const phone = isHandheld();
+  // 1.5× while the journey is up, 2× after. A chosen Ultra tier still respects the cap.
+  function phoneDprCap() {
+    if (!phone) return Infinity;
+    return intro.active ? 1.5 : 2;
+  }
+  const renderScale = (t) => {
+    const cap = phoneDprCap();
+    if (t.ultra && !(cap < Infinity)) return ultraScale();
+    return Math.min(1, Math.min(t.dpr, cap) / (window.devicePixelRatio || 1));
+  };
+  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr, phoneDprCap());
   const msaaFor = (t) => (t.ultra || effectiveDpr(t) >= 2 ? 1 : t.msaa);
   const fxaaFor = (t) => !t.ultra && effectiveDpr(t) < 2;
   // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
@@ -1547,7 +1611,13 @@
     return TIER_BY_CHOICE[choice] ? choice : 'auto';
   }
   let quality = readQuality();
-  let tierName = TIER_BY_CHOICE[quality] || detectTier();
+  // After a lost WebGL context the page reloads once and starts light for that visit only.
+  let recoverLight = false;
+  try {
+    recoverLight = sessionStorage.getItem('nour.recoverLight') === '1';
+    if (recoverLight) sessionStorage.removeItem('nour.recoverLight');
+  } catch (e) { recoverLight = false; }
+  let tierName = TIER_BY_CHOICE[quality] || ((phone || recoverLight) ? 'light' : detectTier());
   let tier = TIERS[tierName];
 
   // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
@@ -1693,6 +1763,60 @@
   unlinkCredits($('cesium-credits'));
   const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
   const canvas = scene.canvas;
+  // One full-screen animation at a time. The journey canvas is already running; the globe
+  // keeps its render loop but does not draw until the journey releases the canvas.
+  // (preUpdate still runs, so a flight started underneath would force a draw every frame
+  // via the camera-changed check — the opening flight waits in openingHeld.)
+  if (intro.active) {
+    globeHeld = true;
+    scene.requestRenderMode = true;
+    scene.maximumRenderTimeChange = Number.POSITIVE_INFINITY;
+  }
+  // Cesium 1.145 never listens for a lost WebGL context: the canvas stays black and the
+  // render loop stops. preventDefault asks the browser to restore it; one reload rebuilds
+  // every GL resource. A second loss in the same tab explains itself instead of looping.
+  canvas.addEventListener('webglcontextlost', (event) => {
+    event.preventDefault();
+    try { viewer.useDefaultRenderLoop = false; } catch (e) { /* already stopped */ }
+  }, false);
+  canvas.addEventListener('webglcontextrestored', () => {
+    let already = false;
+    try {
+      already = sessionStorage.getItem('nour.glrestore') === '1';
+      sessionStorage.setItem('nour.glrestore', '1');
+    } catch (e) { already = false; }
+    if (already) {
+      fail("Le rendu 3D s'est interrompu. Rechargez la page pour retrouver le globe.");
+      return;
+    }
+    try { sessionStorage.setItem('nour.recoverLight', '1'); } catch (e) { /* reload at the same tier */ }
+    location.reload();
+  }, false);
+  // On a phone, ignore the address-bar resize (height only, under 150 px) and debounce a
+  // real one so the drawing buffer is not reallocated on every frame of the animation.
+  if (phone) {
+    const widget = viewer.cesiumWidget;
+    const origResize = widget.resize.bind(widget);
+    let stableW = 0, stableH = 0, resizeTimer = 0;
+    widget.resize = function () {
+      const c = widget.canvas;
+      const cw = c.clientWidth, ch = c.clientHeight;
+      if (widget._forceResize || !stableW || !cw || !ch) {
+        clearTimeout(resizeTimer); resizeTimer = 0;
+        origResize();
+        stableW = c.clientWidth; stableH = c.clientHeight;
+        return;
+      }
+      if (cw === stableW && Math.abs(ch - stableH) < 150) return;
+      if (cw === stableW && ch === stableH) return;
+      if (resizeTimer) return;
+      resizeTimer = setTimeout(() => {
+        resizeTimer = 0;
+        origResize();
+        stableW = c.clientWidth; stableH = c.clientHeight;
+      }, 180);
+    };
+  }
 
   // Satellite imagery (Esri World Imagery). If a tile fails, Natural Earth
   // underneath stays visible instead of a hole.
@@ -1719,6 +1843,13 @@
       this.credit = undefined;
       this.proxy = undefined;
       this.hasAlphaChannel = true;
+      // One 256² canvas for every tile. A new canvas per tile, held until the GPU upload,
+      // was a large part of the memory that made iOS kill the tab. Tiles are shaded one
+      // at a time and the result is snapshotted (ImageBitmap) before the canvas is reused.
+      this._cv = document.createElement('canvas');
+      this._cv.width = this._cv.height = 256;
+      this._ctx = this._cv.getContext('2d', { willReadFrequently: true });
+      this._queue = Promise.resolve();
     }
     getTileCredits() { return []; }
     pickFeatures() { return undefined; }
@@ -1727,42 +1858,46 @@
       const loading = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
       if (!loading) return undefined;
       return loading.then((img) => {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = 256;
-        const ctx = cv.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0, 256, 256);
-        if (img.close) img.close();
-        const src = ctx.getImageData(0, 0, 256, 256).data;
-        const h = new Float32Array(256 * 256);
-        for (let i = 0, j = 0; i < h.length; i++, j += 4) {
-          const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
-          h[i] = v > 0 ? v : 0;
-        }
-        const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
-        const cell = 156543.03392 * Math.cos((rect.north + rect.south) / 2) / (1 << level);
-        const zf = 1.6;                                   // gentle vertical exaggeration
-        const zen = D2R(45), azm = D2R(135);              // light from the north-west
-        const cz = Math.cos(zen), sz = Math.sin(zen), flat = cz;
-        const out = ctx.createImageData(256, 256), o = out.data;
-        const at = (r, c) => h[Math.min(255, Math.max(0, r)) * 256 + Math.min(255, Math.max(0, c))];
-        for (let r = 0; r < 256; r++) {
-          for (let c = 0; c < 256; c++) {
-            const a = at(r - 1, c - 1), b = at(r - 1, c), cc = at(r - 1, c + 1);
-            const d = at(r, c - 1), f = at(r, c + 1);
-            const g = at(r + 1, c - 1), hh = at(r + 1, c), i = at(r + 1, c + 1);
-            const dx = ((cc + 2 * f + i) - (a + 2 * d + g)) / (8 * cell);
-            const dy = ((g + 2 * hh + i) - (a + 2 * b + cc)) / (8 * cell);
-            const slope = Math.atan(zf * Math.hypot(dx, dy));
-            const aspect = Math.atan2(dy, -dx);
-            const shade = cz * Math.cos(slope) + sz * Math.sin(slope) * Math.cos(azm - aspect);
-            const dlt = shade - flat, k = (r * 256 + c) * 4;
-            if (dlt < 0) { o[k + 3] = Math.min(0.5, -dlt * 1.3) * 255; }
-            else { o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = Math.min(0.1, dlt * 0.4) * 255; }
-          }
-        }
-        ctx.putImageData(out, 0, 0);
-        return cv;
+        const task = this._queue.then(() => this._shade(img, x, y, level), () => this._shade(img, x, y, level));
+        this._queue = task.then(() => undefined, () => undefined);
+        return task;
       });
+    }
+    _shade(img, x, y, level) {
+      const ctx = this._ctx;
+      ctx.drawImage(img, 0, 0, 256, 256);
+      if (img.close) img.close();
+      const src = ctx.getImageData(0, 0, 256, 256).data;
+      const h = new Float32Array(256 * 256);
+      for (let i = 0, j = 0; i < h.length; i++, j += 4) {
+        const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
+        h[i] = v > 0 ? v : 0;
+      }
+      const rect = this.tilingScheme.tileXYToRectangle(x, y, level);
+      const cell = 156543.03392 * Math.cos((rect.north + rect.south) / 2) / (1 << level);
+      const zf = 1.6;                                   // gentle vertical exaggeration
+      const zen = D2R(45), azm = D2R(135);              // light from the north-west
+      const cz = Math.cos(zen), sz = Math.sin(zen), flat = cz;
+      const out = ctx.createImageData(256, 256), o = out.data;
+      const at = (r, c) => h[Math.min(255, Math.max(0, r)) * 256 + Math.min(255, Math.max(0, c))];
+      for (let r = 0; r < 256; r++) {
+        for (let c = 0; c < 256; c++) {
+          const a = at(r - 1, c - 1), b = at(r - 1, c), cc = at(r - 1, c + 1);
+          const d = at(r, c - 1), f = at(r, c + 1);
+          const g = at(r + 1, c - 1), hh = at(r + 1, c), i = at(r + 1, c + 1);
+          const dx = ((cc + 2 * f + i) - (a + 2 * d + g)) / (8 * cell);
+          const dy = ((g + 2 * hh + i) - (a + 2 * b + cc)) / (8 * cell);
+          const slope = Math.atan(zf * Math.hypot(dx, dy));
+          const aspect = Math.atan2(dy, -dx);
+          const shade = cz * Math.cos(slope) + sz * Math.sin(slope) * Math.cos(azm - aspect);
+          const dlt = shade - flat, k = (r * 256 + c) * 4;
+          if (dlt < 0) { o[k + 3] = Math.min(0.5, -dlt * 1.3) * 255; }
+          else { o[k] = o[k + 1] = o[k + 2] = 255; o[k + 3] = Math.min(0.1, dlt * 0.4) * 255; }
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+      // Snapshot so the next tile can reuse _cv before Cesium uploads this one.
+      return typeof createImageBitmap === 'function' ? createImageBitmap(this._cv) : this._cv;
     }
   }
   const hillshade = viewer.imageryLayers.addImageryProvider(new HillshadeImageryProvider());
@@ -1899,7 +2034,7 @@
   globe.showWaterEffect = false;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
-  globe.tileCacheSize = 1000;
+  globe.tileCacheSize = phone ? 100 : 1000;
   globe.preloadSiblings = true;
   globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
   globe.atmosphereLightIntensity = 10;
@@ -2743,7 +2878,7 @@
   // Ends a dive, finished (card shown) or not (touch, another flight): no blur or haze, no prefetch left, and the
   // frame-rate watch resumes after a warm-up.
   function endDive(finished) {
-    if (diveSeq) { slowWindows = 0; warmUntil = performance.now() + 5000; }
+    if (diveSeq) { slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 5000; }
     diving = false; diveSeq = false; diveStage = finished ? 'done' : null;
     prefetchStop(!finished);
   }
@@ -3019,7 +3154,8 @@
   // HUD readout + adaptive quality (steps down if frame rate stays low).
   const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
     : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
-  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
+  let frames = 0, fpsT = performance.now(), slowWindows = 0, fastWindows = 0, hudT = 0;
+  let warmUntil = performance.now() + (phone ? 4000 : 12000);
   let capturing = false;     // a high-resolution capture is slow on purpose: never read it as a weak device
   function applyTier(name) {
     tierName = name; tier = TIERS[name];
@@ -3035,6 +3171,28 @@
     try { scene.msaaSamples = msaaFor(tier); } catch (e) { /* no multisampling on this device */ }
     $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   }
+  // The journey's stop releases the globe. Installed here, once applyTier exists, and still
+  // during the synchronous setup (the journey's rAF cannot run until this script yields).
+  function releaseGlobe() {
+    if (!globeHeld) return;
+    globeHeld = false;
+    scene.maximumRenderTimeChange = 0;
+    scene.requestRenderMode = false;
+    frames = 0; fpsT = performance.now(); slowWindows = 0; fastWindows = 0;
+    warmUntil = performance.now() + (phone ? 4000 : 12000);
+    applyTier(tierName);   // intro.active is now false, so the phone cap rises from 1.5× to 2×
+    const held = openingHeld; openingHeld = null;
+    if (held) held();
+    scene.requestRender();
+  }
+  if (globeHeld) {
+    const origStop = intro.stop;
+    intro.stop = function (quiet) {
+      const result = origStop.apply(this, arguments);
+      releaseGlobe();
+      return result;
+    };
+  }
   $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   function syncQualityButtons() {
     document.querySelectorAll('#menu [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
@@ -3043,8 +3201,8 @@
     quality = choice;
     try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
     catch (e) { /* storage blocked: the choice applies to this visit only */ }
-    slowWindows = 0; warmUntil = performance.now() + 6000;
-    applyTier(TIER_BY_CHOICE[choice] || detectTier());
+    slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 6000;
+    applyTier(TIER_BY_CHOICE[choice] || (phone ? 'light' : detectTier()));
     syncQualityButtons();
   }
   document.querySelectorAll('#menu [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
@@ -3052,7 +3210,7 @@
   window.addEventListener('resize', () => { if (tier.ultra && !capturing) viewer.resolutionScale = renderScale(tier); });
   syncQualityButtons();
   // A hidden tab stops frames: do not count that gap as slowness.
-  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
+  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; fastWindows = 0; warmUntil = fpsT + 4000; });
   scene.postRender.addEventListener(() => {
     frames++;
     const now = performance.now();
@@ -3064,8 +3222,18 @@
       // The last step (light) costs sharpness (coarser ground, 2x pixels): only a really low frame rate takes it.
       const i = TIER_ORDER.indexOf(tierName);
       const floor = TIER_ORDER[i + 1] === 'light' ? 15 : 24;
-      slowWindows = (now > warmUntil && fps < floor && !capturing && !diveSeq) ? slowWindows + 1 : 0;
-      if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
+      const cooled = now > warmUntil && !capturing && !diveSeq;
+      slowWindows = (cooled && fps < floor) ? slowWindows + 1 : 0;
+      if (quality === 'auto' && slowWindows >= 3 && i >= 0 && i < TIER_ORDER.length - 1) {
+        applyTier(TIER_ORDER[i + 1]); slowWindows = 0; fastWindows = 0; warmUntil = now + 6000;
+      }
+      // Phones start on Légère. Step back up only after several calm, fast windows.
+      // The pixel cap stays at 2×, so a higher tier spends the headroom on terrain, not on a 3× buffer.
+      const quick = cooled && fps >= 45 && phone && quality === 'auto' && i > 0;
+      fastWindows = quick ? fastWindows + 1 : 0;
+      if (fastWindows >= 3) {
+        applyTier(TIER_ORDER[i - 1]); fastWindows = 0; slowWindows = 0; warmUntil = now + 6000;
+      }
     }
     if (now - hudT > 200) {
       hudT = now;
@@ -6574,11 +6742,17 @@
     // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
     const h = parseHash();
-    if (h && !activePlace && !spectacle.touring) goToHash(h);
-    else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
-      duration: 7500,
-      onDone: () => setPhase('Orbite'),
-    });
+    const begin = () => {
+      if (h && !activePlace && !spectacle.touring) goToHash(h);
+      else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
+        duration: 7500,
+        onDone: () => setPhase('Orbite'),
+      });
+    };
+    // While the journey canvas is still up it is the only animated full-screen view.
+    // api.stop releases it and then runs this flight.
+    if (globeHeld) openingHeld = begin;
+    else begin();
   }
   const removeTileListener = globe.tileLoadProgressEvent.addEventListener((queued) => {
     if (queued === 0 && globe.tilesLoaded) ready();
