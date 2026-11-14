@@ -496,11 +496,12 @@
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
-  .intro-name { margin: 8px 0 10px; font: 300 clamp(40px, 11vw, 84px)/1.05 var(--font-ui); letter-spacing: .12em; text-transform: uppercase; }
-  .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); white-space: pre-line; }
+  .intro-name { margin: 8px 0 10px; font: 300 clamp(32px, 6.5vw, 60px)/1.05 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+  .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
-    display: block; position: absolute; left: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0; max-width: none;
-    font: 400 12px/1.5 var(--font-mono); letter-spacing: .08em; color: var(--muted); text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
+    display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0;
+    max-width: 46rem; font: 400 12px/1.45 var(--font-mono); letter-spacing: .03em; color: var(--muted); white-space: pre-line;
+    text-shadow: 0 1px 10px rgba(0, 0, 0, 0.9);
   }
   .loader.journey .intro-skip:not([hidden]) {
     display: inline-flex; align-items: center; position: absolute; top: calc(var(--safe-t) + var(--gutter)); right: var(--gutter);
@@ -1065,7 +1066,7 @@
       <div class="intro-fact" id="intro-fact"></div>
       <div class="intro-darija" id="intro-darija" dir="rtl" lang="ar-MA"></div>
     </div>
-    <p class="intro-note">Illustration · tailles et vitesse non à l’échelle</p>
+    <p class="intro-note" id="intro-credit">Photos de sondes · tailles et vitesse non à l’échelle</p>
     <button class="intro-skip" id="intro-skip" type="button" hidden>Passer ›</button>
     <button class="intro-voice" id="intro-voice" type="button" aria-pressed="false" hidden>
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
@@ -1083,130 +1084,108 @@
 
 <script>
 // ---------- Opening journey ----------
-// Instead of a loading bar: a flight past the planets, from Neptune inwards, one by one, down to the Earth, drawn on a
-// 2D canvas while Cesium and the first tiles load behind it. It runs before the Cesium script so it starts at once.
-// The planets are drawn here (illustrations, not photographs); sizes and speed are not to scale. The figures in the
-// captions are real: mean distance to the Sun and equatorial diameter (NASA planetary fact sheets, rounded).
-// Not shown with reduced motion, with ?intro=0 (tests) or on a deep link: the plain title card is used instead.
+// A slow flight from Neptune inwards, on a 2D canvas, while Cesium loads behind it. This script sits before the
+// Cesium tag so it starts at once. Each disc is a masked probe photograph (see the credit line): the terminator and
+// the night side are the ones in that exposure, one sun, no repaint. A thin limb halo sits outside the atmosphere.
+// Sizes and speed are not to scale. The figures are real: mean distance to the Sun and equatorial diameter (NASA
+// planetary fact sheets, rounded). Not shown with reduced motion, with ?intro=0 (tests) or on a deep link.
 (() => {
   'use strict';
-  const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); } };
+  const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); }, photos: { loaded: 0, failed: 0, total: 0 } };
   const loader = document.getElementById('loader'), canvas = document.getElementById('intro-canvas');
   const off = new URLSearchParams(location.search).get('intro') === '0';
   if (off || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  // ----- Procedural planets -----
-  const hash = (x, y, s) => { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(s, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
-  const vnoise = (x, y, s) => {
-    const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, ux = fx * fx * (3 - 2 * fx), uy = fy * fy * (3 - 2 * fy);
-    const a = hash(xi, yi, s), b = hash(xi + 1, yi, s), c = hash(xi, yi + 1, s), d = hash(xi + 1, yi + 1, s);
-    return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
+  // body = planet diameter / image width, measured on the masked file, so Saturn's rings extend past the ball
+  // and a gibbous plate is sized by its real limb. Files reused from the probe-photo set.
+  const PHOTOS = {
+    neptune: { src: 'media/planets/neptune.webp', body: 1 },
+    uranus:  { src: 'media/planets/uranus.webp', body: 1 },
+    saturn:  { src: 'media/planets/saturn.webp', body: 0.397 },
+    jupiter: { src: 'media/planets/jupiter.webp', body: 1.824 },
+    mars:    { src: 'media/planets/mars.webp', body: 1 },
+    lune:    { src: 'media/planets/moon.webp', body: 1 },
+    titan:   { src: 'media/planets/titan.webp', body: 1.188 },
+    earth:   { src: 'media/planets/earth.webp', body: 1 },
   };
-  const fbm = (x, y, s) => 0.5 * vnoise(x, y, s) + 0.3 * vnoise(x * 2.1, y * 2.1, s + 1) + 0.2 * vnoise(x * 4.3, y * 4.3, s + 2);
-  const rgb = (hex) => [parseInt(hex.slice(1, 3), 16), parseInt(hex.slice(3, 5), 16), parseInt(hex.slice(5, 7), 16)];
-  const mix = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-  const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-  // Cloud bands by latitude, stirred a little by noise.
-  const bands = (colours, stir, seed) => {
-    const pal = colours.map(rgb);
-    return (lat, lon) => {
-      let v = lat / Math.PI + 0.5 + stir * (fbm(lon * 2.2, lat * 7, seed) - 0.5);
-      v = Math.min(0.9999, Math.max(0, v)) * (pal.length - 1);
-      const i = Math.floor(v), c = mix(pal[i], pal[i + 1], v - i), k = 0.93 + 0.14 * vnoise(lon * 2.5, lat * 46, seed + 7);
-      return [c[0] * k, c[1] * k, c[2] * k];
-    };
+  // Halo follows the photograph's own silhouette (the real limb), not a drawn circle, so a gibbous plate
+  // does not grow a ring on the empty night side.
+  const LIMB = {
+    neptune: 'rgba(140, 190, 230, 0.9)', uranus: 'rgba(180, 222, 226, 0.7)', saturn: 'rgba(220, 196, 150, 0.45)',
+    jupiter: 'rgba(214, 176, 130, 0.4)', mars: 'rgba(186, 112, 80, 0.4)', titan: 'rgba(214, 156, 96, 0.65)',
+    earth: 'rgba(150, 198, 255, 0.85)',
   };
-  const jupiterBands = bands(['#8f7a66', '#c9b79c', '#b98f68', '#e6d8bf', '#c39c73', '#ead9c0', '#a9744e', '#dcc7a6', '#b58c66', '#cdbba1', '#8c7765'], 0.05, 11);
-  const spot = rgb('#b5573a');
-  const mars = { a: rgb('#c1663c'), b: rgb('#a8502e'), dark: rgb('#6e3a26'), ice: rgb('#efe9e2') };
-  const moon = { a: rgb('#a9a8a4'), b: rgb('#8f8e8b'), mare: rgb('#6c6d70') };
-  const earth = { sea: rgb('#2c5aa0'), land: rgb('#5d7d52'), cloud: rgb('#f2f4f6') };
-  const LIGHT = (() => { const v = [-0.5, -0.38, 0.78], n = Math.hypot(...v); return v.map((c) => c / n); })();
-  const BODIES = [
-    // Neptune's true colour is a pale blue only a little deeper than Uranus's (Irwin et al., MNRAS, 2024); the deep
-    // blue of the Voyager pictures came from contrast stretching.
-    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, tilt: 0.49, gas: true,
-      colour: bands(['#6f9fd6', '#7fb0e0', '#8cbbe6', '#79a9dc', '#6b9ad2'], 0.04, 3) },
-    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, tilt: 1.71, gas: true,
-      colour: bands(['#a3dbe0', '#b2e5e7', '#b9e9ea', '#a8dfe2'], 0.02, 5) },
-    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, tilt: 0.47, gas: true, rings: true, moons: [[20.3, 0.043, 1]],   // Titan
-      colour: bands(['#a8946a', '#d6c08e', '#e3d2a6', '#cdb680', '#dccb9c', '#c2aa78', '#b8a172'], 0.03, 7) },
-    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, tilt: 0.05, gas: true,
-      moons: [[5.9, 0.026, -1], [9.4, 0.022, 1], [15.0, 0.037, -1], [26.3, 0.034, 1]],   // Io, Europa, Ganymede, Callisto
-      colour: (lat, lon) => {
-        const c = jupiterBands(lat, lon), e = ((lon + 0.45) / 0.13) ** 2 + ((lat - 0.38) / 0.07) ** 2;   // the Great Red Spot, 22° south, about 16 000 km across
-        return e < 1.6 ? mix(c, spot, 0.85 * (1 - smooth(0.4, 1.6, e))) : c;
-      } },
-    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, tilt: 0.44,
-      colour: (lat, lon) => {
-        let c = mix(mars.a, mars.b, fbm(lon * 1.6 + 9, lat * 1.6, 21));
-        c = mix(c, mars.dark, 0.75 * smooth(0.52, 0.66, fbm(lon * 1.3, lat * 1.9 + 4, 23)));
-        const cap = lat + 0.12 * (fbm(lon * 3, 2, 25) - 0.5);
-        return mix(c, mars.ice, Math.max(smooth(-1.22, -1.32, cap), smooth(1.38, 1.46, cap)));
-      } },
-    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, tilt: 0,
-      colour: (lat, lon) => {
-        const c = mix(moon.a, moon.b, fbm(lon * 5, lat * 5, 31));
-        return mix(c, moon.mare, 0.85 * smooth(0.5, 0.6, fbm(lon * 1.4 + 2, lat * 1.6 + 1, 33)));
-      } },
-  ];
-  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', tilt: 0.41,
-    colour: (lat, lon) => {
-      const c = mix(earth.sea, earth.land, smooth(0.56, 0.62, fbm(lon * 1.5 + 5, lat * 1.8, 41)));
-      return mix(c, earth.cloud, 0.85 * smooth(0.55, 0.7, fbm(lon * 2.6, lat * 3.4 + 7, 43)));
-    } };
-
-  // One lit sphere, with Saturn's rings in their real proportions (C 1.24–1.53, B 1.53–1.95, A 2.03–2.27 radii).
-  function sprite(spec, size) {
-    const N = spec.rings ? Math.round(size * 2.4) : size, R = size / 2 - 1.5, mid = N / 2;
-    const disc = document.createElement('canvas'); disc.width = disc.height = N;
-    const g = disc.getContext('2d'), img = g.createImageData(N, N), px = img.data;
-    const ct = Math.cos(spec.tilt), st = Math.sin(spec.tilt), lo = Math.floor(mid - R - 2), hi = Math.ceil(mid + R + 2);
-    for (let y = lo; y < hi; y++) for (let x = lo; x < hi; x++) {
-      const nx = (x + 0.5 - mid) / R, ny = (y + 0.5 - mid) / R, rr = nx * nx + ny * ny;
-      if (rr > 1.03) continue;
-      const nz = Math.sqrt(Math.max(0, 1 - rr)), bx = nx * ct + ny * st, by = ny * ct - nx * st;
-      const c = spec.colour(Math.asin(Math.max(-1, Math.min(1, by))), Math.atan2(bx, nz));
-      const lit = (0.02 + 0.98 * smooth(-0.08, 0.72, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2])) * (spec.gas ? 0.6 + 0.4 * nz : 0.82 + 0.18 * nz);
-      const i = (y * N + x) * 4;
-      px[i] = c[0] * lit; px[i + 1] = c[1] * lit; px[i + 2] = c[2] * lit;
-      px[i + 3] = 255 * Math.min(1, Math.max(0, (1 - Math.sqrt(rr)) * R + 0.5));
-    }
-    g.putImageData(img, 0, 0);
-    if (!spec.rings) return { image: disc, k: mid / R };
-    // Rings, pixel by pixel: fine ringlets, and the planet's shadow falling across the far side. A ring point is in
-    // shadow when it lies behind the planet as seen from the Sun and within one radius of the Sun–planet line.
-    const RINGS = [[1.24, 1.53, [150, 135, 105], 0.32], [1.53, 1.95, [222, 203, 160], 0.92], [2.03, 2.27, [196, 178, 140], 0.78]];
-    const OPEN = 0.34, DEPTH = Math.sqrt(1 - OPEN * OPEN) / OPEN;
-    const far = g.createImageData(N, N), near = g.createImageData(N, N);
-    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-      const sx = x + 0.5 - mid, sy = y + 0.5 - mid, u = sx * ct + sy * st, v = sy * ct - sx * st;
-      const rho = Math.hypot(u, v / OPEN) / R;
-      if (rho < 1.24 || rho > 2.27) continue;
-      const band = RINGS.find((q) => rho >= q[0] && rho <= q[1]);
-      if (!band) continue;
-      const z = v * DEPTH, along = sx * LIGHT[0] + sy * LIGHT[1] + z * LIGHT[2];
-      const off = (sx * sx + sy * sy + z * z - along * along) / (R * R);      // squared distance to the Sun–planet line
-      const shadow = along < 0 ? 0.08 + 0.92 * smooth(0.9, 1.1, off) : 1;
-      const edge = Math.min(1, (rho - band[0]) * R * 0.8, (band[1] - rho) * R * 0.8);
-      const k = (0.74 + 0.5 * vnoise(rho * 85, 0.5, 61)) * shadow, d = (v > 0 ? near : far).data, i = (y * N + x) * 4;
-      d[i] = band[2][0] * k; d[i + 1] = band[2][1] * k; d[i + 2] = band[2][2] * k;
-      d[i + 3] = 255 * band[3] * Math.max(0, edge) * (0.8 + 0.2 * vnoise(rho * 240, 1.5, 63));
-    }
-    const out = document.createElement('canvas'); out.width = out.height = N;
-    const o = out.getContext('2d'), layer = document.createElement('canvas'); layer.width = layer.height = N;
-    const lg = layer.getContext('2d');
-    lg.putImageData(far, 0, 0); o.drawImage(layer, 0, 0);          // the far half goes behind the planet
-    o.drawImage(disc, 0, 0);
-    lg.putImageData(near, 0, 0); o.drawImage(layer, 0, 0);         // the near half passes in front
-    return { image: out, k: mid / R };
+  function makeHalo(im, color) {
+    if (!color) return null;
+    const pad = 28, c = document.createElement('canvas');
+    c.width = im.naturalWidth + pad * 2; c.height = im.naturalHeight + pad * 2;
+    const g = c.getContext('2d');
+    g.shadowColor = color; g.shadowBlur = 18;
+    g.drawImage(im, pad, pad);
+    g.shadowBlur = 0; g.globalCompositeOperation = 'destination-out';
+    g.drawImage(im, pad, pad);
+    return c;
   }
-  // Built one at a time between frames, in the order they are needed, so no single frame waits for all of them.
-  const queue = [...BODIES, EARTH];
-  (function build() { const b = queue.shift(); if (!b) return; b.sprite = sprite(b, b === EARTH ? 192 : (Math.max(innerWidth, innerHeight) > 1000 ? 1024 : 768)); setTimeout(build, 30); })();
+  const sprites = {};
+  api.photos.total = Object.keys(PHOTOS).length;
+  Object.keys(PHOTOS).forEach((key) => {
+    const im = new Image();
+    im.decoding = 'async';
+    im.onload = () => {
+      sprites[key] = { image: im, body: PHOTOS[key].body, w: im.naturalWidth, h: im.naturalHeight, halo: makeHalo(im, LIMB[key]) };
+      api.photos.loaded++;
+    };
+    im.onerror = () => { api.photos.failed++; };
+    im.src = PHOTOS[key].src;
+  });
+  const TITAN = 'Titan — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA06230';
+  const BODIES = [
+    { name: 'Neptune', kind: 'Géante de glace', fact: '4,5 milliards de\u00a0km du Soleil\ndiamètre\u00a049\u00a0500\u00a0km', size: 0.9, photo: 'neptune',
+      credit: 'Neptune — NASA/JPL, Voyager 2, caméra NAC, PIA01492' },
+    { name: 'Uranus', kind: 'Géante de glace, couchée sur son orbite', fact: '2,9 milliards de\u00a0km du Soleil\ndiamètre\u00a051\u00a0100\u00a0km', size: 0.92, photo: 'uranus',
+      credit: 'Uranus — NASA/JPL-Caltech, Voyager 2, ISS, PIA18182' },
+    { name: 'Saturne', kind: 'Géante gazeuse, anneaux de glace', fact: '1,4 milliard de\u00a0km du Soleil\ndiamètre\u00a0120\u00a0500\u00a0km', size: 1.05, photo: 'saturn', moonTilt: 0.04,
+      credit: 'Saturne — NASA/JPL-Caltech/Space Science Institute, Cassini, ISS, PIA11141', extraCredit: TITAN,
+      moons: [{ dist: 3.15, size: 0.086, way: 1, photo: 'titan' }] },
+    { name: 'Jupiter', kind: 'Géante gazeuse, la plus grande planète', fact: '778 millions de\u00a0km du Soleil\ndiamètre\u00a0143\u00a0000\u00a0km', size: 1.25, photo: 'jupiter',
+      credit: 'Jupiter — NASA/JPL-Caltech/SwRI/MSSS/Roman Tkachenko, Juno, JunoCam, PIA21381' },
+    { name: 'Mars', kind: 'Planète rocheuse', fact: '228 millions de\u00a0km du Soleil\ndiamètre\u00a06\u00a0800\u00a0km', size: 0.72, photo: 'mars',
+      credit: 'Mars — ESA/MPS pour l’équipe OSIRIS, Rosetta, OSIRIS, CC BY-SA 3.0 IGO' },
+    { name: 'Lune', kind: 'Satellite naturel de la Terre', fact: '384\u00a0400\u00a0km de la Terre\ndiamètre\u00a03\u00a0475\u00a0km', size: 0.6, photo: 'lune',
+      credit: 'Lune — NASA/JPL, Galileo, SSI, PIA00405' },
+  ];
+  const EARTH = { name: 'Terre', kind: 'Notre planète', fact: '150 millions de\u00a0km du Soleil\ndiamètre\u00a012\u00a0756\u00a0km', size: 1, photo: 'earth',
+    credit: 'Terre — NASA, Apollo 17, Hasselblad, AS17-148-22727' };
+  const TOTAL = BODIES.length + 1;
 
+  // Slow cinematic passes. The gap after Jupiter is the long empty stretch inward to Mars.
+  const START = 1.8, PASS = 6.4, EARTH_TAKES = 4.2;
+  const GAPS = [5.6, 5.8, 5.6, 6.4, 5.0, 4.2];
+  const starts = [];
+  let acc = START;
+  for (let i = 0; i < BODIES.length; i++) { starts.push(acc); acc += GAPS[i]; }
+  const EARTH_AT = acc;
+
+  const hash = (x, y, s) => { let h = Math.imul(x, 374761393) ^ Math.imul(y, 668265263) ^ Math.imul(s, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+  // Sparse field, fixed magnitudes. No streaks and no twinkle: a long exposure of deep space, drifting slowly.
+  const stars = Array.from({ length: 150 }, (_, i) => {
+    const faint = Math.pow(hash(i, 4, 51), 0.42);
+    const b = 0.12 + 0.88 * (1 - faint);
+    const warm = hash(i, 5, 51);
+    return {
+      x: hash(i, 1, 51), y: hash(i, 2, 51), b,
+      rgb: `${Math.round(214 + warm * 36)},${Math.round(218 + warm * 22)},${Math.round(232 - warm * 28)}`,
+      s: b > 0.82 ? 1.7 : b > 0.5 ? 1.15 : 0.75,
+      drift: 0.25 + hash(i, 6, 51) * 0.75,
+    };
+  });
+
+  let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null;
+  const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
+  const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
+  const creditEl = document.getElementById('intro-credit');
   // ----- Voice: Moroccan Darija, only after a tap (browsers refuse sound that starts by itself) -----
   // [file in fatiha/audio, the same words in Arabic script shown under the caption]. One table, so a wrong word is a
   // one-line fix: change the text here and replace the matching mp3.
@@ -1220,23 +1199,36 @@
     Lune: ['darija-lune', 'وهادا القمر ديالنا. قريب لينا بزاف، وكيدور على الأرض.'],
     Terre: ['darija-terre', 'وها حنا وصلنا. هادي الأرض، الدار ديالنا. دابا نقدرو نشوفو البلايص من الفوق.'],
   };
-  // Atmosphere colour of each body (r,g,b), for the soft halo around it.
-  const GLOW = { Neptune: '120,165,225', Uranus: '170,225,228', Saturne: '225,205,150', Jupiter: '225,190,150', Mars: '215,120,80', Lune: '200,200,205', Terre: '110,160,235' };
-
-  // ----- Timeline (seconds of animation time; the clock stops while the page is hidden or blocked) -----
-  // With the voice on the clock runs at half speed, so each planet stays on screen as long as its sentence lasts.
-  const START = 3.0, STAGGER = 2.8, PASS = 6.4, EARTH_AT = START + BODIES.length * STAGGER, EARTH_TAKES = 3.5, VOICE_RATE = 0.5;
-  const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome' };
-  const TINT = ['244,246,250', '188,210,255', '255,224,188'];   // white, blue-white, warm
-  const stars = Array.from({ length: 420 }, (_, i) => {
-    const r = hash(i, 4, 51);
-    return { x: hash(i, 1, 51) * 2 - 1, y: hash(i, 2, 51) * 2 - 1, z: 0.05 + 0.95 * hash(i, 3, 51), c: r < 0.6 ? 0 : r < 0.85 ? 1 : 2, tw: 1 + 3 * hash(i, 5, 51), ph: 6.28 * hash(i, 6, 51) };
-  }).sort((p, q) => p.c - q.c);   // sorted by tint: three colour changes per frame instead of hundreds
-  let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null, sky = null, rate = 1;
-  let voiceOn = false, muted = false, busy = false, audio = null, voiceQ = [], curVK = null, voiced = null, swapTimer = 0;
-  const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
-  const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
+  const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome', credit: 'Photos de sondes · tailles et vitesse non à l’échelle' };
+  // With the voice on the clock runs slower (VOICE_RATE), so a planet stays on screen as long as its sentence lasts;
+  // before the first planet it is slower still, for the welcome.
+  const VOICE_RATE = 0.5, WELCOME_RATE = 0.3, welcomeEnd = () => starts[0] + 0.18 * PASS;
+  let rate = 1, voiceOn = false, muted = false, busy = false, audio = null, voiceQ = [], curVK = null, voiced = null, swapTimer = 0, sky = null;
   const darijaEl = document.getElementById('intro-darija'), voiceBtn = document.getElementById('intro-voice'), voiceLabel = document.getElementById('intro-voice-label');
+  const savedVoice = () => { try { return localStorage.getItem('nour.voix') === '1'; } catch (e) { return false; } };
+  const saveVoice = (v) => { try { localStorage.setItem('nour.voix', v ? '1' : '0'); } catch (e) { /* private mode */ } };
+  function pump() {
+    if (busy || !voiceQ.length || !voiceOn || muted) return;
+    const k = voiceQ.shift(); busy = true;
+    audio = new Audio(`audio/${VOICE[k][0]}.mp3`);
+    audio.addEventListener('ended', () => { busy = false; pump(); });
+    audio.addEventListener('error', () => { busy = false; pump(); });
+    const p = audio.play();
+    if (p && p.catch) p.catch(() => { busy = false; setVoice(false); });   // sound refused: stay silent, the button stays there
+  }
+  function voicePlay(k) { if (voiceOn && !muted && VOICE[k]) { voiceQ.push(k); pump(); } }
+  function voiceStop() { voiceQ = []; busy = false; if (audio) { audio.pause(); audio = null; } }
+  // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
+  function setVoice(on, tap) {
+    voiceOn = on;
+    voiceBtn.setAttribute('aria-pressed', String(on));
+    voiceLabel.textContent = on ? 'Voix activée' : 'Voix en darija';
+    loader.classList.toggle('voice', on);
+    if (tap) saveVoice(on);
+    if (!on) { voiceStop(); return; }
+    const k = curVK || (t < welcomeEnd() ? 'welcome' : null);   // say what is on screen right now
+    if (k) { voiced = k; voicePlay(k); }
+  }
 
   // The sky behind everything, drawn once per size: a faint Milky Way band, a field of small stars, a few bright ones.
   function buildSky() {
@@ -1245,9 +1237,9 @@
     const diag = Math.hypot(W, H);
     g.save(); g.translate(W * 0.5, H * 0.5); g.rotate(-0.5);
     for (let i = 0; i < 48; i++) {
-      const px = (i / 47 - 0.5) * diag * 1.15, py = (vnoise(i * 0.6, 3, 71) - 0.5) * H * 0.1, r = H * (0.14 + 0.2 * vnoise(i * 0.45, 9, 73));
+      const px = (i / 47 - 0.5) * diag * 1.15, py = (hash(i, 3, 71) - 0.5) * H * 0.1, r = H * (0.14 + 0.2 * hash(i, 9, 73));
       const gr = g.createRadialGradient(px, py, 0, px, py, r);
-      gr.addColorStop(0, vnoise(i * 0.3, 5, 75) > 0.62 ? 'rgba(255,214,170,0.05)' : 'rgba(150,172,255,0.055)'); gr.addColorStop(1, 'rgba(120,140,255,0)');
+      gr.addColorStop(0, hash(i, 5, 75) > 0.62 ? 'rgba(255,214,170,0.05)' : 'rgba(150,172,255,0.055)'); gr.addColorStop(1, 'rgba(120,140,255,0)');
       g.fillStyle = gr; g.fillRect(px - r, py - r, 2 * r, 2 * r);
     }
     g.fillStyle = '#DDE6FF';
@@ -1275,33 +1267,42 @@
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     buildSky();
   }
-
-  // ----- Voice -----
-  const savedVoice = () => { try { return localStorage.getItem('nour.voix') === '1'; } catch (e) { return false; } };
-  const saveVoice = (v) => { try { localStorage.setItem('nour.voix', v ? '1' : '0'); } catch (e) { /* private mode */ } };
-  function pump() {
-    if (busy || !voiceQ.length || !voiceOn || muted) return;
-    const k = voiceQ.shift(); busy = true;
-    audio = new Audio(`audio/${VOICE[k][0]}.mp3`);
-    audio.addEventListener('ended', () => { busy = false; pump(); });
-    audio.addEventListener('error', () => { busy = false; pump(); });
-    const p = audio.play();
-    if (p && p.catch) p.catch(() => { busy = false; setVoice(false); });   // sound refused: stay silent, the button stays there
+  function drawSprite(key, x, y, r) {
+    const sp = sprites[key];
+    if (!sp || r < 0.5) return false;
+    const dw = 2 * r / sp.body, dh = dw * sp.h / sp.w;
+    ctx.drawImage(sp.image, x - dw / 2, y - dh / 2, dw, dh);
+    return true;
   }
-  function voicePlay(k) { if (voiceOn && !muted && VOICE[k]) { voiceQ.push(k); pump(); } }
-  function voiceStop() { voiceQ = []; busy = false; if (audio) { audio.pause(); audio = null; } }
-  // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
-  function setVoice(on, tap) {
-    voiceOn = on;
-    voiceBtn.setAttribute('aria-pressed', String(on));
-    voiceLabel.textContent = on ? 'Voix activée' : 'Voix en darija';
-    loader.classList.toggle('voice', on);
-    if (tap) saveVoice(on);
-    if (!on) { voiceStop(); return; }
-    const k = curVK || (t < START + 0.2 * PASS ? 'welcome' : null);   // say what is on screen right now
-    if (k) { voiced = k; voicePlay(k); }
+  function drawLimb(key, x, y, r) {
+    const sp = sprites[key];
+    if (!sp || !sp.halo || r < 3) return;
+    const dw = 2 * r / sp.body, scale = dw / sp.w;
+    const hw = sp.halo.width * scale, hh = sp.halo.height * scale;
+    ctx.drawImage(sp.halo, x - hw / 2, y - hh / 2, hw, hh);
   }
-
+  function drawBody(b, x, y, r) {
+    drawLimb(b.photo, x, y, r);
+    drawSprite(b.photo, x, y, r);
+    const ang = b.moonTilt || 0;
+    for (const m of b.moons || []) {
+      if (!m.photo) continue;
+      const mx = x + m.way * m.dist * r * Math.cos(ang), my = y + m.way * m.dist * r * Math.sin(ang);
+      const mr = Math.max(1.2, m.size * r);
+      if (mx < -80 || mx > W + 80 || my < -80 || my > H + 80) continue;
+      drawLimb(m.photo, mx, my, mr);
+      drawSprite(m.photo, mx, my, mr);
+    }
+  }
+  function drawStars(dt) {
+    for (const s of stars) {
+      s.x -= dt * 0.006 * s.drift;
+      if (s.x < 0) s.x += 1;
+      ctx.globalAlpha = s.b * 0.85;
+      ctx.fillStyle = `rgb(${s.rgb})`;
+      ctx.fillRect(s.x * W, s.y * H, s.s, s.s);
+    }
+  }
   // Caption: the old one fades out, then the new one fades in.
   function setCaption(b, waiting) {
     const key = b ? b.name + (waiting ? '…' : '') : null;
@@ -1310,89 +1311,58 @@
     clearTimeout(swapTimer);
     const apply = () => {
       caption.classList.toggle('show', !!b);
-      if (!b) { curVK = null; voiced = null; return; }
-      const vk = b.voiceKey || b.name, step = b === EARTH ? BODIES.length + 1 : BODIES.indexOf(b) + 1;
-      curVK = vk;
-      kicker.textContent = step > 0 ? `${String(step).padStart(2, '0')} / ${String(BODIES.length + 1).padStart(2, '0')}\n${b.kind}` : b.kind;
-      nameEl.textContent = b.name;
-      factEl.textContent = waiting ? (b.fact ? `${b.fact}\nle globe se prépare…` : 'le globe se prépare…') : b.fact;
-      darijaEl.textContent = VOICE[vk] ? VOICE[vk][1] : '';
-      if (voiced !== vk) { voiced = vk; voicePlay(vk); }
+      if (b) {
+        const vk = b.voiceKey || b.name, step = b === EARTH ? TOTAL : BODIES.indexOf(b) + 1;
+        curVK = vk;
+        kicker.textContent = step > 0 ? `${String(step).padStart(2, '0')} / ${String(TOTAL).padStart(2, '0')}\n${b.kind}` : b.kind;
+        nameEl.textContent = b.name;
+        factEl.textContent = waiting ? (b.fact ? `${b.fact}\nle globe se prépare…` : 'le globe se prépare…') : b.fact;
+        darijaEl.textContent = VOICE[vk] ? VOICE[vk][1] : '';
+        if (voiced !== vk) { voiced = vk; voicePlay(vk); }
+      } else { curVK = null; voiced = null; }
+      creditEl.textContent = b
+        ? b.credit + (b.extraCredit ? '\n' + b.extraCredit : '')
+        : 'Photos de sondes · tailles et vitesse non à l’échelle';
     };
     if (prev && b && prev.replace('…', '') !== b.name) { caption.classList.remove('show'); swapTimer = setTimeout(apply, 300); } else apply();
   }
   function frame(now) {
     raf = requestAnimationFrame(frame);
     const real = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now;
-    rate += ((voiceOn && !muted && !api.arrived ? VOICE_RATE : 1) - rate) * Math.min(1, real * 3);
+    rate += ((voiceOn && !muted && !api.arrived ? (t < welcomeEnd() ? WELCOME_RATE : VOICE_RATE) : 1) - rate) * Math.min(1, real * 3);
     const dt = real * rate; t += dt;
     if (!W || canvas.clientWidth !== W || canvas.clientHeight !== H) resize();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.globalAlpha = 1; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    // A slow sway of the camera, so the sky is never quite still.
-    const swayX = Math.sin(t * 0.31) * W * 0.01, swayY = Math.cos(t * 0.23) * H * 0.008;
-    const cx = W / 2 + swayX, cy = H / 2 + swayY, span = Math.max(W, H) * 0.6;
-    if (sky) ctx.drawImage(sky, -14 - swayX * 0.5, -14 - swayY * 0.5, W + 28, H + 28);
-    // Stars streaming out of the point we fly towards; the streaks stretch as one planet hands over to the next.
-    let pulse = 0;
-    for (let i = 0; i < BODIES.length; i++) { const dd = t - (START + i * STAGGER + 0.9 * PASS); pulse = Math.max(pulse, Math.exp(-dd * dd / 0.6)); }
-    const speed = 0.085 * (1 + 1.8 * pulse), tail = 1.035 + 0.06 * pulse;
-    ctx.lineCap = 'round';
-    let tint = -1;
-    for (const s of stars) {
-      s.z -= dt * speed;
-      if (s.z < 0.05) s.z += 0.95;
-      const x = cx + s.x / s.z * span * 0.5, y = cy + s.y / s.z * span * 0.5, near = 1 - s.z;
-      if (x < 0 || x > W || y < 0 || y > H) continue;
-      if (s.c !== tint) { tint = s.c; ctx.strokeStyle = `rgb(${TINT[tint]})`; }
-      ctx.globalAlpha = Math.min(1, near * 1.4) * 0.9 * (0.82 + 0.18 * Math.sin(t * s.tw + s.ph));
-      const d = 0.5 + near * 1.4, zb = s.z * tail;      // a short streak back along its path
-      ctx.lineWidth = d; ctx.beginPath(); ctx.moveTo(cx + s.x / zb * span * 0.5, cy + s.y / zb * span * 0.5); ctx.lineTo(x, y); ctx.stroke();
-    }
-    // The Earth, last and straight ahead: it ends at the size of the globe in the first Cesium view (seen from
-    // 110 000 km, field of view 60° on the long side), so the picture and the real globe can cross-fade.
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2;
+    if (sky) ctx.drawImage(sky, 0, 0, W, H);
+    drawStars(dt);
+    // Earth, last and dead ahead. It ends at the size of the globe in the first Cesium view (110 000 km, 60° on
+    // the long side) so the photograph and the real globe can cross-fade.
     const ue = Math.min(1, Math.max(0, (t - EARTH_AT) / EARTH_TAKES));
-    if (ue > 0 && EARTH.sprite) {
-      const target = Math.max(W, H) * 0.0475, grow = leaving < 0 ? 1 : Math.exp(0.5 * (t - leaving));
-      const r = target * Math.exp(-3.4 * (1 - ue) * (1 - ue)) * grow;
-      ctx.globalAlpha = Math.min(1, ue * 4) * 0.16;
-      const halo = ctx.createRadialGradient(cx, cy, r * 0.95, cx, cy, r * 1.22);
-      halo.addColorStop(0, `rgba(${GLOW.Terre},1)`); halo.addColorStop(1, `rgba(${GLOW.Terre},0)`);
-      ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(cx, cy, r * 1.22, 0, 6.2832); ctx.fill();
-      ctx.globalAlpha = Math.min(1, ue * 4);
-      ctx.drawImage(EARTH.sprite.image, cx - r * EARTH.sprite.k, cy - r * EARTH.sprite.k, 2 * r * EARTH.sprite.k, 2 * r * EARTH.sprite.k);
+    if (ue > 0) {
+      const target = Math.max(W, H) * 0.0475, grow = leaving < 0 ? 1 : Math.exp(0.35 * (t - leaving));
+      const r = target * Math.exp(-2.4 * (1 - ue) * (1 - ue)) * grow;
+      ctx.globalAlpha = Math.min(1, ue * 3);
+      drawBody(EARTH, cx, cy, r);
     }
-    // The planets, far ones first: each one comes out of the point ahead, grows and slides past on one side.
-    const base = 0.3 * Math.sqrt(W * H);
     let current = null;
+    const reach = Math.min(W, H);
     for (let i = BODIES.length - 1; i >= 0; i--) {
-      const b = BODIES[i], u = (t - START - i * STAGGER) / PASS;
-      if (u <= 0 || u >= 1 || !b.sprite) continue;
-      const r = base * b.size / (48 * Math.exp(-5.39 * u)), side = i % 2 ? 1 : -1, slope = (i % 3 - 1) * 0.22;
-      const x = cx + side * 1.75 * r * Math.cos(slope), y = cy + 1.75 * r * Math.sin(slope) + r * 0.12 + Math.sin(t * 0.5 + i) * r * 0.015;
-      const fade = smooth(0, 0.12, u) * smooth(0, 0.2, 1 - u);
-      if (r < Math.max(W, H) * 2) {   // a soft atmosphere around the disc
-        const rim = GLOW[b.name], halo = ctx.createRadialGradient(x, y, r * 0.9, x, y, r * 1.45);
-        halo.addColorStop(0, `rgba(${rim},0.24)`); halo.addColorStop(1, `rgba(${rim},0)`);
-        ctx.globalAlpha = fade; ctx.fillStyle = halo; ctx.beginPath(); ctx.arc(x, y, r * 1.45, 0, 6.2832); ctx.fill();
-      }
-      ctx.globalAlpha = fade;
-      ctx.drawImage(b.sprite.image, x - r * b.sprite.k, y - r * b.sprite.k, 2 * r * b.sprite.k, 2 * r * b.sprite.k);
-      // Large moons, at their real distances and sizes in planet radii, along the equator.
-      ctx.fillStyle = '#CFC8BD';
-      for (const [dist, size, way] of b.moons || []) {
-        const mx = x + way * dist * r * Math.cos(b.tilt), my = y + way * dist * r * Math.sin(b.tilt), mr = Math.max(0.7, size * r);
-        if (mx < -mr || mx > W + mr || my < -mr || my > H + mr) continue;
-        ctx.beginPath(); ctx.arc(mx, my, mr, 0, 2 * Math.PI); ctx.fill();
-      }
-      if (u > 0.2 && u < 0.72) current = b;
+      const b = BODIES[i], u = (t - starts[i]) / PASS;
+      if (u <= 0 || u >= 1) continue;
+      const r = reach * b.size * (0.04 + 0.30 * Math.pow(u, 1.15));
+      const side = i % 2 ? 1 : -1, drift = u * u;
+      const x = cx + side * drift * W * 0.42, y = cy + ((i % 3) - 1) * drift * H * 0.08;
+      ctx.globalAlpha = Math.min(1, u / 0.08, (1 - u) / 0.14);
+      drawBody(b, x, y, r);
+      if (u > 0.18 && u < 0.78) current = b;
     }
     ctx.globalAlpha = 1;
     if (t > 2.4) loader.classList.add('under-way');
     if (ue >= 1 && !api.arrived) { api.arrived = true; skipBtn.hidden = true; voiceBtn.hidden = true; }
     if (api.arrived && onArrive && leaving < 0) { leaving = t; const cb = onArrive; onArrive = null; cb(); }
-    const stage = current || (ue > 0.25 && leaving < 0 ? EARTH : null) || (voiceOn && !muted && leaving < 0 && t < START + 0.2 * PASS ? WELCOME : null);
-    setCaption(stage, api.arrived);
+    setCaption(current || (ue > 0.25 && leaving < 0 ? EARTH : null) || (voiceOn && !muted && leaving < 0 && t < welcomeEnd() ? WELCOME : null), api.arrived);
     if (leaving >= 0 && t - leaving > 1.6) api.stop(true);
   }
   api.active = true;
@@ -1402,10 +1372,9 @@
     muted = true; voiceStop(); loader.classList.remove('voice'); voiceBtn.hidden = true;
     if (t < EARTH_AT + EARTH_TAKES - 0.6) t = EARTH_AT + EARTH_TAKES - 0.6;
   };
-  // `quiet`: the loader is already fading out, leave it as it is (a sentence still being said carries on).
-  // Otherwise fall back to the plain title card and stop the voice.
   api.stop = (quiet) => {
     cancelAnimationFrame(raf); clearTimeout(swapTimer); api.active = false; api.whenArrived = (cb) => cb();
+    // quiet: the loader is already fading out and a sentence still being said carries on; otherwise stop the voice too.
     if (!quiet) { voiceStop(); loader.classList.remove('journey', 'under-way', 'voice'); }
   };
   Object.defineProperty(api, 'time', { get: () => t, set: (v) => { t = v; } });   // tests
@@ -1491,7 +1460,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-13.5';
+  const NOUR_BUILD = '2026-11-13.6';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
