@@ -53,15 +53,15 @@ Uranus, Saturne (Titan à côté), Jupiter (les quatre lunes galiléennes en poi
 où le vrai globe prend le relais. Chaque disque est une **photo** de sonde ou de télescope (Voyager 2, Cassini,
 Juno, Rosetta, Galileo, Apollo 17), créditée dans le coin et dans « Sources et crédits ». Tailles et vitesse ne
 sont pas à l'échelle ; les distances affichées sont réelles (fiches planétaires de la NASA, arrondies) et l'écart
-entre les rencontres suit ces distances, comprimé dans le temps. « Passer » (ou Échap) saute à l'arrivée.
+entre les rencontres suit ces distances, comprimé dans le temps. « Passer » (ou Échap) coupe le voyage tout de suite : le dessin est libéré et le globe prend le relais.
 Avec « mouvement réduit », les photos défilent en fondu, sans trajectoire. Un lien direct (`#tolede`, `#vue=…`)
 ou `?intro=0` (les tests) saute le voyage : la fiche-titre simple le remplace.
 
 ### Fatiha : qualité d'image
 
-Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, la qualité part de l'appareil (les téléphones démarrent en « Équilibrée », rendue à la résolution réelle de l'écran, jusqu'à 3×) et ne baisse que si la fréquence d'images reste basse de façon prolongée, après un temps de chauffe. La version du site (`2026-11-14.1`) est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
+Le menu (« Qualité d'image ») propose **Ultra · HDR 5K** (rendu HDR, image calculée jusqu'à 5120 px puis réduite à l'écran, pour un ordinateur puissant), **Auto**, **Haute**, **Équilibrée** et **Légère** (choix mémorisé dans le navigateur ; `?qualite=haute|equilibree|legere` l'impose aussi). En Auto, un ordinateur part de l'appareil. Un téléphone (écran tactile étroit, ou iOS) part en « Légère » : le voyage est dessiné à 1,5× et le globe à 2× au plus, pour ne pas faire tomber l'onglet. Si l'image reste fluide, Auto peut remonter d'un cran à la fois ; ce plafond de pixels reste. Sur un ordinateur, Auto ne fait que descendre, après un temps de chauffe, si la fréquence reste basse. La version du site (`2026-11-14.2`) est affichée dans « Sources et crédits », en bas du menu. L'effet d'eau de Cesium est volontairement désactivé : il donnait des côtes en escaliers et des taches de reflet sur les terres sous le niveau de la mer.
 
-Le mode automatique ne descend en « Légère » que si l'image reste sous 15 images par seconde (24 pour passer de « Haute » à « Équilibrée ») : ce dernier palier coûte de la netteté. À l'arrivée sur un lieu, la caméra attend (« Mise au point », 7 s au plus) que les images du sol visibles soient chargées avant d'afficher la fiche.
+Le mode automatique ne descend en « Légère » que si l'image reste sous 15 images par seconde (24 pour passer de « Haute » à « Équilibrée ») : ce dernier palier coûte de la netteté. Sur un téléphone parti en « Légère », il peut au contraire remonter si la fréquence reste au-dessus de 48 images par seconde. À l'arrivée sur un lieu, la caméra attend (« Mise au point », 7 s au plus) que les images du sol visibles soient chargées avant d'afficher la fiche.
 
 ### Fatiha : boussole, carnet de voyage, raccourcis
 

@@ -46,7 +46,7 @@
   .vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 58%, rgba(2, 3, 8, 0.6) 100%); }
   .shade { position: fixed; left: 0; right: 0; pointer-events: none; }
   .shade-top { top: 0; height: 170px; background: linear-gradient(rgba(4, 6, 11, 0.72), transparent); }
-  .shade-bottom { bottom: 0; height: 48vh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
+  .shade-bottom { bottom: 0; height: 48vh; height: 48dvh; background: linear-gradient(transparent, rgba(4, 6, 11, 0.5) 45%, rgba(4, 6, 11, 0.92)); }
 
   .ui { position: fixed; z-index: 5; }
   .kicker { font: 500 11px/1.4 var(--font-mono); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
@@ -484,15 +484,16 @@
   .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
-  #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; }
+  #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; touch-action: none; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
-  .loader.journey { background: #000; }
+  .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
   .loader.journey .inner { position: relative; transition: opacity 1s ease; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.8); }
   .loader.journey .bar, .loader.journey .start { display: none; }
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh);
+    bottom: calc(var(--safe-b) + 15dvh);
     opacity: 0; transition: opacity .5s ease; pointer-events: none; isolation: isolate;
     /* Neptune (and each later disc) crosses this block. The scrim plus a tight halo keep the step line readable. */
     text-shadow: 0 0 2px #000, 0 1px 2px #000, 0 0 18px rgba(0, 0, 0, 0.95), 0 2px 22px rgba(0, 0, 0, 0.9);
@@ -549,7 +550,7 @@
   .film[hidden] { display: none; }
   .film-head { width: min(960px, 100%); display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .film-head h3 { margin: 6px 0 0; font: 300 26px/1.1 var(--font-ui); }
-  .film video { width: min(960px, 100%); max-height: calc(100vh - 150px); background: #000; border-radius: 12px; }
+  .film video { width: min(960px, 100%); max-height: calc(100vh - 150px); max-height: calc(100dvh - 150px); background: #000; border-radius: 12px; }
   @media (max-width: 760px) {
     .film-head h3 { font-size: 22px; }
     .cockpit-hud { letter-spacing: .04em; font-size: 10.5px; }
@@ -591,7 +592,7 @@
     .sheet.watch { max-height: 58vh; }
     body.sheet-open .card, body.sheet-open .places { visibility: hidden; }
     .sheet h3 { font-size: 22px; }
-    .shade-bottom { height: 62vh; }
+    .shade-bottom { height: 62vh; height: 62dvh; }
     @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -1096,7 +1097,7 @@
       <div><div class="kicker">Film</div><h3 id="film-title">Le système solaire</h3></div>
       <button class="close" id="film-close" type="button" aria-label="Fermer le film">✕</button>
     </div>
-    <video id="film-video" controls playsinline preload="none" src="media/systeme-solaire-v2.mp4"></video>
+    <video id="film-video" controls playsinline preload="none" data-src="media/systeme-solaire-v2.mp4"></video>
   </div>
 
   <div class="loader" id="loader">
@@ -1137,6 +1138,17 @@
   'use strict';
   const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); } };
   const loader = document.getElementById('loader'), canvas = document.getElementById('intro-canvas');
+  // Phones: a touch screen that is narrow, or any iOS device (iPadOS reports itself as a Mac).
+  const phoneLike = (() => {
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const sw = window.screen && window.screen.width || window.innerWidth;
+    const sh = window.screen && window.screen.height || window.innerHeight;
+    const narrow = Math.min(sw, sh) <= 820 || matchMedia('(max-width: 820px)').matches;
+    return iOS || (touch && narrow);
+  })();
+  window.__fatihaPhone = phoneLike;
   const off = new URLSearchParams(location.search).get('intro') === '0';
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (off || location.hash.length > 1 || !canvas || !canvas.getContext) return;
@@ -1216,15 +1228,31 @@
   }
 
   let W = 0, H = 0, dpr = 1, t = 0, last = 0, raf = 0, leaving = -1, shown = null, onArrive = null;
+  let allocW = 0, allocH = 0, resizeTimer = 0;
   const kicker = document.getElementById('intro-kicker'), nameEl = document.getElementById('intro-name'), factEl = document.getElementById('intro-fact');
   const caption = document.getElementById('intro-caption'), skipBtn = document.getElementById('intro-skip');
   const stepEl = document.getElementById('intro-step'), distEl = document.getElementById('intro-dist'), speedEl = document.getElementById('intro-speed');
   const creditEl = document.getElementById('intro-credit');
   const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
-  function resize() {
-    dpr = Math.min(3, window.devicePixelRatio || 1);
-    W = canvas.clientWidth; H = canvas.clientHeight;
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+  // The journey is the only full-screen animation while it runs. Phones draw it at 1.5×; computers keep 3×.
+  function journeyDpr() {
+    const raw = window.devicePixelRatio || 1;
+    return phoneLike ? Math.min(1.5, raw) : Math.min(3, raw);
+  }
+  function resize(force) {
+    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    if (!cw || !ch) return;
+    // iOS shows and hides the address bar: a short height change must not rebuild the bitmap.
+    if (!force && allocW > 0 && cw === allocW && Math.abs(ch - allocH) < 150) return;
+    dpr = journeyDpr();
+    W = cw; H = ch;
+    const bw = Math.max(1, Math.round(W * dpr)), bh = Math.max(1, Math.round(H * dpr));
+    if (canvas.width !== bw || canvas.height !== bh) { canvas.width = bw; canvas.height = bh; }
+    allocW = cw; allocH = ch;
+  }
+  function scheduleResize() {
+    if (resizeTimer) return;
+    resizeTimer = setTimeout(() => { resizeTimer = 0; if (api.active) resize(true); }, 160);
   }
   function drawSprite(key, x, y, r) {
     const sp = sprites[key];
@@ -1284,9 +1312,11 @@
     }
   }
   function frame(now) {
+    if (!api.active) return;
     raf = requestAnimationFrame(frame);
     const dt = Math.min(0.1, Math.max(0, (now - last) / 1000)); last = now; t += dt;
-    if (!W || canvas.clientWidth !== W || canvas.clientHeight !== H) resize();
+    if (!allocW) resize(true);
+    else if (canvas.clientWidth !== allocW || Math.abs(canvas.clientHeight - allocH) >= 150) scheduleResize();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
     const cx = W / 2, cy = H / 2, span = Math.max(W, H) * 0.6;
@@ -1349,12 +1379,25 @@
   }
   api.active = true;
   api.whenArrived = (cb) => { onArrive = cb; };
+  // Passer drops the bitmap at once, then hands the globe over. The natural ending still plays its short leave.
   api.skip = () => {
-    const end = reduced ? TOTAL * 1.85 : EARTH_AT + EARTH_TAKES;
-    if (t < end - 0.6) t = end - 0.6;
+    if (!api.active) return;
+    api.arrived = true;
+    skipBtn.hidden = true;
+    const cb = onArrive;
+    onArrive = null;
+    api.stop(true);
+    if (cb) cb();
   };
   api.stop = (quiet) => {
-    cancelAnimationFrame(raf); api.active = false; api.whenArrived = (cb) => cb();
+    api.active = false;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    if (resizeTimer) { clearTimeout(resizeTimer); resizeTimer = 0; }
+    canvas.width = 0; canvas.height = 0;
+    canvas.style.display = 'none';
+    W = 0; H = 0; allocW = 0; allocH = 0;
+    api.whenArrived = (cb) => { cb(); };
     if (!quiet) loader.classList.remove('journey', 'under-way');
   };
   Object.defineProperty(api, 'time', { get: () => t, set: (v) => { t = v; } });
@@ -1437,7 +1480,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.1';
+  const NOUR_BUILD = '2026-11-14.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1467,9 +1510,10 @@
 
   // ---------- Device tier (graceful degradation) ----------
   const TIERS = {
-    // dpr = highest device-pixel ratio rendered. Phones are 3x: rendering at native 3x is what keeps
-    // imagery crisp. msaa is the sample count used only when the effective ratio is below 2; at 2x and
-    // above, pixels are small enough that multisampling and FXAA (which also softens textures) are off.
+  // dpr = highest device-pixel ratio rendered. On a computer, native 3× keeps imagery crisp.
+  // Phones and iOS are capped in renderScale (1.5× while the journey canvas is up, 2× after).
+  // msaa is the sample count used only when the effective ratio is below 2; at 2x and
+  // above, pixels are small enough that multisampling and FXAA (which also softens textures) are off.
     // Ultra (chosen, never automatic): Cesium's high-dynamic-range lighting, and a drawing buffer up to 5120 px on
     // the long side that the browser scales down to the screen (supersampling). Cesium divides the screen-space
     // error by the pixel ratio, so a bigger buffer alone loads the same tiles: a lower sse asks for finer ones.
@@ -1487,18 +1531,36 @@
     const limit = Math.min(cap, gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
     return Math.max(1, limit / (Math.max(window.innerWidth, window.innerHeight) * (window.devicePixelRatio || 1)));
   }
-  const renderScale = (t) => (t.ultra ? ultraScale() : Math.min(1, t.dpr / (window.devicePixelRatio || 1)));
-  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr);
+  // Same rule as the journey script (window.__fatihaPhone): touch + a narrow screen, or iOS.
+  const phoneLike = window.__fatihaPhone != null ? window.__fatihaPhone : (() => {
+    const ua = navigator.userAgent || '';
+    const iOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1);
+    const touch = matchMedia('(pointer: coarse)').matches || (navigator.maxTouchPoints || 0) > 0;
+    const sw = window.screen && window.screen.width || window.innerWidth;
+    const sh = window.screen && window.screen.height || window.innerHeight;
+    return iOS || (touch && (Math.min(sw, sh) <= 820 || matchMedia('(max-width: 820px)').matches));
+  })();
+  let slowWindows = 0, fastWindows = 0, warmUntil = 0;
+  // While the journey is on screen the globe is a still picture, so 1.5× is enough. Afterwards, 2×.
+  const renderScale = (t) => {
+    const device = window.devicePixelRatio || 1;
+    if (t.ultra && !phoneLike) return ultraScale();
+    const cap = phoneLike ? (intro.active ? 1.5 : 2) : t.dpr;
+    return Math.min(1, Math.min(t.dpr, cap) / device);
+  };
+  const effectiveDpr = (t) => Math.min(window.devicePixelRatio || 1, t.dpr, phoneLike ? (intro.active ? 1.5 : 2) : Infinity);
   const msaaFor = (t) => (t.ultra || effectiveDpr(t) >= 2 ? 1 : t.msaa);
   const fxaaFor = (t) => !t.ultra && effectiveDpr(t) < 2;
   // Safari (iPhone, iPad, Mac) and Firefox expose no deviceMemory and report few cores whatever the chip,
   // so a missing value must not count against the device. Only a clear low-end signal selects "light".
+  // Phones and iOS start in Légère; auto may step up later if the frame rate stays high (the pixel cap remains).
   function detectTier() {
     const coarse = matchMedia('(pointer: coarse)').matches;
     const cores = navigator.hardwareConcurrency || 4;
     const mem = navigator.deviceMemory;                    // Chrome/Android only
+    if (phoneLike) return 'light';
     if (mem !== undefined && mem <= 2) return 'light';
-    if (coarse) return cores <= 2 ? 'light' : 'balanced';  // phones and tablets
+    if (coarse) return cores <= 2 ? 'light' : 'balanced';  // a large touch screen that is not a phone
     return cores >= 8 ? 'high' : 'balanced';
   }
   // Quality choice: 'auto' (detected, and lowered if the frame rate stays low) or a pinned tier.
@@ -1638,6 +1700,9 @@
   const naturalEarth = C.ImageryLayer.fromProviderAsync(
     C.TileMapServiceImageryProvider.fromUrl(C.buildModuleUrl('Assets/Textures/NaturalEarthII')));
 
+  // The journey canvas is already a full-screen animation. Until it ends, the globe draws only when
+  // something asks (a tile arriving), not on every frame.
+  const introPlaying = !!intro.active;
   const viewer = new C.Viewer('globe', {
     baseLayer: naturalEarth,
     terrainProvider: new TerrariumTerrainProvider(),
@@ -1649,6 +1714,8 @@
     shadows: tier.shadows,
     terrainShadows: tier.shadows ? C.ShadowMode.ENABLED : C.ShadowMode.DISABLED,
     useBrowserRecommendedResolution: false,
+    requestRenderMode: introPlaying,
+    maximumRenderTimeChange: introPlaying ? Number.POSITIVE_INFINITY : 0.0,
   });
   // The page links to no other site: Cesium and Google credits stay on screen (Google requires them), as text and logos
   // only. Any link Cesium writes into the credit area is replaced by its content.
@@ -1657,6 +1724,39 @@
   unlinkCredits($('cesium-credits'));
   const scene = viewer.scene, globe = scene.globe, camera = scene.camera;
   const canvas = scene.canvas;
+  let cesiumHeldForIntro = introPlaying;
+  function releaseCesiumAfterIntro() {
+    if (!cesiumHeldForIntro) return;
+    cesiumHeldForIntro = false;
+    scene.requestRenderMode = false;
+    scene.maximumRenderTimeChange = 0.0;
+    slowWindows = 0; fastWindows = 0;
+    warmUntil = performance.now() + (phoneLike ? 4000 : 12000);
+    try { viewer.resolutionScale = renderScale(tier); } catch (e) { /* applied again once the tier is ready */ }
+    viewer.useDefaultRenderLoop = true;
+    scene.requestRender();
+  }
+  if (typeof intro.stop === 'function') {
+    const bareStop = intro.stop.bind(intro);
+    intro.stop = function (quiet) {
+      bareStop(quiet);
+      releaseCesiumAfterIntro();
+    };
+  }
+  // A lost WebGL context used to leave a black page. preventDefault lets the browser restore it.
+  let recoverContext = () => {
+    viewer.useDefaultRenderLoop = true;
+    try { viewer.resolutionScale = renderScale(tier); } catch (e) { /* the loop asks again */ }
+    scene.requestRender();
+  };
+  canvas.addEventListener('webglcontextlost', (event) => {
+    event.preventDefault();
+    viewer.useDefaultRenderLoop = false;
+  }, false);
+  canvas.addEventListener('webglcontextrestored', () => {
+    try { recoverContext(); }
+    catch (e) { viewer.useDefaultRenderLoop = true; scene.requestRender(); }
+  }, false);
 
   // Satellite imagery (Esri World Imagery). If a tile fails, Natural Earth
   // underneath stays visible instead of a hole.
@@ -1683,6 +1783,11 @@
       this.credit = undefined;
       this.proxy = undefined;
       this.hasAlphaChannel = true;
+      // One canvas for every tile. Requests run one after another so they cannot overwrite each other.
+      this._canvas = document.createElement('canvas');
+      this._canvas.width = this._canvas.height = 256;
+      this._ctx = this._canvas.getContext('2d', { willReadFrequently: true });
+      this._tail = Promise.resolve();
     }
     getTileCredits() { return []; }
     pickFeatures() { return undefined; }
@@ -1690,13 +1795,16 @@
       const url = TERRAIN_URL.replace('{z}', level).replace('{x}', x).replace('{y}', y);
       const loading = new C.Resource({ url, request }).fetchImage({ preferImageBitmap: true });
       if (!loading) return undefined;
-      return loading.then((img) => {
-        const cv = document.createElement('canvas');
-        cv.width = cv.height = 256;
-        const ctx = cv.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(img, 0, 0, 256, 256);
-        if (img.close) img.close();
-        const src = ctx.getImageData(0, 0, 256, 256).data;
+      const job = this._tail.then(() => loading).then((img) => this._shade(img, x, y, level));
+      this._tail = job.then(() => {}, () => {});
+      return job;
+    }
+    _shade(img, x, y, level) {
+      const cv = this._canvas, ctx = this._ctx;
+      if (!ctx) return undefined;
+      ctx.drawImage(img, 0, 0, 256, 256);
+      if (img.close) img.close();
+      const src = ctx.getImageData(0, 0, 256, 256).data;
         const h = new Float32Array(256 * 256);
         for (let i = 0, j = 0; i < h.length; i++, j += 4) {
           const v = src[j] * 256 + src[j + 1] + src[j + 2] / 256 - 32768;
@@ -1725,8 +1833,18 @@
           }
         }
         ctx.putImageData(out, 0, 0);
-        return cv;
-      });
+        // Snapshot the pixels so the next tile can reuse this canvas. ImageData, not the canvas:
+        // the copy no longer needs the shared bitmap.
+        const copyCanvas = () => {
+          const copy = document.createElement('canvas');
+          copy.width = copy.height = 256;
+          copy.getContext('2d').putImageData(out, 0, 0);
+          return copy;
+        };
+        if (typeof createImageBitmap !== 'function') return copyCanvas();
+        try {
+          return createImageBitmap(out).catch(() => copyCanvas());
+        } catch (e) { return copyCanvas(); }
     }
   }
   const hillshade = viewer.imageryLayers.addImageryProvider(new HillshadeImageryProvider());
@@ -1863,7 +1981,7 @@
   globe.showWaterEffect = false;
   globe.depthTestAgainstTerrain = true;
   globe.maximumScreenSpaceError = tier.sse;
-  globe.tileCacheSize = 1000;
+  globe.tileCacheSize = phoneLike ? 100 : 1000;
   globe.preloadSiblings = true;
   globe.baseColor = C.Color.fromCssColorString('#0b1a2a');
   globe.atmosphereLightIntensity = 10;
@@ -2707,7 +2825,7 @@
   // Ends a dive, finished (card shown) or not (touch, another flight): no blur or haze, no prefetch left, and the
   // frame-rate watch resumes after a warm-up.
   function endDive(finished) {
-    if (diveSeq) { slowWindows = 0; warmUntil = performance.now() + 5000; }
+    if (diveSeq) { slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 5000; }
     diving = false; diveSeq = false; diveStage = finished ? 'done' : null;
     prefetchStop(!finished);
   }
@@ -2983,7 +3101,8 @@
   // HUD readout + adaptive quality (steps down if frame rate stays low).
   const fmtAlt = (m) => m >= 1e5 ? `${Math.round(m / 1000).toLocaleString('fr-FR')} km`
     : m >= 1e4 ? `${(m / 1000).toFixed(1).replace('.', ',')} km` : `${Math.round(m).toLocaleString('fr-FR')} m`;
-  let frames = 0, fpsT = performance.now(), slowWindows = 0, hudT = 0, warmUntil = performance.now() + 12000;
+  let frames = 0, fpsT = performance.now(), hudT = 0;
+  warmUntil = performance.now() + (phoneLike ? 4000 : 12000);
   let capturing = false;     // a high-resolution capture is slow on purpose: never read it as a weak device
   function applyTier(name) {
     tierName = name; tier = TIERS[name];
@@ -2999,6 +3118,15 @@
     try { scene.msaaSamples = msaaFor(tier); } catch (e) { /* no multisampling on this device */ }
     $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   }
+  recoverContext = () => {
+    viewer.useDefaultRenderLoop = true;
+    applyTier(tierName);
+    if (cesiumHeldForIntro) {
+      scene.requestRenderMode = true;
+      scene.maximumRenderTimeChange = Number.POSITIVE_INFINITY;
+    }
+    scene.requestRender();
+  };
   $('hud-quality').textContent = `Qualité ${tier.label}${quality === 'auto' ? ' (auto)' : ''}`;
   function syncQualityButtons() {
     document.querySelectorAll('#menu [data-quality]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.quality === quality)));
@@ -3007,16 +3135,16 @@
     quality = choice;
     try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
     catch (e) { /* storage blocked: the choice applies to this visit only */ }
-    slowWindows = 0; warmUntil = performance.now() + 6000;
+    slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 6000;
     applyTier(TIER_BY_CHOICE[choice] || detectTier());
     syncQualityButtons();
   }
   document.querySelectorAll('#menu [data-quality]').forEach((b) => b.addEventListener('click', () => setQuality(b.dataset.quality)));
   // The Ultra buffer is sized from the window: follow resizes and rotations (not during a capture, which sets its own).
-  window.addEventListener('resize', () => { if (tier.ultra && !capturing) viewer.resolutionScale = renderScale(tier); });
+  window.addEventListener('resize', () => { if (!capturing && (tier.ultra || phoneLike)) viewer.resolutionScale = renderScale(tier); });
   syncQualityButtons();
   // A hidden tab stops frames: do not count that gap as slowness.
-  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; warmUntil = fpsT + 4000; });
+  document.addEventListener('visibilitychange', () => { frames = 0; fpsT = performance.now(); slowWindows = 0; fastWindows = 0; warmUntil = fpsT + 4000; });
   scene.postRender.addEventListener(() => {
     frames++;
     const now = performance.now();
@@ -3025,11 +3153,22 @@
       frames = 0; fpsT = now;
       // Tile loading and shader compilation slow the first seconds: only sustained slowness lowers quality.
       // Nor a dive: it loads tiles at every level on purpose (endDive gives a warm-up afterwards).
+      // Nor the journey: the globe is not drawing continuously, so the count is not a real frame rate.
       // The last step (light) costs sharpness (coarser ground, 2x pixels): only a really low frame rate takes it.
+      // On a phone, auto may also step back up, one tier at a time, when the frame rate stays comfortable.
+      // The pixel cap (2×, 1.5× during the journey) stays on whatever tier that reaches.
       const i = TIER_ORDER.indexOf(tierName);
-      const floor = TIER_ORDER[i + 1] === 'light' ? 15 : 24;
-      slowWindows = (now > warmUntil && fps < floor && !capturing && !diveSeq) ? slowWindows + 1 : 0;
-      if (quality === 'auto' && slowWindows >= 3 && i < TIER_ORDER.length - 1) { applyTier(TIER_ORDER[i + 1]); slowWindows = 0; warmUntil = now + 6000; }
+      const floor = i >= 0 && TIER_ORDER[i + 1] === 'light' ? 15 : 24;
+      const paused = capturing || diveSeq || cesiumHeldForIntro || now <= warmUntil;
+      if (paused) { slowWindows = 0; fastWindows = 0; }
+      else if (fps < floor) { slowWindows++; fastWindows = 0; }
+      else if (phoneLike && quality === 'auto' && fps >= 48 && i > 0) { fastWindows++; slowWindows = 0; }
+      else { slowWindows = 0; fastWindows = 0; }
+      if (quality === 'auto' && slowWindows >= 3 && i >= 0 && i < TIER_ORDER.length - 1) {
+        applyTier(TIER_ORDER[i + 1]); slowWindows = 0; fastWindows = 0; warmUntil = now + 6000;
+      } else if (quality === 'auto' && phoneLike && fastWindows >= 4 && i > 0) {
+        applyTier(TIER_ORDER[i - 1]); slowWindows = 0; fastWindows = 0; warmUntil = now + 6000;
+      }
     }
     if (now - hudT > 200) {
       hudT = now;
@@ -5926,10 +6065,21 @@
     }
     filmBtn.addEventListener('click', openFilm);
     $('film-close').addEventListener('click', () => { closeFilm(); menuBtn.focus(); });
-    filmVideo.addEventListener('error', () => { filmBtn.hidden = true; closeFilm(); });
-    fetch('media/systeme-solaire-v2.mp4', { method: 'HEAD' }).then((r) => {
-      if (r.ok) filmBtn.hidden = false;
-      else if (r.status === 405) return fetch('media/systeme-solaire-v2.mp4', { headers: { Range: 'bytes=0-0' } }).then((g) => { if (g.ok) filmBtn.hidden = false; });
+    const filmSrc = filmVideo.getAttribute('data-src') || 'media/systeme-solaire-v2.mp4';
+    filmVideo.removeAttribute('src');
+    function revealFilm() {
+      if (!filmVideo.getAttribute('src')) filmVideo.src = filmSrc;
+      filmBtn.hidden = false;
+    }
+    filmVideo.addEventListener('error', () => {
+      filmBtn.hidden = true; closeFilm();
+      filmVideo.removeAttribute('src');
+      try { filmVideo.load(); } catch (e) { /* the empty player stays hidden with the button */ }
+    });
+    // The file is not in every copy of the site. Ask before giving the player a src, so a missing film is not a 404.
+    fetch(filmSrc, { method: 'HEAD' }).then((r) => {
+      if (r.ok) revealFilm();
+      else if (r.status === 405) return fetch(filmSrc, { headers: { Range: 'bytes=0-0' } }).then((g) => { if (g.ok) revealFilm(); });
     }).catch(() => {});
 
     // Keys, before the page's own Escape handler (capture on window): during the tour any key ends it; the photo viewer
@@ -6860,12 +7010,24 @@
     setTimeout(liftVeil, 1400);
     // Deep link (index.html#alhambra), shared view (#vue=…) or a place picked during loading
     // takes over from the opening shot.
-    const h = parseHash();
-    if (h && !activePlace && !spectacle.touring) goToHash(h);
-    else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
-      duration: 7500,
-      onDone: () => setPhase('Orbite'),
-    });
+    const begin = () => {
+      const h = parseHash();
+      if (h && !activePlace && !spectacle.touring) goToHash(h);
+      else if (!flight && !activePlace) startFlight(C.Cartesian3.fromDegrees(25, 30, 0), { heading: 0, pitch: -90, range: 1.9e7 }, {
+        duration: 7500,
+        onDone: () => setPhase('Orbite'),
+      });
+    };
+    // The journey's leave still plays on its own canvas. The globe flight starts when that canvas is gone,
+    // so the two full-screen views never animate together (and the flight's clock starts on a live render loop).
+    if (intro.active) {
+      const prev = intro.stop.bind(intro);
+      let begun = false;
+      intro.stop = function (quiet) {
+        prev(quiet);
+        if (!begun) { begun = true; begin(); }
+      };
+    } else begin();
   }
   const removeTileListener = globe.tileLoadProgressEvent.addEventListener((queued) => {
     if (queued === 0 && globe.tilesLoaded) ready();
