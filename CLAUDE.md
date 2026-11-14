@@ -151,6 +151,12 @@ python3 -m satlab bench --campaign standard --out results/standard
   is kept in `nour.musique` and a remembered "on" restarts at the next gesture. The Darija voice calls `duck()`, the main
   script calls `hold(mediaAudible())` twice a second, and the song and the generated "Bande-son" exclude each other.
   iPhone ignores `volume`, so there the song pauses during a sentence. `__music.state` is the test hook.
+  The journey speaks five languages (`LANGS`: fr, ar, tr, en, es), chosen with the `#intro-lang` select and kept in
+  `nour.langue`; with no saved choice the browser's language decides, French otherwise. French stays the reference
+  (`BODIES`); the others translate names, kinds and buttons, and build the two figures from `FIGURES` with their own
+  number format (`wording()`, `paint()`). Arabic sets `dir="rtl"` and needs `letter-spacing: 0`. Photo credits, the
+  title card and the rest of the site stay in French. None of the translations was reviewed by a native speaker.
+  Tests can set `__intro.lang`; a headless browser defaults to English.
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.

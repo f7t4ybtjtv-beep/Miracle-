@@ -545,6 +545,19 @@
   }
   /* Background music: same pill, one row under the voice button */
   .loader.journey .intro-music:not([hidden]) { top: calc(var(--safe-t) + var(--gutter) + 56px); }
+  /* Language of the journey: a native select dressed as the same pill, third row */
+  .intro-lang { display: none; }
+  .loader.journey .intro-lang:not([hidden]) {
+    display: block; position: absolute; top: calc(var(--safe-t) + var(--gutter) + 112px); left: var(--gutter);
+    height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid var(--line-2); background: rgba(4, 6, 11, 0.45);
+    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .06em; cursor: pointer; -webkit-appearance: none; appearance: none;
+  }
+  .loader.journey .intro-lang:hover, .loader.journey .intro-lang:focus-visible { border-color: var(--accent); color: var(--accent); }
+  .intro-lang option { background: #04060B; color: #F4F6FA; }
+  /* Arabic: joined letters must not be spaced out, and the block reads from the right */
+  .intro-caption[lang="ar"] { text-align: right; }
+  .intro-caption[lang="ar"] .kicker, .intro-caption[lang="ar"] .intro-name, .intro-caption[lang="ar"] .intro-fact { letter-spacing: 0; }
+  .intro-caption[lang="ar"] .intro-name { line-height: 1.35; }
   /* The veil covers this corner until it has finished fading. Tools must not take Passer's tap. */
   body:not(.veil-gone) .ui.top .tools { pointer-events: none; }
 
@@ -1102,6 +1115,13 @@
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
       <span id="intro-music-label">Musique</span>
     </button>
+    <select class="intro-lang" id="intro-lang" aria-label="Langue · Language · اللغة · Dil · Idioma" hidden>
+      <option value="fr" lang="fr">Français</option>
+      <option value="ar" lang="ar">العربية</option>
+      <option value="tr" lang="tr">Türkçe</option>
+      <option value="en" lang="en">English</option>
+      <option value="es" lang="es">Español</option>
+    </select>
     <div class="inner">
       <h2>Fatiha</h2>
       <p class="tagline">maman d’Amine</p>
@@ -1309,6 +1329,63 @@
     Lune: ['darija-lune', 'وهادا القمر ديالنا. قريب لينا بزاف، وكيدور على الأرض.'],
     Terre: ['darija-terre', 'وها حنا وصلنا. هادي الأرض، الدار ديالنا. دابا نقدرو نشوفو البلايص من الفوق.'],
   };
+  // ----- Languages of the journey -----
+  // French is the page's language and stays the reference (the BODIES table above). The other languages translate what
+  // the journey shows: names, kinds, the two figures, the buttons. Photo credits stay as they are (names of agencies
+  // and probes). `nour.langue` keeps the choice; without one, the browser's language decides. Not reviewed by native
+  // speakers: to fix a word, edit its line here.
+  const LANGS = {
+    fr: { skip: 'Passer ›', voice: 'Voix en darija', voiceOn: 'Voix activée', voiceTap: 'Touchez pour écouter', music: 'Musique', musicOn: 'Musique activée',
+      musicTap: 'Touchez pour la musique', wait: 'le globe se prépare…', note: 'Photos de sondes · tailles et vitesse non à l’échelle', journey: 'Voyage' },
+    ar: { skip: 'تخطي', voice: 'الصوت بالدارجة', voiceOn: 'الصوت مفعّل', voiceTap: 'المس للاستماع', music: 'موسيقى', musicOn: 'الموسيقى مفعّلة',
+      musicTap: 'المس لتشغيل الموسيقى', wait: 'الكرة الأرضية تتهيأ…', note: 'صور من مسابير فضائية · الأحجام والسرعة ليست بمقياس حقيقي', journey: 'رحلة',
+      sun: (d) => `البعد عن الشمس: ${d} كم`, earth: (d) => `البعد عن الأرض: ${d} كم`, diam: (d) => `القطر: ${d} كم`, bn: 'مليار', mn: 'مليون', dec: '.', sep: ',',
+      names: { Neptune: 'نبتون', Uranus: 'أورانوس', Saturne: 'زحل', Jupiter: 'المشتري', Mars: 'المريخ', Lune: 'القمر', Terre: 'الأرض' },
+      kinds: { Neptune: 'عملاق جليدي', Uranus: 'عملاق جليدي، مائل على جنبه', Saturne: 'عملاق غازي، حلقاته من جليد', Jupiter: 'عملاق غازي، أكبر الكواكب',
+        Mars: 'كوكب صخري', Lune: 'القمر الطبيعي للأرض', Terre: 'كوكبنا' } },
+    tr: { skip: 'Geç ›', voice: 'Darija dilinde ses', voiceOn: 'Ses açık', voiceTap: 'Dinlemek için dokunun', music: 'Müzik', musicOn: 'Müzik açık',
+      musicTap: 'Müzik için dokunun', wait: 'küre hazırlanıyor…', note: 'Uzay aracı fotoğrafları · boyutlar ve hız ölçekli değildir', journey: 'Yolculuk',
+      sun: (d) => `Güneş’e uzaklığı ${d} km`, earth: (d) => `Dünya’ya uzaklığı ${d} km`, diam: (d) => `çapı ${d} km`, bn: 'milyar', mn: 'milyon', dec: ',', sep: '.',
+      names: { Neptune: 'Neptün', Uranus: 'Uranüs', Saturne: 'Satürn', Jupiter: 'Jüpiter', Mars: 'Mars', Lune: 'Ay', Terre: 'Dünya' },
+      kinds: { Neptune: 'Buz devi', Uranus: 'Buz devi, yörüngesinde yan yatmış', Saturne: 'Gaz devi, buzdan halkalar', Jupiter: 'Gaz devi, en büyük gezegen',
+        Mars: 'Kayaç gezegen', Lune: 'Dünya’nın doğal uydusu', Terre: 'Gezegenimiz' } },
+    en: { skip: 'Skip ›', voice: 'Voice in Darija', voiceOn: 'Voice on', voiceTap: 'Tap to listen', music: 'Music', musicOn: 'Music on',
+      musicTap: 'Tap for music', wait: 'the globe is getting ready…', note: 'Probe photographs · sizes and speed not to scale', journey: 'Journey',
+      sun: (d) => `${d} km from the Sun`, earth: (d) => `${d} km from Earth`, diam: (d) => `diameter ${d} km`, bn: 'billion', mn: 'million', dec: '.', sep: ',',
+      names: { Neptune: 'Neptune', Uranus: 'Uranus', Saturne: 'Saturn', Jupiter: 'Jupiter', Mars: 'Mars', Lune: 'Moon', Terre: 'Earth' },
+      kinds: { Neptune: 'Ice giant', Uranus: 'Ice giant, tilted on its side', Saturne: 'Gas giant, rings of ice', Jupiter: 'Gas giant, the largest planet',
+        Mars: 'Rocky planet', Lune: 'Earth’s natural satellite', Terre: 'Our planet' } },
+    es: { skip: 'Saltar ›', voice: 'Voz en dariya', voiceOn: 'Voz activada', voiceTap: 'Toca para escuchar', music: 'Música', musicOn: 'Música activada',
+      musicTap: 'Toca para la música', wait: 'el globo se prepara…', note: 'Fotos de sondas · tamaños y velocidad no a escala', journey: 'Viaje',
+      sun: (d) => `a ${d} km del Sol`, earth: (d) => `a ${d} km de la Tierra`, diam: (d) => `diámetro ${d} km`, bn: null, mn: 'millones de', dec: ',', sep: ' ',
+      names: { Neptune: 'Neptuno', Uranus: 'Urano', Saturne: 'Saturno', Jupiter: 'Júpiter', Mars: 'Marte', Lune: 'Luna', Terre: 'Tierra' },
+      kinds: { Neptune: 'Gigante de hielo', Uranus: 'Gigante de hielo, inclinado sobre su órbita', Saturne: 'Gigante gaseoso, anillos de hielo',
+        Jupiter: 'Gigante gaseoso, el planeta más grande', Mars: 'Planeta rocoso', Lune: 'Satélite natural de la Tierra', Terre: 'Nuestro planeta' } },
+  };
+  // The two figures of each body: [distance, unit ('bn', 'mn' or '' for plain km), measured from the Sun or the Earth, diameter in km].
+  const FIGURES = { Neptune: [4.5, 'bn', 'sun', 49500], Uranus: [2.9, 'bn', 'sun', 51100], Saturne: [1.4, 'bn', 'sun', 120500], Jupiter: [778, 'mn', 'sun', 143000],
+    Mars: [228, 'mn', 'sun', 6800], Lune: [384400, '', 'earth', 3475], Terre: [150, 'mn', 'sun', 12756] };
+  const langSel = document.getElementById('intro-lang');
+  let lang = 'fr';
+  try { const saved = localStorage.getItem('nour.langue'), nav = (navigator.language || 'fr').slice(0, 2).toLowerCase(); lang = LANGS[saved] ? saved : LANGS[nav] ? nav : 'fr'; }
+  catch (e) { /* storage blocked: French */ }
+  const T = (k) => LANGS[lang][k];
+  function figure(L, n) {
+    const [whole, frac] = String(n).split('.');
+    // Spanish keeps four-digit numbers unbroken; the others group every thousand.
+    const grouped = (lang === 'es' && whole.length < 5) ? whole : whole.replace(/\B(?=(\d{3})+$)/g, L.sep);
+    return frac ? grouped + L.dec + frac : grouped;
+  }
+  // What the caption shows for a body in the chosen language (French: the BODIES table as written).
+  function wording(b) {
+    const L = LANGS[lang], f = FIGURES[b.name];
+    if (b === WELCOME) return { name: b.name, kind: L.journey, fact: '' };
+    if (lang === 'fr' || !f) return { name: b.name, kind: b.kind, fact: b.fact };
+    // Spanish counts in "millones" (4500 millones), not in billions.
+    const inMn = f[1] === 'bn' && !L.bn, unit = inMn ? 'mn' : f[1];
+    const dist = figure(L, inMn ? Math.round(f[0] * 1000) : f[0]) + (unit ? '\u00a0' + L[unit] : '');
+    return { name: L.names[b.name], kind: L.kinds[b.name], fact: `${L[f[2]](dist)}\n${L.diam(figure(L, f[3]))}` };
+  }
   const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome', credit: 'Photos de sondes · tailles et vitesse non à l’échelle' };
   // With the voice on the clock runs slower (VOICE_RATE), so a planet stays on screen as long as its sentence lasts;
   // before the first planet it is slower still, for the welcome.
@@ -1365,7 +1442,7 @@
     window.__music.duck(false);
     voiceBtn.setAttribute('aria-pressed', 'false');
     loader.classList.remove('voice');
-    voiceLabel.textContent = 'Touchez pour écouter';
+    voiceLabel.textContent = T('voiceTap');
   }
   function pump() {
     if (busy || !voiceQ.length || !voiceOn || muted) return;
@@ -1397,10 +1474,11 @@
     if (audio) { swappingSrc = true; audio.pause(); swappingSrc = false; }
   }
   // `tap`: the visitor chose it, so remember the choice. A refusal by the browser never overwrites it.
+  function syncVoiceLabel() { voiceLabel.textContent = voiceOn ? T('voiceOn') : (voiceBlocked ? T('voiceTap') : T('voice')); }
   function setVoice(on, tap) {
     voiceOn = on;
     voiceBtn.setAttribute('aria-pressed', String(on));
-    voiceLabel.textContent = on ? 'Voix activée' : (voiceBlocked ? 'Touchez pour écouter' : 'Voix en darija');
+    syncVoiceLabel();
     loader.classList.toggle('voice', on);
     if (tap) saveVoice(on);
     if (!on) { voiceStop(); return; }
@@ -1502,6 +1580,16 @@
       ctx.fillRect(s.x * W, s.y * H, s.s, s.s);
     }
   }
+  // The words of the caption in the chosen language. Called again when the language changes.
+  let painted = null;
+  function paint() {
+    caption.lang = lang; caption.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    if (!painted) return;
+    const { b, waiting, step } = painted, w = wording(b), count = `\u2066${String(step).padStart(2, '0')} / ${String(TOTAL).padStart(2, '0')}\u2069`;   // isolated: stays "05 / 07" in Arabic
+    kicker.textContent = step > 0 ? `${count}\n${w.kind}` : w.kind;
+    nameEl.textContent = w.name;
+    factEl.textContent = waiting ? (w.fact ? `${w.fact}\n${T('wait')}` : T('wait')) : w.fact;
+  }
   // Caption: the old one fades out, then the new one fades in.
   function setCaption(b, waiting) {
     const key = b ? b.name + (waiting ? '…' : '') : null;
@@ -1513,15 +1601,13 @@
       if (b) {
         const vk = b.voiceKey || b.name, step = b === EARTH ? TOTAL : BODIES.indexOf(b) + 1;
         curVK = vk;
-        kicker.textContent = step > 0 ? `${String(step).padStart(2, '0')} / ${String(TOTAL).padStart(2, '0')}\n${b.kind}` : b.kind;
-        nameEl.textContent = b.name;
-        factEl.textContent = waiting ? (b.fact ? `${b.fact}\nle globe se prépare…` : 'le globe se prépare…') : b.fact;
+        painted = { b, waiting, step }; paint();
         darijaEl.textContent = VOICE[vk] ? VOICE[vk][1] : '';
         if (voiced !== vk) { voiced = vk; voicePlay(vk); }
-      } else { curVK = null; voiced = null; }
+      } else { curVK = null; voiced = null; painted = null; }
       creditEl.textContent = b
         ? b.credit + (b.extraCredit ? '\n' + b.extraCredit : '')
-        : 'Photos de sondes · tailles et vitesse non à l’échelle';
+        : T('note');
     };
     if (prev && b && prev.replace('…', '') !== b.name) { caption.classList.remove('show'); swapTimer = setTimeout(apply, 300); } else apply();
   }
@@ -1593,10 +1679,21 @@
   const music = window.__music, musicBtn = document.getElementById('intro-music'), musicLabel = document.getElementById('intro-music-label');
   const syncMusicBtn = () => {
     musicBtn.setAttribute('aria-pressed', String(music.on || music.armed));
-    musicLabel.textContent = music.on ? 'Musique activée' : music.armed ? 'Touchez pour la musique' : 'Musique';
+    musicLabel.textContent = music.on ? T('musicOn') : music.armed ? T('musicTap') : T('music');
   };
   musicBtn.hidden = false; syncMusicBtn(); music.onchange(syncMusicBtn);
   musicBtn.addEventListener('click', () => music.set(!music.on, true));
+  // Language: every word of the journey follows the choice at once.
+  function setLang(code, tap) {
+    if (!LANGS[code]) return;
+    lang = code; langSel.value = code;
+    if (tap) { try { localStorage.setItem('nour.langue', code); } catch (e) { /* private mode */ } }
+    skipBtn.textContent = T('skip'); syncVoiceLabel(); syncMusicBtn(); paint();
+    if (!painted) creditEl.textContent = T('note');
+  }
+  langSel.hidden = false; setLang(lang);
+  langSel.addEventListener('change', () => setLang(langSel.value, true));
+  Object.defineProperty(api, 'lang', { get: () => lang, set: (v) => setLang(v) });   // tests
   window.addEventListener('keydown', (e) => { if (api.active && (e.key === 'Escape' || e.key === 'Enter')) api.skip(); });
   if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
@@ -1674,7 +1771,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.3';
+  const NOUR_BUILD = '2026-11-14.4';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
