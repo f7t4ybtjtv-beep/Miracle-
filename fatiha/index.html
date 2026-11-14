@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Fatiha, maman d’Amine</title>
-<meta name="description" content="Fatiha, maman d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<title>Fatiha, c’est pour toi Rafa, ma rafale</title>
+<meta name="description" content="Fatiha, c’est pour toi Rafa, ma rafale. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
 <meta name="theme-color" content="#04060B" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwNDA2MEIiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMCIgZmlsbD0iI0Y0RjZGQSIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE5IiBmaWxsPSJub25lIiBzdHJva2U9IiM5RkQzRkYiIHN0cm9rZS1vcGFjaXR5PSIuNTUiIHN0cm9rZS13aWR0aD0iMS42Ii8+PC9zdmc+" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -683,7 +683,7 @@
   <header class="ui top">
     <div class="brand">
       <h1>Fatiha</h1>
-      <span class="tag">maman d’Amine</span>
+      <span class="tag">c’est pour toi Rafa, ma rafale</span>
       <div class="hud" aria-live="off">
         <span class="phase" id="hud-phase">Orbite</span>
         <span>Alt. <b id="hud-alt">—</b></span>
@@ -1775,7 +1775,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.5';
+  const NOUR_BUILD = '2026-11-14.6';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -5882,7 +5882,7 @@
       const ctx = out.getContext('2d');
       ctx.drawImage(canvas, 0, 0);
       const px = Math.max(14, Math.round(out.width / 190));
-      const line = `Fatiha, maman d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
+      const line = `Fatiha, c’est pour toi Rafa, ma rafale${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
       ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
       ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
       ctx.fillStyle = 'rgba(244, 246, 250, 0.9)'; ctx.textBaseline = 'middle';
@@ -6008,7 +6008,7 @@
       tour.i += 1; tour.arrived = false;
       if (tour.i >= PLACES.length) {
         tourCount();
-        setCredit(['Fatiha · maman d’Amine', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
+        setCredit(['Fatiha · c’est pour toi Rafa, ma rafale', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
         tourTimers.later(endTour, TOUR.finale);
         return;
       }
