@@ -98,7 +98,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   city cameras, GDELT conflict headlines, country picked by touching the globe with Natural Earth outlines from world-atlas)
   is one block of the script. `CITY_CAMS` holds only cameras whose owner publishes them (checked by hand: embeddable,
   live, plays embedded); YouTube players must keep `referrerpolicy="strict-origin"` (with `no-referrer` YouTube shows
-  error 153), and SkylineWebcams forbids embedding. Windy stays dormant unless a visitor brings `?wkey=`. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
+  error 153), and SkylineWebcams forbids embedding. Windy's public widgets (`webcams.windy.com/webcams/public/embed/nearby` and `embed.windy.com/embed.html`) are created only while the Cameras tab is open on a known point: a place, a touched point, or the capital (or centre) of a country picked from the list. Do not iframe `www.windy.com` (`frame-ancestors 'self' *.windy.com`) and do not call `api.windy.com`. hls.js and the outlines come lazily from jsDelivr. None of these hosts is reachable
   from the sandbox, so tests route them to simulated responses (npm copies of hls.js and world-atlas); say so
   whenever you report on this panel. Jerusalem has `cc: []` on purpose. Never add private or unsecured cameras.
   The "Plonger" card button chains two `startFlight` legs (climb to a straight-down view with `apex: true`, then at once
