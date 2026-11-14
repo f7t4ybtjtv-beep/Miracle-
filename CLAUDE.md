@@ -138,6 +138,13 @@ python3 -m satlab bench --campaign standard --out results/standard
   `whenArrived(cb)`, settable `time` for tests). `ready()` hands over with `intro.whenArrived(open)`; `fail()` and deep links
   stop it. Off with reduced motion, a hash in the URL, or `?intro=0`: test harnesses that click `#btn-start` must add
   `?intro=0` (the button is hidden during the journey). The page now has two inline scripts: syntax-check each one.
+  `groundSharp()` is the "picture is sharp" test (the high and medium tile queues of `globe._surface`, private fields
+  of the pinned Cesium, are empty); `globe.tilesLoaded` also waits for the off-screen preload queue and never turns
+  true while the camera orbits. `startSettle` uses it at the end of a dive and of `flyToPlace`. Cesium loads tiles
+  on a per-frame time budget, so the software renderer (2-5 fps) loads the ground far slower than a phone: timings
+  measured there prove nothing about real devices. The travel log (`nour.carnet`), the random place, the HUD heading
+  and the keyboard shortcuts sit next to `recordVisit`. Never add face recognition or any search for people: the
+  "Une personne a disparu" box in Enquête only lists official phone numbers.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
 
