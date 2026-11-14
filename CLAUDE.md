@@ -145,6 +145,8 @@ python3 -m satlab bench --campaign standard --out results/standard
   were written without a native speaker and must be listened to before they are trusted: to fix one, edit its line in `VOICE`
   and replace its mp3. `__intro.voice` and a stubbed `HTMLMediaElement.play` are enough to test it. The sky behind (Milky Way,
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
+  The title card shows Qur'an 51:47 (`.verse`): simple-script Arabic and Muhammad Hamidullah's French translation, both copied
+  from a reference edition. Never retype or reword either; the Uthmani signs lost letters in some fonts, so keep the simple script.
   `groundSharp()` is the "picture is sharp" test (the high and medium tile queues of `globe._surface`, private fields
   of the pinned Cesium, are empty); `globe.tilesLoaded` also waits for the off-screen preload queue and never turns
   true while the camera orbits. `startSettle` uses it at the end of a dive and of `flyToPlace`. Cesium loads tiles

@@ -466,6 +466,10 @@
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
   .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
   .loader .tagline { margin: 18px 0 30px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .34em; text-transform: lowercase; color: var(--ink-2); }
+  .verse { margin: 0 auto 26px; max-width: 34em; }
+  .verse-ar { margin: 0; font: 400 clamp(22px, 5.6vw, 34px)/1.9 "Geeza Pro", "Noto Naskh Arabic", "Segoe UI", Tahoma, sans-serif; color: var(--ink); }
+  .verse-fr { margin-top: 6px; font: 400 15px/1.6 var(--font-ui); font-style: italic; color: var(--ink); }
+  .verse figcaption { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
   .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
   .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
@@ -1075,6 +1079,13 @@
     <div class="inner">
       <h2>Fatiha</h2>
       <p class="tagline">maman d’Amine</p>
+      <!-- Qur'an 51:47, simple-script text (every Arabic font draws it; the Uthmani signs lost letters in some fonts) and Muhammad Hamidullah's French translation, both copied from a reference edition:
+           never retype or reword either one; check against the source before any change. -->
+      <figure class="verse">
+        <blockquote class="verse-ar" dir="rtl" lang="ar">وَالسَّمَاءَ بَنَيْنَاهَا بِأَيْدٍ وَإِنَّا لَمُوسِعُونَ</blockquote>
+        <div class="verse-fr">Le ciel, Nous l’avons construit par Notre puissance : et Nous l’étendons [constamment] dans l’immensité.</div>
+        <figcaption>Coran, sourate 51 (Adh-Dhâriyât), verset 47 · traduction Muhammad Hamidullah</figcaption>
+      </figure>
       <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à treize lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
       <div class="bar" id="loader-bar"><i></i></div>
       <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
