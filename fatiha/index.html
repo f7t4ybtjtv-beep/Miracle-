@@ -531,6 +531,14 @@
   .entry-scrim { z-index: 1; background: linear-gradient(180deg, rgba(4, 6, 11, 0.5), rgba(4, 6, 11, 0.72) 55%, rgba(4, 6, 11, 0.92)); }
   .loader.video-intro { background: #000; }
   .loader.video-intro .entry-video, .loader.video-intro .entry-scrim { display: block; }
+  /* Portrait screens: the clip is landscape, so "cover" would crop it and enlarge it about 3× (soft). Show it whole and
+     sharp instead, over a blurred, darkened copy of its poster that fills the screen. */
+  .entry-backdrop { display: none; position: absolute; inset: -8%; z-index: 0; pointer-events: none;
+    background: #000 url("media/intro-poster.jpg") center / cover no-repeat; filter: blur(28px) brightness(.45); }
+  @media (orientation: portrait) {
+    .loader.video-intro .entry-backdrop { display: block; }
+    .loader.video-intro .entry-video { object-fit: contain; background: transparent; }
+  }
   .loader.video-intro .inner { position: relative; z-index: 2; }
   .entry-sound {
     display: none; position: absolute; z-index: 3; right: var(--gutter); bottom: calc(var(--safe-b) + 18px);
@@ -1158,6 +1166,7 @@
 
   <div class="loader" id="loader">
     <canvas id="intro-canvas" aria-hidden="true"></canvas>
+    <div class="entry-backdrop" aria-hidden="true"></div>
     <video id="entry-video" class="entry-video" playsinline muted preload="auto" poster="media/intro-poster.jpg" aria-hidden="true">
       <source src="media/intro.mp4" type="video/mp4">
     </video>
@@ -1901,7 +1910,7 @@ window.__entryVideo = (() => {
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-16.1';
+  const NOUR_BUILD = '2026-11-16.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1966,9 +1975,12 @@ window.__entryVideo = (() => {
   }
   const phone = isHandheld();
   // 1.5× while the journey is up, 2× after. A chosen Ultra tier still respects the cap.
+  // Ultra (the owner's default) draws at the screen's full pixel ratio once the journey canvas is gone (3× on an
+  // iPhone); other tiers stay at 2×. A lost WebGL context reloads on Légère (recoverLight), so this cannot loop.
   function phoneDprCap() {
     if (!phone) return Infinity;
-    return intro.active ? 1.5 : 2;
+    if (intro.active) return 1.5;
+    return tier && tier.ultra ? 3 : 2;
   }
   const renderScale = (t) => {
     const cap = phoneDprCap();
