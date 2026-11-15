@@ -525,6 +525,13 @@
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
   #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; touch-action: none; }
+  /* Entry video: the owner's clip as the welcome backdrop, in place of the planet journey (class "video-intro" set by its script) */
+  .entry-video, .entry-scrim { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .entry-video { z-index: 0; object-fit: cover; background: #000; }
+  .entry-scrim { z-index: 1; background: linear-gradient(180deg, rgba(4, 6, 11, 0.5), rgba(4, 6, 11, 0.72) 55%, rgba(4, 6, 11, 0.92)); }
+  .loader.video-intro { background: #000; }
+  .loader.video-intro .entry-video, .loader.video-intro .entry-scrim { display: block; }
+  .loader.video-intro .inner { position: relative; z-index: 2; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
   .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
@@ -1139,6 +1146,10 @@
 
   <div class="loader" id="loader">
     <canvas id="intro-canvas" aria-hidden="true"></canvas>
+    <video id="entry-video" class="entry-video" playsinline muted loop preload="auto" poster="media/intro-poster.jpg" aria-hidden="true">
+      <source src="media/intro.mp4" type="video/mp4">
+    </video>
+    <div class="entry-scrim" aria-hidden="true"></div>
     <div class="intro-caption" id="intro-caption" aria-live="polite">
       <div class="kicker" id="intro-kicker"></div>
       <div class="intro-name" id="intro-name"></div>
@@ -1181,6 +1192,18 @@
   </div>
 
 <script>
+// ---------- Entry video (config) ----------
+// The owner's clip plays as the welcome backdrop instead of the planet journey.
+// On by default; off (so the planet journey runs as before) with reduced motion,
+// a deep link / shared view in the URL, ?intro=0 (tests) or ?video=0.
+window.__entryVideo = (() => {
+  const p = new URLSearchParams(location.search);
+  const on = p.get('intro') !== '0' && p.get('video') !== '0'
+    && location.hash.length <= 1
+    && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return { on };
+})();
+
 // ---------- Background music ----------
 // One song (audio/fond.mp3) played in a loop, quietly. Off until the visitor taps a "Musique" button: browsers forbid
 // sound that starts by itself. The choice is kept in nour.musique; a remembered "on" starts again at the next touch
@@ -1269,7 +1292,7 @@
   const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); }, photos: { loaded: 0, failed: 0, total: 0 } };
   const loader = document.getElementById('loader'), canvas = document.getElementById('intro-canvas');
   const off = new URLSearchParams(location.search).get('intro') === '0';
-  if (off || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (off || (window.__entryVideo && window.__entryVideo.on) || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -1754,6 +1777,24 @@
   window.addEventListener('keydown', (e) => { if (api.active && (e.key === 'Escape' || e.key === 'Enter')) api.skip(); });
   if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
+})();
+
+// ---------- Entry video (mount) ----------
+// If enabled above, play the owner's clip as the welcome backdrop (looping, muted —
+// browsers forbid sound that starts by itself). The entry card, verse and "Commencer"
+// button stay over it; the globe still takes over on the button as usual. If the file
+// fails or autoplay is refused, the poster stays and the plain entry card still works.
+(() => {
+  'use strict';
+  const cfg = window.__entryVideo;
+  if (!cfg || !cfg.on) return;
+  const loader = document.getElementById('loader');
+  const video = document.getElementById('entry-video');
+  if (!loader || !video) { cfg.on = false; return; }
+  loader.classList.add('video-intro');
+  video.addEventListener('error', () => { loader.classList.remove('video-intro'); cfg.on = false; }, { once: true });
+  const p = video.play ? video.play() : null;
+  if (p && typeof p.catch === 'function') p.catch(() => { /* autoplay blocked: poster stays, card still works */ });
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
