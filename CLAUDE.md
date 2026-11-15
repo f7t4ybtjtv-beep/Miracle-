@@ -145,9 +145,12 @@ python3 -m satlab bench --campaign standard --out results/standard
   were written without a native speaker and must be listened to before they are trusted: to fix one, edit its line in `VOICE`
   and replace its mp3. `__intro.voice` and a stubbed `HTMLMediaElement.play` are enough to test it. The sky behind (Milky Way,
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
-  Background music is one song, `fatiha/audio/fond.mp3` (the owner's own, tags and cover stripped), played in a loop by
-  `window.__music`, a block of the first script placed before the journey so it exists with or without it. Off until a
-  "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the choice
+  Background music is one looping song (the owner's own, tags and cover stripped), played by
+  `window.__music`, a block of the first script placed before the journey so it exists with or without it. There are two
+  songs to pick from (`TRACKS`: `audio/fond.mp3` "Originale" and `audio/fond-remaster.mp3` "Remaster"); the choice is kept
+  in `nour.piste` and set through the menu selector `#btn-track` (`[data-track]` buttons) via `__music.setTrack(id, tap)`,
+  which swaps the source and keeps playing if a song is already on. Off until a
+  "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the on/off choice
   is kept in `nour.musique` and a remembered "on" restarts at the next gesture. The Darija voice calls `duck()`, the main
   script calls `hold(mediaAudible())` twice a second, and the song and the generated "Bande-son" exclude each other.
   iPhone ignores `volume`, so there the song pauses during a sentence. `__music.state` is the test hook.
