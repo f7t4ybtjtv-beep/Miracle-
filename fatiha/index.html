@@ -532,6 +532,18 @@
   .loader.video-intro { background: #000; }
   .loader.video-intro .entry-video, .loader.video-intro .entry-scrim { display: block; }
   .loader.video-intro .inner { position: relative; z-index: 2; }
+  .entry-sound {
+    display: none; position: absolute; z-index: 3; right: var(--gutter); bottom: calc(var(--safe-b) + 18px);
+    align-items: center; gap: 9px; min-height: 44px; padding: 0 18px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: rgba(0, 0, 0, 0.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: var(--ink); font: 400 12px var(--font-ui); letter-spacing: .18em; text-transform: uppercase; cursor: pointer;
+    transition: border-color .3s var(--ease), background .3s var(--ease), color .3s var(--ease);
+  }
+  .loader.video-intro .entry-sound { display: inline-flex; }
+  .entry-sound:hover { border-color: var(--accent); background: rgba(159, 211, 255, 0.10); }
+  .entry-sound .wave { opacity: 0; transition: opacity .25s var(--ease); }
+  .entry-sound[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .entry-sound[aria-pressed="true"] .wave { opacity: 1; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
   .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
@@ -1146,10 +1158,14 @@
 
   <div class="loader" id="loader">
     <canvas id="intro-canvas" aria-hidden="true"></canvas>
-    <video id="entry-video" class="entry-video" playsinline muted loop preload="auto" poster="media/intro-poster.jpg" aria-hidden="true">
+    <video id="entry-video" class="entry-video" playsinline muted preload="auto" poster="media/intro-poster.jpg" aria-hidden="true">
       <source src="media/intro.mp4" type="video/mp4">
     </video>
     <div class="entry-scrim" aria-hidden="true"></div>
+    <button class="entry-sound" id="entry-sound" type="button" aria-pressed="false" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      <span id="entry-sound-label">Son</span>
+    </button>
     <div class="intro-caption" id="intro-caption" aria-live="polite">
       <div class="kicker" id="intro-kicker"></div>
       <div class="intro-name" id="intro-name"></div>
@@ -1790,11 +1806,27 @@ window.__entryVideo = (() => {
   if (!cfg || !cfg.on) return;
   const loader = document.getElementById('loader');
   const video = document.getElementById('entry-video');
+  const soundBtn = document.getElementById('entry-sound');
+  const soundLabel = document.getElementById('entry-sound-label');
   if (!loader || !video) { cfg.on = false; return; }
   loader.classList.add('video-intro');
   video.addEventListener('error', () => { loader.classList.remove('video-intro'); cfg.on = false; }, { once: true });
-  const p = video.play ? video.play() : null;
-  if (p && typeof p.catch === 'function') p.catch(() => { /* autoplay blocked: poster stays, card still works */ });
+  // Plays once, then holds on its last frame (no loop).
+  const tryPlay = () => { const p = video.play ? video.play() : null; if (p && typeof p.catch === 'function') p.catch(() => { /* autoplay blocked: poster stays, card still works */ }); };
+  tryPlay();
+  // Sound starts off (browsers forbid sound that starts by itself); the button turns it on.
+  if (soundBtn) {
+    soundBtn.hidden = false;
+    soundBtn.addEventListener('click', () => {
+      const on = video.muted;                 // about to turn sound ON
+      video.muted = !on;
+      soundBtn.setAttribute('aria-pressed', String(on));
+      if (soundLabel) soundLabel.textContent = on ? 'Son activé' : 'Son';
+      if (on) { if (video.ended) { try { video.currentTime = 0; } catch (e) {} } tryPlay(); }   // replay with sound if it had finished
+    });
+  }
+  // Expose for tests.
+  cfg.video = video;
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
