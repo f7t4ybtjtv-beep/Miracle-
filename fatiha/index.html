@@ -782,6 +782,11 @@
         <button class="opt" id="btn-soundtrack" type="button" aria-pressed="false"><b>Bande-son</b><small>musique générée, suit l’altitude</small></button>
         <button class="opt" id="btn-music" data-music type="button" aria-pressed="false"><b>Musique</b><small>la chanson, en fond</small></button>
       </div>
+      <div class="quality track-pick" role="group" aria-label="Choix de la musique de fond" id="btn-track">
+        <button type="button" data-track="fond" aria-pressed="true">Originale</button>
+        <button type="button" data-track="remaster" aria-pressed="false">Remaster</button>
+      </div>
+      <p class="note">Deux versions de la chanson, au choix pour le fond.</p>
     </div>
     <div class="group">
       <div class="kicker">Carnet de voyage</div>
@@ -1189,15 +1194,22 @@
 // It sits here, before the journey, so it exists whether the journey runs or not.
 (() => {
   'use strict';
-  const KEY = 'nour.musique', LEVEL = 0.35, LOW = 0.1;
-  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0;
+  const KEY = 'nour.musique', PKEY = 'nour.piste', LEVEL = 0.35, LOW = 0.1;
+  // Two songs to choose from; the choice is kept in nour.piste. "fond" is the first one, the default.
+  const TRACKS = [
+    { id: 'fond', src: 'audio/fond.mp3', label: 'Originale' },
+    { id: 'remaster', src: 'audio/fond-remaster.mp3', label: 'Remaster' },
+  ];
+  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0, track = 'fond';
   const subs = new Set();
+  const trackOf = (id) => TRACKS.find((t) => t.id === id) || TRACKS[0];
   const save = (v) => { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) { /* private mode */ } };
+  const saveTrack = () => { try { localStorage.setItem(PKEY, track); } catch (e) { /* private mode */ } };
   const tell = () => subs.forEach((fn) => { try { fn(); } catch (e) { /* a listener must not stop the others */ } });
   function ensure() {
     if (el) return el;
     el = document.createElement('audio');
-    el.loop = true; el.preload = 'none'; el.src = 'audio/fond.mp3';
+    el.loop = true; el.preload = 'none'; el.src = trackOf(track).src;
     el.setAttribute('playsinline', ''); el.setAttribute('webkit-playsinline', '');
     el.style.cssText = 'position:fixed;left:0;top:0;width:0;height:0;opacity:0;pointer-events:none';
     document.body.appendChild(el);
@@ -1228,14 +1240,23 @@
   }
   const api = window.__music = {
     get on() { return on; }, get armed() { return armed; }, get held() { return held; },
-    get state() { return { on, armed, ducked, held, canFade, paused: !el || el.paused, volume: el ? el.volume : null, src: el ? el.getAttribute('src') : null, loop: !!el && el.loop }; },   // tests
+    get track() { return track; }, get tracks() { return TRACKS.map((t) => ({ id: t.id, label: t.label })); },
+    get state() { return { on, armed, ducked, held, canFade, track, paused: !el || el.paused, volume: el ? el.volume : null, src: el ? el.getAttribute('src') : null, loop: !!el && el.loop }; },   // tests
     // `tap`: the visitor chose it, so remember the choice.
     set(v, tap) { on = !!v; armed = false; if (tap) save(on); apply(); tell(); return on; },
+    // Switch the song. If one is already playing, swap the source and keep playing; otherwise just remember the choice.
+    setTrack(id, tap) {
+      const t = trackOf(id); if (t.id === track) return track;
+      track = t.id; if (tap) saveTrack();
+      if (el) { const wasPlaying = on && !el.paused; el.src = t.src; try { el.load(); } catch (e) { /* older browser */ } if (wasPlaying || on) { el.currentTime = 0; apply(); } }
+      tell(); return track;
+    },
     duck(v) { v = !!v; if (v === ducked) return; ducked = v; apply(); },
     hold(v) { v = !!v; if (v === held) return; held = v; apply(); tell(); },
     onchange(fn) { subs.add(fn); },
   };
   try { armed = localStorage.getItem(KEY) === '1'; } catch (e) { /* storage blocked */ }
+  try { const p = localStorage.getItem(PKEY); if (p && trackOf(p).id === p) track = p; } catch (e) { /* storage blocked */ }
   // A "Musique" button decides by itself; any other touch or key starts a remembered choice.
   const gesture = (e) => { if (armed && !(e.target && e.target.closest && e.target.closest('[data-music]'))) api.set(true); };
   ['pointerup', 'touchend', 'keydown', 'click'].forEach((type) => window.addEventListener(type, gesture, { capture: true, passive: true }));
@@ -1812,7 +1833,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-15.2';
+  const NOUR_BUILD = '2026-11-15.3';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -5836,7 +5857,15 @@
     b.querySelector('small').textContent = song.armed ? 'reprendra au premier geste'
       : song.on && song.held ? 'en pause : une radio, une télé ou une caméra joue' : 'la chanson, en fond';
   }
-  song.onchange(() => { if ((song.on || song.armed) && (soundtrackOn || st.armed)) setSoundtrack(false); syncMusicButton(); });
+  // Track picker (Originale / Remaster): reflect the stored choice and switch on click.
+  function syncTrackButtons() {
+    document.querySelectorAll('#btn-track [data-track]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.track === song.track)));
+  }
+  document.querySelectorAll('#btn-track [data-track]').forEach((b) => {
+    b.addEventListener('click', () => { song.setTrack(b.dataset.track, true); syncTrackButtons(); });
+  });
+  syncTrackButtons();
+  song.onchange(() => { if ((song.on || song.armed) && (soundtrackOn || st.armed)) setSoundtrack(false); syncMusicButton(); syncTrackButtons(); });
   $('btn-music').addEventListener('click', () => song.set(!(song.on || song.armed), true));
   setInterval(() => song.hold(mediaAudible()), 500);
   // Remembered as on: start at the first touch or key (not before: no sound without a gesture). A gesture also
