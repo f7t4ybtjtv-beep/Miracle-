@@ -177,6 +177,9 @@ python3 -m satlab bench --campaign standard --out results/standard
   "Une personne a disparu" box in Enquête only lists official phone numbers.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
+  The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
+  (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
+  WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block

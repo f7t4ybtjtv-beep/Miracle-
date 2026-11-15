@@ -812,8 +812,8 @@
     <div class="group">
       <div class="kicker">Qualité d’image</div>
       <div class="quality" role="group" aria-label="Qualité d’image">
-        <button type="button" data-quality="ultra" aria-pressed="false">Ultra · HDR 5K</button>
-        <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-quality="ultra" aria-pressed="true">Ultra · HDR 5K</button>
+        <button type="button" data-quality="auto" aria-pressed="false">Auto</button>
         <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
         <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
         <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
@@ -1901,7 +1901,7 @@ window.__entryVideo = (() => {
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-15.4';
+  const NOUR_BUILD = '2026-11-16.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1992,10 +1992,14 @@ window.__entryVideo = (() => {
   // Pinned by ?qualite=ultra|haute|equilibree|legere, or by the selector in the menu (saved in this browser).
   const QUALITY_KEY = 'nour.quality';
   const TIER_BY_CHOICE = { ultra: 'ultra', haute: 'high', equilibree: 'balanced', legere: 'light' };
+  // The owner wants the sharpest picture by default: Ultra unless the visitor picked something else (Auto included,
+  // which is saved as 'auto' so it is not replaced by the default on the next visit).
+  const DEFAULT_QUALITY = 'ultra';
+  const validQuality = (c) => !!TIER_BY_CHOICE[c] || c === 'auto';
   function readQuality() {
     let choice = new URLSearchParams(location.search).get('qualite');
-    if (!TIER_BY_CHOICE[choice]) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
-    return TIER_BY_CHOICE[choice] ? choice : 'auto';
+    if (!validQuality(choice)) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
+    return validQuality(choice) ? choice : DEFAULT_QUALITY;
   }
   let quality = readQuality();
   // After a lost WebGL context the page reloads once and starts light for that visit only.
@@ -2004,7 +2008,8 @@ window.__entryVideo = (() => {
     recoverLight = sessionStorage.getItem('nour.recoverLight') === '1';
     if (recoverLight) sessionStorage.removeItem('nour.recoverLight');
   } catch (e) { recoverLight = false; }
-  let tierName = TIER_BY_CHOICE[quality] || ((phone || recoverLight) ? 'light' : detectTier());
+  // After a lost WebGL context, start light for that visit whatever the choice, so Ultra cannot crash the tab in a loop.
+  let tierName = recoverLight ? 'light' : (TIER_BY_CHOICE[quality] || (phone ? 'light' : detectTier()));
   let tier = TIERS[tierName];
 
   // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
@@ -3586,7 +3591,7 @@ window.__entryVideo = (() => {
   }
   function setQuality(choice) {
     quality = choice;
-    try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
+    try { localStorage.setItem(QUALITY_KEY, choice); }
     catch (e) { /* storage blocked: the choice applies to this visit only */ }
     slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 6000;
     applyTier(TIER_BY_CHOICE[choice] || (phone ? 'light' : detectTier()));
