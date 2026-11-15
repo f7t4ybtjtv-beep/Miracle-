@@ -27,6 +27,9 @@
     --sheet: rgba(6, 9, 15, 0.88);
     --font-ui: 'Inter', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+    --font-display: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;   /* editorial serif for the opening titles, pairs with the Amiri verse */
+    --font-script: 'Pinyon Script', 'Snell Roundhand', 'Apple Chancery', cursive;   /* the handwritten dedication signature */
+    --ease: cubic-bezier(.2, .7, .2, 1);
     --gutter: 22px;
     --safe-t: env(safe-area-inset-top);
     --safe-b: env(safe-area-inset-bottom);
@@ -473,29 +476,37 @@
   /* Opening title card */
   .loader {
     position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
-    background: radial-gradient(ellipse 75% 60% at 50% 42%, var(--bg-2), var(--bg) 72%);
+    background:
+      radial-gradient(ellipse 58% 40% at 50% 30%, rgba(159, 211, 255, 0.08), transparent 70%),
+      radial-gradient(ellipse 80% 62% at 50% 44%, var(--bg-2), var(--bg) 72%);
     transition: opacity 1.2s ease;
     touch-action: none; overscroll-behavior: none;
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
-  .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; text-shadow: 0 0 46px rgba(159, 211, 255, 0.16), 0 1px 3px rgba(0, 0, 0, 0.55); }
+  .loader h2 { margin: 14px 0 0; font: 500 clamp(54px, 15vw, 132px)/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; margin-right: -.16em; text-shadow: 0 0 48px rgba(159, 211, 255, 0.18), 0 1px 3px rgba(0, 0, 0, 0.55); animation: title-breathe 7s ease-in-out infinite; }
+  @keyframes title-breathe { 0%, 100% { text-shadow: 0 0 40px rgba(159, 211, 255, 0.13), 0 1px 3px rgba(0, 0, 0, 0.55); } 50% { text-shadow: 0 0 58px rgba(159, 211, 255, 0.24), 0 1px 3px rgba(0, 0, 0, 0.55); } }
   .loader .tagline { margin: 20px 0 6px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .12em; text-transform: lowercase; color: var(--ink-2); }
   /* Dedication: keep the real names (Rafa, Mélissa), so no lowercase transform here; set a touch brighter and larger so it reads as the heart of the card */
-  .loader .tagline.dedic { text-transform: none; color: var(--ink); font-size: clamp(15px, 4vw, 20px); letter-spacing: .13em; }
-  .loader .dedicace { margin: 0 auto; font: 400 clamp(12px, 3.2vw, 15px) var(--font-ui); letter-spacing: .14em; color: var(--muted); }
-  .loader .dedicace::before { content: "— "; color: var(--muted); }
+  /* The dedication, set as a handwritten signature (Pinyon Script): the heart of the card. Words and real names unchanged. */
+  .loader .tagline.dedic { text-transform: none; color: var(--ink); font: 400 clamp(28px, 7.4vw, 44px)/1.1 var(--font-script); letter-spacing: 0; margin: 16px 0 2px; }
+  .loader .dedicace { margin: 0 auto; font: 400 clamp(19px, 5vw, 25px)/1.2 var(--font-script); letter-spacing: 0; color: var(--ink-2); }
   /* A short hairline sets the personal dedication apart from the Qur'anic verse below */
-  .loader .dedicace::after { content: ""; display: block; width: 50px; height: 1px; margin: 26px auto 2px; background: linear-gradient(90deg, transparent, rgba(244, 246, 250, 0.26), transparent); }
+  .loader .dedicace::after { content: ""; display: block; width: 50px; height: 1px; margin: 24px auto 2px; background: linear-gradient(90deg, transparent, rgba(244, 246, 250, 0.26), transparent); }
   /* Amiri Quran, SIL Open Font License (fonts/OFL-amiri-quran.txt): served from this site, no outside request */
   @font-face { font-family: "Amiri Quran"; src: url("fonts/amiri-quran.woff2") format("woff2"); font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
+  /* Cormorant Garamond, SIL Open Font License (fonts/OFL-cormorant.txt): Latin subset, self-hosted — editorial serif for the opening titles */
+  @font-face { font-family: "Cormorant Garamond"; src: url("fonts/cormorant-500.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+  @font-face { font-family: "Cormorant Garamond"; src: url("fonts/cormorant-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
+  /* Pinyon Script, SIL Open Font License (fonts/OFL-pinyon.txt): Latin subset, self-hosted — the handwritten signature of the dedication */
+  @font-face { font-family: "Pinyon Script"; src: url("fonts/pinyon-script.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
   .verse { margin: 0 auto 26px; max-width: 34em; }
   .verse-ar { margin: 0; font: 400 clamp(24px, 6vw, 38px)/2.1 "Amiri Quran", "Geeza Pro", "Noto Naskh Arabic", serif; color: var(--ink); }
   .verse-fr { margin-top: 6px; font: 400 15px/1.6 var(--font-ui); font-style: italic; color: var(--ink); }
   .verse figcaption { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
   .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
-  .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
-  .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
+  .loader .bar { width: 200px; height: 1px; margin: 32px auto 0; background: var(--line); overflow: hidden; border-radius: 1px; }
+  .loader .bar i { display: block; width: 38%; height: 100%; background: linear-gradient(90deg, transparent, var(--accent), var(--ink)); box-shadow: 0 0 8px rgba(159, 211, 255, 0.5); animation: slide 1.6s ease-in-out infinite; }
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
   /* Entrance: the static title card settles in, one block after another (off during the journey, which has its own captions) */
   @keyframes loader-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
@@ -508,11 +519,14 @@
   .loader:not(.journey) .inner > .bar { animation-delay: .72s; }
   .loader:not(.journey) .inner > .start { animation-delay: .80s; }
   .loader .start {
-    margin-top: 32px; height: 52px; padding: 0 32px; border-radius: 999px; border: 1px solid var(--ink); background: transparent;
-    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .26em; text-transform: uppercase; cursor: pointer; transition: background .25s, color .25s;
+    margin-top: 34px; height: 54px; padding: 0 36px; border-radius: 999px; border: 1px solid var(--line-2);
+    background: linear-gradient(180deg, rgba(159, 211, 255, 0.10), rgba(159, 211, 255, 0.03));
+    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .24em; text-transform: uppercase; cursor: pointer;
+    transition: border-color .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease), color .3s var(--ease);
   }
-  .loader .start:hover { background: var(--ink); color: var(--bg); }
-  .loader .start:disabled { opacity: .4; cursor: progress; background: transparent; color: var(--ink); }
+  .loader:not(.journey) .start:not(:disabled) { border-color: rgba(159, 211, 255, 0.45); box-shadow: 0 0 0 1px rgba(159, 211, 255, 0.06), 0 8px 30px rgba(159, 211, 255, 0.10); }
+  .loader .start:not(:disabled):hover { border-color: var(--accent); color: #04060B; background: linear-gradient(180deg, #DCEEFF, var(--accent)); box-shadow: 0 0 34px rgba(159, 211, 255, 0.34); }
+  .loader .start:disabled { opacity: .5; cursor: progress; background: transparent; color: var(--ink-2); border-color: var(--line); box-shadow: none; }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
   #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; touch-action: none; }
@@ -524,7 +538,7 @@
   .loader.journey.under-way .inner { opacity: 0; pointer-events: none; }
   .loader.journey .intro-caption {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 15vh); bottom: calc(var(--safe-b) + 15dvh);
-    max-width: 560px; opacity: 0; transition: opacity .3s ease; pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
+    max-width: 560px; opacity: 0; transition: opacity .55s var(--ease); pointer-events: none; isolation: isolate; text-shadow: 0 1px 14px rgba(0, 0, 0, 0.85);
   }
   .loader.journey .intro-caption::before {
     content: ''; position: absolute; z-index: -1; inset: -28px calc(-1 * var(--gutter)) -22px;
@@ -533,7 +547,7 @@
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
-  .intro-name { margin: 8px 0 10px; font: 300 clamp(32px, 6.5vw, 60px)/1.05 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; }
+  .intro-name { margin: 8px 0 10px; font: 500 clamp(36px, 7vw, 66px)/1.02 var(--font-display); letter-spacing: .05em; text-transform: uppercase; }
   .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0;
@@ -570,6 +584,15 @@
   }
   .loader.journey .intro-lang:hover, .loader.journey .intro-lang:focus-visible { border-color: var(--accent); color: var(--accent); }
   .intro-lang option { background: #04060B; color: #F4F6FA; }
+  /* Premium: unify the journey pills (Passer / Voix / Musique / Langue) into one coherent glass with a light hover lift */
+  .loader.journey .intro-skip:not([hidden]),
+  .loader.journey .intro-voice:not([hidden]),
+  .loader.journey .intro-lang:not([hidden]) {
+    background: rgba(4, 6, 11, 0.5); backdrop-filter: blur(12px) saturate(1.1); -webkit-backdrop-filter: blur(12px) saturate(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    transition: border-color .25s var(--ease), color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
+  }
+  .loader.journey .intro-skip:hover, .loader.journey .intro-voice:hover, .loader.journey .intro-lang:hover { transform: translateY(-1px); }
   /* Arabic: joined letters must not be spaced out, and the block reads from the right */
   .intro-caption[lang="ar"] { text-align: right; }
   .intro-caption[lang="ar"] .kicker, .intro-caption[lang="ar"] .intro-name, .intro-caption[lang="ar"] .intro-fact { letter-spacing: 0; }
@@ -621,7 +644,7 @@
     .sheet.open { animation: none; }
     .loader .bar i, .eq i { animation: none; }
     .loader .bar i { width: 100%; }
-    .loader .inner > * { animation: none; }
+    .loader .inner > *, .loader h2 { animation: none !important; }
   }
 
   /* Enquête */
@@ -1789,7 +1812,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-15.1';
+  const NOUR_BUILD = '2026-11-15.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
