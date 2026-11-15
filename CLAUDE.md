@@ -160,6 +160,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.
+  The opening card also uses two other self-hosted fonts (Latin subset woff2 in `fatiha/fonts/`, each SIL OFL with its licence beside it, no outside
+  request): Cormorant Garamond (`--font-display`) for the editorial titles — the big "Fatiha" and the journey planet names — and Pinyon Script
+  (`--font-script`) for the handwritten dedication ("c'est pour toi Rafa, ma rafale" / "de la part de Mélissa"). Inter stays the UI face and
+  JetBrains Mono the label face. `--ease` is the shared easing for the opening's motion; the title's faint breathing glow and the staggered
+  entrance are off under `prefers-reduced-motion`.
   `groundSharp()` is the "picture is sharp" test (the high and medium tile queues of `globe._surface`, private fields
   of the pinned Cesium, are empty); `globe.tilesLoaded` also waits for the off-screen preload queue and never turns
   true while the camera orbits. `startSettle` uses it at the end of a dive and of `flyToPlace`. Cesium loads tiles
