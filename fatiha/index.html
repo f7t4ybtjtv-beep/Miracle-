@@ -479,11 +479,14 @@
   }
   .loader.done { opacity: 0; pointer-events: none; }
   .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
-  .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; }
-  .loader .tagline { margin: 18px 0 8px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .12em; text-transform: lowercase; color: var(--ink-2); }
-  /* Dedication: keep the real names (Rafa, Mélissa), so no lowercase transform here */
-  .loader .tagline.dedic { text-transform: none; }
-  .loader .dedicace { margin: 0 0 30px; font: 400 clamp(12px, 3.2vw, 15px) var(--font-ui); letter-spacing: .14em; color: var(--muted); }
+  .loader h2 { margin: 18px 0 0; font: 300 clamp(46px, 14vw, 118px)/1 var(--font-ui); letter-spacing: .32em; text-transform: uppercase; margin-right: -.32em; text-shadow: 0 0 46px rgba(159, 211, 255, 0.16), 0 1px 3px rgba(0, 0, 0, 0.55); }
+  .loader .tagline { margin: 20px 0 6px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .12em; text-transform: lowercase; color: var(--ink-2); }
+  /* Dedication: keep the real names (Rafa, Mélissa), so no lowercase transform here; set a touch brighter and larger so it reads as the heart of the card */
+  .loader .tagline.dedic { text-transform: none; color: var(--ink); font-size: clamp(15px, 4vw, 20px); letter-spacing: .13em; }
+  .loader .dedicace { margin: 0 auto; font: 400 clamp(12px, 3.2vw, 15px) var(--font-ui); letter-spacing: .14em; color: var(--muted); }
+  .loader .dedicace::before { content: "— "; color: var(--muted); }
+  /* A short hairline sets the personal dedication apart from the Qur'anic verse below */
+  .loader .dedicace::after { content: ""; display: block; width: 50px; height: 1px; margin: 26px auto 2px; background: linear-gradient(90deg, transparent, rgba(244, 246, 250, 0.26), transparent); }
   /* Amiri Quran, SIL Open Font License (fonts/OFL-amiri-quran.txt): served from this site, no outside request */
   @font-face { font-family: "Amiri Quran"; src: url("fonts/amiri-quran.woff2") format("woff2"); font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
   .verse { margin: 0 auto 26px; max-width: 34em; }
@@ -494,6 +497,16 @@
   .loader .bar { width: 180px; height: 1px; margin: 30px auto 0; background: var(--line); overflow: hidden; }
   .loader .bar i { display: block; width: 35%; height: 100%; background: var(--ink); animation: slide 1.6s ease-in-out infinite; }
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
+  /* Entrance: the static title card settles in, one block after another (off during the journey, which has its own captions) */
+  @keyframes loader-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .loader:not(.journey) .inner > * { animation: loader-rise .9s cubic-bezier(.2, .7, .2, 1) both; }
+  .loader:not(.journey) .inner > h2 { animation-delay: .05s; }
+  .loader:not(.journey) .inner > .tagline { animation-delay: .20s; }
+  .loader:not(.journey) .inner > .dedicace { animation-delay: .32s; }
+  .loader:not(.journey) .inner > .verse { animation-delay: .46s; }
+  .loader:not(.journey) .inner > #loader-text { animation-delay: .60s; }
+  .loader:not(.journey) .inner > .bar { animation-delay: .72s; }
+  .loader:not(.journey) .inner > .start { animation-delay: .80s; }
   .loader .start {
     margin-top: 32px; height: 52px; padding: 0 32px; border-radius: 999px; border: 1px solid var(--ink); background: transparent;
     color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .26em; text-transform: uppercase; cursor: pointer; transition: background .25s, color .25s;
@@ -608,6 +621,7 @@
     .sheet.open { animation: none; }
     .loader .bar i, .eq i { animation: none; }
     .loader .bar i { width: 100%; }
+    .loader .inner > * { animation: none; }
   }
 
   /* Enquête */
@@ -1775,7 +1789,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-14.6';
+  const NOUR_BUILD = '2026-11-15.1';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
