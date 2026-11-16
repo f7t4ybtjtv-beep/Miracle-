@@ -799,11 +799,10 @@
         <button class="opt" id="btn-music" data-music type="button" aria-pressed="false"><b>Musique</b><small>la chanson, en fond</small></button>
       </div>
       <div class="quality track-pick" role="group" aria-label="Choix de la musique de fond" id="btn-track">
-        <button type="button" data-track="fond" aria-pressed="false">Originale</button>
         <button type="button" data-track="remaster" aria-pressed="false">Remaster</button>
         <button type="button" data-track="coeur" aria-pressed="true">Cœur de Pierre</button>
       </div>
-      <p class="note">Trois chansons au choix pour le fond.</p>
+      <p class="note">Deux chansons au choix pour le fond.</p>
     </div>
     <div class="group">
       <div class="kicker">Carnet de voyage</div>
@@ -1222,7 +1221,7 @@ window.__entryVideo = (() => {
 })();
 
 // ---------- Background music ----------
-// One song (audio/fond.mp3) played in a loop, quietly. Off until the visitor taps a "Musique" button: browsers forbid
+// One song (see TRACKS) played in a loop, quietly. Off until the visitor taps a "Musique" button: browsers forbid
 // sound that starts by itself. The choice is kept in nour.musique; a remembered "on" starts again at the next touch
 // or key ("armed"). The Darija voice lowers it (`duck`), a radio, a TV or a camera pauses it (`hold`), and so does a
 // hidden tab. iPhone ignores `volume`, so there the music pauses during a sentence instead of playing lower.
@@ -1230,9 +1229,8 @@ window.__entryVideo = (() => {
 (() => {
   'use strict';
   const KEY = 'nour.musique', PKEY = 'nour.piste2', LEVEL = 0.35, LOW = 0.1;
-  // Three songs to choose from; the choice is kept in nour.piste2 (new key so everyone starts on the owner's new default, "coeur").
+  // Two songs to choose from; the choice is kept in nour.piste2 (new key so everyone starts on the owner's new default, "coeur").
   const TRACKS = [
-    { id: 'fond', src: 'audio/fond.mp3', label: 'Originale' },
     { id: 'remaster', src: 'audio/fond-remaster.mp3', label: 'Remaster' },
     { id: 'coeur', src: 'audio/coeur-de-pierre.mp3', label: 'Cœur de Pierre' },
   ];
