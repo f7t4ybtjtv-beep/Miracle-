@@ -183,6 +183,7 @@
     display: grid; align-content: start; gap: 4px; min-height: 68px; padding: 12px 14px; text-align: left; cursor: pointer;
     border-radius: 16px; border: 1px solid var(--line); background: rgba(244, 246, 250, 0.03); transition: border-color .2s, background .2s;
   }
+  a.opt { text-decoration: none; color: inherit; }
   .opt b { font: 400 15px/1.25 var(--font-ui); color: var(--ink); }
   .opt small { font: 400 11.5px/1.4 var(--font-ui); color: var(--muted); }
   .opt:hover { border-color: var(--line-2); }
@@ -783,6 +784,7 @@
         <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
         <button class="opt" id="btn-random" type="button"><b>Lieu au hasard</b><small>un lieu que tu n’as pas encore vu</small></button>
         <button class="opt" id="btn-full" type="button" aria-pressed="false" hidden><b>Plein écran</b><small>cache les barres du navigateur</small></button>
+        <a class="opt" id="btn-planets" href="planetes.html"><b>Survol des planètes</b><small>Mercure, Vénus, la Lune, Mars, Jupiter, Saturne, Uranus, Neptune</small></a>
         <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
       </div>
     </div>

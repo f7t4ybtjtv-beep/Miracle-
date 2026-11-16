@@ -184,6 +184,9 @@ python3 -m satlab bench --campaign standard --out results/standard
   the script picks one by orientation at load and sets `src`/`poster` itself (no `<source>` in the markup). It plays once
   and holds on its last frame; the "Son" button turns the sound on. `.claude/skills/fatiha-video` can still render the
   earlier NASA EPIC push-in if the owner asks for it again.
+  `fatiha/planetes.html` (menu "Survol des planètes", a plain internal link) is a separate, dependency-free WebGL page: free
+  flight around eight bodies with equirectangular maps in `fatiha/media/maps/` (from the MIT npm package solar-system 0.1.46,
+  James Hastings-Trew's maps, see `LICENCE.txt` there; 1024 px wide, so blurry below ~100 km). `window.__planetes` is the test hook.
   The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
   (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
   WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.

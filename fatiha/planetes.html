@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rafa · Survol des planètes</title>
+<meta name="theme-color" content="#04060B">
+<style>
+  /* Cormorant Garamond, SIL Open Font License (fonts/OFL-cormorant.txt) */
+  @font-face { font-family: "Cormorant Garamond"; src: url("fonts/cormorant-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+  :root { --bg: #04060B; --ink: #F4F6FA; --dim: rgba(244, 246, 250, 0.66); --accent: #9FD3FF; --line: rgba(244, 246, 250, 0.16); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
+    font: 15px/1.4 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; touch-action: none; display: block; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  header { position: fixed; top: 0; left: 0; right: 0; padding: max(14px, env(safe-area-inset-top)) 16px 0;
+    display: flex; align-items: center; gap: 12px; pointer-events: none; }
+  header > * { pointer-events: auto; }
+  .back { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 14px;
+    border-radius: 22px; border: 1px solid var(--line); background: rgba(4, 6, 11, 0.55); color: var(--ink); text-decoration: none;
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .title { margin-left: auto; text-align: right; text-shadow: 0 1px 8px #000; }
+  .title h1 { margin: 0; font: 500 clamp(30px, 7vw, 46px)/1 "Cormorant Garamond", Georgia, serif; letter-spacing: 0.01em; }
+  .title p { margin: 4px 0 0; color: var(--dim); font-size: 13px; }
+  nav { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px max(14px, env(safe-area-inset-bottom));
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; background: linear-gradient(transparent, rgba(4, 6, 11, 0.8)); }
+  nav::-webkit-scrollbar { display: none; }
+  nav button { flex: none; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line);
+    background: rgba(4, 6, 11, 0.55); color: var(--ink); font: inherit; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  nav button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  nav button:focus-visible, .back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hint { position: fixed; left: 50%; bottom: calc(118px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+    color: var(--dim); font-size: 13px; text-align: center; transition: opacity 0.8s; pointer-events: none; width: max-content; max-width: calc(100% - 32px); }
+  .hint.gone { opacity: 0; }
+  .alt { position: fixed; left: 16px; bottom: calc(74px + env(safe-area-inset-bottom)); font: 12px/1 "JetBrains Mono", ui-monospace, monospace; color: var(--dim); }
+  .credit { position: fixed; right: 16px; bottom: calc(74px + env(safe-area-inset-bottom)); font-size: 10px; color: rgba(244, 246, 250, 0.4); max-width: 46%; text-align: right; }
+  .nogl { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 24px; text-align: center; }
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="Planète en 3D : glisse pour tourner autour, pince ou molette pour t’approcher"></canvas>
+<header>
+  <a class="back" href="./#" aria-label="Retour à la Terre">← Terre</a>
+  <div class="title"><h1 id="name">Mars</h1><p id="fact"></p></div>
+</header>
+<p class="hint" id="hint">Glisse pour survoler · pince ou molette pour descendre</p>
+<p class="alt" id="alt" aria-live="off"></p>
+<p class="credit">Cartes d’après les sondes de la NASA (J. Hastings-Trew), licence dans media/maps</p>
+<nav id="list" aria-label="Choisir une planète"></nav>
+<div class="nogl" id="nogl">Ton navigateur ne peut pas afficher la 3D ici.</div>
+<script>
+(() => {
+  'use strict';
+  // Equatorial diameters, NASA planetary fact sheets (rounded to the km).
+  const BODIES = [
+    { id: 'mercure', name: 'Mercure', km: 4879 },
+    { id: 'venus',   name: 'Vénus',   km: 12104, atmo: [1.0, 0.85, 0.55] },
+    { id: 'lune',    name: 'La Lune', km: 3475 },
+    { id: 'mars',    name: 'Mars',    km: 6792, atmo: [0.95, 0.6, 0.45] },
+    { id: 'jupiter', name: 'Jupiter', km: 142984, atmo: [0.95, 0.85, 0.7] },
+    { id: 'saturne', name: 'Saturne', km: 120536, atmo: [0.95, 0.88, 0.65], rings: [1.24, 2.27] },
+    { id: 'uranus',  name: 'Uranus',  km: 51118, atmo: [0.6, 0.9, 0.95] },
+    { id: 'neptune', name: 'Neptune', km: 49528, atmo: [0.45, 0.65, 1.0] },
+  ];
+  const fmt = new Intl.NumberFormat('fr-FR');
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('c');
+  const gl = canvas.getContext('webgl', { antialias: true });
+  if (!gl) { $('nogl').style.display = 'flex'; return; }
+
+  function shader(type, src) {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
+    return s;
+  }
+  function program(vs, fs) {
+    const p = gl.createProgram();
+    gl.attachShader(p, shader(gl.VERTEX_SHADER, vs)); gl.attachShader(p, shader(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(p);
+    const u = {}, n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+    for (let i = 0; i < n; i++) { const a = gl.getActiveUniform(p, i); u[a.name] = gl.getUniformLocation(p, a.name); }
+    return { p, u, pos: gl.getAttribLocation(p, 'pos') };
+  }
+
+  // Planet: unit sphere, equirectangular map, sun shading, thin atmosphere rim.
+  const planetProg = program(`
+    attribute vec3 pos; uniform mat4 mvp; varying vec3 n;
+    void main() { n = pos; gl_Position = mvp * vec4(pos, 1.0); }`, `
+    precision highp float; varying vec3 n; uniform sampler2D map; uniform vec3 sun, eye, atmo; uniform float hasAtmo, high;
+    void main() {
+      vec3 N = normalize(n);
+      float u = 0.5 + atan(N.x, -N.z) / 6.2831853, v = 0.5 - asin(clamp(N.y, -1.0, 1.0)) / 3.1415927;
+      vec3 col = texture2D(map, vec2(u, v)).rgb;
+      float d = dot(N, sun), light = smoothstep(-0.08, 0.35, d) * 0.97 + 0.03;
+      vec3 V = normalize(eye - N);
+      float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0) * smoothstep(-0.25, 0.4, d) * hasAtmo * high;
+      gl_FragColor = vec4(col * light + atmo * rim * 0.75, 1.0);
+    }`);
+  // Saturn's rings: flat annulus in the equator plane, radial colour strip, planet shadow.
+  const ringProg = program(`
+    attribute vec3 pos; uniform mat4 mvp; varying vec3 p;
+    void main() { p = pos; gl_Position = mvp * vec4(pos, 1.0); }`, `
+    precision highp float; varying vec3 p; uniform sampler2D map; uniform vec2 radii; uniform vec3 sun;
+    void main() {
+      float r = length(p.xz); if (r < radii.x || r > radii.y) discard;
+      vec3 c = texture2D(map, vec2((r - radii.x) / (radii.y - radii.x), 0.5)).rgb;
+      float a = clamp(dot(c, vec3(0.33)) * 1.25, 0.0, 0.92);
+      float t = -dot(p, sun); vec3 q = p + sun * t; float shadow = (t > 0.0 && length(q) < 1.0) ? 0.12 : 1.0;
+      gl_FragColor = vec4(c * shadow * 0.95, a);
+    }`);
+  const starProg = program(`
+    attribute vec3 pos; uniform mat4 vp; varying float b;
+    void main() { b = fract(sin(dot(pos.xy, vec2(12.9898, 78.233))) * 43758.5453);
+      vec4 c = vp * vec4(pos, 0.0); gl_Position = c.xyww; gl_PointSize = 1.0 + b * 1.6; }`, `
+    precision mediump float; varying float b; void main() { gl_FragColor = vec4(vec3(0.35 + b * 0.65), 1.0); }`);
+
+  function buffer(data) { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW); return b; }
+  // Sphere
+  const LAT = 96, LON = 192, verts = [], idx = [];
+  for (let i = 0; i <= LAT; i++) {
+    const t = i / LAT * Math.PI;
+    for (let j = 0; j <= LON; j++) { const f = j / LON * 2 * Math.PI; verts.push(Math.sin(t) * Math.sin(f), Math.cos(t), -Math.sin(t) * Math.cos(f)); }
+  }
+  for (let i = 0; i < LAT; i++) for (let j = 0; j < LON; j++) {
+    const a = i * (LON + 1) + j, b = a + LON + 1; idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const sphereBuf = buffer(new Float32Array(verts));
+  const sphereIdx = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereIdx);
+  const big = idx.length > 65535 && gl.getExtension('OES_element_index_uint');
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, big ? new Uint32Array(idx) : new Uint16Array(idx), gl.STATIC_DRAW);
+  if (!big && idx.length > 65535) throw new Error('index');
+  const ringBuf = buffer(new Float32Array([-3, 0, -3, 3, 0, -3, -3, 0, 3, 3, 0, 3]));
+  const STARS = 2400, sp = new Float32Array(STARS * 3);
+  for (let i = 0; i < STARS; i++) {
+    const z = Math.random() * 2 - 1, a = Math.random() * 6.2832, r = Math.sqrt(1 - z * z);
+    sp.set([r * Math.cos(a), z, r * Math.sin(a)], i * 3);
+  }
+  const starBuf = buffer(sp);
+
+  const textures = {};
+  function texture(src, cb) {
+    if (textures[src]) { cb && cb(textures[src]); return textures[src]; }
+    const t = gl.createTexture(); textures[src] = t;
+    gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([20, 20, 24, 255]));
+    const im = new Image();
+    im.onload = () => {
+      gl.bindTexture(gl.TEXTURE_2D, t);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      api.loaded++; cb && cb(t);
+    };
+    im.onerror = () => { api.failed++; };
+    im.src = src;
+    return t;
+  }
+
+  // Matrices (column-major)
+  function persp(fov, asp, n, f) { const t = 1 / Math.tan(fov / 2); return [t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0]; }
+  function look(e, c, up) {
+    const z = norm(sub(e, c)), x = norm(cross(up, z)), y = cross(z, x);
+    return [x[0], y[0], z[0], 0, x[1], y[1], z[1], 0, x[2], y[2], z[2], 0, -dot(x, e), -dot(y, e), -dot(z, e), 1];
+  }
+  function mul(a, b) { const o = new Array(16); for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { let s = 0; for (let k = 0; k < 4; k++) s += a[k * 4 + j] * b[i * 4 + k]; o[i * 4 + j] = s; } return o; }
+  const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  const norm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+
+  // Camera: longitude, latitude and height above the surface in planet radii; "goal" values are eased toward.
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cam = { lon: 1.75, lat: 0.25, h: 2.2 }, goal = { lon: 1.75, lat: 0.25, h: 2.2 };
+  const H_MIN = 0.02, H_MAX = 9;
+  let body = BODIES[3], idle = 0, lastT = performance.now();
+  const sun = norm([0.9, 0.25, 0.6]);
+  const api = window.__planetes = { loaded: 0, failed: 0, frames: 0, cam, goal, get body() { return body.id; }, select };
+
+  const nav = $('list');
+  BODIES.forEach((b) => {
+    const el = document.createElement('button'); el.type = 'button'; el.textContent = b.name; el.dataset.id = b.id;
+    el.addEventListener('click', () => select(b.id, true)); nav.appendChild(el);
+  });
+  function select(id, fromUser) {
+    body = BODIES.find((b) => b.id === id) || BODIES[3];
+    texture('media/maps/' + body.id + '.webp');
+    if (body.rings) texture('media/maps/anneaux.png');
+    $('name').textContent = body.name;
+    $('fact').textContent = fmt.format(body.km) + ' km de diamètre';
+    nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === body.id)));
+    document.title = 'Rafa · ' + body.name;
+    goal.h = body.rings ? 4.2 : 2.2; goal.lon = cam.lon = 1.75; cam.h = reduced ? goal.h : goal.h * 2.5; goal.lat = body.rings ? 0.32 : 0.2;
+    if (fromUser) history.replaceState(null, '', '#' + body.id);
+  }
+
+  // Input: one finger (or mouse) flies over the surface, two fingers or the wheel change height.
+  const pts = new Map(); let pinch = 0;
+  const hint = $('hint');
+  function touched() { idle = 0; hint.classList.add('gone'); }
+  canvas.addEventListener('pointerdown', (e) => { canvas.setPointerCapture(e.pointerId); pts.set(e.pointerId, [e.clientX, e.clientY]); pinch = 0; touched(); });
+  canvas.addEventListener('pointermove', (e) => {
+    const p = pts.get(e.pointerId); if (!p) return;
+    if (pts.size === 1) {
+      // Scale the drag to the visible ground: the lower the flight, the slower the ground moves.
+      const k = Math.min(cam.h, 1.5) * 2.2 / Math.max(innerHeight, 1);
+      goal.lon -= (e.clientX - p[0]) * k / Math.max(Math.cos(goal.lat), 0.2);
+      goal.lat = Math.max(-1.45, Math.min(1.45, goal.lat + (e.clientY - p[1]) * k));
+    }
+    pts.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pts.size === 2) {
+      const [a, b] = [...pts.values()], d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+      if (pinch) zoom(pinch / d);
+      pinch = d;
+    }
+    touched();
+  });
+  const up = (e) => { pts.delete(e.pointerId); pinch = 0; };
+  canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoom(Math.exp(e.deltaY * 0.0015)); touched(); }, { passive: false });
+  function zoom(f) { goal.h = Math.max(H_MIN, Math.min(H_MAX, goal.h * f)); }
+  addEventListener('keydown', (e) => {
+    const s = Math.min(goal.h, 1.5) * 0.08, m = { ArrowLeft: [-s, 0], ArrowRight: [s, 0], ArrowUp: [0, s], ArrowDown: [0, -s] }[e.key];
+    if (m) { goal.lon += m[0]; goal.lat = Math.max(-1.45, Math.min(1.45, goal.lat + m[1])); touched(); e.preventDefault(); }
+    if (e.key === '+' || e.key === '=') { zoom(0.8); touched(); }
+    if (e.key === '-') { zoom(1.25); touched(); }
+  });
+
+  function resize() {
+    const dpr = Math.min(devicePixelRatio || 1, 2), w = Math.round(innerWidth * dpr), h = Math.round(innerHeight * dpr);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    gl.viewport(0, 0, w, h);
+  }
+
+  function frame(now) {
+    const dt = Math.min((now - lastT) / 1000, 0.1); lastT = now; idle += dt;
+    if (!reduced && idle > 6 && !pts.size) goal.lon += dt * 0.03 * Math.min(goal.h, 1);
+    const k = 1 - Math.exp(-dt * 6);
+    cam.lon += (goal.lon - cam.lon) * k; cam.lat += (goal.lat - cam.lat) * k;
+    cam.h = Math.exp(Math.log(cam.h) + (Math.log(goal.h) - Math.log(cam.h)) * (1 - Math.exp(-dt * 3)));
+    resize();
+    const r = 1 + cam.h, cl = Math.cos(cam.lat);
+    const eye = [r * cl * Math.sin(cam.lon), r * Math.sin(cam.lat), -r * cl * Math.cos(cam.lon)];
+    // Near the ground, tilt the view toward the horizon like an aircraft; from far, look at the centre.
+    const tilt = Math.max(0, Math.min(1, (0.6 - cam.h) / 0.55));
+    const north = norm([-Math.sin(cam.lat) * Math.sin(cam.lon), Math.cos(cam.lat), Math.sin(cam.lat) * Math.cos(cam.lon)]);
+    const ground = eye.map((v) => v / r);
+    const ahead = [ground[0] + north[0] * cam.h * 3 * tilt, ground[1] + north[1] * cam.h * 3 * tilt, ground[2] + north[2] * cam.h * 3 * tilt];
+    const target = [ahead[0] * tilt, ahead[1] * tilt, ahead[2] * tilt];
+    const upv = tilt > 0.01 ? ground : north;
+    const view = look(eye, target, upv);
+    const asp = canvas.width / canvas.height, fov = asp < 1 ? 1.0 : 0.75;
+    const near = Math.max(cam.h * 0.3, 0.0005), proj = persp(fov, asp, near, r + 4);
+    const vp = mul(proj, view);
+
+    gl.clearColor(0.016, 0.024, 0.043, 1); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    // Stars at infinity (w = 0), behind everything.
+    gl.disable(gl.DEPTH_TEST);
+    gl.useProgram(starProg.p);
+    gl.uniformMatrix4fv(starProg.u.vp, false, mul(proj, view.slice(0, 12).concat([0, 0, 0, 1])));
+    gl.bindBuffer(gl.ARRAY_BUFFER, starBuf); gl.enableVertexAttribArray(starProg.pos); gl.vertexAttribPointer(starProg.pos, 3, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.POINTS, 0, STARS);
+    gl.enable(gl.DEPTH_TEST);
+
+    gl.useProgram(planetProg.p);
+    gl.uniformMatrix4fv(planetProg.u.mvp, false, vp);
+    gl.uniform3fv(planetProg.u.sun, sun); gl.uniform3fv(planetProg.u.eye, eye);
+    gl.uniform3fv(planetProg.u.atmo, body.atmo || [0, 0, 0]); gl.uniform1f(planetProg.u.hasAtmo, body.atmo ? 1 : 0); gl.uniform1f(planetProg.u.high, Math.min(1, Math.max(0, (cam.h - 0.05) / 0.6)));
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texture('media/maps/' + body.id + '.webp')); gl.uniform1i(planetProg.u.map, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, sphereBuf); gl.enableVertexAttribArray(planetProg.pos); gl.vertexAttribPointer(planetProg.pos, 3, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereIdx);
+    gl.drawElements(gl.TRIANGLES, idx.length, big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, 0);
+
+    if (body.rings) {
+      gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
+      gl.useProgram(ringProg.p);
+      gl.uniformMatrix4fv(ringProg.u.mvp, false, vp);
+      gl.uniform2fv(ringProg.u.radii, body.rings); gl.uniform3fv(ringProg.u.sun, sun);
+      gl.bindTexture(gl.TEXTURE_2D, texture('media/maps/anneaux.png')); gl.uniform1i(ringProg.u.map, 0);
+      gl.bindBuffer(gl.ARRAY_BUFFER, ringBuf); gl.enableVertexAttribArray(ringProg.pos); gl.vertexAttribPointer(ringProg.pos, 3, gl.FLOAT, false, 0, 0);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      gl.depthMask(true); gl.disable(gl.BLEND);
+    }
+
+    const alt = cam.h * body.km / 2;
+    $('alt').textContent = 'altitude ' + fmt.format(Math.round(alt > 100 ? alt / 10 : alt) * (alt > 100 ? 10 : 1)) + ' km';
+    api.frames++;
+    requestAnimationFrame(frame);
+  }
+
+  const start = location.hash.slice(1);
+  select(BODIES.some((b) => b.id === start) ? start : 'mars', false);
+  setTimeout(() => hint.classList.add('gone'), 7000);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
