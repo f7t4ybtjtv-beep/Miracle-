@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Rafa, c’est pour toi, ma rafale</title>
-<meta name="description" content="Rafa, c’est pour toi, ma rafale. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<title>Rafa · Mama, de la part d’Amine</title>
+<meta name="description" content="Mama, de la part d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
 <meta name="theme-color" content="#04060B" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwNDA2MEIiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMCIgZmlsbD0iI0Y0RjZGQSIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE5IiBmaWxsPSJub25lIiBzdHJva2U9IiM5RkQzRkYiIHN0cm9rZS1vcGFjaXR5PSIuNTUiIHN0cm9rZS13aWR0aD0iMS42Ii8+PC9zdmc+" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -735,7 +735,7 @@
   <header class="ui top">
     <div class="brand">
       <h1>Rafa</h1>
-      <span class="tag">c’est pour toi Rafa, ma rafale</span>
+      <span class="tag">Mama, de la part d’Amine</span>
       <div class="hud" aria-live="off">
         <span class="phase" id="hud-phase">Orbite</span>
         <span>Alt. <b id="hud-alt">—</b></span>
@@ -1192,8 +1192,7 @@
     </select>
     <div class="inner">
       <h2>Rafa</h2>
-      <p class="tagline dedic">c’est pour toi Rafa, ma rafale</p>
-      <p class="dedicace">de la part d'Amine</p>
+      <p class="tagline dedic">Mama, de la part d’Amine</p>
       <!-- Qur'an 51:47, Uthmani text (drawn with the bundled Amiri Quran font: system fonts lose some of its signs) and Muhammad Hamidullah's French translation, both copied from a reference edition:
            never retype or reword either one; check against the source before any change. -->
       <figure class="verse">
@@ -6036,7 +6035,7 @@ window.__entryVideo = (() => {
       const ctx = out.getContext('2d');
       ctx.drawImage(canvas, 0, 0);
       const px = Math.max(14, Math.round(out.width / 190));
-      const line = `Rafa, c’est pour toi, ma rafale${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
+      const line = `Rafa · Mama, de la part d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
       ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
       ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
       ctx.fillStyle = 'rgba(244, 246, 250, 0.9)'; ctx.textBaseline = 'middle';
@@ -6162,7 +6161,7 @@ window.__entryVideo = (() => {
       tour.i += 1; tour.arrived = false;
       if (tour.i >= PLACES.length) {
         tourCount();
-        setCredit(['Rafa · c’est pour toi, ma rafale', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
+        setCredit(['Rafa · Mama, de la part d’Amine', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
         tourTimers.later(endTour, TOUR.finale);
         return;
       }
