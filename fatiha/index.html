@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Fatiha, c’est pour toi Rafa, ma rafale</title>
-<meta name="description" content="Fatiha, c’est pour toi Rafa, ma rafale. La lumière du dialogue : un voyage au-dessus de la Terre vers treize lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
+<title>Rafa · Mama, de la part d’Amine</title>
+<meta name="description" content="Mama, de la part d’Amine. La lumière du dialogue : un voyage au-dessus de la Terre vers quatorze lieux où des cultures se sont rencontrées, relief réel et coordonnées réelles." />
 <meta name="theme-color" content="#04060B" />
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMwNDA2MEIiLz48Y2lyY2xlIGN4PSIzMiIgY3k9IjMyIiByPSIxMCIgZmlsbD0iI0Y0RjZGQSIvPjxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjE5IiBmaWxsPSJub25lIiBzdHJva2U9IiM5RkQzRkYiIHN0cm9rZS1vcGFjaXR5PSIuNTUiIHN0cm9rZS13aWR0aD0iMS42Ii8+PC9zdmc+" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Widgets/widgets.css">
 <style>
   :root {
-    /* Fatiha, "space cinema": the Earth full screen, cool white type on a blue-black night, one ice-blue accent. */
+    /* Rafa, "space cinema": the Earth full screen, cool white type on a blue-black night, one ice-blue accent. */
     --bg: #04060B;
     --bg-2: #0B1220;
     --ink: #F4F6FA;
@@ -183,6 +183,7 @@
     display: grid; align-content: start; gap: 4px; min-height: 68px; padding: 12px 14px; text-align: left; cursor: pointer;
     border-radius: 16px; border: 1px solid var(--line); background: rgba(244, 246, 250, 0.03); transition: border-color .2s, background .2s;
   }
+  a.opt { text-decoration: none; color: inherit; }
   .opt b { font: 400 15px/1.25 var(--font-ui); color: var(--ink); }
   .opt small { font: 400 11.5px/1.4 var(--font-ui); color: var(--muted); }
   .opt:hover { border-color: var(--line-2); }
@@ -474,25 +475,32 @@
   }
 
   /* Opening title card */
+  /* "Givre": calm, cold, spacious. Clean UI type (Inter) and mono micro-labels;
+     no serif/script, no breathing glow, no staggered entrance. */
   .loader {
     position: fixed; inset: 0; z-index: 20; display: grid; place-items: center;
     background:
-      radial-gradient(ellipse 58% 40% at 50% 30%, rgba(159, 211, 255, 0.08), transparent 70%),
-      radial-gradient(ellipse 80% 62% at 50% 44%, var(--bg-2), var(--bg) 72%);
+      radial-gradient(130% 80% at 50% -12%, rgba(159, 211, 255, 0.10), transparent 58%),
+      linear-gradient(180deg, #0A111B 0%, #070B12 52%, var(--bg) 100%);
     transition: opacity 1.2s ease;
     touch-action: none; overscroll-behavior: none;
   }
   .loader.done { opacity: 0; pointer-events: none; }
-  .loader .inner { max-width: 640px; padding: 0 28px; text-align: center; }
-  .loader h2 { margin: 14px 0 0; font: 500 clamp(54px, 15vw, 132px)/1 var(--font-display); letter-spacing: .16em; text-transform: uppercase; margin-right: -.16em; text-shadow: 0 0 48px rgba(159, 211, 255, 0.18), 0 1px 3px rgba(0, 0, 0, 0.55); animation: title-breathe 7s ease-in-out infinite; }
-  @keyframes title-breathe { 0%, 100% { text-shadow: 0 0 40px rgba(159, 211, 255, 0.13), 0 1px 3px rgba(0, 0, 0, 0.55); } 50% { text-shadow: 0 0 58px rgba(159, 211, 255, 0.24), 0 1px 3px rgba(0, 0, 0, 0.55); } }
+  /* Short screens (phone held sideways): the opening card is taller than the screen, so let it scroll to reach "Commencer". */
+  @media (max-height: 560px) {
+    .loader:not(.journey) { overflow-y: auto; touch-action: pan-y; place-items: start center; }
+    .loader:not(.journey) .inner { padding-top: 24px; padding-bottom: 32px; }
+  }
+  .loader .inner { max-width: 560px; padding: 0 30px; text-align: center; }
+  .loader h2 { margin: 0; font: 300 clamp(40px, 10vw, 74px)/1 var(--font-ui); letter-spacing: .34em; text-transform: uppercase; margin-right: -.34em; color: var(--ink); text-shadow: 0 1px 34px rgba(159, 211, 255, 0.12); }
   .loader .tagline { margin: 20px 0 6px; font: 400 clamp(14px, 3.6vw, 18px) var(--font-ui); letter-spacing: .12em; text-transform: lowercase; color: var(--ink-2); }
-  /* Dedication: keep the real names (Rafa, Mélissa), so no lowercase transform here; set a touch brighter and larger so it reads as the heart of the card */
-  /* The dedication, set as a handwritten signature (Pinyon Script): the heart of the card. Words and real names unchanged. */
-  .loader .tagline.dedic { text-transform: none; color: var(--ink); font: 400 clamp(28px, 7.4vw, 44px)/1.1 var(--font-script); letter-spacing: 0; margin: 16px 0 2px; }
-  .loader .dedicace { margin: 0 auto; font: 400 clamp(19px, 5vw, 25px)/1.2 var(--font-script); letter-spacing: 0; color: var(--ink-2); }
+  /* Dedication — the heart of the card. Words and real names strictly unchanged.
+     The human line in clean light sans; the attribution as a quiet mono micro-label. */
+  .loader .tagline.dedic { text-transform: none; color: var(--ink); font: 300 clamp(20px, 5vw, 28px)/1.4 var(--font-ui); letter-spacing: .01em; margin: 30px 0 14px; }
+  .loader .famille { display: block; width: auto; height: auto; max-width: min(78vw, 300px); max-height: 24vh; max-height: 24dvh; margin: 18px auto 0; border-radius: 20px; object-fit: cover; border: 1px solid var(--line-2); box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55), 0 0 40px rgba(159, 211, 255, 0.12); }
+  .loader .dedicace { margin: 0 auto; font: 400 12px/1.5 var(--font-mono); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
   /* A short hairline sets the personal dedication apart from the Qur'anic verse below */
-  .loader .dedicace::after { content: ""; display: block; width: 50px; height: 1px; margin: 24px auto 2px; background: linear-gradient(90deg, transparent, rgba(244, 246, 250, 0.26), transparent); }
+  .loader .dedicace::after { content: ""; display: block; width: 44px; height: 1px; margin: 26px auto 0; background: linear-gradient(90deg, transparent, rgba(244, 246, 250, 0.22), transparent); }
   /* Amiri Quran, SIL Open Font License (fonts/OFL-amiri-quran.txt): served from this site, no outside request */
   @font-face { font-family: "Amiri Quran"; src: url("fonts/amiri-quran.woff2") format("woff2"); font-display: swap; unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+FB50-FDFF, U+FE70-FEFF; }
   /* Cormorant Garamond, SIL Open Font License (fonts/OFL-cormorant.txt): Latin subset, self-hosted — editorial serif for the opening titles */
@@ -500,36 +508,49 @@
   @font-face { font-family: "Cormorant Garamond"; src: url("fonts/cormorant-600.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
   /* Pinyon Script, SIL Open Font License (fonts/OFL-pinyon.txt): Latin subset, self-hosted — the handwritten signature of the dedication */
   @font-face { font-family: "Pinyon Script"; src: url("fonts/pinyon-script.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215; }
-  .verse { margin: 0 auto 26px; max-width: 34em; }
-  .verse-ar { margin: 0; font: 400 clamp(24px, 6vw, 38px)/2.1 "Amiri Quran", "Geeza Pro", "Noto Naskh Arabic", serif; color: var(--ink); }
-  .verse-fr { margin-top: 6px; font: 400 15px/1.6 var(--font-ui); font-style: italic; color: var(--ink); }
-  .verse figcaption { margin-top: 8px; font: 400 12px/1.5 var(--font-mono); letter-spacing: .06em; color: var(--ink-2); }
+  .verse { margin: 30px auto 0; max-width: 34em; }
+  .verse-ar { margin: 0; font: 400 clamp(23px, 5.6vw, 34px)/2.05 "Amiri Quran", "Geeza Pro", "Noto Naskh Arabic", serif; color: var(--ink); }
+  .verse-fr { margin-top: 10px; font: 400 14px/1.65 var(--font-ui); font-style: italic; color: var(--ink-2); }
+  .verse figcaption { margin-top: 10px; font: 400 11px/1.5 var(--font-mono); letter-spacing: .08em; color: var(--muted); }
   .loader p { margin: 0 auto; max-width: 48ch; font: 400 15px/1.7 var(--font-ui); color: var(--ink-2); }
-  .loader .bar { width: 200px; height: 1px; margin: 32px auto 0; background: var(--line); overflow: hidden; border-radius: 1px; }
-  .loader .bar i { display: block; width: 38%; height: 100%; background: linear-gradient(90deg, transparent, var(--accent), var(--ink)); box-shadow: 0 0 8px rgba(159, 211, 255, 0.5); animation: slide 1.6s ease-in-out infinite; }
+  #loader-text { margin-top: 28px; max-width: 42ch; font: 400 12.5px/1.75 var(--font-ui); letter-spacing: .01em; color: var(--muted); }
+  .loader .bar { width: 130px; height: 1px; margin: 28px auto 0; background: rgba(244, 246, 250, 0.10); overflow: hidden; }
+  .loader .bar i { display: block; width: 34%; height: 100%; background: linear-gradient(90deg, transparent, var(--accent)); opacity: .9; animation: slide 1.8s ease-in-out infinite; }
   @keyframes slide { from { transform: translateX(-100%); } to { transform: translateX(290%); } }
-  /* Entrance: the static title card settles in, one block after another (off during the journey, which has its own captions) */
-  @keyframes loader-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-  .loader:not(.journey) .inner > * { animation: loader-rise .9s cubic-bezier(.2, .7, .2, 1) both; }
-  .loader:not(.journey) .inner > h2 { animation-delay: .05s; }
-  .loader:not(.journey) .inner > .tagline { animation-delay: .20s; }
-  .loader:not(.journey) .inner > .dedicace { animation-delay: .32s; }
-  .loader:not(.journey) .inner > .verse { animation-delay: .46s; }
-  .loader:not(.journey) .inner > #loader-text { animation-delay: .60s; }
-  .loader:not(.journey) .inner > .bar { animation-delay: .72s; }
-  .loader:not(.journey) .inner > .start { animation-delay: .80s; }
+  /* Entrance: the whole card settles in once, softly (off during the journey, which has its own captions, and under reduced motion) */
+  @keyframes loader-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .loader:not(.journey) .inner { animation: loader-rise 1.1s var(--ease) both; }
   .loader .start {
-    margin-top: 34px; height: 54px; padding: 0 36px; border-radius: 999px; border: 1px solid var(--line-2);
-    background: linear-gradient(180deg, rgba(159, 211, 255, 0.10), rgba(159, 211, 255, 0.03));
-    color: var(--ink); font: 400 13px var(--font-ui); letter-spacing: .24em; text-transform: uppercase; cursor: pointer;
-    transition: border-color .3s var(--ease), box-shadow .3s var(--ease), background .3s var(--ease), color .3s var(--ease);
+    margin-top: 30px; height: 50px; padding: 0 34px; border-radius: 999px; border: 1px solid var(--line-2);
+    background: rgba(255, 255, 255, 0.04); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: var(--ink); font: 400 12px var(--font-ui); letter-spacing: .26em; text-transform: uppercase; cursor: pointer;
+    transition: border-color .35s var(--ease), box-shadow .35s var(--ease), background .35s var(--ease), color .35s var(--ease);
   }
-  .loader:not(.journey) .start:not(:disabled) { border-color: rgba(159, 211, 255, 0.45); box-shadow: 0 0 0 1px rgba(159, 211, 255, 0.06), 0 8px 30px rgba(159, 211, 255, 0.10); }
-  .loader .start:not(:disabled):hover { border-color: var(--accent); color: #04060B; background: linear-gradient(180deg, #DCEEFF, var(--accent)); box-shadow: 0 0 34px rgba(159, 211, 255, 0.34); }
-  .loader .start:disabled { opacity: .5; cursor: progress; background: transparent; color: var(--ink-2); border-color: var(--line); box-shadow: none; }
+  .loader:not(.journey) .start:not(:disabled) { border-color: rgba(159, 211, 255, 0.40); box-shadow: 0 0 24px rgba(159, 211, 255, 0.08); }
+  .loader .start:not(:disabled):hover { border-color: var(--accent); background: rgba(159, 211, 255, 0.10); box-shadow: 0 0 30px rgba(159, 211, 255, 0.20); }
+  .loader .start:disabled { opacity: .45; cursor: progress; background: transparent; color: var(--muted); border-color: var(--line); box-shadow: none; }
   .fallback-list { margin-top: 20px; text-align: left; font: 400 13px/1.7 var(--font-ui); color: var(--ink-2); }
   /* Opening journey: a flight past the planets instead of a loading bar (class "journey" set by its script) */
   #intro-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: none; pointer-events: none; touch-action: none; }
+  /* Entry video: the owner's clip as the welcome backdrop, in place of the planet journey (class "video-intro" set by its script) */
+  .entry-video, .entry-scrim { display: none; position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .entry-video { z-index: 0; object-fit: cover; background: #000; }
+  .entry-scrim { z-index: 1; background: linear-gradient(180deg, rgba(4, 6, 11, 0.5), rgba(4, 6, 11, 0.72) 55%, rgba(4, 6, 11, 0.92)); }
+  .loader.video-intro { background: #000; }
+  .loader.video-intro .entry-video, .loader.video-intro .entry-scrim { display: block; }
+  .loader.video-intro .inner { position: relative; z-index: 2; }
+  .entry-sound {
+    display: none; position: absolute; z-index: 3; right: var(--gutter); bottom: calc(var(--safe-b) + 18px);
+    align-items: center; gap: 9px; min-height: 44px; padding: 0 18px; border-radius: 999px;
+    border: 1px solid var(--line-2); background: rgba(0, 0, 0, 0.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: var(--ink); font: 400 12px var(--font-ui); letter-spacing: .18em; text-transform: uppercase; cursor: pointer;
+    transition: border-color .3s var(--ease), background .3s var(--ease), color .3s var(--ease);
+  }
+  .loader.video-intro .entry-sound { display: inline-flex; }
+  .entry-sound:hover { border-color: var(--accent); background: rgba(159, 211, 255, 0.10); }
+  .entry-sound .wave { opacity: 0; transition: opacity .25s var(--ease); }
+  .entry-sound[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .entry-sound[aria-pressed="true"] .wave { opacity: 1; }
   .intro-caption, .intro-note, .intro-skip { display: none; }
   .loader.journey { background: #000; touch-action: none; overscroll-behavior: none; }
   .loader.journey #intro-canvas { display: block; }
@@ -547,7 +568,7 @@
   }
   .loader.journey .intro-caption.show { opacity: 1; }
   .intro-caption .kicker { color: var(--ink-2); white-space: pre-line; line-height: 1.9; }
-  .intro-name { margin: 8px 0 10px; font: 500 clamp(36px, 7vw, 66px)/1.02 var(--font-display); letter-spacing: .05em; text-transform: uppercase; }
+  .intro-name { margin: 8px 0 10px; font: 300 clamp(32px, 6.5vw, 60px)/1.05 var(--font-ui); letter-spacing: .14em; text-transform: uppercase; }
   .intro-fact { font: 400 12px/1.7 var(--font-mono); letter-spacing: .04em; color: var(--ink-2); white-space: pre-line; }
   .loader.journey .intro-note {
     display: block; position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(var(--safe-b) + 14px); margin: 0;
@@ -644,7 +665,7 @@
     .sheet.open { animation: none; }
     .loader .bar i, .eq i { animation: none; }
     .loader .bar i { width: 100%; }
-    .loader .inner > *, .loader h2 { animation: none !important; }
+    .loader .inner, .loader .inner > *, .loader h2 { animation: none !important; }
   }
 
   /* Enquête */
@@ -719,8 +740,8 @@
 
   <header class="ui top">
     <div class="brand">
-      <h1>Fatiha</h1>
-      <span class="tag">c’est pour toi Rafa, ma rafale</span>
+      <h1>Rafa</h1>
+      <span class="tag">Mama, de la part d’Amine</span>
       <div class="hud" aria-live="off">
         <span class="phase" id="hud-phase">Orbite</span>
         <span>Alt. <b id="hud-alt">—</b></span>
@@ -745,7 +766,7 @@
 
   <aside class="ui sheet menu" id="menu" role="dialog" aria-modal="false" aria-label="Menu">
     <div class="sheet-head">
-      <div><div class="kicker">Fatiha · menu</div><h3>Explorer la Terre</h3></div>
+      <div><div class="kicker">Rafa · menu</div><h3>Explorer la Terre</h3></div>
       <button class="close" type="button" data-close="menu" aria-label="Fermer le menu">✕</button>
     </div>
     <div class="group">
@@ -764,11 +785,12 @@
     <div class="group">
       <div class="kicker">Spectacle</div>
       <div class="grid2">
-        <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les treize lieux, comme un film</small></button>
+        <button class="opt" id="btn-tour" type="button" aria-controls="cine"><b>Visite cinéma</b><small>les quatorze lieux, comme un film</small></button>
         <button class="opt" id="btn-time" type="button" aria-pressed="false" aria-controls="timebar"><b>Curseur du temps</b><small>fais tourner le soleil sur 24 heures</small></button>
         <button class="opt" id="btn-share" type="button"><b>Partager cette vue</b><small>un lien vers ce point de vue exact</small></button>
         <button class="opt" id="btn-random" type="button"><b>Lieu au hasard</b><small>un lieu que tu n’as pas encore vu</small></button>
         <button class="opt" id="btn-full" type="button" aria-pressed="false" hidden><b>Plein écran</b><small>cache les barres du navigateur</small></button>
+        <a class="opt" id="btn-planets" href="planetes.html"><b>Survol des planètes</b><small>Mercure, Vénus, la Lune, Mars, Jupiter, Saturne, Uranus, Neptune</small></a>
         <button class="opt" id="btn-epic" type="button" aria-controls="epic"><b>La Terre entière, aujourd’hui</b><small>photos NASA prises à 1,5 million de km</small></button>
       </div>
     </div>
@@ -783,10 +805,10 @@
         <button class="opt" id="btn-music" data-music type="button" aria-pressed="false"><b>Musique</b><small>la chanson, en fond</small></button>
       </div>
       <div class="quality track-pick" role="group" aria-label="Choix de la musique de fond" id="btn-track">
-        <button type="button" data-track="fond" aria-pressed="true">Originale</button>
         <button type="button" data-track="remaster" aria-pressed="false">Remaster</button>
+        <button type="button" data-track="coeur" aria-pressed="true">Cœur de Pierre</button>
       </div>
-      <p class="note">Deux versions de la chanson, au choix pour le fond.</p>
+      <p class="note">Deux chansons au choix pour le fond.</p>
     </div>
     <div class="group">
       <div class="kicker">Carnet de voyage</div>
@@ -798,8 +820,8 @@
     <div class="group">
       <div class="kicker">Qualité d’image</div>
       <div class="quality" role="group" aria-label="Qualité d’image">
-        <button type="button" data-quality="ultra" aria-pressed="false">Ultra · HDR 5K</button>
-        <button type="button" data-quality="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-quality="ultra" aria-pressed="true">Ultra · HDR 5K</button>
+        <button type="button" data-quality="auto" aria-pressed="false">Auto</button>
         <button type="button" data-quality="haute" aria-pressed="false">Haute</button>
         <button type="button" data-quality="equilibree" aria-pressed="false">Équilibrée</button>
         <button type="button" data-quality="legere" aria-pressed="false">Légère</button>
@@ -1144,6 +1166,13 @@
 
   <div class="loader" id="loader">
     <canvas id="intro-canvas" aria-hidden="true"></canvas>
+    <!-- The source is chosen by the entry-video script: a portrait cut for upright screens, a landscape one otherwise. -->
+    <video id="entry-video" class="entry-video" playsinline muted preload="auto" aria-hidden="true"></video>
+    <div class="entry-scrim" aria-hidden="true"></div>
+    <button class="entry-sound" id="entry-sound" type="button" aria-pressed="false" hidden>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      <span id="entry-sound-label">Son</span>
+    </button>
     <div class="intro-caption" id="intro-caption" aria-live="polite">
       <div class="kicker" id="intro-kicker"></div>
       <div class="intro-name" id="intro-name"></div>
@@ -1168,9 +1197,9 @@
       <option value="es" lang="es">Español</option>
     </select>
     <div class="inner">
-      <h2>Fatiha</h2>
-      <p class="tagline dedic">c’est pour toi Rafa, ma rafale</p>
-      <p class="dedicace">de la part de Mélissa</p>
+      <h2>Rafa</h2>
+      <img class="famille" src="media/famille.jpg" width="560" height="996" alt="La famille réunie en djellabas bleues brodées d’or, avec le bébé dans les bras" decoding="async" />
+      <p class="tagline dedic">Mama, de la part d’Amine</p>
       <!-- Qur'an 51:47, Uthmani text (drawn with the bundled Amiri Quran font: system fonts lose some of its signs) and Muhammad Hamidullah's French translation, both copied from a reference edition:
            never retype or reword either one; check against the source before any change. -->
       <figure class="verse">
@@ -1178,7 +1207,7 @@
         <div class="verse-fr">Le ciel, Nous l’avons construit par Notre puissance : et Nous l’étendons [constamment] dans l’immensité.</div>
         <figcaption>Coran, sourate 51 (Adh-Dhâriyât), verset 47 · traduction Muhammad Hamidullah</figcaption>
       </figure>
-      <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à treize lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
+      <p id="loader-text">La lumière du dialogue : survolez la Terre depuis l’espace jusqu’à quatorze lieux où des langues, des savoirs et des croyances se sont croisés. Relief et coordonnées réels.</p>
       <div class="bar" id="loader-bar"><i></i></div>
       <button class="start" id="btn-start" type="button" disabled>Chargement du globe…</button>
       <div id="fallback"></div>
@@ -1186,21 +1215,33 @@
   </div>
 
 <script>
+// ---------- Entry video (config) ----------
+// The owner's clip plays as the welcome backdrop instead of the planet journey.
+// On by default; off (so the planet journey runs as before) with reduced motion,
+// a deep link / shared view in the URL, ?intro=0 (tests) or ?video=0.
+window.__entryVideo = (() => {
+  const p = new URLSearchParams(location.search);
+  const on = p.get('intro') !== '0' && p.get('video') !== '0'
+    && location.hash.length <= 1
+    && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  return { on };
+})();
+
 // ---------- Background music ----------
-// One song (audio/fond.mp3) played in a loop, quietly. Off until the visitor taps a "Musique" button: browsers forbid
+// One song (see TRACKS) played in a loop, quietly. Off until the visitor taps a "Musique" button: browsers forbid
 // sound that starts by itself. The choice is kept in nour.musique; a remembered "on" starts again at the next touch
 // or key ("armed"). The Darija voice lowers it (`duck`), a radio, a TV or a camera pauses it (`hold`), and so does a
 // hidden tab. iPhone ignores `volume`, so there the music pauses during a sentence instead of playing lower.
 // It sits here, before the journey, so it exists whether the journey runs or not.
 (() => {
   'use strict';
-  const KEY = 'nour.musique', PKEY = 'nour.piste', LEVEL = 0.35, LOW = 0.1;
-  // Two songs to choose from; the choice is kept in nour.piste. "fond" is the first one, the default.
+  const KEY = 'nour.musique', PKEY = 'nour.piste2', LEVEL = 0.35, LOW = 0.1;
+  // Two songs to choose from; the choice is kept in nour.piste2 (new key so everyone starts on the owner's new default, "coeur").
   const TRACKS = [
-    { id: 'fond', src: 'audio/fond.mp3', label: 'Originale' },
     { id: 'remaster', src: 'audio/fond-remaster.mp3', label: 'Remaster' },
+    { id: 'coeur', src: 'audio/coeur-de-pierre.mp3', label: 'Cœur de Pierre' },
   ];
-  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0, track = 'fond';
+  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0, track = 'coeur';
   const subs = new Set();
   const trackOf = (id) => TRACKS.find((t) => t.id === id) || TRACKS[0];
   const save = (v) => { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) { /* private mode */ } };
@@ -1274,7 +1315,7 @@
   const api = window.__intro = { active: false, arrived: false, stop() {}, skip() {}, whenArrived(cb) { cb(); }, photos: { loaded: 0, failed: 0, total: 0 } };
   const loader = document.getElementById('loader'), canvas = document.getElementById('intro-canvas');
   const off = new URLSearchParams(location.search).get('intro') === '0';
-  if (off || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (off || (window.__entryVideo && window.__entryVideo.on) || location.hash.length > 1 || !canvas || !canvas.getContext || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -1448,7 +1489,7 @@
     const dist = figure(L, inMn ? Math.round(f[0] * 1000) : f[0]) + (unit ? '\u00a0' + L[unit] : '');
     return { name: L.names[b.name], kind: L.kinds[b.name], fact: `${L[f[2]](dist)}\n${L.diam(figure(L, f[3]))}` };
   }
-  const WELCOME = { name: 'Fatiha', kind: 'Voyage', fact: '', voiceKey: 'welcome', credit: 'Photos de sondes · tailles et vitesse non à l’échelle' };
+  const WELCOME = { name: 'Rafa', kind: 'Voyage', fact: '', voiceKey: 'welcome', credit: 'Photos de sondes · tailles et vitesse non à l’échelle' };
   // With the voice on the clock runs slower (VOICE_RATE), so a planet stays on screen as long as its sentence lasts;
   // before the first planet it is slower still, for the welcome.
   const VOICE_RATE = 0.5, WELCOME_RATE = 0.3, welcomeEnd = () => starts[0] + 0.18 * PASS;
@@ -1760,6 +1801,47 @@
   if (savedVoice()) setVoice(true);   // chosen on an earlier visit: try again, the browser may refuse without a tap
   last = performance.now(); raf = requestAnimationFrame(frame);
 })();
+
+// ---------- Entry video (mount) ----------
+// If enabled above, play the welcome clip as the backdrop (muted at first — browsers forbid
+// sound that starts by itself). The clip is a slow push-in on a NASA EPIC photograph of the
+// whole Earth (DSCOVR, 13 Nov. 2026, 11:15 UTC) down to North Africa and the Mediterranean,
+// with the owner's soundtrack; it comes in two cuts so neither is cropped and enlarged:
+// 1080×1920 for upright screens, 1920×1080 otherwise (picked once, at load). The entry card,
+// verse and "Commencer" button stay over it; if the file fails or autoplay is refused, the
+// poster stays and the plain entry card still works.
+(() => {
+  'use strict';
+  const cfg = window.__entryVideo;
+  if (!cfg || !cfg.on) return;
+  const loader = document.getElementById('loader');
+  const video = document.getElementById('entry-video');
+  const soundBtn = document.getElementById('entry-sound');
+  const soundLabel = document.getElementById('entry-sound-label');
+  if (!loader || !video) { cfg.on = false; return; }
+  const cut = matchMedia('(orientation: portrait)').matches ? 'portrait' : 'landscape';
+  video.poster = `media/intro-poster-${cut}.jpg`;
+  video.src = `media/intro-${cut}.mp4`;
+  cfg.cut = cut;
+  loader.classList.add('video-intro');
+  video.addEventListener('error', () => { loader.classList.remove('video-intro'); cfg.on = false; }, { once: true });
+  // Plays once, then holds on its last frame (no loop).
+  const tryPlay = () => { const p = video.play ? video.play() : null; if (p && typeof p.catch === 'function') p.catch(() => { /* autoplay blocked: poster stays, card still works */ }); };
+  tryPlay();
+  // Sound starts off (browsers forbid sound that starts by itself); the button turns it on.
+  if (soundBtn) {
+    soundBtn.hidden = false;
+    soundBtn.addEventListener('click', () => {
+      const on = video.muted;                 // about to turn sound ON
+      video.muted = !on;
+      soundBtn.setAttribute('aria-pressed', String(on));
+      if (soundLabel) soundLabel.textContent = on ? 'Son activé' : 'Son';
+      if (on) { if (video.ended) { try { video.currentTime = 0; } catch (e) {} } tryPlay(); }   // replay with sound if it had finished
+    });
+  }
+  // Expose for tests.
+  cfg.video = video;
+})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/cesium@1.145.0/Build/Cesium/Cesium.js"></script>
 <script>
@@ -1816,6 +1898,9 @@
     { id: 'angkor', name: 'Angkor Vat', country: 'Cambodge', cc: ['KH'], lat: 13.4125, lon: 103.8670,
       text: "Temple construit au début du XIIe siècle sous Suryavarman II et dédié à Vishnou, puis devenu un lieu de culte bouddhiste. Il est entouré de douves d'environ 190\u00a0m de large, au nord de Siem Reap.",
       meta: 'UNESCO 1992 · Angkor', view: { heading: 90, pitch: -32, range: 4200 }, solarHour: 7.5, night: 350 },
+    { id: 'mecque', name: 'La Grande Mosquée de La Mecque', country: 'Arabie Saoudite', cc: ['SA'], lat: 21.4225, lon: 39.8262,
+      text: "La Grande Mosquée de La Mecque, la plus grande mosquée du monde, entoure la Kaaba, le bâtiment cubique au centre de la vie spirituelle musulmane. Chaque année, près de deux millions de pèlerins s'y rassemblent pour le Hajj, l'un des cinq piliers de l'Islam. Construction et extension se poursuivent depuis le VIIe siècle.",
+      meta: 'Centre spirituel de l\'Islam · Depuis le VIIe siècle', view: { heading: 0, pitch: -15, range: 1200 }, solarHour: 11, night: 60 },
   ];
 
   // Pick the local solar hour at which the sun stands ~32° high today at this
@@ -1833,7 +1918,7 @@
   }
   PLACES.forEach((p) => { p.solarHour = niceSolarHour(p.lat, p.solarHour, new Date()); });
 
-  const NOUR_BUILD = '2026-11-15.3';
+  const NOUR_BUILD = '2026-11-16.2';
   const $ = (id) => document.getElementById(id);
   const loader = $('loader');
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1898,9 +1983,12 @@
   }
   const phone = isHandheld();
   // 1.5× while the journey is up, 2× after. A chosen Ultra tier still respects the cap.
+  // Ultra (the owner's default) draws at the screen's full pixel ratio once the journey canvas is gone (3× on an
+  // iPhone); other tiers stay at 2×. A lost WebGL context reloads on Légère (recoverLight), so this cannot loop.
   function phoneDprCap() {
     if (!phone) return Infinity;
-    return intro.active ? 1.5 : 2;
+    if (intro.active) return 1.5;
+    return tier && tier.ultra ? 3 : 2;
   }
   const renderScale = (t) => {
     const cap = phoneDprCap();
@@ -1924,10 +2012,14 @@
   // Pinned by ?qualite=ultra|haute|equilibree|legere, or by the selector in the menu (saved in this browser).
   const QUALITY_KEY = 'nour.quality';
   const TIER_BY_CHOICE = { ultra: 'ultra', haute: 'high', equilibree: 'balanced', legere: 'light' };
+  // The owner wants the sharpest picture by default: Ultra unless the visitor picked something else (Auto included,
+  // which is saved as 'auto' so it is not replaced by the default on the next visit).
+  const DEFAULT_QUALITY = 'ultra';
+  const validQuality = (c) => !!TIER_BY_CHOICE[c] || c === 'auto';
   function readQuality() {
     let choice = new URLSearchParams(location.search).get('qualite');
-    if (!TIER_BY_CHOICE[choice]) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
-    return TIER_BY_CHOICE[choice] ? choice : 'auto';
+    if (!validQuality(choice)) { try { choice = localStorage.getItem(QUALITY_KEY); } catch (e) { choice = null; } }
+    return validQuality(choice) ? choice : DEFAULT_QUALITY;
   }
   let quality = readQuality();
   // After a lost WebGL context the page reloads once and starts light for that visit only.
@@ -1936,7 +2028,8 @@
     recoverLight = sessionStorage.getItem('nour.recoverLight') === '1';
     if (recoverLight) sessionStorage.removeItem('nour.recoverLight');
   } catch (e) { recoverLight = false; }
-  let tierName = TIER_BY_CHOICE[quality] || ((phone || recoverLight) ? 'light' : detectTier());
+  // After a lost WebGL context, start light for that visit whatever the choice, so Ultra cannot crash the tab in a loop.
+  let tierName = recoverLight ? 'light' : (TIER_BY_CHOICE[quality] || (phone ? 'light' : detectTier()));
   let tier = TIERS[tierName];
 
   // ---------- Terrain: Terrarium-encoded heights (AWS Open Data) ----------
@@ -3518,7 +3611,7 @@
   }
   function setQuality(choice) {
     quality = choice;
-    try { if (choice === 'auto') localStorage.removeItem(QUALITY_KEY); else localStorage.setItem(QUALITY_KEY, choice); }
+    try { localStorage.setItem(QUALITY_KEY, choice); }
     catch (e) { /* storage blocked: the choice applies to this visit only */ }
     slowWindows = 0; fastWindows = 0; warmUntil = performance.now() + 6000;
     applyTier(TIER_BY_CHOICE[choice] || (phone ? 'light' : detectTier()));
@@ -3580,6 +3673,7 @@
     'The Light · Stream : radio-browser.info (radios et musique) · iptv-org (chaînes) · GDELT (actualité) · contours : Natural Earth via world-atlas',
     'Caméras : directs publiés par leurs propriétaires (Vision-Environnement, EarthCam, earthTV, PARIS TV, ANNnewsCH, FNN, Vatican Media, I Love You Venice) · webcams publiques et carte : widgets Windy.com · bande-son générée dans le navigateur',
     'Ouverture : planètes dessinées (illustrations, pas à l’échelle) · distances et diamètres : NASA, fiches planétaires',
+    'Vidéo d’accueil : enregistrement personnel, musique originale (Remastered)',
     'Rendu : CesiumJS · nuages décoratifs (non météorologiques) · limbe, bande verte et halo des lumières de nuit : approximations',
   ].join('<br>');
 
@@ -5948,7 +6042,7 @@
       const ctx = out.getContext('2d');
       ctx.drawImage(canvas, 0, 0);
       const px = Math.max(14, Math.round(out.width / 190));
-      const line = `Fatiha, c’est pour toi Rafa, ma rafale${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
+      const line = `Rafa · Mama, de la part d’Amine${activePlace ? ` · ${activePlace.name}` : ''} · Imagerie : Esri, Maxar, Earthstar Geographics · Relief : Tilezen Terrain Tiles (AWS Open Data) · NASA GIBS · CesiumJS · ${new Date().toISOString().slice(0, 10)}`;
       ctx.font = `${px}px "JetBrains Mono", Consolas, monospace`;
       ctx.fillStyle = 'rgba(8, 10, 16, 0.55)'; ctx.fillRect(0, out.height - px * 2.1, out.width, px * 2.1);
       ctx.fillStyle = 'rgba(244, 246, 250, 0.9)'; ctx.textBaseline = 'middle';
@@ -6074,7 +6168,7 @@
       tour.i += 1; tour.arrived = false;
       if (tour.i >= PLACES.length) {
         tourCount();
-        setCredit(['Fatiha · c’est pour toi Rafa, ma rafale', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
+        setCredit(['Rafa · Mama, de la part d’Amine', 'La lumière du dialogue', `${PLACES.length} lieux · relief et coordonnées réels`]);
         tourTimers.later(endTour, TOUR.finale);
         return;
       }
@@ -6285,12 +6379,12 @@
       }
       copyLink(link);
     }
-    function shareView() { shareLink(viewHash(), 'Une vue de la Terre, sur Fatiha'); }
+    function shareView() { shareLink(viewHash(), 'Une vue de la Terre, sur Rafa'); }
     $('btn-share').addEventListener('click', shareView);
     $('card-share').addEventListener('click', () => {
       const p = activePlace;
       if (!p) return;
-      shareLink(`#${p.id}${nightView ? '/nuit' : diveView ? '/plongee' : ''}`, `Fatiha · ${p.name}`, $('card-share'));
+      shareLink(`#${p.id}${nightView ? '/nuit' : diveView ? '/plongee' : ''}`, `Rafa · ${p.name}`, $('card-share'));
     });
 
     // ----- La Terre entière, aujourd'hui: NASA EPIC, the camera of DSCOVR at the Sun–Earth Lagrange point L1 -----
@@ -7263,7 +7357,7 @@
           : `<Polygon><tessellate>1</tessellate><outerBoundaryIs><LinearRing><coordinates>${coords(g.coordinates[0])}</coordinates></LinearRing></outerBoundaryIs></Polygon>`;
         return `<Placemark><name>${esc(p.title)}</name><description>${esc(p.note)}</description><TimeStamp><when>${p.t}</when></TimeStamp>${geo}</Placemark>`;
       }).join('\n');
-      return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Fatiha · journal d’enquête</name>\n${body}\n</Document></kml>\n`;
+      return `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2"><Document><name>Rafa · journal d’enquête</name>\n${body}\n</Document></kml>\n`;
     }
     function download(name, text, type) {
       const a = document.createElement('a');

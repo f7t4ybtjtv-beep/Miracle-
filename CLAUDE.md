@@ -147,8 +147,8 @@ python3 -m satlab bench --campaign standard --out results/standard
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
   Background music is one looping song (the owner's own, tags and cover stripped), played by
   `window.__music`, a block of the first script placed before the journey so it exists with or without it. There are two
-  songs to pick from (`TRACKS`: `audio/fond.mp3` "Originale" and `audio/fond-remaster.mp3` "Remaster"); the choice is kept
-  in `nour.piste` and set through the menu selector `#btn-track` (`[data-track]` buttons) via `__music.setTrack(id, tap)`,
+  songs to pick from (`TRACKS`: `audio/fond-remaster.mp3` "Remaster" and `audio/coeur-de-pierre.mp3`
+  "Cœur de Pierre", the owner's song and the default); the choice is kept in `nour.piste2` (new key so the new default reaches everyone) and set through the menu selector `#btn-track` (`[data-track]` buttons) via `__music.setTrack(id, tap)`,
   which swaps the source and keeps playing if a song is already on. Off until a
   "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the on/off choice
   is kept in `nour.musique` and a remembered "on" restarts at the next gesture. The Darija voice calls `duck()`, the main
@@ -163,6 +163,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.
+  The opening card shows the owner's family photo (`media/famille.jpg`, `.famille`, 560 px, kept small for the 33 MB hosting limit) above the dedication; under 560 px of height the card scrolls.
   The opening card also uses two other self-hosted fonts (Latin subset woff2 in `fatiha/fonts/`, each SIL OFL with its licence beside it, no outside
   request): Cormorant Garamond (`--font-display`) for the editorial titles — the big "Fatiha" and the journey planet names — and Pinyon Script
   (`--font-script`) for the handwritten dedication ("c'est pour toi Rafa, ma rafale" / "de la part de Mélissa"). Inter stays the UI face and
@@ -177,6 +178,22 @@ python3 -m satlab bench --campaign standard --out results/standard
   "Une personne a disparu" box in Enquête only lists official phone numbers.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
+  The welcome video (`.entry-video`, its own small script after the journey) is the owner's own screen recording
+  (a pull-back from the ground to space, 512×856 source) with the owner's "Remastered" song (`audio/fond-remaster.mp3`),
+  in two cuts so neither is cropped: `media/intro-portrait.mp4` (1080 wide) and `media/intro-landscape.mp4` (1920×1080,
+  the recording centred over a blurred copy), each with its poster and kept near 12 MB (the hosting upload limit is 16 MiB);
+  the script picks one by orientation at load and sets `src`/`poster` itself (no `<source>` in the markup). It plays once
+  and holds on its last frame; the "Son" button turns the sound on. `.claude/skills/fatiha-video` can still render the
+  earlier NASA EPIC push-in if the owner asks for it again.
+  `fatiha/planetes.html` (menu "Survol des planètes", a plain internal link) is a separate, dependency-free WebGL page: free
+  flight around eight bodies with equirectangular maps in `fatiha/media/maps/` (from the MIT npm package solar-system 0.1.46,
+  James Hastings-Trew's maps, see `LICENCE.txt` there; 1024 px wide, so blurry below ~100 km). `window.__planetes` is the test hook. The Sun follows the camera, about 60° to its side (`sun` is recomputed each frame), so relief and the terminator always show; `halo` per body draws an additive atmosphere glow (the back half of a larger sphere: this mesh winds clockwise, so `cullFace(gl.BACK)` keeps the far half).
+  Ultra HD for Lune, Mars and Mercure: NASA Trek WMTS tiles (`trek.nasa.gov`, CORS open, 256 px, level z has 2^(z+1) x 2^z
+  tiles, row 0 north; deepest level 8 Moon, 7 Mars/Mercury): the base map is redrawn from level 2 and an 8x8-tile window around
+  the camera is composited into one detail texture (`det`, `updateDetail`). The gas giants and Venus have no such source.
+  The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
+  (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
+  WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.
 
 All pages are independent — there's no shared CSS/JS file. If a style or
 behavior needs to change in both, edit each `<style>`/`<script>` block

@@ -1,0 +1,4 @@
+Cartes des planètes (mercure, venus, lune, mars, jupiter, saturne, anneaux, uranus, neptune) :
+copiées du paquet npm « solar-system » 0.1.46, publié sous licence MIT. Ces cartes sont celles
+de James Hastings-Trew (Planet Pixel Emporium), assemblées à partir d'images des sondes de la NASA.
+Seules la taille et le format ont été changés (WebP, 1024 × 512 au plus).
