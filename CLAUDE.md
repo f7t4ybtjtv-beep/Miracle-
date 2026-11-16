@@ -177,11 +177,13 @@ python3 -m satlab bench --campaign standard --out results/standard
   "Une personne a disparu" box in Enquête only lists official phone numbers.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
-  The welcome video (`.entry-video`, its own small script after the journey) is a slow push-in on one NASA EPIC
-  full-disc photograph (2048 px, 13 Nov. 2026) with the owner's soundtrack, rendered in two cuts so neither is cropped:
-  `media/intro-portrait.mp4` (1080×1920) and `media/intro-landscape.mp4` (1920×1080), each with its poster; the script
-  picks one by orientation at load and sets `src`/`poster` itself (no `<source>` in the markup). It plays once and holds
-  on its last frame; the "Son" button turns the sound on. The renderer used lives outside the repo.
+  The welcome video (`.entry-video`, its own small script after the journey) is the owner's own screen recording
+  (a pull-back from the ground to space, 512×856 source) with the owner's "Remastered" song (`audio/fond-remaster.mp3`),
+  in two cuts so neither is cropped: `media/intro-portrait.mp4` (1080 wide) and `media/intro-landscape.mp4` (1920×1080,
+  the recording centred over a blurred copy), each with its poster and kept near 12 MB (the hosting upload limit is 16 MiB);
+  the script picks one by orientation at load and sets `src`/`poster` itself (no `<source>` in the markup). It plays once
+  and holds on its last frame; the "Son" button turns the sound on. `.claude/skills/fatiha-video` can still render the
+  earlier NASA EPIC push-in if the owner asks for it again.
   The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
   (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
   WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.
