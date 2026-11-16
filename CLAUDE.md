@@ -163,6 +163,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   The title card shows Qur'an 51:47 (`.verse`): Uthmani Arabic and Muhammad Hamidullah's French translation, both copied
   from a reference edition. Never retype or reword either. System fonts lose some Uthmani signs, so the verse uses the bundled
   Amiri Quran font (`fatiha/fonts/`, SIL OFL, licence beside it); check `document.fonts` shows it loaded before judging a capture.
+  The opening card shows the owner's family photo (`media/famille.jpg`, `.famille`, 560 px, kept small for the 33 MB hosting limit) above the dedication; under 560 px of height the card scrolls.
   The opening card also uses two other self-hosted fonts (Latin subset woff2 in `fatiha/fonts/`, each SIL OFL with its licence beside it, no outside
   request): Cormorant Garamond (`--font-display`) for the editorial titles — the big "Fatiha" and the journey planet names — and Pinyon Script
   (`--font-script`) for the handwritten dedication ("c'est pour toi Rafa, ma rafale" / "de la part de Mélissa"). Inter stays the UI face and
