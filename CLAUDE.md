@@ -147,7 +147,7 @@ python3 -m satlab bench --campaign standard --out results/standard
   star field) is drawn once per size by `buildSky()`; the 420 streaming stars are sorted by tint to keep colour changes few.
   Background music is one looping song (the owner's own, tags and cover stripped), played by
   `window.__music`, a block of the first script placed before the journey so it exists with or without it. There are two
-  songs to pick from (`TRACKS`: `audio/fond.mp3` "Originale" and `audio/fond-remaster.mp3` "Remaster"); the choice is kept
+  songs to pick from (`TRACKS`: `audio/fond.mp3` "Originale" and `audio/fond-remaster.mp3` "Remaster", the default); the choice is kept
   in `nour.piste` and set through the menu selector `#btn-track` (`[data-track]` buttons) via `__music.setTrack(id, tap)`,
   which swaps the source and keeps playing if a song is already on. Off until a
   "Musique" button is tapped (journey pill `#intro-music`, menu option `#btn-music`, both marked `data-music`); the on/off choice
@@ -177,6 +177,11 @@ python3 -m satlab bench --campaign standard --out results/standard
   "Une personne a disparu" box in Enquête only lists official phone numbers.
   The 5K image button renders into a bigger drawing buffer (`viewer.resolutionScale`), so it sets `capturing` to
   keep the FPS monitor from downgrading quality, and it is disabled over Google 3D tiles (Google's terms).
+  The welcome video (`.entry-video`, its own small script after the journey) is a slow push-in on one NASA EPIC
+  full-disc photograph (2048 px, 13 Nov. 2026) with the owner's soundtrack, rendered in two cuts so neither is cropped:
+  `media/intro-portrait.mp4` (1080×1920) and `media/intro-landscape.mp4` (1920×1080), each with its poster; the script
+  picks one by orientation at load and sets `src`/`poster` itself (no `<source>` in the markup). It plays once and holds
+  on its last frame; the "Son" button turns the sound on. The renderer used lives outside the repo.
   The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
   (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
   WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.
