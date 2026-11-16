@@ -187,6 +187,9 @@ python3 -m satlab bench --campaign standard --out results/standard
   `fatiha/planetes.html` (menu "Survol des planètes", a plain internal link) is a separate, dependency-free WebGL page: free
   flight around eight bodies with equirectangular maps in `fatiha/media/maps/` (from the MIT npm package solar-system 0.1.46,
   James Hastings-Trew's maps, see `LICENCE.txt` there; 1024 px wide, so blurry below ~100 km). `window.__planetes` is the test hook.
+  Ultra HD for Lune, Mars and Mercure: NASA Trek WMTS tiles (`trek.nasa.gov`, CORS open, 256 px, level z has 2^(z+1) x 2^z
+  tiles, row 0 north; deepest level 8 Moon, 7 Mars/Mercury): the base map is redrawn from level 2 and an 8x8-tile window around
+  the camera is composited into one detail texture (`det`, `updateDetail`). The gas giants and Venus have no such source.
   The owner wants the sharpest picture: quality defaults to Ultra (`DEFAULT_QUALITY`) on every device, phones included
   (still capped at 2× pixels there); a visitor's choice, Auto included, is saved in `nour.quality` and wins. After a lost
   WebGL context the reload starts Légère for that visit whatever the choice, so Ultra cannot crash a phone in a loop.

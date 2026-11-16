@@ -46,7 +46,7 @@
 </header>
 <p class="hint" id="hint">Glisse pour survoler · pince ou molette pour descendre</p>
 <p class="alt" id="alt" aria-live="off"></p>
-<p class="credit">Cartes d’après les sondes de la NASA (J. Hastings-Trew), licence dans media/maps</p>
+<p class="credit" id="credit">Cartes d’après les sondes de la NASA (J. Hastings-Trew), licence dans media/maps</p>
 <nav id="list" aria-label="Choisir une planète"></nav>
 <div class="nogl" id="nogl">Ton navigateur ne peut pas afficher la 3D ici.</div>
 <script>
@@ -54,10 +54,10 @@
   'use strict';
   // Equatorial diameters, NASA planetary fact sheets (rounded to the km).
   const BODIES = [
-    { id: 'mercure', name: 'Mercure', km: 4879 },
+    { id: 'mercure', name: 'Mercure', km: 4879, trek: 'Mercury/EQ/Mercury_MESSENGER_MDIS_Basemap_EnhancedColor_Mosaic_Global_665m', max: 7, credit: 'Mercure HD : NASA/JHUAPL/Carnegie, MESSENGER MDIS (NASA Trek)' },
     { id: 'venus',   name: 'Vénus',   km: 12104, atmo: [1.0, 0.85, 0.55] },
-    { id: 'lune',    name: 'La Lune', km: 3475 },
-    { id: 'mars',    name: 'Mars',    km: 6792, atmo: [0.95, 0.6, 0.45] },
+    { id: 'lune',    name: 'La Lune', km: 3475, trek: 'Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02', max: 8, credit: 'Lune HD : NASA/GSFC/ASU, LRO WAC (NASA Trek)' },
+    { id: 'mars',    name: 'Mars',    km: 6792, atmo: [0.95, 0.6, 0.45], trek: 'Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m', max: 7, credit: 'Mars HD : NASA/USGS, Viking MDIM 2.1 (NASA Trek)' },
     { id: 'jupiter', name: 'Jupiter', km: 142984, atmo: [0.95, 0.85, 0.7] },
     { id: 'saturne', name: 'Saturne', km: 120536, atmo: [0.95, 0.88, 0.65], rings: [1.24, 2.27] },
     { id: 'uranus',  name: 'Uranus',  km: 51118, atmo: [0.6, 0.9, 0.95] },
@@ -86,11 +86,19 @@
   const planetProg = program(`
     attribute vec3 pos; uniform mat4 mvp; varying vec3 n;
     void main() { n = pos; gl_Position = mvp * vec4(pos, 1.0); }`, `
-    precision highp float; varying vec3 n; uniform sampler2D map; uniform vec3 sun, eye, atmo; uniform float hasAtmo, high;
+    precision highp float; varying vec3 n; uniform sampler2D map, detail; uniform vec4 rect; uniform float useDetail; uniform vec3 sun, eye, atmo; uniform float hasAtmo, high;
     void main() {
       vec3 N = normalize(n);
       float u = 0.5 + atan(N.x, -N.z) / 6.2831853, v = 0.5 - asin(clamp(N.y, -1.0, 1.0)) / 3.1415927;
       vec3 col = texture2D(map, vec2(u, v)).rgb;
+      if (useDetail > 0.5) {
+        float du = u - rect.x; du -= floor(du);
+        vec2 q = vec2(du / rect.z, (v - rect.y) / rect.w);
+        if (q.x > 0.0 && q.x < 1.0 && q.y > 0.0 && q.y < 1.0) {
+          vec2 e = min(q, 1.0 - q); float w = smoothstep(0.0, 0.08, min(e.x, e.y));
+          col = mix(col, texture2D(detail, q).rgb, w);
+        }
+      }
       float d = dot(N, sun), light = smoothstep(-0.08, 0.35, d) * 0.97 + 0.03;
       vec3 V = normalize(eye - N);
       float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0) * smoothstep(-0.25, 0.4, d) * hasAtmo * high;
@@ -145,6 +153,7 @@
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([20, 20, 24, 255]));
     const im = new Image();
     im.onload = () => {
+      textureImages[src] = im;
       gl.bindTexture(gl.TEXTURE_2D, t);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, im);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -157,6 +166,57 @@
     im.src = src;
     return t;
   }
+
+  // Ultra HD: NASA Trek WMTS tiles (geographic, 256 px, level z = 2^(z+1) x 2^z tiles, row 0 at the north).
+  // A 8x8-tile window around the point under the camera is composited into one texture at the level the height
+  // needs; the base map is redrawn from level 2 (2048 px) once. Outside the window the base map shows.
+  const N = 8, TS = 256, TREK = 'https://trek.nasa.gov/tiles/';
+  const det = { canvas: document.createElement('canvas'), key: '', rect: [0, 0, 1, 1], tex: gl.createTexture(), dirty: false, ready: false, gen: 0, loaded: 0, failed: 0 };
+  det.canvas.width = det.canvas.height = N * TS;
+  const dctx = det.canvas.getContext('2d');
+  const base = { canvas: document.createElement('canvas'), tex: null, id: '', dirty: false };
+  base.canvas.width = 2048; base.canvas.height = 1024;
+  const bctx = base.canvas.getContext('2d');
+  function tileUrl(b, z, y, x) { return TREK + b.trek + '/1.0.0/default/default028mm/' + z + '/' + y + '/' + x + '.jpg'; }
+  function loadTile(url, cb) { const im = new Image(); im.crossOrigin = 'anonymous'; im.onload = () => cb(im); im.onerror = () => { det.failed++; }; im.src = url; }
+  function setupTex(t, src) {
+    gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  }
+  function baseHD(b) {
+    if (base.id === b.id) return; base.id = b.id; base.tex = null; base.n = 0;
+    bctx.drawImage(textureImages['media/maps/' + b.id + '.webp'] || det.canvas, 0, 0, 2048, 1024);
+    for (let y = 0; y < 4; y++) for (let x = 0; x < 8; x++) loadTile(tileUrl(b, 2, y, x), (im) => {
+      if (base.id !== b.id) return; bctx.drawImage(im, x * TS, y * TS); det.loaded++; if (++base.n === 32) base.dirty = true;
+    });
+  }
+  function updateDetail(b, lon, lat, h) {
+    if (!b.trek) { det.ready = false; return; }
+    baseHD(b);
+    if (base.dirty) { if (!base.tex) base.tex = gl.createTexture(); setupTex(base.tex, base.canvas); base.dirty = false; }
+    // Level whose 8 tiles cover about three times the visible ground.
+    let z = Math.floor(Math.log2(8 * Math.PI / (3 * Math.max(Math.min(h, 1.2), 1e-4))));
+    z = Math.min(z, b.max);
+    if (z < 3) { det.ready = false; return; }
+    const cols = 2 ** (z + 1), rows = 2 ** z;
+    const u = ((lon / (2 * Math.PI) + 0.5) % 1 + 1) % 1, v = 0.5 - lat / Math.PI;
+    const x0 = Math.round(u * cols - N / 2), y0 = Math.max(0, Math.min(rows - N, Math.round(v * rows - N / 2)));
+    const key = b.id + '/' + z + '/' + x0 + '/' + y0;
+    if (key === det.key) return;
+    // Keep the old window shown until the new one has tiles; start from the base map scaled into place.
+    det.key = key; const g = ++det.gen;
+    dctx.drawImage(base.canvas, ((x0 % cols) + cols) % cols / cols * 2048, y0 / rows * 1024, N / cols * 2048, N / rows * 1024, 0, 0, N * TS, N * TS);
+    const rect = [(((x0 % cols) + cols) % cols) / cols, y0 / rows, N / cols, N / rows];
+    for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) {
+      const x = (((x0 + i) % cols) + cols) % cols, y = y0 + j;
+      loadTile(tileUrl(b, z, y, x), (im) => {
+        if (g !== det.gen) return; dctx.drawImage(im, i * TS, j * TS); det.loaded++;
+        det.rect = rect; det.dirty = true; det.ready = true;
+      });
+    }
+  }
+  const textureImages = {};
 
   // Matrices (column-major)
   function persp(fov, asp, n, f) { const t = 1 / Math.tan(fov / 2); return [t / asp, 0, 0, 0, 0, t, 0, 0, 0, 0, (f + n) / (n - f), -1, 0, 0, 2 * f * n / (n - f), 0]; }
@@ -172,10 +232,10 @@
   // Camera: longitude, latitude and height above the surface in planet radii; "goal" values are eased toward.
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const cam = { lon: 1.75, lat: 0.25, h: 2.2 }, goal = { lon: 1.75, lat: 0.25, h: 2.2 };
-  const H_MIN = 0.02, H_MAX = 9;
+  const H_MIN = 0.0015, H_MAX = 9;
   let body = BODIES[3], idle = 0, lastT = performance.now();
   const sun = norm([0.9, 0.25, 0.6]);
-  const api = window.__planetes = { loaded: 0, failed: 0, frames: 0, cam, goal, get body() { return body.id; }, select };
+  const api = window.__planetes = { loaded: 0, failed: 0, frames: 0, cam, goal, get body() { return body.id; }, select, det };
 
   const nav = $('list');
   BODIES.forEach((b) => {
@@ -187,7 +247,8 @@
     texture('media/maps/' + body.id + '.webp');
     if (body.rings) texture('media/maps/anneaux.png');
     $('name').textContent = body.name;
-    $('fact').textContent = fmt.format(body.km) + ' km de diamètre';
+    $('fact').textContent = fmt.format(body.km) + ' km de diamètre' + (body.trek ? ' · ultra HD' : '');
+    $('credit').textContent = body.credit || 'Carte d’après les sondes de la NASA (J. Hastings-Trew), licence dans media/maps';
     nav.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.id === body.id)));
     document.title = 'Rafa · ' + body.name;
     goal.h = body.rings ? 4.2 : 2.2; goal.lon = cam.lon = 1.75; cam.h = reduced ? goal.h : goal.h * 2.5; goal.lat = body.rings ? 0.32 : 0.2;
@@ -218,7 +279,7 @@
   const up = (e) => { pts.delete(e.pointerId); pinch = 0; };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
   canvas.addEventListener('wheel', (e) => { e.preventDefault(); zoom(Math.exp(e.deltaY * 0.0015)); touched(); }, { passive: false });
-  function zoom(f) { goal.h = Math.max(H_MIN, Math.min(H_MAX, goal.h * f)); }
+  function zoom(f) { goal.h = Math.max(body.trek ? H_MIN : 0.02, Math.min(H_MAX, goal.h * f)); }
   addEventListener('keydown', (e) => {
     const s = Math.min(goal.h, 1.5) * 0.08, m = { ArrowLeft: [-s, 0], ArrowRight: [s, 0], ArrowUp: [0, s], ArrowDown: [0, -s] }[e.key];
     if (m) { goal.lon += m[0]; goal.lat = Math.max(-1.45, Math.min(1.45, goal.lat + m[1])); touched(); e.preventDefault(); }
@@ -265,8 +326,14 @@
     gl.useProgram(planetProg.p);
     gl.uniformMatrix4fv(planetProg.u.mvp, false, vp);
     gl.uniform3fv(planetProg.u.sun, sun); gl.uniform3fv(planetProg.u.eye, eye);
+    updateDetail(body, cam.lon, cam.lat, cam.h);
+    if (det.dirty) { setupTex(det.tex, det.canvas); det.dirty = false; }
+    const hd = body.trek && det.ready && det.key.startsWith(body.id + '/');
+    gl.uniform1f(planetProg.u.useDetail, hd ? 1 : 0); gl.uniform4fv(planetProg.u.rect, det.rect);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, det.tex); gl.uniform1i(planetProg.u.detail, 1);
+    gl.activeTexture(gl.TEXTURE0);
     gl.uniform3fv(planetProg.u.atmo, body.atmo || [0, 0, 0]); gl.uniform1f(planetProg.u.hasAtmo, body.atmo ? 1 : 0); gl.uniform1f(planetProg.u.high, Math.min(1, Math.max(0, (cam.h - 0.05) / 0.6)));
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, texture('media/maps/' + body.id + '.webp')); gl.uniform1i(planetProg.u.map, 0);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, (body.trek && base.id === body.id && base.tex) || texture('media/maps/' + body.id + '.webp')); gl.uniform1i(planetProg.u.map, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, sphereBuf); gl.enableVertexAttribArray(planetProg.pos); gl.vertexAttribPointer(planetProg.pos, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereIdx);
     gl.drawElements(gl.TRIANGLES, idx.length, big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, 0);
