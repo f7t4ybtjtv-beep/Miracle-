@@ -22,9 +22,13 @@
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
   .title { margin-left: auto; text-align: right; text-shadow: 0 1px 8px #000; }
   .title h1 { margin: 0; font: 500 clamp(30px, 7vw, 46px)/1 "Cormorant Garamond", Georgia, serif; letter-spacing: 0.01em; }
+  .title .kick { display: block; margin-bottom: 6px; font: 500 10.5px/1 "JetBrains Mono", ui-monospace, monospace; letter-spacing: .24em; text-transform: uppercase; color: var(--accent); opacity: .85; }
+  body::after { content: ""; position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(2, 3, 8, 0.55) 100%); }
+  header, nav, .hint, .alt, .credit { z-index: 1; }
   .title p { margin: 4px 0 0; color: var(--dim); font-size: 13px; }
   nav { position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px max(14px, env(safe-area-inset-bottom));
     display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; background: linear-gradient(transparent, rgba(4, 6, 11, 0.8)); }
+  nav { -webkit-mask-image: linear-gradient(90deg, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 88%, transparent); }
   nav::-webkit-scrollbar { display: none; }
   nav button { flex: none; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid var(--line);
     background: rgba(4, 6, 11, 0.55); color: var(--ink); font: inherit; cursor: pointer; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
@@ -42,7 +46,7 @@
 <canvas id="c" aria-label="Planète en 3D : glisse pour tourner autour, pince ou molette pour t’approcher"></canvas>
 <header>
   <a class="back" href="./#" aria-label="Retour à la Terre">← Terre</a>
-  <div class="title"><h1 id="name">Mars</h1><p id="fact"></p></div>
+  <div class="title"><span class="kick">Survol libre</span><h1 id="name">Mars</h1><p id="fact"></p></div>
 </header>
 <p class="hint" id="hint">Glisse pour survoler · pince ou molette pour descendre</p>
 <p class="alt" id="alt" aria-live="off"></p>
@@ -55,13 +59,13 @@
   // Equatorial diameters, NASA planetary fact sheets (rounded to the km).
   const BODIES = [
     { id: 'mercure', name: 'Mercure', km: 4879, trek: 'Mercury/EQ/Mercury_MESSENGER_MDIS_Basemap_EnhancedColor_Mosaic_Global_665m', max: 7, credit: 'Mercure HD : NASA/JHUAPL/Carnegie, MESSENGER MDIS (NASA Trek)' },
-    { id: 'venus',   name: 'Vénus',   km: 12104, atmo: [1.0, 0.85, 0.55] },
+    { id: 'venus',   name: 'Vénus',   km: 12104, atmo: [1.0, 0.85, 0.55], halo: 0.05 },
     { id: 'lune',    name: 'La Lune', km: 3475, trek: 'Moon/EQ/LRO_WAC_Mosaic_Global_303ppd_v02', max: 8, credit: 'Lune HD : NASA/GSFC/ASU, LRO WAC (NASA Trek)' },
-    { id: 'mars',    name: 'Mars',    km: 6792, atmo: [0.95, 0.6, 0.45], trek: 'Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m', max: 7, credit: 'Mars HD : NASA/USGS, Viking MDIM 2.1 (NASA Trek)' },
-    { id: 'jupiter', name: 'Jupiter', km: 142984, atmo: [0.95, 0.85, 0.7] },
-    { id: 'saturne', name: 'Saturne', km: 120536, atmo: [0.95, 0.88, 0.65], rings: [1.24, 2.27] },
-    { id: 'uranus',  name: 'Uranus',  km: 51118, atmo: [0.6, 0.9, 0.95] },
-    { id: 'neptune', name: 'Neptune', km: 49528, atmo: [0.45, 0.65, 1.0] },
+    { id: 'mars',    name: 'Mars',    km: 6792, atmo: [0.95, 0.6, 0.45], halo: 0.025, trek: 'Mars/EQ/Mars_Viking_MDIM21_ClrMosaic_global_232m', max: 7, credit: 'Mars HD : NASA/USGS, Viking MDIM 2.1 (NASA Trek)' },
+    { id: 'jupiter', name: 'Jupiter', km: 142984, atmo: [0.95, 0.85, 0.7], halo: 0.03 },
+    { id: 'saturne', name: 'Saturne', km: 120536, atmo: [0.95, 0.88, 0.65], halo: 0.03, rings: [1.24, 2.27] },
+    { id: 'uranus',  name: 'Uranus',  km: 51118, atmo: [0.6, 0.9, 0.95], halo: 0.04 },
+    { id: 'neptune', name: 'Neptune', km: 49528, atmo: [0.45, 0.65, 1.0], halo: 0.04 },
   ];
   const fmt = new Intl.NumberFormat('fr-FR');
   const $ = (id) => document.getElementById(id);
@@ -99,10 +103,16 @@
           col = mix(col, texture2D(detail, q).rgb, w);
         }
       }
-      float d = dot(N, sun), light = smoothstep(-0.08, 0.35, d) * 0.97 + 0.03;
+      float d = dot(N, sun);
       vec3 V = normalize(eye - N);
-      float rim = pow(1.0 - max(dot(N, V), 0.0), 3.0) * smoothstep(-0.25, 0.4, d) * hasAtmo * high;
-      gl_FragColor = vec4(col * light + atmo * rim * 0.75, 1.0);
+      float mu = max(dot(N, V), 0.0);
+      // Soft Lambert terminator, a little limb darkening (stronger on the gas giants), faint earthshine-like ambient.
+      float light = smoothstep(-0.06, 0.55, d) * mix(1.0, pow(mu, 0.35), mix(0.18, 0.45, hasAtmo)) + 0.025;
+      float rim = pow(1.0 - mu, 3.0) * smoothstep(-0.25, 0.4, d) * hasAtmo * high;
+      vec3 c = col * light * 1.08 + atmo * rim * 0.6;
+      // Gentle filmic shoulder so bright deserts and clouds keep their detail.
+      c = c / (1.0 + c * 0.18) * 1.12;
+      gl_FragColor = vec4(c, 1.0);
     }`);
   // Saturn's rings: flat annulus in the equator plane, radial colour strip, planet shadow.
   const ringProg = program(`
@@ -116,11 +126,25 @@
       float t = -dot(p, sun); vec3 q = p + sun * t; float shadow = (t > 0.0 && length(q) < 1.0) ? 0.12 : 1.0;
       gl_FragColor = vec4(c * shadow * 0.95, a);
     }`);
+  // Atmosphere halo: the back half of a slightly larger sphere, glowing where the line of sight grazes the planet (additive).
+  const haloProg = program(`
+    attribute vec3 pos; uniform mat4 mvp; uniform float R; varying vec3 p;
+    void main() { p = pos * R; gl_Position = mvp * vec4(p, 1.0); }`, `
+    precision highp float; varying vec3 p; uniform vec3 eye, sun, atmo; uniform float R, k;
+    void main() {
+      vec3 D = normalize(p - eye);
+      float b = length(cross(eye, D));
+      float t = clamp((b - 1.0) / (R - 1.0), 0.0, 1.0);
+      float g = pow(1.0 - t, 2.6) * smoothstep(-0.35, 0.55, dot(normalize(p), sun));
+      gl_FragColor = vec4(atmo * g * k, 1.0);
+    }`);
   const starProg = program(`
     attribute vec3 pos; uniform mat4 vp; varying float b;
     void main() { b = fract(sin(dot(pos.xy, vec2(12.9898, 78.233))) * 43758.5453);
       vec4 c = vp * vec4(pos, 0.0); gl_Position = c.xyww; gl_PointSize = 1.0 + b * 1.6; }`, `
-    precision mediump float; varying float b; void main() { gl_FragColor = vec4(vec3(0.35 + b * 0.65), 1.0); }`);
+    precision mediump float; varying float b; void main() {
+      vec3 tint = b > 0.85 ? vec3(0.8, 0.88, 1.0) : (b < 0.12 ? vec3(1.0, 0.9, 0.78) : vec3(1.0));
+      gl_FragColor = vec4(tint * (0.3 + b * 0.7), 1.0); }`);
 
   function buffer(data) { const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW); return b; }
   // Sphere
@@ -234,7 +258,8 @@
   const cam = { lon: 1.75, lat: 0.25, h: 2.2 }, goal = { lon: 1.75, lat: 0.25, h: 2.2 };
   const H_MIN = 0.0015, H_MAX = 9;
   let body = BODIES[3], idle = 0, lastT = performance.now();
-  const sun = norm([0.9, 0.25, 0.6]);
+  // The Sun sits off to the side of the camera (like a probe's photo), so the relief and the day/night line show.
+  let sun = norm([0.9, 0.25, 0.6]);
   const api = window.__planetes = { loaded: 0, failed: 0, frames: 0, cam, goal, get body() { return body.id; }, select, det };
 
   const nav = $('list');
@@ -300,6 +325,7 @@
     cam.lon += (goal.lon - cam.lon) * k; cam.lat += (goal.lat - cam.lat) * k;
     cam.h = Math.exp(Math.log(cam.h) + (Math.log(goal.h) - Math.log(cam.h)) * (1 - Math.exp(-dt * 3)));
     resize();
+    { const sl = cam.lon + 1.05, sb = Math.max(-1.2, Math.min(1.2, cam.lat + 0.4)); sun = [Math.cos(sb) * Math.sin(sl), Math.sin(sb), -Math.cos(sb) * Math.cos(sl)]; }
     const r = 1 + cam.h, cl = Math.cos(cam.lat);
     const eye = [r * cl * Math.sin(cam.lon), r * Math.sin(cam.lat), -r * cl * Math.cos(cam.lon)];
     // Near the ground, tilt the view toward the horizon like an aircraft; from far, look at the centre.
@@ -338,6 +364,19 @@
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereIdx);
     gl.drawElements(gl.TRIANGLES, idx.length, big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, 0);
 
+    const halo = body.halo || 0;
+    if (halo && cam.h > halo + 0.02) {
+      gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE); gl.depthMask(false);
+      gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);   // this mesh winds clockwise, so BACK keeps the far half
+      gl.useProgram(haloProg.p);
+      gl.uniformMatrix4fv(haloProg.u.mvp, false, vp); gl.uniform1f(haloProg.u.R, 1 + halo);
+      gl.uniform3fv(haloProg.u.eye, eye); gl.uniform3fv(haloProg.u.sun, sun); gl.uniform3fv(haloProg.u.atmo, body.atmo);
+      gl.uniform1f(haloProg.u.k, 0.85 * Math.min(1, (cam.h - halo) / 0.3));
+      gl.bindBuffer(gl.ARRAY_BUFFER, sphereBuf); gl.enableVertexAttribArray(haloProg.pos); gl.vertexAttribPointer(haloProg.pos, 3, gl.FLOAT, false, 0, 0);
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, sphereIdx);
+      gl.drawElements(gl.TRIANGLES, idx.length, big ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT, 0);
+      gl.disable(gl.CULL_FACE); gl.depthMask(true); gl.disable(gl.BLEND);
+    }
     if (body.rings) {
       gl.enable(gl.BLEND); gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA); gl.depthMask(false);
       gl.useProgram(ringProg.p);
