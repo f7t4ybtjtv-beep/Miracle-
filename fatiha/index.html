@@ -800,9 +800,10 @@
       </div>
       <div class="quality track-pick" role="group" aria-label="Choix de la musique de fond" id="btn-track">
         <button type="button" data-track="fond" aria-pressed="false">Originale</button>
-        <button type="button" data-track="remaster" aria-pressed="true">Remaster</button>
+        <button type="button" data-track="remaster" aria-pressed="false">Remaster</button>
+        <button type="button" data-track="coeur" aria-pressed="true">Cœur de Pierre</button>
       </div>
-      <p class="note">Deux versions de la chanson, au choix pour le fond.</p>
+      <p class="note">Trois chansons au choix pour le fond.</p>
     </div>
     <div class="group">
       <div class="kicker">Carnet de voyage</div>
@@ -1228,13 +1229,14 @@ window.__entryVideo = (() => {
 // It sits here, before the journey, so it exists whether the journey runs or not.
 (() => {
   'use strict';
-  const KEY = 'nour.musique', PKEY = 'nour.piste', LEVEL = 0.35, LOW = 0.1;
-  // Two songs to choose from; the choice is kept in nour.piste. "remaster" is the default (the owner's choice).
+  const KEY = 'nour.musique', PKEY = 'nour.piste2', LEVEL = 0.35, LOW = 0.1;
+  // Three songs to choose from; the choice is kept in nour.piste2 (new key so everyone starts on the owner's new default, "coeur").
   const TRACKS = [
     { id: 'fond', src: 'audio/fond.mp3', label: 'Originale' },
     { id: 'remaster', src: 'audio/fond-remaster.mp3', label: 'Remaster' },
+    { id: 'coeur', src: 'audio/coeur-de-pierre.mp3', label: 'Cœur de Pierre' },
   ];
-  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0, track = 'remaster';
+  let on = false, armed = false, ducked = false, held = false, el = null, canFade = true, ramp = 0, plays = 0, track = 'coeur';
   const subs = new Set();
   const trackOf = (id) => TRACKS.find((t) => t.id === id) || TRACKS[0];
   const save = (v) => { try { localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) { /* private mode */ } };
